@@ -36,7 +36,7 @@ export function DocsHeader({
 
 				<DocsMobileNav groups={groups} />
 
-				<div className="ml-auto shrink-0 sm:mx-auto sm:w-full sm:max-w-96 sm:min-w-0">
+				<div className="ml-auto shrink-0 sm:mx-auto sm:w-full sm:max-w-96 sm:min-w-0 sm:shrink">
 					<DocsSearch entries={entries} />
 				</div>
 

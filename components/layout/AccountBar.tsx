@@ -8,6 +8,9 @@ import { Button } from '@/components/ui/Button';
 import { BRAND } from '@/lib/brand';
 import type { SessionUser } from '@/lib/types/session';
 
+const navLink =
+	'rounded-md px-2.5 py-1.5 text-body font-medium text-text-muted no-underline transition-colors duration-120 ease-out hover:bg-surface-hover hover:text-text hover:no-underline';
+
 export function AccountBar({ user }: { user: SessionUser | null }) {
 	return (
 		<header className="flex h-14 shrink-0 items-center gap-4 border-b border-border bg-bg px-6 sm:px-8">
@@ -15,6 +18,15 @@ export function AccountBar({ user }: { user: SessionUser | null }) {
 				<BrandMark size="sm" />
 				<span className="text-body font-semibold">{BRAND.name}</span>
 			</Link>
+
+			<nav aria-label="Main" className="hidden items-center gap-1 sm:flex">
+				<Link href="/docs" className={navLink}>
+					Docs
+				</Link>
+				<a href={BRAND.supportUrl} rel="external" className={navLink}>
+					Support
+				</a>
+			</nav>
 
 			<div className="flex-1" />
 

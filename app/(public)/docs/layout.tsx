@@ -9,20 +9,22 @@ export default function DocsLayout({ children }: { children: ReactNode }) {
 	const entries = docSearchIndex();
 
 	return (
-		<div className="flex min-h-svh flex-col">
+		<div className="flex min-h-svh flex-col lg:h-svh lg:min-h-0 lg:overflow-hidden">
 			<DocsHeader groups={groups} entries={entries} />
 
-			<div className="flex flex-1 items-start">
-				<aside className="sticky top-16 hidden h-[calc(100svh-4rem)] w-72 shrink-0 overflow-y-auto border-r border-border px-4 py-8 lg:block">
+			<div className="flex flex-1 lg:min-h-0">
+				<aside className="thin-scroll hidden w-72 shrink-0 overflow-y-auto border-r border-border px-4 py-8 lg:block">
 					<DocsNavTree groups={groups} />
 				</aside>
 
-				<div className="min-w-0 flex-1">
-					<div className="flex max-w-300 items-start gap-10 px-6 py-10 sm:px-10">{children}</div>
+				<div className="thin-scroll flex min-w-0 flex-1 flex-col lg:min-h-0 lg:overflow-y-auto">
+					<div className="mx-auto flex w-full max-w-300 flex-1 items-start gap-10 px-6 py-10 sm:px-10">
+						{children}
+					</div>
+
+					<PublicFooter />
 				</div>
 			</div>
-
-			<PublicFooter />
 		</div>
 	);
 }
