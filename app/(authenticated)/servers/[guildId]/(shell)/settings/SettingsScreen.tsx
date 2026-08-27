@@ -1,7 +1,7 @@
 'use client';
 
 import { Download, RotateCcw, Trash2, Upload } from 'lucide-react';
-import { useState, type ReactNode } from 'react';
+import { useCallback, useState, type ReactNode } from 'react';
 import { toast } from 'sonner';
 import { ConfirmDialog } from '@/components/management/ConfirmDialog';
 import { PageHeader } from '@/components/management/PageHeader';
@@ -11,18 +11,15 @@ import { Button } from '@/components/ui/Button';
 import { Field } from '@/components/ui/Field';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
-import { Switch } from '@/components/ui/Switch';
 import { BRAND } from '@/lib/brand';
 import { EMBED_SWATCHES } from '@/lib/discord-colors';
-import { useConfigDraft } from '@/lib/hooks/useConfigDraft';
-import { ROLE_LABELS, ROLE_ORDER } from '@/lib/team';
-import type { GuildSettings, TeamMember } from '@/lib/types/management';
+import { useConfigDraft, type SaveOutcome } from '@/lib/hooks/useConfigDraft';
+import { patchSettings } from '@/lib/settings-client';
+import type { GuildSettings } from '@/lib/types/management';
 
 const LOCALES = [
 	{ value: 'en-US', label: 'English (US)' },
-	{ value: 'pt-BR', label: 'Português (Brasil)' },
-	{ value: 'es-ES', label: 'Español' },
-	{ value: 'fr-FR', label: 'Français' }
+	{ value: 'pt-BR', label: 'Português (Brasil)' }
 ];
 
 const TIMEZONES = [
@@ -35,20 +32,26 @@ const TIMEZONES = [
 type Danger = 'reset' | 'remove' | null;
 
 type SettingsScreenProps = {
+	guildId: string;
 	settings: GuildSettings;
 	guildName: string;
-	team: TeamMember[];
 };
 
-export function SettingsScreen({ settings, guildName, team }: SettingsScreenProps) {
-	const form = useConfigDraft<GuildSettings>(settings);
+export function SettingsScreen({ guildId, settings, guildName }: SettingsScreenProps) {
+	const save = useCallback(
+		async (next: GuildSettings): Promise<SaveOutcome<GuildSettings>> => {
+			const result = await patchSettings(guildId, next);
+
+			return result.status === 'saved'
+				? { status: 'saved', saved: result.settings }
+				: { status: 'error', message: result.message };
+		},
+		[guildId]
+	);
+
+	const form = useConfigDraft<GuildSettings>(settings, { save });
 	const draft = form.draft;
 	const [danger, setDanger] = useState<Danger>(null);
-
-	const seats = ROLE_ORDER.map((role) => ({
-		role,
-		count: team.filter((member) => member.role === role).length
-	})).filter((seat) => seat.count > 0);
 
 	return (
 		<div className="w-full p-6 sm:p-8">
@@ -140,60 +143,6 @@ export function SettingsScreen({ settings, guildName, team }: SettingsScreenProp
 							className="max-w-80"
 						/>
 					</Field>
-
-					<Field
-						label="Legacy prefix"
-						hint="For the handful of text commands that predate slash commands."
-					>
-						<Input
-							value={draft.legacyPrefix}
-							onChange={(event) => {
-								form.set('legacyPrefix', event.target.value);
-							}}
-							maxLength={3}
-							className="w-20 font-mono"
-						/>
-					</Field>
-				</SettingsSection>
-
-				<SettingsSection title="Replies" description="What the bot does after it answers.">
-					<Switch
-						checked={draft.deleteCommandReplies}
-						onCheckedChange={(next) => {
-							form.set('deleteCommandReplies', next);
-						}}
-						label="Clean up command replies"
-						description="Deletes the bot answer after 30 seconds. Ephemeral replies are unaffected."
-					/>
-
-					<Switch
-						checked={draft.dmOnFailure}
-						onCheckedChange={(next) => {
-							form.set('dmOnFailure', next);
-						}}
-						label="DM the member when a command fails"
-						description="Rather than posting the error in the channel where everyone reads it."
-					/>
-				</SettingsSection>
-
-				<SettingsSection
-					title="Who can use the dashboard"
-					description="Change this on the Team screen."
-				>
-					<ul className="flex flex-wrap gap-x-6 gap-y-2">
-						{seats.map((seat) => (
-							<li key={seat.role} className="text-body-sm">
-								<span className="tabular font-semibold">{seat.count}</span>{' '}
-								<span className="text-text-muted">
-									{ROLE_LABELS[seat.role]}
-									{seat.count === 1 ? '' : 's'}
-								</span>
-							</li>
-						))}
-					</ul>
-					<p className="text-caption font-normal text-text-muted">
-						Plus anyone holding Manage Server in Discord, which {BRAND.name} cannot revoke.
-					</p>
 				</SettingsSection>
 
 				<SettingsSection
@@ -286,9 +235,16 @@ export function SettingsScreen({ settings, guildName, team }: SettingsScreenProp
 				state={form.state}
 				onDiscard={form.discard}
 				onSave={() => {
-					void form.save().then(() => {
-						toast.success('Settings saved');
-					});
+					void form.save().then(
+						(state) => {
+							if (state === 'idle') toast.success('Settings saved');
+						},
+						(error: unknown) => {
+							toast.error('Could not save', {
+								description: error instanceof Error ? error.message : 'Unknown failure'
+							});
+						}
+					);
 				}}
 				onResolveConflict={form.resolveConflict}
 			/>

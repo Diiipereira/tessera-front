@@ -151,8 +151,5 @@ export const mockGuildSettings: GuildSettings = {
 	locale: 'en-US',
 	timezone: 'America/Sao_Paulo',
 	embedColor: '#5865f2',
-	botNickname: '',
-	legacyPrefix: '!',
-	deleteCommandReplies: false,
-	dmOnFailure: true
+	botNickname: ''
 };

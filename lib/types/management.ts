@@ -160,7 +160,4 @@ export type GuildSettings = {
 	timezone: string;
 	embedColor: string;
 	botNickname: string;
-	legacyPrefix: string;
-	deleteCommandReplies: boolean;
-	dmOnFailure: boolean;
 };
