@@ -1,0 +1,19 @@
+export type SessionDeviceKind = 'desktop' | 'mobile';
+
+export type AccountSession = {
+	id: string;
+	deviceKind: SessionDeviceKind;
+	device: string;
+	browser: string;
+	location: string;
+	ip: string;
+	lastSeenAt: string;
+	current: boolean;
+};
+
+export type AccountPreferences = {
+	locale: string;
+	emailOnMention: boolean;
+	emailOnCase: boolean;
+	emailProduct: boolean;
+};

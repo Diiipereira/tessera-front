@@ -1,0 +1,519 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+@custom-variant sidebar-collapsed (&:where([data-sidebar='collapsed'] *));
+
+@font-face {
+	font-family: 'Inter';
+	font-style: normal;
+	font-weight: 100 900;
+	font-display: swap;
+	src: url('/fonts/Inter-Variable.woff2') format('woff2');
+}
+
+@font-face {
+	font-family: 'JetBrains Mono';
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+	src: url('/fonts/JetBrainsMono-400.woff2') format('woff2');
+}
+
+@font-face {
+	font-family: 'JetBrains Mono';
+	font-style: normal;
+	font-weight: 500;
+	font-display: swap;
+	src: url('/fonts/JetBrainsMono-500.woff2') format('woff2');
+}
+
+:root {
+	--bg: #ffffff;
+	--bg-subtle: #f8fafc;
+	--surface: #ffffff;
+	--surface-raised: #ffffff;
+	--surface-sunken: #f1f5f9;
+	--surface-hover: #f8fafc;
+
+	--border: #e2e8f0;
+	--border-strong: #cbd5e1;
+
+	--text: #0f172a;
+	--text-muted: #64748b;
+	--text-subtle: #94a3b8;
+	--text-inverse: #ffffff;
+
+	--primary: #5865f2;
+	--primary-hover: #4752e0;
+	--primary-active: #3841c4;
+	--primary-fg: #ffffff;
+	--primary-subtle: #eef0fe;
+	--primary-subtle-fg: #3841c4;
+
+	--success: #16a34a;
+	--success-subtle: #f0fdf4;
+	--success-fg: #14532d;
+	--warning: #d97706;
+	--warning-subtle: #fffbeb;
+	--warning-fg: #78350f;
+	--danger: #dc2626;
+	--danger-subtle: #fef2f2;
+	--danger-fg: #7f1d1d;
+	--danger-on: #ffffff;
+	--danger-hover: color-mix(in oklab, var(--danger) 85%, black);
+	--danger-active: color-mix(in oklab, var(--danger) 75%, black);
+	--info: #2563eb;
+	--info-subtle: #eff6ff;
+	--info-fg: #1e3a8a;
+
+	--ring: #5865f2;
+	--link: #4752e0;
+	--link-hover: #3841c4;
+	--switch-off: #64748b;
+	--tooltip: #0f172a;
+	--tooltip-fg: #ffffff;
+
+	--on-light: #0f172a;
+	--on-dark: #ffffff;
+
+	--discord: #5865f2;
+	--discord-hover: #4752e0;
+	--discord-fg: #ffffff;
+
+	--chart-1: #5865f2;
+	--chart-2: #0d9488;
+	--chart-3: #d97706;
+	--chart-4: #db2777;
+
+	--elevation-1: 0 1px 2px rgb(15 23 42 / 0.06);
+	--elevation-2: 0 4px 12px rgb(15 23 42 / 0.08);
+	--elevation-3: 0 16px 48px rgb(15 23 42 / 0.14);
+	--elevation-thumb: 0 1px 2px rgb(2 6 23 / 0.25);
+	--overlay: rgb(2 6 23 / 0.6);
+
+	--mesh:
+		radial-gradient(90% 70% at 8% 0%, #e0e3fd 0%, transparent 55%),
+		radial-gradient(70% 60% at 92% 6%, #eef0fe 0%, transparent 50%),
+		radial-gradient(120% 90% at 50% 100%, #f8fafc 0%, transparent 62%);
+}
+
+.dark {
+	--bg: #0a0c10;
+	--bg-subtle: #0f1218;
+	--surface: #14171f;
+	--surface-raised: #1b1f29;
+	--surface-sunken: #0a0c10;
+	--surface-hover: #1f2430;
+
+	--border: #262b36;
+	--border-strong: #363c4a;
+
+	--text: #f1f5f9;
+	--text-muted: #94a3b8;
+	--text-subtle: #64748b;
+	--text-inverse: #0f172a;
+
+	--primary: #6b77f5;
+	--primary-hover: #838df5;
+	--primary-active: #5865f2;
+	--primary-fg: #ffffff;
+	--primary-subtle: #1c2140;
+	--primary-subtle-fg: #a5adf8;
+
+	--success: #4ade80;
+	--success-subtle: #0b2818;
+	--success-fg: #86efac;
+	--warning: #fbbf24;
+	--warning-subtle: #2a1d05;
+	--warning-fg: #fcd34d;
+	--danger: #f87171;
+	--danger-subtle: #2a0f0f;
+	--danger-fg: #fca5a5;
+	--danger-on: #0f172a;
+	--danger-hover: color-mix(in oklab, var(--danger) 85%, black);
+	--danger-active: color-mix(in oklab, var(--danger) 75%, black);
+	--info: #60a5fa;
+	--info-subtle: #0c1a33;
+	--info-fg: #93c5fd;
+
+	--ring: #6b77f5;
+	--link: #a5adf8;
+	--link-hover: #c7ccfb;
+	--switch-off: #64748b;
+	--tooltip: #f1f5f9;
+	--tooltip-fg: #0f172a;
+
+	--chart-1: #6b77f5;
+	--chart-2: #0d9488;
+	--chart-3: #d97706;
+	--chart-4: #db2777;
+
+	--elevation-1: none;
+	--elevation-2: none;
+	--elevation-3: none;
+	--elevation-thumb: 0 1px 2px rgb(2 6 23 / 0.35);
+	--overlay: rgb(2 6 23 / 0.72);
+
+	--mesh:
+		radial-gradient(90% 70% at 8% 0%, #2e369e 0%, transparent 55%),
+		radial-gradient(70% 60% at 92% 6%, #3841c4 0%, transparent 50%),
+		radial-gradient(120% 90% at 50% 100%, #1a1f4d 0%, transparent 62%);
+}
+
+@theme {
+	--font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+	--font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+	--color-brand-50: #eef0fe;
+	--color-brand-100: #e0e3fd;
+	--color-brand-200: #c7ccfb;
+	--color-brand-300: #a5adf8;
+	--color-brand-400: #838df5;
+	--color-brand-500: #5865f2;
+	--color-brand-600: #4752e0;
+	--color-brand-700: #3841c4;
+	--color-brand-800: #2e369e;
+	--color-brand-900: #29307d;
+	--color-brand-950: #1a1f4d;
+
+	--radius-xs: 4px;
+	--radius-sm: 6px;
+	--radius-md: 8px;
+	--radius-lg: 12px;
+	--radius-xl: 16px;
+	--radius-2xl: 24px;
+
+	--text-display: 48px;
+	--text-display--line-height: 52px;
+	--text-display--font-weight: 700;
+	--text-display--letter-spacing: -0.02em;
+
+	--text-display-sm: 30px;
+	--text-display-sm--line-height: 36px;
+	--text-display-sm--font-weight: 700;
+	--text-display-sm--letter-spacing: -0.02em;
+
+	--text-h1: 30px;
+	--text-h1--line-height: 36px;
+	--text-h1--font-weight: 600;
+	--text-h1--letter-spacing: -0.015em;
+
+	--text-h2: 24px;
+	--text-h2--line-height: 32px;
+	--text-h2--font-weight: 600;
+	--text-h2--letter-spacing: -0.01em;
+
+	--text-h3: 20px;
+	--text-h3--line-height: 28px;
+	--text-h3--font-weight: 600;
+	--text-h3--letter-spacing: -0.005em;
+
+	--text-h4: 16px;
+	--text-h4--line-height: 24px;
+	--text-h4--font-weight: 600;
+
+	--text-body-lg: 16px;
+	--text-body-lg--line-height: 26px;
+
+	--text-body: 14px;
+	--text-body--line-height: 22px;
+
+	--text-body-sm: 13px;
+	--text-body-sm--line-height: 20px;
+
+	--text-caption: 12px;
+	--text-caption--line-height: 16px;
+	--text-caption--font-weight: 500;
+
+	--text-overline: 11px;
+	--text-overline--line-height: 14px;
+	--text-overline--font-weight: 600;
+	--text-overline--letter-spacing: 0.06em;
+
+	--ease-overlay: cubic-bezier(0.16, 1, 0.3, 1);
+
+	--animate-pop: pop 150ms cubic-bezier(0.16, 1, 0.3, 1);
+	--animate-fade-out: fade-out 100ms ease-out;
+	--animate-scale-in: scale-in 220ms cubic-bezier(0.16, 1, 0.3, 1);
+	--animate-slide-in-left: slide-in-left 220ms cubic-bezier(0.16, 1, 0.3, 1);
+	--animate-slide-in-right: slide-in-right 220ms cubic-bezier(0.16, 1, 0.3, 1);
+	--animate-rise: rise 260ms cubic-bezier(0.16, 1, 0.3, 1);
+	--animate-drift: drift 9s ease-in-out infinite;
+	--animate-dash: dash 1.6s linear infinite;
+
+	@keyframes dash {
+		to {
+			stroke-dashoffset: -24;
+		}
+	}
+
+	@keyframes drift {
+		0%,
+		100% {
+			opacity: 0.25;
+			transform: none;
+		}
+		50% {
+			opacity: 0.7;
+			transform: translateY(-6px);
+		}
+	}
+
+	@keyframes rise {
+		from {
+			transform: translateY(100%);
+		}
+		to {
+			transform: none;
+		}
+	}
+
+	@keyframes slide-in-left {
+		from {
+			transform: translateX(-100%);
+		}
+		to {
+			transform: none;
+		}
+	}
+
+	@keyframes slide-in-right {
+		from {
+			transform: translateX(100%);
+		}
+		to {
+			transform: none;
+		}
+	}
+
+	@keyframes scale-in {
+		from {
+			opacity: 0;
+			transform: scale(0.96);
+		}
+		to {
+			opacity: 1;
+			transform: none;
+		}
+	}
+
+	@keyframes pop {
+		from {
+			opacity: 0;
+			transform: scale(0.96) translateY(-4px);
+		}
+		to {
+			opacity: 1;
+			transform: none;
+		}
+	}
+
+	@keyframes fade-out {
+		from {
+			opacity: 1;
+		}
+		to {
+			opacity: 0;
+		}
+	}
+}
+
+/* `inline` keeps the var() reference in the utility, so these follow the theme. */
+@theme inline {
+	--color-bg: var(--bg);
+	--color-bg-subtle: var(--bg-subtle);
+	--color-surface: var(--surface);
+	--color-surface-raised: var(--surface-raised);
+	--color-surface-sunken: var(--surface-sunken);
+	--color-surface-hover: var(--surface-hover);
+
+	--color-border: var(--border);
+	--color-border-strong: var(--border-strong);
+
+	--color-text: var(--text);
+	--color-text-muted: var(--text-muted);
+	--color-text-subtle: var(--text-subtle);
+	--color-text-inverse: var(--text-inverse);
+
+	--color-primary: var(--primary);
+	--color-primary-hover: var(--primary-hover);
+	--color-primary-active: var(--primary-active);
+	--color-primary-fg: var(--primary-fg);
+	--color-primary-subtle: var(--primary-subtle);
+	--color-primary-subtle-fg: var(--primary-subtle-fg);
+
+	--color-success: var(--success);
+	--color-success-subtle: var(--success-subtle);
+	--color-success-fg: var(--success-fg);
+	--color-warning: var(--warning);
+	--color-warning-subtle: var(--warning-subtle);
+	--color-warning-fg: var(--warning-fg);
+	--color-danger: var(--danger);
+	--color-danger-subtle: var(--danger-subtle);
+	--color-danger-fg: var(--danger-fg);
+	--color-danger-on: var(--danger-on);
+	--color-danger-hover: var(--danger-hover);
+	--color-danger-active: var(--danger-active);
+	--color-info: var(--info);
+	--color-info-subtle: var(--info-subtle);
+	--color-info-fg: var(--info-fg);
+
+	--color-ring: var(--ring);
+	--color-link: var(--link);
+	--color-link-hover: var(--link-hover);
+	--color-switch-off: var(--switch-off);
+	--color-tooltip: var(--tooltip);
+	--color-tooltip-fg: var(--tooltip-fg);
+	--color-overlay: var(--overlay);
+
+	--color-on-light: var(--on-light);
+	--color-on-dark: var(--on-dark);
+
+	--color-discord: var(--discord);
+	--color-discord-hover: var(--discord-hover);
+	--color-discord-fg: var(--discord-fg);
+
+	--color-chart-1: var(--chart-1);
+	--color-chart-2: var(--chart-2);
+	--color-chart-3: var(--chart-3);
+	--color-chart-4: var(--chart-4);
+
+	--shadow-1: var(--elevation-1);
+	--shadow-2: var(--elevation-2);
+	--shadow-3: var(--elevation-3);
+	--shadow-thumb: var(--elevation-thumb);
+}
+
+/* Gradient only, no base colour, so it can sit as an absolute overlay inside a
+   section that already owns its background. --mesh flips with the theme. */
+@utility brand-mesh {
+	background-image: var(--mesh);
+}
+
+@utility thin-scroll {
+	/* Used by the sidebar rail and by any dialog whose body scrolls.
+	   The collapsed rail is 64px, so a default scrollbar eats a third of it and
+	   squashes the active pill into a portrait sliver. `both-edges` keeps the
+	   column centred; the width is what has to come down.
+	   Chromium treats `scrollbar-width` and `::-webkit-scrollbar` as mutually
+	   exclusive — set either standard property and the 5px below is ignored, so
+	   the webkit path has to reset them. Firefox has no webkit pseudo-element
+	   and keeps `thin`, which is as narrow as it goes there. */
+	scrollbar-width: thin;
+	scrollbar-color: var(--border-strong) transparent;
+	scrollbar-gutter: stable both-edges;
+}
+
+@supports selector(::-webkit-scrollbar) {
+	.thin-scroll {
+		scrollbar-width: auto;
+		scrollbar-color: auto;
+	}
+
+	.thin-scroll::-webkit-scrollbar {
+		width: 5px;
+	}
+
+	.thin-scroll::-webkit-scrollbar-track {
+		background: transparent;
+	}
+
+	.thin-scroll::-webkit-scrollbar-thumb {
+		background-color: var(--border-strong);
+		border-radius: 999px;
+	}
+
+	.thin-scroll:hover::-webkit-scrollbar-thumb {
+		background-color: var(--text-subtle);
+	}
+}
+
+@layer base {
+	* {
+		border-color: var(--border);
+	}
+
+	html {
+		-webkit-text-size-adjust: 100%;
+		scrollbar-width: thin;
+		scrollbar-color: var(--border-strong) transparent;
+	}
+
+	body {
+		background-color: var(--bg);
+		color: var(--text);
+		font-family: var(--font-sans);
+		font-optical-sizing: auto;
+		font-size: 14px;
+		line-height: 22px;
+		-webkit-font-smoothing: antialiased;
+		text-rendering: optimizeLegibility;
+	}
+
+	:focus-visible {
+		outline: 2px solid var(--ring);
+		outline-offset: 2px;
+	}
+
+	/* The native stepper cannot be styled, only removed. NumberInput draws its own
+	   chevrons; the input keeps type="number" so Up/Down and the mobile numeric
+	   keypad still work. */
+	input[type='number']::-webkit-outer-spin-button,
+	input[type='number']::-webkit-inner-spin-button {
+		appearance: none;
+		margin: 0;
+	}
+
+	input[type='number'] {
+		appearance: textfield;
+	}
+
+	/* Same reasoning as the stepper: the UA draws these in its own palette, ignores
+	   ours, and cannot be restyled — only removed. SearchInput draws the clear
+	   button and DateTimeInput draws the calendar one, both of which still open
+	   the native picker through showPicker(). */
+	input[type='search']::-webkit-search-cancel-button,
+	input[type='search']::-webkit-search-decoration {
+		appearance: none;
+	}
+
+	input[type='time']::-webkit-calendar-picker-indicator,
+	input[type='date']::-webkit-calendar-picker-indicator,
+	input[type='datetime-local']::-webkit-calendar-picker-indicator {
+		display: none;
+	}
+
+	/* The swatch keeps our border and radius instead of the UA's grey inset. */
+	input[type='color'] {
+		appearance: none;
+	}
+
+	input[type='color']::-webkit-color-swatch-wrapper {
+		padding: 0;
+	}
+
+	input[type='color']::-webkit-color-swatch {
+		border: none;
+		border-radius: 4px;
+	}
+
+	input[type='color']::-moz-color-swatch {
+		border: none;
+		border-radius: 4px;
+	}
+
+	.tabular {
+		font-variant-numeric: tabular-nums;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		*,
+		*::before,
+		*::after {
+			animation-duration: 0.01ms !important;
+			animation-iteration-count: 1 !important;
+			transition-duration: 0.01ms !important;
+			scroll-behavior: auto !important;
+		}
+	}
+}

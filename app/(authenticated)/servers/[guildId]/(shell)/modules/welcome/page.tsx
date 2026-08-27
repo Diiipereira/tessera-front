@@ -1,0 +1,41 @@
+import { redirect } from 'next/navigation';
+import { WelcomeSkeleton } from '@/components/skeletons/WelcomeSkeleton';
+import { apiGet } from '@/lib/api';
+import type { GuildModuleStateDto } from '@/lib/api-url';
+import { ApiUnreachableError, resolveGuild } from '@/lib/guild-access';
+import { loadChannels, loadRoles } from '@/lib/guild-shape';
+import { toWelcomeConfig, welcomeVariables } from '@/lib/modules/welcome';
+import { holdSkeleton } from '@/lib/skeleton-hold';
+import type { GuildPageProps } from '@/lib/types/page';
+import { WelcomeScreen } from './WelcomeScreen';
+
+export const metadata = { title: 'Welcome' };
+
+export default async function Page({ params, searchParams }: GuildPageProps) {
+	const [{ guildId }, query] = await Promise.all([params, searchParams]);
+	const guild = await resolveGuild(guildId);
+
+	if (query.state === 'loading') return <WelcomeSkeleton />;
+
+	await holdSkeleton(query);
+
+	const [state, channels, roles] = await Promise.all([
+		apiGet<GuildModuleStateDto>(`/guilds/${guildId}/modules/welcome`),
+		loadChannels(guildId),
+		loadRoles(guildId)
+	]);
+
+	if (state.status === 'unauthenticated') redirect('/login');
+	if (state.status === 'unreachable') throw new ApiUnreachableError(state.reason);
+
+	return (
+		<WelcomeScreen
+			guildId={guildId}
+			config={toWelcomeConfig(state.data)}
+			version={state.data.version}
+			channels={channels}
+			roles={roles}
+			variables={welcomeVariables(guild.name)}
+		/>
+	);
+}
