@@ -1,13 +1,14 @@
 'use client';
 
 import { Monitor, Moon, Sun, type LucideIcon } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useTheme, type ThemeMode } from '@/components/providers/theme-context';
 import { cn } from '@/lib/utils/cn';
 
-const options: { mode: ThemeMode; label: string; icon: LucideIcon }[] = [
-	{ mode: 'light', label: 'Light theme', icon: Sun },
-	{ mode: 'dark', label: 'Dark theme', icon: Moon },
-	{ mode: 'system', label: 'System theme', icon: Monitor }
+const options: { mode: ThemeMode; labelKey: string; icon: LucideIcon }[] = [
+	{ mode: 'light', labelKey: 'lightTheme', icon: Sun },
+	{ mode: 'dark', labelKey: 'darkTheme', icon: Moon },
+	{ mode: 'system', labelKey: 'systemTheme', icon: Monitor }
 ];
 
 const base =
@@ -19,13 +20,14 @@ const states = {
 };
 
 export function ThemeToggle() {
+	const t = useTranslations('shell');
 	const { mode, setMode } = useTheme();
 
 	return (
 		<div
 			className="flex items-center gap-0.5 rounded-md border border-border bg-surface-sunken p-0.5"
 			role="group"
-			aria-label="Theme"
+			aria-label={t('theme')}
 		>
 			{options.map((option) => {
 				const Icon = option.icon;
@@ -34,7 +36,7 @@ export function ThemeToggle() {
 					<button
 						key={option.mode}
 						type="button"
-						aria-label={option.label}
+						aria-label={t(option.labelKey)}
 						aria-pressed={active}
 						className={cn(base, active ? states.active : states.idle)}
 						onClick={() => {

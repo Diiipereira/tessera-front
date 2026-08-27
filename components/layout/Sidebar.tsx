@@ -1,6 +1,7 @@
 'use client';
 
 import { PanelLeftClose, PanelLeftOpen } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { BrandMark } from '@/components/auth/BrandMark';
 import { useSidebar } from '@/components/providers/sidebar-context';
 import { BRAND } from '@/lib/brand';
@@ -17,6 +18,7 @@ type SidebarProps = {
 };
 
 export function Sidebar({ guild, guilds, plan }: SidebarProps) {
+	const t = useTranslations('shell');
 	const { collapsed, toggle } = useSidebar();
 
 	return (
@@ -29,7 +31,7 @@ export function Sidebar({ guild, guilds, plan }: SidebarProps) {
 				<button
 					type="button"
 					aria-expanded={!collapsed}
-					aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+					aria-label={collapsed ? t('expandSidebar') : t('collapseSidebar')}
 					className="grid size-8 shrink-0 place-items-center rounded-md text-text-muted transition-colors duration-120 ease-out hover:bg-surface-hover hover:text-text sidebar-collapsed:size-10"
 					onClick={toggle}
 				>

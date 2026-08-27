@@ -1,6 +1,7 @@
 'use client';
 
 import { CircleQuestionMark, Menu, Search } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import type { RefObject } from 'react';
 import { useSidebar } from '@/components/providers/sidebar-context';
@@ -24,6 +25,7 @@ type TopbarProps = {
 };
 
 export function Topbar({ guild, user, onSearch, onOpenAccount, accountTriggerRef }: TopbarProps) {
+	const t = useTranslations('shell');
 	const { setMobileOpen } = useSidebar();
 	const shortcut = useShortcut('K');
 
@@ -31,7 +33,7 @@ export function Topbar({ guild, user, onSearch, onOpenAccount, accountTriggerRef
 		<header className="flex h-14 shrink-0 items-center gap-4 border-b border-border bg-bg px-4 sm:px-6">
 			<button
 				type="button"
-				aria-label="Open navigation"
+				aria-label={t('openNavigation')}
 				className={cn(iconButton, 'lg:hidden')}
 				onClick={() => {
 					setMobileOpen(true);
@@ -50,7 +52,7 @@ export function Topbar({ guild, user, onSearch, onOpenAccount, accountTriggerRef
 				onClick={onSearch}
 			>
 				<Search className="size-4 shrink-0" aria-hidden="true" />
-				<span className="min-w-0 flex-1 truncate text-left">Search or jump to…</span>
+				<span className="min-w-0 flex-1 truncate text-left">{t('searchOrJump')}</span>
 				<span className="rounded-sm border border-border px-1.5 font-mono text-caption font-normal whitespace-nowrap">
 					{shortcut}
 				</span>
@@ -58,7 +60,7 @@ export function Topbar({ guild, user, onSearch, onOpenAccount, accountTriggerRef
 
 			<button
 				type="button"
-				aria-label="Search"
+				aria-label={t('search')}
 				className={cn(iconButton, 'sm:hidden')}
 				onClick={onSearch}
 			>
@@ -67,7 +69,7 @@ export function Topbar({ guild, user, onSearch, onOpenAccount, accountTriggerRef
 
 			<ThemeToggle />
 
-			<Link href="/docs" aria-label="Help and docs" className={cn(iconButton, 'hidden sm:grid')}>
+			<Link href="/docs" aria-label={t('helpAndDocs')} className={cn(iconButton, 'hidden sm:grid')}>
 				<CircleQuestionMark className="size-4" aria-hidden="true" />
 			</Link>
 

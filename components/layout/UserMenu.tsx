@@ -11,6 +11,7 @@ import {
 	Sun,
 	User
 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import type { RefObject } from 'react';
 import { useTheme, type ThemeMode } from '@/components/providers/theme-context';
@@ -30,10 +31,10 @@ const item =
 const surface =
 	'z-60 rounded-lg border border-border-strong bg-surface-raised p-1 shadow-2 data-[state=open]:animate-pop';
 
-const themes: { mode: ThemeMode; label: string }[] = [
-	{ mode: 'light', label: 'Light' },
-	{ mode: 'dark', label: 'Dark' },
-	{ mode: 'system', label: 'System' }
+const themes: { mode: ThemeMode; labelKey: string }[] = [
+	{ mode: 'light', labelKey: 'themeLight' },
+	{ mode: 'dark', labelKey: 'themeDark' },
+	{ mode: 'system', labelKey: 'themeSystem' }
 ];
 
 type UserMenuProps = {
@@ -51,6 +52,7 @@ export function UserMenu({
 	collapsible = false,
 	compact = false
 }: UserMenuProps) {
+	const t = useTranslations('shell');
 	const { mode, setMode } = useTheme();
 
 	const triggerClass = compact
@@ -59,7 +61,7 @@ export function UserMenu({
 
 	return (
 		<DropdownMenu.Root>
-			<DropdownMenu.Trigger ref={triggerRef} aria-label="Account menu" className={triggerClass}>
+			<DropdownMenu.Trigger ref={triggerRef} aria-label={t('accountMenu')} className={triggerClass}>
 				<Avatar initials={user.initials} color={user.color} src={user.avatarUrl} shape="circle" />
 				{compact ? null : (
 					<>
@@ -92,14 +94,14 @@ export function UserMenu({
 					{onOpenAccount === undefined ? null : (
 						<DropdownMenu.Item className={item} onSelect={onOpenAccount}>
 							<User className="size-4 shrink-0 text-text-subtle" aria-hidden="true" />
-							<span className="flex-1">Account</span>
+							<span className="flex-1">{t('account')}</span>
 						</DropdownMenu.Item>
 					)}
 
 					<DropdownMenu.Sub>
 						<DropdownMenu.SubTrigger className={item}>
 							<Sun className="size-4 shrink-0 text-text-subtle" aria-hidden="true" />
-							<span className="flex-1">Theme</span>
+							<span className="flex-1">{t('theme')}</span>
 							<ChevronRight className="size-3.5 shrink-0 text-text-subtle" aria-hidden="true" />
 						</DropdownMenu.SubTrigger>
 						<DropdownMenu.Portal>
@@ -112,7 +114,7 @@ export function UserMenu({
 								>
 									{themes.map((option) => (
 										<DropdownMenu.RadioItem key={option.mode} value={option.mode} className={item}>
-											<span className="flex-1">{option.label}</span>
+											<span className="flex-1">{t(option.labelKey)}</span>
 											{mode === option.mode ? (
 												<Check className="size-4 shrink-0 text-primary" aria-hidden="true" />
 											) : null}
@@ -126,14 +128,14 @@ export function UserMenu({
 					<DropdownMenu.Item asChild>
 						<Link href="/docs" className={item}>
 							<BookOpen className="size-4 shrink-0 text-text-subtle" aria-hidden="true" />
-							<span className="flex-1">Docs</span>
+							<span className="flex-1">{t('docs')}</span>
 						</Link>
 					</DropdownMenu.Item>
 
 					<DropdownMenu.Item asChild>
 						<a href={BRAND.supportUrl} rel="external" className={item}>
 							<LifeBuoy className="size-4 shrink-0 text-text-subtle" aria-hidden="true" />
-							<span className="flex-1">Support</span>
+							<span className="flex-1">{t('support')}</span>
 						</a>
 					</DropdownMenu.Item>
 
@@ -142,7 +144,7 @@ export function UserMenu({
 					<DropdownMenu.Item asChild>
 						<Link href="/logout" className={item}>
 							<LogOut className="size-4 shrink-0 text-text-subtle" aria-hidden="true" />
-							<span className="flex-1">Sign out</span>
+							<span className="flex-1">{t('signOut')}</span>
 						</Link>
 					</DropdownMenu.Item>
 				</DropdownMenu.Content>

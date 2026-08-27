@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
+import { Translated } from '@/tests/i18n';
 import { PLANS, findPlan, formatPrice, monthlyEquivalentCents } from '@/lib/billing';
 import { PricingScreen } from './PricingScreen';
 
@@ -14,9 +15,11 @@ const pro = findPlan('pro');
 
 function renderPricing() {
 	return render(
-		<ThemeProvider>
-			<PricingScreen />
-		</ThemeProvider>
+		<Translated>
+			<ThemeProvider>
+				<PricingScreen />
+			</ThemeProvider>
+		</Translated>
 	);
 }
 

@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { Crown } from 'lucide-react';
 import { Meter } from '@/components/ui/Meter';
@@ -12,6 +13,8 @@ type PlanCardProps = {
 };
 
 export function PlanCard({ plan, guildId, collapsible = false }: PlanCardProps) {
+	const t = useTranslations('shell');
+
 	return (
 		<div
 			className={cn(
@@ -26,7 +29,7 @@ export function PlanCard({ plan, guildId, collapsible = false }: PlanCardProps) 
 					href={guildHref(guildId, '/billing')}
 					className="text-caption text-link hover:text-link-hover"
 				>
-					Manage
+					{t('managePlan')}
 				</Link>
 			</div>
 			<Meter

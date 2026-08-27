@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { SessionContext, type SessionState } from '@/components/providers/session-context';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
+import { Translated } from '@/tests/i18n';
 import type { SessionUser } from '@/lib/types/session';
 import { HeroActions } from './HeroActions';
 import { PublicHeaderActions } from './PublicHeaderActions';
@@ -41,9 +42,11 @@ const signedIn: SessionState = { status: 'signed-in', user };
 
 function withSession(state: SessionState, children: ReactNode) {
 	return render(
-		<ThemeProvider>
-			<SessionContext.Provider value={state}>{children}</SessionContext.Provider>
-		</ThemeProvider>
+		<Translated>
+			<ThemeProvider>
+				<SessionContext.Provider value={state}>{children}</SessionContext.Provider>
+			</ThemeProvider>
+		</Translated>
 	);
 }
 
