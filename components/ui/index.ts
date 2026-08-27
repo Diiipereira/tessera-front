@@ -3,6 +3,7 @@ export { Badge, type BadgeVariant } from './Badge';
 export { Button, type ButtonSize, type ButtonVariant } from './Button';
 export { Card } from './Card';
 export { Checkbox, type CheckedState } from './Checkbox';
+export { Combobox, type ComboboxOption } from './Combobox';
 export { DateTimeInput } from './DateTimeInput';
 export { Dialog, type DialogSize } from './Dialog';
 export { EmptyState } from './EmptyState';

@@ -1,13 +1,14 @@
 'use client';
 
 import { Download, RotateCcw, Trash2, Upload } from 'lucide-react';
-import { useCallback, useState, type ReactNode } from 'react';
+import { useCallback, useMemo, useState, type ReactNode } from 'react';
 import { toast } from 'sonner';
 import { ConfirmDialog } from '@/components/management/ConfirmDialog';
 import { PageHeader } from '@/components/management/PageHeader';
 import { SaveBar } from '@/components/modules/SaveBar';
 import { SettingsSection } from '@/components/modules/SettingsSection';
 import { Button } from '@/components/ui/Button';
+import { Combobox } from '@/components/ui/Combobox';
 import { Field } from '@/components/ui/Field';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
@@ -15,18 +16,12 @@ import { BRAND } from '@/lib/brand';
 import { EMBED_SWATCHES } from '@/lib/discord-colors';
 import { useConfigDraft, type SaveOutcome } from '@/lib/hooks/useConfigDraft';
 import { patchSettings } from '@/lib/settings-client';
+import { timezoneOptions } from '@/lib/timezones';
 import type { GuildSettings } from '@/lib/types/management';
 
 const LOCALES = [
 	{ value: 'en-US', label: 'English (US)' },
 	{ value: 'pt-BR', label: 'Português (Brasil)' }
-];
-
-const TIMEZONES = [
-	{ value: 'America/Sao_Paulo', label: 'America/São Paulo (GMT-3)' },
-	{ value: 'UTC', label: 'UTC' },
-	{ value: 'Europe/Lisbon', label: 'Europe/Lisbon (GMT+0)' },
-	{ value: 'America/New_York', label: 'America/New York (GMT-5)' }
 ];
 
 type Danger = 'reset' | 'remove' | null;
@@ -52,6 +47,7 @@ export function SettingsScreen({ guildId, settings, guildName }: SettingsScreenP
 	const form = useConfigDraft<GuildSettings>(settings, { save });
 	const draft = form.draft;
 	const [danger, setDanger] = useState<Danger>(null);
+	const timezones = useMemo(() => timezoneOptions(), []);
 
 	return (
 		<div className="w-full p-6 sm:p-8">
@@ -65,33 +61,36 @@ export function SettingsScreen({ guildId, settings, guildName }: SettingsScreenP
 					title="Language and time"
 					description="Everything the bot writes, and every schedule, follows these."
 				>
-					<Field
-						label="Server language"
-						hint="Bot replies use this, not each member's Discord locale."
-					>
-						<Select
-							options={LOCALES}
-							value={draft.locale}
-							onValueChange={(next) => {
-								form.set('locale', next);
-							}}
-							className="max-w-80"
-						/>
-					</Field>
+					<div className="grid gap-4 sm:grid-cols-2">
+						<Field
+							label="Server language"
+							hint="What the bot writes in Discord. Your dashboard language lives in your account."
+						>
+							<Select
+								options={LOCALES}
+								value={draft.locale}
+								onValueChange={(next) => {
+									form.set('locale', next);
+								}}
+							/>
+						</Field>
 
-					<Field
-						label="Timezone"
-						hint="Scheduled messages and daily resets run against this clock."
-					>
-						<Select
-							options={TIMEZONES}
-							value={draft.timezone}
-							onValueChange={(next) => {
-								form.set('timezone', next);
-							}}
-							className="max-w-80"
-						/>
-					</Field>
+						<Field
+							label="Timezone"
+							hint="Scheduled messages and daily resets run against this clock."
+						>
+							<Combobox
+								options={timezones}
+								value={draft.timezone}
+								onValueChange={(next) => {
+									form.set('timezone', next);
+								}}
+								placeholder="Pick a timezone"
+								searchPlaceholder="Search timezones"
+								emptyLabel="No timezone matches that."
+							/>
+						</Field>
+					</div>
 				</SettingsSection>
 
 				<SettingsSection

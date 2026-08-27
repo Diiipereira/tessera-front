@@ -14,6 +14,8 @@ class ResizeObserverStub implements ResizeObserver {
 
 globalThis.ResizeObserver = ResizeObserverStub;
 
+Element.prototype.scrollIntoView = () => undefined;
+
 globalThis.matchMedia = (query: string): MediaQueryList => ({
 	matches: false,
 	media: query,
