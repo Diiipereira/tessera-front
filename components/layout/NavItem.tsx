@@ -1,6 +1,7 @@
 'use client';
 
 import { Crown } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useNavigation } from '@/components/providers/navigation-context';
 import { useSidebar } from '@/components/providers/sidebar-context';
@@ -28,16 +29,18 @@ type NavItemProps = {
 };
 
 export function NavItem({ item, href, active, collapsible = false, onNavigate }: NavItemProps) {
+	const t = useTranslations('nav');
 	const { collapsed } = useSidebar();
 	const { start } = useNavigation();
 	const Icon = item.icon;
 	const showTooltip = collapsible && collapsed;
+	const label = t(item.id);
 
 	const link = (
 		<Link
 			href={href}
 			aria-current={active ? 'page' : undefined}
-			aria-label={item.label}
+			aria-label={label}
 			className={cn(base, active ? states.active : states.idle, collapsible && collapsedLayout)}
 			onClick={() => {
 				start(href);
@@ -51,7 +54,7 @@ export function NavItem({ item, href, active, collapsible = false, onNavigate }:
 					collapsible && 'sidebar-collapsed:hidden'
 				)}
 			>
-				{item.label}
+				{label}
 			</span>
 			{item.premium ? (
 				<Crown
@@ -59,7 +62,7 @@ export function NavItem({ item, href, active, collapsible = false, onNavigate }:
 						'size-3.5 shrink-0 text-warning',
 						collapsible && 'sidebar-collapsed:hidden'
 					)}
-					aria-label="Premium"
+					aria-label={t('premium')}
 				/>
 			) : null}
 		</Link>
@@ -68,7 +71,7 @@ export function NavItem({ item, href, active, collapsible = false, onNavigate }:
 	if (!showTooltip) return link;
 
 	return (
-		<Tooltip content={item.label} side="right" asChild>
+		<Tooltip content={label} side="right" asChild>
 			{link}
 		</Tooltip>
 	);

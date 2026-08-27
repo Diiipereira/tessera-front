@@ -15,6 +15,8 @@ import {
 	X,
 	type LucideIcon
 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { useRouter } from 'next/navigation';
 import { useRef, useState, type KeyboardEvent, type ReactNode, type RefObject } from 'react';
 import { toast } from 'sonner';
 import { Avatar } from '@/components/layout/Avatar';
@@ -29,6 +31,8 @@ import { Select } from '@/components/ui/Select';
 import { Switch } from '@/components/ui/Switch';
 import { BRAND } from '@/lib/brand';
 import { useConfigDraft } from '@/lib/hooks/useConfigDraft';
+import { SUPPORTED_LOCALES } from '@/lib/locale';
+import { rememberLocale } from '@/lib/locale-client';
 import { guildHref } from '@/lib/navigation';
 import { relativeTime } from '@/lib/time';
 import type { AccountPreferences, AccountSession } from '@/lib/types/account';
@@ -36,19 +40,14 @@ import type { Guild } from '@/lib/types/guild';
 import type { SessionUser } from '@/lib/types/session';
 import { cn } from '@/lib/utils/cn';
 
-const LOCALES = [
-	{ value: 'en-US', label: 'English (US)' },
-	{ value: 'pt-BR', label: 'Português (Brasil)' }
-];
-
 const TABS = [
-	{ id: 'profile', label: 'Profile', icon: User },
-	{ id: 'interface', label: 'Interface', icon: SlidersHorizontal },
-	{ id: 'email', label: 'Email', icon: Mail },
-	{ id: 'servers', label: 'Servers', icon: Server },
-	{ id: 'sessions', label: 'Sessions', icon: MonitorSmartphone },
-	{ id: 'data', label: 'Your data', icon: DatabaseZap }
-] as const satisfies readonly { id: string; label: string; icon: LucideIcon }[];
+	{ id: 'profile', icon: User },
+	{ id: 'interface', icon: SlidersHorizontal },
+	{ id: 'email', icon: Mail },
+	{ id: 'servers', icon: Server },
+	{ id: 'sessions', icon: MonitorSmartphone },
+	{ id: 'data', icon: DatabaseZap }
+] as const satisfies readonly { id: string; icon: LucideIcon }[];
 
 type TabId = (typeof TABS)[number]['id'];
 
@@ -81,12 +80,18 @@ export function AccountPanel({
 	sessions,
 	guilds
 }: AccountPanelProps) {
+	const t = useTranslations('account');
+	const localeNames = useTranslations('locales');
+	const shared = useTranslations('common');
+	const router = useRouter();
 	const form = useConfigDraft<AccountPreferences>(preferences);
 	const draft = form.draft;
 	const [active, setActive] = useState(sessions);
 	const [deleting, setDeleting] = useState(false);
 	const [tab, setTab] = useState<TabId>('profile');
 	const rail = useRef<HTMLDivElement>(null);
+
+	const localeOptions = SUPPORTED_LOCALES.map((value) => ({ value, label: localeNames(value) }));
 
 	function move(next: TabId) {
 		setTab(next);
@@ -125,13 +130,13 @@ export function AccountPanel({
 				>
 					<header className="flex shrink-0 items-center gap-3 border-b border-border px-5 py-4">
 						<div className="min-w-0 flex-1">
-							<DialogPrimitive.Title className="text-h3">Account</DialogPrimitive.Title>
+							<DialogPrimitive.Title className="text-h3">{t('title')}</DialogPrimitive.Title>
 							<p className="mt-0.5 truncate text-body-sm text-text-muted">
-								{`Your ${BRAND.name} account, the devices signed in to it, and what leaves your inbox.`}
+								{t('subtitle', { brand: BRAND.name })}
 							</p>
 						</div>
 						<DialogPrimitive.Close
-							aria-label="Close account settings"
+							aria-label={t('close')}
 							className="grid size-8 shrink-0 place-items-center rounded-md text-text-muted transition-colors duration-120 ease-out hover:bg-surface-hover hover:text-text"
 						>
 							<X className="size-4" aria-hidden="true" />
@@ -142,7 +147,7 @@ export function AccountPanel({
 						<div
 							ref={rail}
 							role="tablist"
-							aria-label="Account sections"
+							aria-label={t('sections')}
 							aria-orientation="vertical"
 							onKeyDown={onRailKeyDown}
 							className="flex shrink-0 gap-0.5 overflow-x-auto border-b border-border p-2 sm:w-48 sm:flex-col sm:overflow-x-visible sm:border-r sm:border-b-0"
@@ -170,7 +175,7 @@ export function AccountPanel({
 										)}
 									>
 										<entry.icon aria-hidden="true" />
-										{entry.label}
+										{t(`tabs.${entry.id}`)}
 									</button>
 								);
 							})}
@@ -185,9 +190,9 @@ export function AccountPanel({
 						>
 							{tab === 'profile' ? (
 								<Pane
-									title="Profile"
-									description="Read from Discord every time you sign in."
-									action={<Badge variant="outline">Managed by Discord</Badge>}
+									title={t('profile.title')}
+									description={t('profile.description')}
+									action={<Badge variant="outline">{t('profile.managed')}</Badge>}
 								>
 									<div className="flex items-center gap-4">
 										<Avatar initials={user.initials} color={user.color} shape="circle" size="lg" />
@@ -199,25 +204,21 @@ export function AccountPanel({
 										</div>
 									</div>
 
-									<Field
-										label="Discord ID"
-										hint="Support asks for this when something needs looking up."
-									>
+									<Field label={t('profile.idLabel')} hint={t('profile.idHint')}>
 										<Input value={user.id} readOnly className="max-w-80 font-mono" />
 									</Field>
 
 									<p className="text-body-sm text-pretty text-text-muted">
-										Change your name or avatar in Discord — {BRAND.name} picks it up on the next
-										sign-in.
+										{t('profile.upstream', { brand: BRAND.name })}
 									</p>
 								</Pane>
 							) : null}
 
 							{tab === 'interface' ? (
-								<Pane title="Interface" description="Applies everywhere you sign in.">
-									<Field label="Language">
+								<Pane title={t('interface.title')} description={t('interface.description')}>
+									<Field label={t('interface.language')}>
 										<Select
-											options={LOCALES}
+											options={localeOptions}
 											value={draft.locale}
 											onValueChange={(next) => {
 												form.set('locale', next);
@@ -228,9 +229,9 @@ export function AccountPanel({
 
 									<div className="flex items-start justify-between gap-4">
 										<div className="min-w-0">
-											<p className="text-body-sm font-medium">Theme</p>
+											<p className="text-body-sm font-medium">{t('interface.theme')}</p>
 											<p className="text-caption font-normal text-text-muted">
-												Saved in this browser, not on your account.
+												{t('interface.themeHint')}
 											</p>
 										</div>
 										<ThemeToggle />
@@ -239,37 +240,37 @@ export function AccountPanel({
 							) : null}
 
 							{tab === 'email' ? (
-								<Pane title="Email" description="We never email about anything else.">
+								<Pane title={t('email.title')} description={t('email.description')}>
 									<Switch
 										checked={draft.emailOnMention}
 										onCheckedChange={(next) => {
 											form.set('emailOnMention', next);
 										}}
-										label="When someone mentions me in a ticket"
-										description="Only for tickets you are assigned to."
+										label={t('email.onMention')}
+										description={t('email.onMentionHint')}
 									/>
 									<Switch
 										checked={draft.emailOnCase}
 										onCheckedChange={(next) => {
 											form.set('emailOnCase', next);
 										}}
-										label="When a case I opened is edited or revoked"
+										label={t('email.onCase')}
 									/>
 									<Switch
 										checked={draft.emailProduct}
 										onCheckedChange={(next) => {
 											form.set('emailProduct', next);
 										}}
-										label={`What is new in ${BRAND.name}`}
-										description="At most once a month, and never about pricing."
+										label={t('email.onProduct', { brand: BRAND.name })}
+										description={t('email.onProductHint')}
 									/>
 								</Pane>
 							) : null}
 
 							{tab === 'servers' ? (
 								<Pane
-									title="Servers"
-									description={`${String(guilds.length)} servers you can manage.`}
+									title={t('servers.title')}
+									description={t('servers.description', { count: guilds.length })}
 								>
 									<ul className="flex flex-col">
 										{guilds.map((guild) => (
@@ -281,7 +282,9 @@ export function AccountPanel({
 												<div className="min-w-0 flex-1">
 													<p className="truncate text-body">{guild.name}</p>
 													<p className="truncate text-caption font-normal text-text-muted">
-														{guild.hasBot ? `${BRAND.name} is in this server` : 'Not added yet'}
+														{guild.hasBot
+															? t('servers.present', { brand: BRAND.name })
+															: t('servers.absent')}
 													</p>
 												</div>
 												{guild.hasBot ? (
@@ -293,10 +296,10 @@ export function AccountPanel({
 															onOpenChange(false);
 														}}
 													>
-														Open
+														{shared('open')}
 													</Button>
 												) : (
-													<Badge variant="outline">No bot</Badge>
+													<Badge variant="outline">{t('servers.noBot')}</Badge>
 												)}
 											</li>
 										))}
@@ -306,18 +309,18 @@ export function AccountPanel({
 
 							{tab === 'sessions' ? (
 								<Pane
-									title="Active sessions"
-									description="Signing out everywhere ends all of them but this one."
+									title={t('sessions.title')}
+									description={t('sessions.description')}
 									action={
 										<Button
 											variant="outline"
 											size="sm"
 											onClick={() => {
 												setActive((current) => current.filter((entry) => entry.current));
-												toast.success('Signed out everywhere else');
+												toast.success(t('sessions.signedOutOthers'));
 											}}
 										>
-											Sign out everywhere
+											{t('sessions.signOutOthers')}
 										</Button>
 									}
 								>
@@ -343,7 +346,7 @@ export function AccountPanel({
 														{session.device} · {session.browser}
 														{session.current ? (
 															<Badge variant="success" className="ml-2">
-																This device
+																{t('sessions.thisDevice')}
 															</Badge>
 														) : null}
 													</p>
@@ -359,10 +362,10 @@ export function AccountPanel({
 															setActive((current) =>
 																current.filter((entry) => entry.id !== session.id)
 															);
-															toast.success(`Signed out of ${session.device}`);
+															toast.success(t('sessions.revoked', { device: session.device }));
 														}}
 													>
-														Revoke
+														{t('sessions.revoke')}
 													</Button>
 												)}
 											</li>
@@ -372,35 +375,33 @@ export function AccountPanel({
 							) : null}
 
 							{tab === 'data' ? (
-								<Pane title="Your data" description="Yours to take, yours to delete." danger>
+								<Pane title={t('data.title')} description={t('data.description')} danger>
 									<div className="flex flex-wrap items-start gap-3 border-b border-border pb-4">
 										<div className="min-w-60 flex-1">
-											<p className="text-body font-medium">Download my data</p>
+											<p className="text-body font-medium">{t('data.downloadTitle')}</p>
 											<p className="text-body-sm text-pretty text-text-muted">
-												Everything tied to your account: sessions, preferences and the audit entries
-												you produced.
+												{t('data.downloadBody')}
 											</p>
 										</div>
 										<Button
 											variant="outline"
 											size="sm"
 											onClick={() => {
-												toast.success('Export requested', {
-													description: 'You get an email when the archive is ready.'
+												toast.success(t('data.downloadRequested'), {
+													description: t('data.downloadRequestedHint')
 												});
 											}}
 										>
 											<Download aria-hidden="true" />
-											Download
+											{t('data.download')}
 										</Button>
 									</div>
 
 									<div className="flex flex-wrap items-start gap-3">
 										<div className="min-w-60 flex-1">
-											<p className="text-body font-medium">Delete my account</p>
+											<p className="text-body font-medium">{t('data.deleteTitle')}</p>
 											<p className="text-body-sm text-pretty text-text-muted">
-												Removes your access to every server here. The servers themselves and their
-												configuration stay.
+												{t('data.deleteBody')}
 											</p>
 										</div>
 										<Button
@@ -411,7 +412,7 @@ export function AccountPanel({
 											}}
 										>
 											<Trash2 aria-hidden="true" />
-											Delete account
+											{t('data.delete')}
 										</Button>
 									</div>
 								</Pane>
@@ -426,7 +427,9 @@ export function AccountPanel({
 						onDiscard={form.discard}
 						onSave={() => {
 							void form.save().then(() => {
-								toast.success('Preferences saved');
+								rememberLocale(draft.locale);
+								router.refresh();
+								toast.success(t('saved'));
 							});
 						}}
 						onResolveConflict={form.resolveConflict}
@@ -436,19 +439,16 @@ export function AccountPanel({
 					<ConfirmDialog
 						open={deleting}
 						onOpenChange={setDeleting}
-						title="Delete your account?"
-						description="This cannot be undone, and support cannot restore it."
-						confirmPhrase="DELETE"
-						confirmLabel="Delete my account"
+						title={t('data.confirmTitle')}
+						description={t('data.confirmDescription')}
+						confirmPhrase={t('data.confirmPhrase')}
+						confirmLabel={t('data.confirmLabel')}
 						onConfirm={() => {
-							toast.success('Account scheduled for deletion', {
-								description: 'You have 7 days to sign in again and stop it.'
-							});
+							toast.success(t('data.scheduled'), { description: t('data.scheduledHint') });
 						}}
 					>
 						<p className="text-body-sm text-pretty text-text-muted">
-							You lose access to {guilds.length} servers. If you are the only Owner of one, hand the
-							seat over first — otherwise nobody can change its plan.
+							{t('data.confirmBody', { count: guilds.length })}
 						</p>
 					</ConfirmDialog>
 				</DialogPrimitive.Content>

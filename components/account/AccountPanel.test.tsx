@@ -1,24 +1,31 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from 'react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import { mockAccountPreferences, mockAccountSessions, mockGuilds, mockUser } from '@/lib/mock';
+import { Translated } from '@/tests/i18n';
 import { AccountPanel } from './AccountPanel';
+
+vi.mock('next/navigation', () => ({
+	useRouter: () => ({ refresh: () => undefined })
+}));
 
 function renderPanel() {
 	return render(
-		<ThemeProvider>
-			<AccountPanel
-				open
-				onOpenChange={() => undefined}
-				returnFocusTo={createRef<HTMLElement>()}
-				user={mockUser}
-				preferences={mockAccountPreferences}
-				sessions={mockAccountSessions}
-				guilds={mockGuilds}
-			/>
-		</ThemeProvider>
+		<Translated>
+			<ThemeProvider>
+				<AccountPanel
+					open
+					onOpenChange={() => undefined}
+					returnFocusTo={createRef<HTMLElement>()}
+					user={mockUser}
+					preferences={mockAccountPreferences}
+					sessions={mockAccountSessions}
+					guilds={mockGuilds}
+				/>
+			</ThemeProvider>
+		</Translated>
 	);
 }
 

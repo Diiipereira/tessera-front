@@ -13,7 +13,7 @@ export type ModulePatchBody = {
 
 type ValidationIssue = { path?: string; message?: string };
 
-type ErrorBody = {
+export type ErrorBody = {
 	error?: {
 		code?: string;
 		message?: string;

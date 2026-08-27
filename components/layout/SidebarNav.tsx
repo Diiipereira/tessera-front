@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
 import { useNavigation } from '@/components/providers/navigation-context';
 import { findActiveNavItem, guildHref, navGroups } from '@/lib/navigation';
@@ -18,13 +19,14 @@ type SidebarNavProps = {
 };
 
 export function SidebarNav({ guildId, collapsible = false, onNavigate }: SidebarNavProps) {
+	const t = useTranslations('nav');
 	const pathname = usePathname();
 	const { pendingHref } = useNavigation();
 	const activeItem = findActiveNavItem(guildId, pendingHref ?? pathname);
 
 	return (
 		<nav
-			aria-label="Server navigation"
+			aria-label={t('serverNavigation')}
 			className="flex flex-1 thin-scroll flex-col gap-1.5 overflow-y-auto p-2 sidebar-collapsed:px-0"
 		>
 			{navGroups.map((group, index) => (
@@ -41,7 +43,7 @@ export function SidebarNav({ guildId, collapsible = false, onNavigate }: Sidebar
 								collapsible && 'sidebar-collapsed:hidden'
 							)}
 						>
-							{group.label}
+							{t(`groups.${group.id}`)}
 						</span>
 					</div>
 					{group.items.map((item) => {

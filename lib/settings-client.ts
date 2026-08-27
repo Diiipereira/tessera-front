@@ -1,5 +1,5 @@
 import { apiBaseUrl } from '@/lib/api-url';
-import { describeFailure } from '@/lib/module-client';
+import { describeFailure, type ErrorBody } from '@/lib/module-client';
 import type { GuildSettings } from '@/lib/types/management';
 
 export type SettingsWriteResult =
@@ -31,8 +31,7 @@ export async function patchSettings(
 		return { status: 'saved', settings: (await response.json()) as GuildSettings };
 	}
 
-	return {
-		status: 'error',
-		message: describeFailure(await response.json().catch(() => ({})), response.status)
-	};
+	const failure = (await response.json().catch(() => ({}))) as ErrorBody;
+
+	return { status: 'error', message: describeFailure(failure, response.status) };
 }

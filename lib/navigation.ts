@@ -24,7 +24,6 @@ import {
 
 export type NavItem = {
 	id: string;
-	label: string;
 	path: string;
 	icon: LucideIcon;
 	premium?: boolean;
@@ -32,76 +31,53 @@ export type NavItem = {
 
 export type NavGroup = {
 	id: string;
-	label: string;
 	items: NavItem[];
 };
 
 export type GuildHref = `/servers/${string}`;
 
-export type Crumb = {
-	label: string;
-	href?: GuildHref;
-};
+export type Crumb =
+	{ kind: 'nav'; id: string; href?: GuildHref } | { kind: 'text'; text: string; href?: GuildHref };
 
 export const navGroups: NavGroup[] = [
 	{
 		id: 'overview',
-		label: 'Overview',
 		items: [
-			{ id: 'overview', label: 'Overview', path: '', icon: LayoutDashboard },
-			{ id: 'modules', label: 'Modules', path: '/modules', icon: Blocks }
+			{ id: 'overview', path: '', icon: LayoutDashboard },
+			{ id: 'modules', path: '/modules', icon: Blocks }
 		]
 	},
 	{
 		id: 'modules',
-		label: 'Modules',
 		items: [
-			{ id: 'welcome', label: 'Welcome', path: '/modules/welcome', icon: DoorOpen },
-			{ id: 'moderation', label: 'Moderation', path: '/modules/moderation', icon: Shield },
-			{ id: 'automod', label: 'AutoMod', path: '/modules/automod', icon: ShieldAlert },
-			{ id: 'logging', label: 'Logging', path: '/modules/logging', icon: ScrollText },
-			{ id: 'levels', label: 'Levels', path: '/modules/levels', icon: TrendingUp },
-			{ id: 'economy', label: 'Economy', path: '/modules/economy', icon: Coins, premium: true },
-			{ id: 'tickets', label: 'Tickets', path: '/modules/tickets', icon: Ticket },
-			{
-				id: 'reaction-roles',
-				label: 'Reaction roles',
-				path: '/modules/reaction-roles',
-				icon: Sticker
-			},
-			{ id: 'giveaways', label: 'Giveaways', path: '/modules/giveaways', icon: Gift },
-			{
-				id: 'custom-commands',
-				label: 'Custom commands',
-				path: '/modules/custom-commands',
-				icon: Terminal
-			},
-			{
-				id: 'scheduled',
-				label: 'Scheduled messages',
-				path: '/modules/scheduled',
-				icon: CalendarClock,
-				premium: true
-			}
+			{ id: 'welcome', path: '/modules/welcome', icon: DoorOpen },
+			{ id: 'moderation', path: '/modules/moderation', icon: Shield },
+			{ id: 'automod', path: '/modules/automod', icon: ShieldAlert },
+			{ id: 'logging', path: '/modules/logging', icon: ScrollText },
+			{ id: 'levels', path: '/modules/levels', icon: TrendingUp },
+			{ id: 'economy', path: '/modules/economy', icon: Coins, premium: true },
+			{ id: 'tickets', path: '/modules/tickets', icon: Ticket },
+			{ id: 'reaction-roles', path: '/modules/reaction-roles', icon: Sticker },
+			{ id: 'giveaways', path: '/modules/giveaways', icon: Gift },
+			{ id: 'custom-commands', path: '/modules/custom-commands', icon: Terminal },
+			{ id: 'scheduled', path: '/modules/scheduled', icon: CalendarClock, premium: true }
 		]
 	},
 	{
 		id: 'management',
-		label: 'Management',
 		items: [
-			{ id: 'commands', label: 'Commands', path: '/commands', icon: SquareSlash },
-			{ id: 'members', label: 'Members', path: '/members', icon: Users },
-			{ id: 'cases', label: 'Cases', path: '/cases', icon: Gavel },
-			{ id: 'audit', label: 'Audit log', path: '/audit', icon: FileClock }
+			{ id: 'commands', path: '/commands', icon: SquareSlash },
+			{ id: 'members', path: '/members', icon: Users },
+			{ id: 'cases', path: '/cases', icon: Gavel },
+			{ id: 'audit', path: '/audit', icon: FileClock }
 		]
 	},
 	{
 		id: 'server',
-		label: 'Server',
 		items: [
-			{ id: 'team', label: 'Team', path: '/team', icon: UserCog },
-			{ id: 'billing', label: 'Billing', path: '/billing', icon: CreditCard },
-			{ id: 'settings', label: 'Settings', path: '/settings', icon: Settings }
+			{ id: 'team', path: '/team', icon: UserCog },
+			{ id: 'billing', path: '/billing', icon: CreditCard },
+			{ id: 'settings', path: '/settings', icon: Settings }
 		]
 	}
 ];
@@ -146,15 +122,15 @@ export function breadcrumbsFor(guildId: string, pathname: string): Crumb[] {
 	const crumbs: Crumb[] = [];
 
 	if (item.path.startsWith('/modules/')) {
-		crumbs.push({ label: 'Modules', href: guildHref(guildId, '/modules') });
+		crumbs.push({ kind: 'nav', id: 'modules', href: guildHref(guildId, '/modules') });
 	}
 
 	if (rest === '') {
-		crumbs.push({ label: item.label });
+		crumbs.push({ kind: 'nav', id: item.id });
 		return crumbs;
 	}
 
-	crumbs.push({ label: item.label, href });
-	crumbs.push({ label: /^\d+$/.test(rest) ? `#${rest}` : rest });
+	crumbs.push({ kind: 'nav', id: item.id, href });
+	crumbs.push({ kind: 'text', text: /^\d+$/.test(rest) ? `#${rest}` : rest });
 	return crumbs;
 }

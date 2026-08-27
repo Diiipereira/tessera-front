@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import { NextIntlClientProvider } from 'next-intl';
+import { getLocale } from 'next-intl/server';
 import type { ReactNode } from 'react';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import { Toaster } from '@/components/ui/Toaster';
@@ -35,9 +37,11 @@ const PRE_PAINT = `(function () {
 	}
 })();`;
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({ children }: { children: ReactNode }) {
+	const locale = await getLocale();
+
 	return (
-		<html lang="pt-BR" suppressHydrationWarning>
+		<html lang={locale} suppressHydrationWarning>
 			<head>
 				<link
 					rel="preload"
@@ -49,12 +53,14 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 				<script dangerouslySetInnerHTML={{ __html: PRE_PAINT }} />
 			</head>
 			<body>
-				<ThemeProvider>
-					<TooltipProvider delayDuration={400} disableHoverableContent>
-						{children}
-					</TooltipProvider>
-					<Toaster />
-				</ThemeProvider>
+				<NextIntlClientProvider>
+					<ThemeProvider>
+						<TooltipProvider delayDuration={400} disableHoverableContent>
+							{children}
+						</TooltipProvider>
+						<Toaster />
+					</ThemeProvider>
+				</NextIntlClientProvider>
 			</body>
 		</html>
 	);

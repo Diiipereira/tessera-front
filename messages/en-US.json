@@ -1,0 +1,140 @@
+{
+	"common": {
+		"save": "Save",
+		"cancel": "Cancel",
+		"close": "Close",
+		"discard": "Discard",
+		"open": "Open",
+		"remove": "Remove",
+		"search": "Search…"
+	},
+	"locales": {
+		"en-US": "English (US)",
+		"pt-BR": "Português (Brasil)"
+	},
+	"nav": {
+		"overview": "Overview",
+		"modules": "Modules",
+		"welcome": "Welcome",
+		"moderation": "Moderation",
+		"automod": "AutoMod",
+		"logging": "Logging",
+		"levels": "Levels",
+		"economy": "Economy",
+		"tickets": "Tickets",
+		"reaction-roles": "Reaction roles",
+		"giveaways": "Giveaways",
+		"custom-commands": "Custom commands",
+		"scheduled": "Scheduled messages",
+		"commands": "Commands",
+		"members": "Members",
+		"cases": "Cases",
+		"audit": "Audit log",
+		"team": "Team",
+		"billing": "Billing",
+		"settings": "Settings",
+		"premium": "Premium",
+		"breadcrumb": "Breadcrumb",
+		"serverNavigation": "Server navigation",
+		"navigation": "Navigation",
+		"closeNavigation": "Close navigation",
+		"groups": {
+			"overview": "Overview",
+			"modules": "Modules",
+			"management": "Management",
+			"server": "Server"
+		}
+	},
+	"stub": {
+		"fallback": "Screen",
+		"notBuilt": "This screen has not been built yet.",
+		"lands": "{name} lands here",
+		"shell": "The app shell is in place. This route is a placeholder until the screen itself is built."
+	},
+	"palette": {
+		"title": "Command palette",
+		"placeholder": "Jump to a module, server or action…",
+		"empty": "Nothing matches “{query}”.",
+		"servers": "Servers",
+		"switchServer": "switch server",
+		"addServer": "add {name}",
+		"navigate": "navigate",
+		"select": "select",
+		"dismiss": "close",
+		"escapeKey": "esc"
+	},
+	"account": {
+		"title": "Account",
+		"subtitle": "Your {brand} account, the devices signed in to it, and what leaves your inbox.",
+		"close": "Close account settings",
+		"sections": "Account sections",
+		"saved": "Preferences saved",
+		"tabs": {
+			"profile": "Profile",
+			"interface": "Interface",
+			"email": "Email",
+			"servers": "Servers",
+			"sessions": "Sessions",
+			"data": "Your data"
+		},
+		"profile": {
+			"title": "Profile",
+			"description": "Read from Discord every time you sign in.",
+			"managed": "Managed by Discord",
+			"idLabel": "Discord ID",
+			"idHint": "Support asks for this when something needs looking up.",
+			"upstream": "Change your name or avatar in Discord — {brand} picks it up on the next sign-in."
+		},
+		"interface": {
+			"title": "Interface",
+			"description": "Applies everywhere you sign in.",
+			"language": "Language",
+			"theme": "Theme",
+			"themeHint": "Saved in this browser, not on your account."
+		},
+		"email": {
+			"title": "Email",
+			"description": "We never email about anything else.",
+			"onMention": "When someone mentions me in a ticket",
+			"onMentionHint": "Only for tickets you are assigned to.",
+			"onCase": "When a case I opened is edited or revoked",
+			"onProduct": "What is new in {brand}",
+			"onProductHint": "At most once a month, and never about pricing."
+		},
+		"servers": {
+			"title": "Servers",
+			"description": "{count} servers you can manage.",
+			"present": "{brand} is in this server",
+			"absent": "Not added yet",
+			"noBot": "No bot"
+		},
+		"sessions": {
+			"title": "Active sessions",
+			"description": "Signing out everywhere ends all of them but this one.",
+			"signOutOthers": "Sign out everywhere",
+			"signedOutOthers": "Signed out everywhere else",
+			"thisDevice": "This device",
+			"revoke": "Revoke",
+			"revoked": "Signed out of {device}"
+		},
+		"data": {
+			"title": "Your data",
+			"description": "Yours to take, yours to delete.",
+			"downloadTitle": "Download my data",
+			"downloadBody": "Everything tied to your account: sessions, preferences and the audit entries you produced.",
+			"download": "Download",
+			"downloadRequested": "Export requested",
+			"downloadRequestedHint": "You get an email when the archive is ready.",
+			"deleteTitle": "Delete my account",
+			"deleteBody": "Removes your access to every server here. The servers themselves and their configuration stay.",
+			"delete": "Delete account",
+			"confirmTitle": "Delete your account?",
+			"confirmDescription": "This cannot be undone, and support cannot restore it.",
+			"confirmPhrase": "DELETE",
+			"confirmLabel": "Delete my account",
+			"confirmBody": "You lose access to {count} servers. If you are the only Owner of one, hand the seat over first — otherwise nobody can change its plan.",
+			"scheduled": "Account scheduled for deletion",
+			"scheduledHint": "You have 7 days to sign in again and stop it."
+		}
+	}
+}

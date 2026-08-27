@@ -2,6 +2,7 @@
 
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useSidebar } from '@/components/providers/sidebar-context';
 import type { Plan } from '@/lib/types/billing';
 import type { Guild } from '@/lib/types/guild';
@@ -16,6 +17,7 @@ type MobileNavProps = {
 };
 
 export function MobileNav({ guild, guilds, plan }: MobileNavProps) {
+	const t = useTranslations('nav');
 	const { mobileOpen, setMobileOpen } = useSidebar();
 	const close = () => {
 		setMobileOpen(false);
@@ -26,7 +28,7 @@ export function MobileNav({ guild, guilds, plan }: MobileNavProps) {
 			<DialogPrimitive.Portal>
 				<DialogPrimitive.Overlay className="fixed inset-0 z-40 bg-overlay backdrop-blur-xs data-[state=closed]:animate-fade-out data-[state=open]:animate-pop lg:hidden" />
 				<DialogPrimitive.Content className="fixed inset-y-0 left-0 z-50 flex w-80 max-w-[calc(100vw-3rem)] flex-col border-r border-border bg-bg-subtle shadow-3 data-[state=open]:animate-slide-in-left lg:hidden">
-					<DialogPrimitive.Title className="sr-only">Navigation</DialogPrimitive.Title>
+					<DialogPrimitive.Title className="sr-only">{t('navigation')}</DialogPrimitive.Title>
 
 					<div className="relative">
 						<GuildSwitcher
@@ -36,7 +38,7 @@ export function MobileNav({ guild, guilds, plan }: MobileNavProps) {
 							onNavigate={close}
 						/>
 						<DialogPrimitive.Close
-							aria-label="Close navigation"
+							aria-label={t('closeNavigation')}
 							className="absolute top-3 right-3 grid size-8 place-items-center rounded-md text-text-muted transition-colors duration-120 ease-out hover:bg-surface-hover hover:text-text"
 						>
 							<X className="size-4" aria-hidden="true" />

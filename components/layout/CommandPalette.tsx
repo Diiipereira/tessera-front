@@ -2,6 +2,7 @@
 
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { Search, type LucideIcon } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState, type KeyboardEvent } from 'react';
 import { guildHref, navGroups, type GuildHref } from '@/lib/navigation';
@@ -27,6 +28,9 @@ type CommandPaletteProps = {
 };
 
 export function CommandPalette({ open, onOpenChange, guild, guilds }: CommandPaletteProps) {
+	const t = useTranslations('palette');
+	const nav = useTranslations('nav');
+	const shared = useTranslations('common');
 	const router = useRouter();
 	const [query, setQuery] = useState('');
 	const [cursor, setCursor] = useState(0);
@@ -36,10 +40,10 @@ export function CommandPalette({ open, onOpenChange, guild, guilds }: CommandPal
 			...navGroups.flatMap((group) =>
 				group.items.map((item) => ({
 					id: `${group.id}:${item.id}`,
-					label: item.label,
+					label: nav(item.id),
 					meta: item.path === '' ? '/' : item.path,
 					href: guildHref(guild.id, item.path),
-					group: group.id === 'overview' ? 'Navigation' : group.label,
+					group: group.id === 'overview' ? nav('navigation') : nav(`groups.${group.id}`),
 					icon: item.icon
 				}))
 			),
@@ -48,13 +52,13 @@ export function CommandPalette({ open, onOpenChange, guild, guilds }: CommandPal
 				.map((entry) => ({
 					id: `guild:${entry.id}`,
 					label: entry.name,
-					meta: entry.hasBot ? 'switch server' : `add ${entry.name}`,
+					meta: entry.hasBot ? t('switchServer') : t('addServer', { name: entry.name }),
 					href: guildHref(entry.id, ''),
-					group: 'Servers',
+					group: t('servers'),
 					guild: entry
 				}))
 		],
-		[guild.id, guilds]
+		[guild.id, guilds, nav, t]
 	);
 
 	const matches = useMemo(
@@ -129,7 +133,7 @@ export function CommandPalette({ open, onOpenChange, guild, guilds }: CommandPal
 			<DialogPrimitive.Portal>
 				<DialogPrimitive.Overlay className="fixed inset-0 z-40 bg-overlay backdrop-blur-xs data-[state=closed]:animate-fade-out data-[state=open]:animate-pop" />
 				<DialogPrimitive.Content className="fixed inset-x-6 top-24 z-50 mx-auto flex max-w-160 flex-col overflow-hidden rounded-xl border border-border-strong bg-surface-raised shadow-3 data-[state=open]:animate-pop">
-					<DialogPrimitive.Title className="sr-only">Command palette</DialogPrimitive.Title>
+					<DialogPrimitive.Title className="sr-only">{t('title')}</DialogPrimitive.Title>
 
 					<div className="flex items-center gap-3 border-b border-border px-5 py-4">
 						<Search className="size-5 shrink-0 text-text-subtle" aria-hidden="true" />
@@ -140,22 +144,22 @@ export function CommandPalette({ open, onOpenChange, guild, guilds }: CommandPal
 							}}
 							onKeyDown={handleKeydown}
 							type="text"
-							placeholder="Jump to a module, server or action…"
-							aria-label="Search"
+							placeholder={t('placeholder')}
+							aria-label={shared('search')}
 							role="combobox"
 							aria-expanded="true"
 							aria-controls="palette-results"
 							className="min-w-0 flex-1 bg-transparent text-body-lg text-text outline-none"
 						/>
 						<span className="rounded-sm border border-border px-1.5 py-0.5 font-mono text-caption font-normal text-text-muted">
-							esc
+							{t('escapeKey')}
 						</span>
 					</div>
 
 					<div id="palette-results" role="listbox" className="max-h-105 overflow-y-auto p-2">
 						{sections.length === 0 ? (
 							<p className="px-2 py-6 text-center text-body-sm text-text-muted">
-								Nothing matches &ldquo;{query}&rdquo;.
+								{t('empty', { query })}
 							</p>
 						) : (
 							sections.map((section) => (
@@ -215,13 +219,13 @@ export function CommandPalette({ open, onOpenChange, guild, guilds }: CommandPal
 
 					<div className="flex flex-wrap items-center gap-4 border-t border-border bg-surface-sunken px-5 py-2.5 text-caption font-normal text-text-muted">
 						<span>
-							<span className="font-mono">&uarr;&darr;</span> navigate
+							<span className="font-mono">&uarr;&darr;</span> {t('navigate')}
 						</span>
 						<span>
-							<span className="font-mono">&crarr;</span> select
+							<span className="font-mono">&crarr;</span> {t('select')}
 						</span>
 						<span>
-							<span className="font-mono">esc</span> close
+							<span className="font-mono">{t('escapeKey')}</span> {t('dismiss')}
 						</span>
 					</div>
 				</DialogPrimitive.Content>

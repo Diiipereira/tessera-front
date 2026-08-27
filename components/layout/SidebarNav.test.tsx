@@ -4,6 +4,7 @@ import { NavigationProvider } from '@/components/providers/NavigationProvider';
 import { SidebarProvider } from '@/components/providers/SidebarProvider';
 import { TooltipProvider } from '@/components/ui/tooltip-provider';
 import { guildHref, navGroups } from '@/lib/navigation';
+import { Translated } from '@/tests/i18n';
 import { SidebarNav } from './SidebarNav';
 
 const GUILD_ID = '1';
@@ -17,13 +18,15 @@ vi.mock('next/navigation', () => ({
 function renderNav(at: string) {
 	pathname.current = at;
 	return render(
-		<TooltipProvider>
-			<SidebarProvider>
-				<NavigationProvider>
-					<SidebarNav guildId={GUILD_ID} collapsible />
-				</NavigationProvider>
-			</SidebarProvider>
-		</TooltipProvider>
+		<Translated>
+			<TooltipProvider>
+				<SidebarProvider>
+					<NavigationProvider>
+						<SidebarNav guildId={GUILD_ID} collapsible />
+					</NavigationProvider>
+				</SidebarProvider>
+			</TooltipProvider>
+		</Translated>
 	);
 }
 

@@ -61,21 +61,29 @@ describe('findActiveNavItem', () => {
 
 describe('breadcrumbsFor', () => {
 	it('gives a single crumb outside the modules group', () => {
-		expect(breadcrumbsFor(GUILD, `/servers/${GUILD}/audit`)).toEqual([{ label: 'Audit log' }]);
+		expect(breadcrumbsFor(GUILD, `/servers/${GUILD}/audit`)).toEqual([
+			{ kind: 'nav', id: 'audit' }
+		]);
 	});
 
 	it('links back to the section from a detail route', () => {
 		expect(breadcrumbsFor(GUILD, `/servers/${GUILD}/cases/42`)).toEqual([
-			{ label: 'Cases', href: `/servers/${GUILD}/cases` },
-			{ label: '#42' }
+			{ kind: 'nav', id: 'cases', href: `/servers/${GUILD}/cases` },
+			{ kind: 'text', text: '#42' }
 		]);
 	});
 
 	it('prepends Modules for a module page', () => {
 		expect(breadcrumbsFor(GUILD, `/servers/${GUILD}/modules/welcome`)).toEqual([
-			{ label: 'Modules', href: `/servers/${GUILD}/modules` },
-			{ label: 'Welcome' }
+			{ kind: 'nav', id: 'modules', href: `/servers/${GUILD}/modules` },
+			{ kind: 'nav', id: 'welcome' }
 		]);
+	});
+
+	it('carries the id, not human text, so the label can be translated', () => {
+		const crumbs = breadcrumbsFor(GUILD, `/servers/${GUILD}/modules/welcome`);
+
+		expect(JSON.stringify(crumbs)).not.toContain('Welcome');
 	});
 });
 

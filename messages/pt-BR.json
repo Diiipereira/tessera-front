@@ -1,0 +1,140 @@
+{
+	"common": {
+		"save": "Salvar",
+		"cancel": "Cancelar",
+		"close": "Fechar",
+		"discard": "Descartar",
+		"open": "Abrir",
+		"remove": "Remover",
+		"search": "Buscar…"
+	},
+	"locales": {
+		"en-US": "English (US)",
+		"pt-BR": "Português (Brasil)"
+	},
+	"nav": {
+		"overview": "Visão geral",
+		"modules": "Módulos",
+		"welcome": "Boas-vindas",
+		"moderation": "Moderação",
+		"automod": "AutoMod",
+		"logging": "Registros",
+		"levels": "Níveis",
+		"economy": "Economia",
+		"tickets": "Tickets",
+		"reaction-roles": "Cargos por reação",
+		"giveaways": "Sorteios",
+		"custom-commands": "Comandos personalizados",
+		"scheduled": "Mensagens agendadas",
+		"commands": "Comandos",
+		"members": "Membros",
+		"cases": "Casos",
+		"audit": "Registro de auditoria",
+		"team": "Equipe",
+		"billing": "Assinatura",
+		"settings": "Configurações",
+		"premium": "Premium",
+		"breadcrumb": "Trilha de navegação",
+		"serverNavigation": "Navegação do servidor",
+		"navigation": "Navegação",
+		"closeNavigation": "Fechar a navegação",
+		"groups": {
+			"overview": "Visão geral",
+			"modules": "Módulos",
+			"management": "Gerenciamento",
+			"server": "Servidor"
+		}
+	},
+	"stub": {
+		"fallback": "Tela",
+		"notBuilt": "Esta tela ainda não foi construída.",
+		"lands": "{name} vai ficar aqui",
+		"shell": "A estrutura do app já está de pé. Esta rota é um espaço reservado até a tela existir."
+	},
+	"palette": {
+		"title": "Paleta de comandos",
+		"placeholder": "Ir para um módulo, servidor ou ação…",
+		"empty": "Nada corresponde a “{query}”.",
+		"servers": "Servidores",
+		"switchServer": "trocar de servidor",
+		"addServer": "adicionar {name}",
+		"navigate": "navegar",
+		"select": "selecionar",
+		"dismiss": "fechar",
+		"escapeKey": "esc"
+	},
+	"account": {
+		"title": "Conta",
+		"subtitle": "Sua conta {brand}, os aparelhos conectados a ela, e o que sai para o seu e-mail.",
+		"close": "Fechar as configurações da conta",
+		"sections": "Seções da conta",
+		"saved": "Preferências salvas",
+		"tabs": {
+			"profile": "Perfil",
+			"interface": "Interface",
+			"email": "E-mail",
+			"servers": "Servidores",
+			"sessions": "Sessões",
+			"data": "Seus dados"
+		},
+		"profile": {
+			"title": "Perfil",
+			"description": "Lido do Discord toda vez que você entra.",
+			"managed": "Gerenciado pelo Discord",
+			"idLabel": "ID do Discord",
+			"idHint": "O suporte pede este número quando precisa consultar alguma coisa.",
+			"upstream": "Mude seu nome ou avatar no Discord — a {brand} pega na próxima entrada."
+		},
+		"interface": {
+			"title": "Interface",
+			"description": "Vale em todo lugar onde você entrar.",
+			"language": "Idioma",
+			"theme": "Tema",
+			"themeHint": "Salvo neste navegador, não na sua conta."
+		},
+		"email": {
+			"title": "E-mail",
+			"description": "Nunca mandamos e-mail sobre outra coisa.",
+			"onMention": "Quando alguém me mencionar num ticket",
+			"onMentionHint": "Só nos tickets atribuídos a você.",
+			"onCase": "Quando um caso que eu abri for editado ou revogado",
+			"onProduct": "O que há de novo na {brand}",
+			"onProductHint": "No máximo uma vez por mês, e nunca sobre preço."
+		},
+		"servers": {
+			"title": "Servidores",
+			"description": "{count} servidores que você pode gerenciar.",
+			"present": "A {brand} está neste servidor",
+			"absent": "Ainda não adicionada",
+			"noBot": "Sem bot"
+		},
+		"sessions": {
+			"title": "Sessões ativas",
+			"description": "Sair de todos os lugares encerra todas menos esta.",
+			"signOutOthers": "Sair de todos os lugares",
+			"signedOutOthers": "Você saiu de todos os outros lugares",
+			"thisDevice": "Este aparelho",
+			"revoke": "Revogar",
+			"revoked": "Você saiu de {device}"
+		},
+		"data": {
+			"title": "Seus dados",
+			"description": "Seus para levar, seus para apagar.",
+			"downloadTitle": "Baixar meus dados",
+			"downloadBody": "Tudo ligado à sua conta: sessões, preferências e os registros de auditoria que você gerou.",
+			"download": "Baixar",
+			"downloadRequested": "Exportação solicitada",
+			"downloadRequestedHint": "Você recebe um e-mail quando o arquivo estiver pronto.",
+			"deleteTitle": "Excluir minha conta",
+			"deleteBody": "Remove seu acesso a todos os servidores daqui. Os servidores e as configurações deles ficam.",
+			"delete": "Excluir conta",
+			"confirmTitle": "Excluir sua conta?",
+			"confirmDescription": "Isto não tem volta, e o suporte não consegue restaurar.",
+			"confirmPhrase": "EXCLUIR",
+			"confirmLabel": "Excluir minha conta",
+			"confirmBody": "Você perde acesso a {count} servidores. Se for o único Dono de algum, passe o posto adiante antes — senão ninguém consegue mudar o plano dele.",
+			"scheduled": "Conta agendada para exclusão",
+			"scheduledHint": "Você tem 7 dias para entrar de novo e cancelar."
+		}
+	}
+}

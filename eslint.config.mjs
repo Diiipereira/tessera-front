@@ -2,6 +2,7 @@ import js from '@eslint/js';
 import nextVitals from 'eslint-config-next/core-web-vitals';
 import prettier from 'eslint-config-prettier/flat';
 import betterTailwind from 'eslint-plugin-better-tailwindcss';
+import i18next from 'eslint-plugin-i18next';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import globals from 'globals';
 import ts from 'typescript-eslint';
@@ -9,6 +10,39 @@ import ts from 'typescript-eslint';
 const DIRECTIVE = /^(eslint\b|eslint-|globals?\b|exported\b|@ts-|prettier-ignore\b|#)/;
 
 const HEX = /#[0-9a-fA-F]{3,8}/;
+
+const COPY_ATTRIBUTES = [
+	'alt',
+	'aria-label',
+	'blurb',
+	'body',
+	'confirmLabel',
+	'confirmPhrase',
+	'description',
+	'emptyLabel',
+	'error',
+	'help',
+	'hint',
+	'label',
+	'lead',
+	'overline',
+	'placeholder',
+	'searchPlaceholder',
+	'summary',
+	'text',
+	'title'
+];
+
+const TRANSLATED = [
+	'app/layout.tsx',
+	'components/account/**/*.tsx',
+	'components/layout/Breadcrumbs.tsx',
+	'components/layout/CommandPalette.tsx',
+	'components/layout/MobileNav.tsx',
+	'components/layout/NavItem.tsx',
+	'components/layout/ScreenStub.tsx',
+	'components/layout/SidebarNav.tsx'
+];
 
 const house = {
 	rules: {
@@ -92,6 +126,20 @@ export default ts.config(
 	{
 		files: ['components/modules/DiscordPreview.tsx'],
 		rules: { '@next/next/no-img-element': 'off' }
+	},
+	{
+		files: TRANSLATED,
+		ignores: ['**/*.test.{ts,tsx}'],
+		plugins: { i18next },
+		rules: {
+			'i18next/no-literal-string': [
+				'error',
+				{
+					mode: 'jsx-only',
+					'jsx-attributes': { include: COPY_ATTRIBUTES }
+				}
+			]
+		}
 	},
 	{
 		files: ['**/*.{ts,tsx}'],
