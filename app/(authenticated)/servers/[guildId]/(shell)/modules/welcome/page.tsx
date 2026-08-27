@@ -5,7 +5,6 @@ import type { GuildModuleStateDto } from '@/lib/api-url';
 import { ApiUnreachableError, resolveGuild } from '@/lib/guild-access';
 import { loadChannels, loadRoles } from '@/lib/guild-shape';
 import { toWelcomeConfig, welcomeVariables } from '@/lib/modules/welcome';
-import { holdSkeleton } from '@/lib/skeleton-hold';
 import type { GuildPageProps } from '@/lib/types/page';
 import { WelcomeScreen } from './WelcomeScreen';
 
@@ -16,8 +15,6 @@ export default async function Page({ params, searchParams }: GuildPageProps) {
 	const guild = await resolveGuild(guildId);
 
 	if (query.state === 'loading') return <WelcomeSkeleton />;
-
-	await holdSkeleton(query);
 
 	const [state, channels, roles] = await Promise.all([
 		apiGet<GuildModuleStateDto>(`/guilds/${guildId}/modules/welcome`),
