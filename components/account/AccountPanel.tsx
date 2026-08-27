@@ -38,9 +38,7 @@ import { cn } from '@/lib/utils/cn';
 
 const LOCALES = [
 	{ value: 'en-US', label: 'English (US)' },
-	{ value: 'pt-BR', label: 'Português (Brasil)' },
-	{ value: 'es-ES', label: 'Español' },
-	{ value: 'fr-FR', label: 'Français' }
+	{ value: 'pt-BR', label: 'Português (Brasil)' }
 ];
 
 const TABS = [
