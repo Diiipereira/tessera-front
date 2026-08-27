@@ -21,6 +21,7 @@ export function Input({
 	className,
 	id,
 	disabled,
+	readOnly,
 	...rest
 }: InputProps) {
 	const field = useFieldState();
@@ -29,13 +30,16 @@ export function Input({
 
 	const stateClasses = isInvalid
 		? 'border-danger focus:border-danger'
-		: 'border-border hover:border-border-strong focus:border-primary';
+		: readOnly
+			? 'cursor-default border-border bg-surface-sunken'
+			: 'border-border hover:border-border-strong focus:border-primary';
 
 	const input = (
 		<input
 			{...rest}
 			id={id ?? field?.controlId}
 			disabled={isDisabled}
+			readOnly={readOnly}
 			aria-invalid={isInvalid || undefined}
 			aria-describedby={field?.describedBy}
 			className={cn(base, stateClasses, leading && 'pl-9', trailing && 'pr-9', className)}
