@@ -79,7 +79,7 @@ export const MODULE_HIGHLIGHTS: ModuleHighlight[] = [
 		id: 'welcome',
 		icon: DoorOpen,
 		title: 'Welcome',
-		body: 'Greet new members with plain text or an embed, hand out autoroles, and say goodbye when they leave.'
+		body: 'Greet new members with plain text or an embed, and hand out their first roles on the way in.'
 	},
 	{
 		id: 'levels',

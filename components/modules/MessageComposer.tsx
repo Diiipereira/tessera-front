@@ -150,7 +150,7 @@ export function MessageComposer({ value, onChange, variables }: MessageComposerP
 							}}
 							maxLength={DESCRIPTION_LIMIT}
 							showCount
-							placeholder="Glad you made it, {user.mention}."
+							placeholder="Glad you made it, {user}."
 						/>
 					</Field>
 

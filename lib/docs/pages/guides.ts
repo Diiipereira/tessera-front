@@ -181,15 +181,15 @@ Muted`
 					},
 					{
 						title: 'Pick the channel',
-						text: 'Channels the bot cannot post in are locked in the picker. If the one you want is locked, that is a permission problem, not a bug.'
+						text: 'Where the greeting goes. The module cannot be turned on without one, so this is the field that decides whether the switch works.'
 					},
 					{
 						title: 'Write the message',
-						text: 'Use `{user.mention}` to ping the new member and `{memberCount}` for the running total. The preview updates as you type.'
+						text: 'Use `{user}` for the member who joined and `{server}` for the server name. The preview updates as you type.'
 					},
 					{
-						title: 'Send a test',
-						text: 'The button posts it to the real channel exactly as a real join would. This is the step people skip and then wonder why it never fired.'
+						title: 'Check it with a real join',
+						text: 'Invite a second account, or ask someone to rejoin. The preview shows the layout, but only a real join proves the bot has the permissions it needs in that channel.'
 					}
 				]
 			},

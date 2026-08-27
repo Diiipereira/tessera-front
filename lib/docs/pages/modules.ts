@@ -16,21 +16,21 @@ const MODULE_DOCS: ModuleDoc[] = [
 	{
 		id: 'welcome',
 		title: 'Welcome',
-		summary: 'Greet new members, give them a role, and say goodbye when they leave.',
-		lead: 'Welcome posts a message the moment someone joins, optionally hands them a role, and can say goodbye when they leave. It is the module most servers turn on first, because it is the one members notice.',
+		summary: 'Greet new members and give them their first roles.',
+		lead: 'Welcome posts a message the moment someone joins and can hand them a role on the way in. It is the module most servers turn on first, because it is the one members notice.',
 		permissions: ['View Channel', 'Send Messages', 'Embed Links', 'Manage Roles'],
 		steps: [
 			{
 				title: 'Pick the channel',
-				text: 'Channels the bot cannot post in are locked in the picker, so you cannot choose one that will silently fail.'
+				text: 'Where the greeting is posted. The bot needs **Send Messages** there, and **Embed Links** as well if you send an embed.'
 			},
 			{
 				title: 'Write the message',
-				text: 'Plain text or an embed. Both accept the same variables — `{user}`, `{server}`, `{memberCount}` and the rest.'
+				text: 'Plain text or an embed. Both accept the same variables — `{user}` and `{server}`.'
 			},
 			{
-				title: 'Send a test',
-				text: 'The **Send test** button posts the message to the channel as the bot would on a real join.'
+				title: 'Turn it on',
+				text: 'The module stays off until you enable it, and it cannot be enabled without a channel. Nothing is posted while it is off.'
 			}
 		],
 		options: [
@@ -38,56 +38,44 @@ const MODULE_DOCS: ModuleDoc[] = [
 				name: 'Channel',
 				type: 'channel',
 				fallback: 'none',
-				text: 'Where the greeting is posted. Channels the bot cannot post in are locked.'
+				text: 'Where the greeting is posted. Required before the module can be turned on.'
 			},
 			{
 				name: 'Message mode',
 				type: 'text | embed',
 				fallback: '`text`',
-				text: 'An embed gets a title, a colour and a thumbnail; plain text does not.'
+				text: 'An embed gets a title, a colour, images and fields; plain text does not.'
 			},
 			{
 				name: 'Message',
 				type: 'string',
-				fallback: '—',
-				text: 'The body. Variables are replaced when it is posted, not when it is saved.'
-			},
-			{
-				name: 'Also DM the new member',
-				type: 'boolean',
-				fallback: 'off',
-				text: 'A private note only the new member sees. Members who block DMs from the server simply do not get it.'
+				fallback: '`Welcome {user} to {server}!`',
+				text: 'The body, up to 2000 characters. Variables are replaced when it is posted, not when it is saved.'
 			},
 			{
 				name: 'Roles to assign',
 				type: 'role[]',
 				fallback: 'none',
-				text: 'Given automatically on join. Roles above the bot in the list are locked.'
-			},
-			{
-				name: 'Post a goodbye message',
-				type: 'boolean',
-				fallback: 'off',
-				text: 'Posted when someone leaves, in a channel you pick separately.'
+				text: 'Given automatically on join. Roles Discord manages itself — bot, integration and booster roles — are locked, because nobody can hand those out.'
 			}
 		],
 		extra: [
 			{ kind: 'heading', id: 'variables', text: 'Variables' },
 			{
 				kind: 'paragraph',
-				text: 'Every message field in this module accepts the same set. Anything the bot cannot resolve is left as written rather than blanked, so a typo is visible instead of invisible.'
+				text: 'Every message field in this module accepts the same two. That includes each part of an embed — its title, its description and its fields. Anything the bot cannot resolve is left as written rather than blanked, so a typo is visible instead of invisible.'
 			},
 			{
 				kind: 'table',
 				head: ['Variable', 'Becomes'],
 				rows: [
-					['`{user}`', 'The member’s name, without a ping'],
-					['`{user.mention}`', 'A real ping'],
-					['`{user.tag}`', 'Name and discriminator'],
-					['`{server}`', 'The server name'],
-					['`{memberCount}`', 'How many members there are, after the join'],
-					['`{channel}`', 'A link to the welcome channel']
+					['`{user}`', 'The member who joined'],
+					['`{server}`', 'The server name']
 				]
+			},
+			{
+				kind: 'paragraph',
+				text: 'Whether `{user}` becomes a real ping or just a name is decided by the module’s mention setting, not by the variable.'
 			}
 		]
 	},
