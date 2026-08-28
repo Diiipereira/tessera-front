@@ -1,6 +1,7 @@
 'use client';
 
 import { GripVertical, Plus, Sticker, Trash2 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { ChannelPicker } from '@/components/discord/ChannelPicker';
@@ -24,12 +25,7 @@ import { DISCORD } from '@/lib/discord-colors';
 import { cn } from '@/lib/utils/cn';
 import { newId } from '@/lib/utils/id';
 
-const MODES: { id: ReactionMode; label: string; blurb: string }[] = [
-	{ id: 'toggle', label: 'Toggle', blurb: 'Press to get it, press again to drop it.' },
-	{ id: 'unique', label: 'Unique', blurb: 'Only one of these roles at a time.' },
-	{ id: 'verify', label: 'Verify', blurb: 'One-way — the role can only be gained.' },
-	{ id: 'drop', label: 'Drop', blurb: 'One-way — the role can only be removed.' }
-];
+const MODES: ReactionMode[] = ['toggle', 'unique', 'verify', 'drop'];
 
 function blankPanel(): ReactionPanel {
 	return {
@@ -49,6 +45,7 @@ type ReactionRolesScreenProps = {
 };
 
 export function ReactionRolesScreen({ config, channels, roles }: ReactionRolesScreenProps) {
+	const t = useTranslations('modules.reactionRoles');
 	const form = useConfigDraft<ReactionRolesConfig>(config);
 	const draft = form.draft;
 
@@ -74,14 +71,14 @@ export function ReactionRolesScreen({ config, channels, roles }: ReactionRolesSc
 
 	const aside = selected ? (
 		<section
-			aria-label="Panel preview"
+			aria-label={t('previewLabel')}
 			className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-4 shadow-1"
 		>
 			<h2 className="text-h4">Preview</h2>
 
 			<div className="rounded-lg p-4" style={{ backgroundColor: DISCORD.surface }}>
 				<p className="mb-3 text-[15px] text-white">
-					{selected.name === '' ? 'Pick your roles' : selected.name}
+					{selected.name === '' ? t('defaultName') : selected.name}
 				</p>
 
 				{selected.options.length === 0 ? (
@@ -97,7 +94,7 @@ export function ReactionRolesScreen({ config, channels, roles }: ReactionRolesSc
 								style={{ backgroundColor: DISCORD.button }}
 							>
 								<span aria-hidden="true">{option.emoji}</span>
-								{option.label === '' ? 'Role' : option.label}
+								{option.label === '' ? t('defaultOption') : option.label}
 							</span>
 						))}
 					</div>
@@ -117,9 +114,7 @@ export function ReactionRolesScreen({ config, channels, roles }: ReactionRolesSc
 				)}
 			</div>
 
-			<p className="text-caption font-normal text-text-muted">
-				{MODES.find((mode) => mode.id === selected.mode)?.blurb}
-			</p>
+			<p className="text-caption font-normal text-text-muted">{t(`mode.${selected.mode}.blurb`)}</p>
 		</section>
 	) : undefined;
 
@@ -127,8 +122,8 @@ export function ReactionRolesScreen({ config, channels, roles }: ReactionRolesSc
 		<ModulePage
 			moduleId="reaction-roles"
 			icon={Sticker}
-			title="Reaction roles"
-			description="Members pick their own roles, without asking staff."
+			title={t('title')}
+			description={t('description')}
 			enabled={draft.enabled}
 			onEnabledChange={(next) => {
 				form.set('enabled', next);
@@ -142,7 +137,7 @@ export function ReactionRolesScreen({ config, channels, roles }: ReactionRolesSc
 					onDiscard={form.discard}
 					onSave={() => {
 						void form.save().then(() => {
-							toast.success('Reaction roles saved');
+							toast.success(t('saved'));
 						});
 					}}
 					onResolveConflict={form.resolveConflict}
@@ -150,7 +145,7 @@ export function ReactionRolesScreen({ config, channels, roles }: ReactionRolesSc
 			}
 		>
 			<SettingsSection
-				title="Panels"
+				title={t('panels.title')}
 				action={
 					<Button
 						variant="outline"
@@ -185,7 +180,7 @@ export function ReactionRolesScreen({ config, channels, roles }: ReactionRolesSc
 										: 'border-border bg-surface text-text-muted hover:border-border-strong hover:text-text'
 								)}
 							>
-								{panel.name === '' ? 'Untitled panel' : panel.name}
+								{panel.name === '' ? t('untitled') : panel.name}
 							</button>
 						))}
 					</div>
@@ -195,13 +190,15 @@ export function ReactionRolesScreen({ config, channels, roles }: ReactionRolesSc
 			{selected ? (
 				<>
 					<SettingsSection
-						title="Panel settings"
+						title={t('settings.title')}
 						action={
 							<Button
 								variant="ghost-danger"
 								size="sm"
 								iconOnly
-								aria-label={`Delete ${selected.name === '' ? 'untitled panel' : selected.name}`}
+								aria-label={t('settings.delete', {
+									name: selected.name === '' ? t('untitled') : selected.name
+								})}
 								onClick={() => {
 									const rest = draft.panels.filter((panel) => panel.id !== selected.id);
 									form.set('panels', rest);
@@ -212,17 +209,17 @@ export function ReactionRolesScreen({ config, channels, roles }: ReactionRolesSc
 							</Button>
 						}
 					>
-						<Field label="Panel name" hint="Shown as the message above the options.">
+						<Field label={t('settings.name')} hint={t('settings.nameHint')}>
 							<Input
 								value={selected.name}
 								onChange={(event) => {
 									updatePanel(selected.id, { name: event.target.value });
 								}}
-								placeholder="Pick your colours"
+								placeholder={t('settings.namePlaceholder')}
 							/>
 						</Field>
 
-						<Field label="Channel">
+						<Field label={t('settings.channel')}>
 							<ChannelPicker
 								channels={channels}
 								value={selected.channelId}
@@ -233,17 +230,17 @@ export function ReactionRolesScreen({ config, channels, roles }: ReactionRolesSc
 						</Field>
 
 						<div className="flex flex-col gap-2">
-							<span className="text-body-sm font-medium">Mode</span>
+							<span className="text-body-sm font-medium">{t('settings.mode')}</span>
 							<div className="grid gap-2 sm:grid-cols-2">
 								{MODES.map((mode) => {
-									const active = selected.mode === mode.id;
+									const active = selected.mode === mode;
 									return (
 										<button
-											key={mode.id}
+											key={mode}
 											type="button"
 											aria-pressed={active}
 											onClick={() => {
-												updatePanel(selected.id, { mode: mode.id });
+												updatePanel(selected.id, { mode });
 											}}
 											className={cn(
 												'flex flex-col items-start gap-0.5 rounded-lg border p-3 text-left transition-colors duration-120 ease-out',
@@ -258,9 +255,11 @@ export function ReactionRolesScreen({ config, channels, roles }: ReactionRolesSc
 													active ? 'text-primary' : 'text-text'
 												)}
 											>
-												{mode.label}
+												{t(`mode.${mode}.label`)}
 											</span>
-											<span className="text-caption font-normal text-text-muted">{mode.blurb}</span>
+											<span className="text-caption font-normal text-text-muted">
+												{t(`mode.${mode}.blurb`)}
+											</span>
 										</button>
 									);
 								})}
@@ -272,14 +271,14 @@ export function ReactionRolesScreen({ config, channels, roles }: ReactionRolesSc
 							onCheckedChange={(next) => {
 								updatePanel(selected.id, { useButtons: next });
 							}}
-							label="Use buttons instead of reactions"
-							description="Buttons are clearer and cannot be removed by accident."
+							label={t('settings.buttons')}
+							description={t('settings.buttonsHint')}
 						/>
 					</SettingsSection>
 
 					<SettingsSection
-						title="Options"
-						description="One row per role a member can pick."
+						title={t('options.title')}
+						description={t('options.description')}
 						action={
 							<Button
 								variant="outline"
@@ -333,7 +332,7 @@ export function ReactionRolesScreen({ config, channels, roles }: ReactionRolesSc
 													className="text-center"
 												/>
 											</Field>
-											<Field label="Label" className="min-w-40 flex-1">
+											<Field label={t('options.label')} className="min-w-40 flex-1">
 												<Input
 													value={option.label}
 													onChange={(event) => {
@@ -341,12 +340,12 @@ export function ReactionRolesScreen({ config, channels, roles }: ReactionRolesSc
 															label: event.target.value
 														});
 													}}
-													placeholder="Blue"
+													placeholder={t('options.labelPlaceholder')}
 												/>
 											</Field>
 										</div>
 
-										<Field label="Role">
+										<Field label={t('options.role')}>
 											<RolePicker
 												roles={roles}
 												value={option.roleId === null ? [] : [option.roleId]}
@@ -355,7 +354,6 @@ export function ReactionRolesScreen({ config, channels, roles }: ReactionRolesSc
 														roleId: next.at(-1) ?? null
 													});
 												}}
-												placeholder="Pick a role…"
 											/>
 										</Field>
 									</div>
@@ -364,7 +362,9 @@ export function ReactionRolesScreen({ config, channels, roles }: ReactionRolesSc
 										variant="ghost-danger"
 										size="sm"
 										iconOnly
-										aria-label={`Remove option ${option.label === '' ? 'without a label' : option.label}`}
+										aria-label={t('options.remove', {
+											label: option.label === '' ? t('options.unlabelled') : option.label
+										})}
 										onClick={() => {
 											updatePanel(selected.id, {
 												options: selected.options.filter((entry) => entry.id !== option.id)

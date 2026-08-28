@@ -722,6 +722,109 @@
 			"notImage": "Este não é um link direto de imagem — o Discord não vai mostrar nada. Ele precisa terminar em .png, .jpg ou .gif",
 			"expiring": "Link de anexo do Discord expira em menos de um dia e a imagem some. Hospede a figura em algum lugar permanente."
 		},
+		"giveaways": {
+			"title": "Sorteios",
+			"description": "Sorteios com prazo e requisitos de entrada, e um novo sorteio quando o ganhador some.",
+			"saved": "Sorteios salvos",
+			"new": "Novo sorteio",
+			"list": {
+				"title": "Sorteios",
+				"state": "Estado do sorteio",
+				"active": "Ativos",
+				"scheduled": "Agendados",
+				"ended": "Encerrados",
+				"emptyActive": "Nada rodando",
+				"emptyActiveBody": "Comece um e ele aparece aqui com a contagem ao vivo.",
+				"emptyScheduled": "Nada agendado",
+				"emptyScheduledBody": "Sorteios marcados para começar depois aparecem aqui.",
+				"emptyEnded": "Nada encerrado",
+				"emptyEndedBody": "Sorteios terminados e seus ganhadores ficam aqui."
+			},
+			"card": {
+				"winners": "{count, plural, =1 {1 ganhador} other {# ganhadores}}",
+				"ended": "encerrado",
+				"hostedBy": "organizado por {host}",
+				"entries": "{count} participações",
+				"level": "nível {level}+",
+				"wonBy": "Ganho por",
+				"endNow": "Encerrar agora",
+				"reroll": "Sortear de novo",
+				"didEnd": "“{prize}” encerrado",
+				"didReroll": "“{prize}” sorteado de novo",
+				"rerollPending": "Um novo ganhador é escolhido quando a API existir."
+			},
+			"defaults": {
+				"title": "Padrões",
+				"description": "Usados quando um sorteio novo é criado.",
+				"winners": "Ganhadores",
+				"dm": "Mandar DM para os ganhadores",
+				"dmHint": "Eles também são mencionados no canal de qualquer jeito."
+			},
+			"create": {
+				"title": "Novo sorteio",
+				"description": "Ele começa no instante em que você cria.",
+				"submit": "Começar o sorteio",
+				"prize": "Prêmio",
+				"prizePlaceholder": "Nitro por um mês",
+				"winners": "Ganhadores",
+				"hours": "Dura (horas)",
+				"roles": "Cargos exigidos",
+				"rolesHint": "Deixe vazio para liberar a entrada de todos.",
+				"rolesPlaceholder": "Qualquer um pode entrar…",
+				"level": "Nível mínimo",
+				"levelHint": "0 significa nenhuma exigência de nível."
+			}
+		},
+		"reactionRoles": {
+			"title": "Cargos por reação",
+			"description": "Os membros escolhem os próprios cargos, sem pedir para a equipe.",
+			"saved": "Cargos por reação salvos",
+			"untitled": "Painel sem nome",
+			"defaultName": "Escolha seus cargos",
+			"previewLabel": "Prévia do painel",
+			"defaultOption": "Cargo",
+			"panels": {
+				"title": "Painéis"
+			},
+			"settings": {
+				"title": "Configurações do painel",
+				"delete": "Excluir {name}",
+				"name": "Nome do painel",
+				"nameHint": "Aparece como a mensagem acima das opções.",
+				"namePlaceholder": "Escolha suas cores",
+				"channel": "Canal",
+				"buttons": "Usar botões em vez de reações",
+				"buttonsHint": "Botões são mais claros e não somem por acidente.",
+				"mode": "Modo"
+			},
+			"options": {
+				"title": "Opções",
+				"description": "Uma linha por cargo que o membro pode escolher.",
+				"label": "Rótulo",
+				"labelPlaceholder": "Azul",
+				"role": "Cargo",
+				"remove": "Remover a opção {label}",
+				"unlabelled": "sem rótulo"
+			},
+			"mode": {
+				"toggle": {
+					"label": "Alternar",
+					"blurb": "Clique para receber, clique de novo para largar."
+				},
+				"unique": {
+					"label": "Exclusivo",
+					"blurb": "Só um destes cargos por vez."
+				},
+				"verify": {
+					"label": "Verificação",
+					"blurb": "Mão única — o cargo só pode ser ganho."
+				},
+				"drop": {
+					"label": "Remoção",
+					"blurb": "Mão única — o cargo só pode ser removido."
+				}
+			}
+		},
 		"levels": {
 			"title": "Níveis",
 			"description": "XP por conversar, ranques para mostrar isso, e cargos entregues pelo caminho.",
@@ -788,7 +891,10 @@
 				"resetPending": "Ligado à API quando ela existir. Nada foi apagado.",
 				"resetBody": "Todo membro cai para o nível 0. Os cargos de recompensa já entregues ficam."
 			},
-			"chart": { "level": "Nível", "totalXp": "XP total" }
+			"chart": {
+				"level": "Nível",
+				"totalXp": "XP total"
+			}
 		},
 		"scheduled": {
 			"title": "Mensagens agendadas",
@@ -822,7 +928,9 @@
 				"next": "Próximas {count}",
 				"nothing": "Nada está agendado — escolha ao menos um dia, ou uma data."
 			},
-			"message": { "title": "Mensagem" },
+			"message": {
+				"title": "Mensagem"
+			},
 			"when": {
 				"no-date": "Nenhuma data definida",
 				"once": "Uma vez, em {at}",
@@ -890,7 +998,9 @@
 				"ephemeral": "Só quem chamou vê a resposta",
 				"ephemeralHint": "Bom para qualquer coisa barulhenta ou pessoal."
 			},
-			"response": { "title": "Resposta" },
+			"response": {
+				"title": "Resposta"
+			},
 			"nameIssue": {
 				"empty": "Um comando precisa de nome.",
 				"shape": "Só letras minúsculas, números, hífens e sublinhados, até 32 caracteres.",
@@ -926,19 +1036,46 @@
 				"rolesPlaceholder": "Ninguém ignorado…"
 			},
 			"event": {
-				"message_delete": { "name": "Mensagem apagada", "body": "Conteúdo, autor e canal." },
-				"message_edit": { "name": "Mensagem editada", "body": "Antes e depois." },
-				"bulk_delete": { "name": "Exclusão em massa", "body": "Uma limpeza, com a contagem." },
-				"member_join": { "name": "Membro entrou", "body": "Com a idade da conta." },
-				"member_leave": { "name": "Membro saiu", "body": "E que cargos tinha." },
-				"nickname": { "name": "Apelido alterado", "body": "Antigo e novo." },
-				"ban": { "name": "Membro banido", "body": "Moderador e motivo." },
-				"timeout": { "name": "Membro em timeout", "body": "Duração e motivo." },
+				"message_delete": {
+					"name": "Mensagem apagada",
+					"body": "Conteúdo, autor e canal."
+				},
+				"message_edit": {
+					"name": "Mensagem editada",
+					"body": "Antes e depois."
+				},
+				"bulk_delete": {
+					"name": "Exclusão em massa",
+					"body": "Uma limpeza, com a contagem."
+				},
+				"member_join": {
+					"name": "Membro entrou",
+					"body": "Com a idade da conta."
+				},
+				"member_leave": {
+					"name": "Membro saiu",
+					"body": "E que cargos tinha."
+				},
+				"nickname": {
+					"name": "Apelido alterado",
+					"body": "Antigo e novo."
+				},
+				"ban": {
+					"name": "Membro banido",
+					"body": "Moderador e motivo."
+				},
+				"timeout": {
+					"name": "Membro em timeout",
+					"body": "Duração e motivo."
+				},
 				"channel_change": {
 					"name": "Canal criado ou excluído",
 					"body": "Inclui as permissões sobrescritas."
 				},
-				"role_change": { "name": "Cargo criado ou excluído", "body": "E edições de permissão." },
+				"role_change": {
+					"name": "Cargo criado ou excluído",
+					"body": "E edições de permissão."
+				},
 				"voice_join": {
 					"name": "Entrada ou saída de voz",
 					"body": "Barulhento em servidor grande."

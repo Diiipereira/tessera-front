@@ -722,6 +722,109 @@
 			"notImage": "This is not a direct image link — Discord will show nothing. It should end in .png, .jpg or .gif",
 			"expiring": "A Discord attachment link expires within a day and the image will vanish. Host it somewhere permanent instead."
 		},
+		"giveaways": {
+			"title": "Giveaways",
+			"description": "Timed draws with entry requirements, and a reroll when a winner goes quiet.",
+			"saved": "Giveaways saved",
+			"new": "New giveaway",
+			"list": {
+				"title": "Giveaways",
+				"state": "Giveaway state",
+				"active": "Active",
+				"scheduled": "Scheduled",
+				"ended": "Ended",
+				"emptyActive": "Nothing running",
+				"emptyActiveBody": "Start one and it shows up here with a live count.",
+				"emptyScheduled": "Nothing scheduled",
+				"emptyScheduledBody": "Giveaways set to start later appear here.",
+				"emptyEnded": "Nothing finished",
+				"emptyEndedBody": "Finished giveaways and their winners land here."
+			},
+			"card": {
+				"winners": "{count, plural, =1 {1 winner} other {# winners}}",
+				"ended": "ended",
+				"hostedBy": "hosted by {host}",
+				"entries": "{count} entries",
+				"level": "level {level}+",
+				"wonBy": "Won by",
+				"endNow": "End now",
+				"reroll": "Reroll",
+				"didEnd": "Ended “{prize}”",
+				"didReroll": "Rerolled “{prize}”",
+				"rerollPending": "A new winner is picked once the API exists."
+			},
+			"defaults": {
+				"title": "Defaults",
+				"description": "Used when a new giveaway is created.",
+				"winners": "Winners",
+				"dm": "DM the winners",
+				"dmHint": "They also get pinged in the channel either way."
+			},
+			"create": {
+				"title": "New giveaway",
+				"description": "It starts the moment you create it.",
+				"submit": "Start giveaway",
+				"prize": "Prize",
+				"prizePlaceholder": "Nitro for a month",
+				"winners": "Winners",
+				"hours": "Runs for (hours)",
+				"roles": "Required roles",
+				"rolesHint": "Leave empty to let everyone enter.",
+				"rolesPlaceholder": "Anyone can enter…",
+				"level": "Minimum level",
+				"levelHint": "0 means no level requirement."
+			}
+		},
+		"reactionRoles": {
+			"title": "Reaction roles",
+			"description": "Members pick their own roles, without asking staff.",
+			"saved": "Reaction roles saved",
+			"untitled": "Untitled panel",
+			"defaultName": "Pick your roles",
+			"previewLabel": "Panel preview",
+			"defaultOption": "Role",
+			"panels": {
+				"title": "Panels"
+			},
+			"settings": {
+				"title": "Panel settings",
+				"delete": "Delete {name}",
+				"name": "Panel name",
+				"nameHint": "Shown as the message above the options.",
+				"namePlaceholder": "Pick your colours",
+				"channel": "Channel",
+				"buttons": "Use buttons instead of reactions",
+				"buttonsHint": "Buttons are clearer and cannot be removed by accident.",
+				"mode": "Mode"
+			},
+			"options": {
+				"title": "Options",
+				"description": "One row per role a member can pick.",
+				"label": "Label",
+				"labelPlaceholder": "Blue",
+				"role": "Role",
+				"remove": "Remove option {label}",
+				"unlabelled": "without a label"
+			},
+			"mode": {
+				"toggle": {
+					"label": "Toggle",
+					"blurb": "Press to get it, press again to drop it."
+				},
+				"unique": {
+					"label": "Unique",
+					"blurb": "Only one of these roles at a time."
+				},
+				"verify": {
+					"label": "Verify",
+					"blurb": "One-way — the role can only be gained."
+				},
+				"drop": {
+					"label": "Drop",
+					"blurb": "One-way — the role can only be removed."
+				}
+			}
+		},
 		"levels": {
 			"title": "Levels",
 			"description": "XP for talking, ranks to show for it, and roles handed out along the way.",
@@ -788,7 +891,10 @@
 				"resetPending": "Wired to the API once it exists. Nothing was deleted.",
 				"resetBody": "Every member drops to level 0. Role rewards already given stay."
 			},
-			"chart": { "level": "Level", "totalXp": "Total XP" }
+			"chart": {
+				"level": "Level",
+				"totalXp": "Total XP"
+			}
 		},
 		"scheduled": {
 			"title": "Scheduled messages",
@@ -822,7 +928,9 @@
 				"next": "Next {count}",
 				"nothing": "Nothing is scheduled — pick at least one day, or a date."
 			},
-			"message": { "title": "Message" },
+			"message": {
+				"title": "Message"
+			},
 			"when": {
 				"no-date": "No date set",
 				"once": "Once, on {at}",
@@ -890,7 +998,9 @@
 				"ephemeral": "Only the caller sees the reply",
 				"ephemeralHint": "Good for anything noisy or personal."
 			},
-			"response": { "title": "Response" },
+			"response": {
+				"title": "Response"
+			},
 			"nameIssue": {
 				"empty": "A command needs a name.",
 				"shape": "Lowercase letters, numbers, dashes and underscores only, up to 32 characters.",
@@ -926,20 +1036,50 @@
 				"rolesPlaceholder": "Nobody ignored…"
 			},
 			"event": {
-				"message_delete": { "name": "Message deleted", "body": "Content, author and channel." },
-				"message_edit": { "name": "Message edited", "body": "Before and after." },
-				"bulk_delete": { "name": "Bulk delete", "body": "A purge, with the count." },
-				"member_join": { "name": "Member joined", "body": "With account age." },
-				"member_leave": { "name": "Member left", "body": "And what roles they had." },
-				"nickname": { "name": "Nickname changed", "body": "Old and new." },
-				"ban": { "name": "Member banned", "body": "Moderator and reason." },
-				"timeout": { "name": "Member timed out", "body": "Duration and reason." },
+				"message_delete": {
+					"name": "Message deleted",
+					"body": "Content, author and channel."
+				},
+				"message_edit": {
+					"name": "Message edited",
+					"body": "Before and after."
+				},
+				"bulk_delete": {
+					"name": "Bulk delete",
+					"body": "A purge, with the count."
+				},
+				"member_join": {
+					"name": "Member joined",
+					"body": "With account age."
+				},
+				"member_leave": {
+					"name": "Member left",
+					"body": "And what roles they had."
+				},
+				"nickname": {
+					"name": "Nickname changed",
+					"body": "Old and new."
+				},
+				"ban": {
+					"name": "Member banned",
+					"body": "Moderator and reason."
+				},
+				"timeout": {
+					"name": "Member timed out",
+					"body": "Duration and reason."
+				},
 				"channel_change": {
 					"name": "Channel created or deleted",
 					"body": "Includes permission overwrites."
 				},
-				"role_change": { "name": "Role created or deleted", "body": "And permission edits." },
-				"voice_join": { "name": "Voice join or leave", "body": "Noisy on big servers." }
+				"role_change": {
+					"name": "Role created or deleted",
+					"body": "And permission edits."
+				},
+				"voice_join": {
+					"name": "Voice join or leave",
+					"body": "Noisy on big servers."
+				}
 			}
 		},
 		"moderation": {
