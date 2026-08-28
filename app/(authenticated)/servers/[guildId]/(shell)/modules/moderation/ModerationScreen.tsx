@@ -1,6 +1,7 @@
 'use client';
 
 import { Shield, Wand2 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { RolePicker } from '@/components/discord/RolePicker';
 import { EscalationTable } from '@/components/modules/EscalationTable';
@@ -18,26 +19,15 @@ import { useConfigDraft } from '@/lib/hooks/useConfigDraft';
 import type { Role } from '@/lib/types/discord';
 import type { ModerationConfig } from '@/lib/types/modules';
 
-const TIMEOUT_DURATIONS = [
-	{ value: '60s', label: '60 seconds' },
-	{ value: '5m', label: '5 minutes' },
-	{ value: '1h', label: '1 hour' },
-	{ value: '24h', label: '24 hours' },
-	{ value: '7d', label: '7 days' }
-];
+const TIMEOUT_DURATIONS = ['60s', '5m', '1h', '24h', '7d'] as const;
 
-const MUTE_DURATIONS = [
-	{ value: '1h', label: '1 hour' },
-	{ value: '24h', label: '24 hours' },
-	{ value: '7d', label: '7 days' },
-	{ value: 'permanent', label: 'Until lifted' }
-];
+const MUTE_DURATIONS = ['1h', '24h', '7d'] as const;
 
 const DELETE_DAYS = [
-	{ value: '0', label: 'Keep their messages' },
-	{ value: '1', label: 'Delete the last 24 hours' },
-	{ value: '7', label: 'Delete the last 7 days' }
-];
+	{ value: '0', key: 'keepMessages' },
+	{ value: '1', key: 'delete1' },
+	{ value: '7', key: 'delete7' }
+] as const;
 
 type ModerationScreenProps = {
 	config: ModerationConfig;
@@ -45,6 +35,8 @@ type ModerationScreenProps = {
 };
 
 export function ModerationScreen({ config, roles }: ModerationScreenProps) {
+	const t = useTranslations('modules.moderation');
+	const spans = useTranslations('durations');
 	const form = useConfigDraft<ModerationConfig>(config);
 	const draft = form.draft;
 
@@ -54,8 +46,8 @@ export function ModerationScreen({ config, roles }: ModerationScreenProps) {
 		<ModulePage
 			moduleId="moderation"
 			icon={Shield}
-			title="Moderation"
-			description="Warns, timeouts, mutes and bans — every one of them written to the case log."
+			title={t('title')}
+			description={t('description')}
 			enabled={draft.enabled}
 			onEnabledChange={(next) => {
 				form.set('enabled', next);
@@ -68,49 +60,40 @@ export function ModerationScreen({ config, roles }: ModerationScreenProps) {
 					onDiscard={form.discard}
 					onSave={() => {
 						void form.save().then(() => {
-							toast.success('Moderation settings saved');
+							toast.success(t('saved'));
 						});
 					}}
 					onResolveConflict={form.resolveConflict}
 				/>
 			}
 		>
-			<SettingsSection
-				title="Who can moderate"
-				description="These roles get the moderation commands and the dashboard actions."
-			>
-				<Field label="Moderator roles" hint="Roles above the bot's own role are locked.">
+			<SettingsSection title={t('who.title')} description={t('who.description')}>
+				<Field label={t('who.modRoles')} hint={t('who.modRolesHint')}>
 					<RolePicker
 						roles={roles}
 						value={draft.modRoleIds}
 						onValueChange={(next) => {
 							form.set('modRoleIds', next);
 						}}
-						placeholder="Pick the staff roles…"
+						placeholder={t('who.modRolesPlaceholder')}
 					/>
 				</Field>
 
-				<Field
-					label="Protected roles"
-					hint="Members with these roles cannot be punished, even by a moderator."
-				>
+				<Field label={t('who.protectedRoles')} hint={t('who.protectedRolesHint')}>
 					<RolePicker
 						roles={roles}
 						value={draft.protectedRoleIds}
 						onValueChange={(next) => {
 							form.set('protectedRoleIds', next);
 						}}
-						placeholder="Nobody is protected…"
+						placeholder={t('who.protectedRolesPlaceholder')}
 					/>
 				</Field>
 			</SettingsSection>
 
-			<SettingsSection
-				title="Muted role"
-				description="Used by the mute command. Discord timeouts do not need one; a mute that outlives 28 days does."
-			>
+			<SettingsSection title={t('muted.title')} description={t('muted.description')}>
 				{mutedRole ? (
-					<Field label="Role">
+					<Field label={t('muted.role')}>
 						<RolePicker
 							roles={roles}
 							value={[mutedRole.id]}
@@ -120,8 +103,8 @@ export function ModerationScreen({ config, roles }: ModerationScreenProps) {
 						/>
 					</Field>
 				) : (
-					<Alert variant="warning" title="No muted role yet">
-						Mute will fall back to a Discord timeout, which Discord caps at 28 days.
+					<Alert variant="warning" title={t('muted.noneTitle')}>
+						{t('muted.noneBody')}
 						<div className="mt-3">
 							<Button
 								variant="outline"
@@ -130,26 +113,23 @@ export function ModerationScreen({ config, roles }: ModerationScreenProps) {
 									const created = roles.find((role) => !role.lockedReason);
 									if (!created) return;
 									form.set('mutedRoleId', created.id);
-									toast.success(`Using @${created.name} as the muted role`, {
-										description: 'Creating a fresh role needs the API, so this reuses one for now.'
+									toast.success(t('muted.using', { role: created.name }), {
+										description: t('muted.usingHint')
 									});
 								}}
 							>
 								<Wand2 aria-hidden="true" />
-								Create it for me
+								{t('muted.create')}
 							</Button>
 						</div>
 					</Alert>
 				)}
 			</SettingsSection>
 
-			<SettingsSection
-				title="Defaults"
-				description="What a moderator gets when they run a command without a duration."
-			>
-				<Field label="Timeout">
+			<SettingsSection title={t('defaults.title')} description={t('defaults.description')}>
+				<Field label={t('defaults.timeout')}>
 					<Select
-						options={TIMEOUT_DURATIONS}
+						options={TIMEOUT_DURATIONS.map((value) => ({ value, label: spans(value) }))}
 						value={draft.timeoutDefault}
 						onValueChange={(next) => {
 							form.set('timeoutDefault', next);
@@ -157,9 +137,12 @@ export function ModerationScreen({ config, roles }: ModerationScreenProps) {
 					/>
 				</Field>
 
-				<Field label="Mute">
+				<Field label={t('defaults.mute')}>
 					<Select
-						options={MUTE_DURATIONS}
+						options={[
+							...MUTE_DURATIONS.map((value) => ({ value, label: spans(value) })),
+							{ value: 'permanent', label: t('defaults.untilLifted') }
+						]}
 						value={draft.muteDefault}
 						onValueChange={(next) => {
 							form.set('muteDefault', next);
@@ -167,9 +150,12 @@ export function ModerationScreen({ config, roles }: ModerationScreenProps) {
 					/>
 				</Field>
 
-				<Field label="On ban" hint="Discord can clear recent messages as part of the ban.">
+				<Field label={t('defaults.onBan')} hint={t('defaults.onBanHint')}>
 					<Select
-						options={DELETE_DAYS}
+						options={DELETE_DAYS.map((option) => ({
+							value: option.value,
+							label: t(`defaults.${option.key}`)
+						}))}
 						value={draft.banDeleteDays}
 						onValueChange={(next) => {
 							form.set('banDeleteDays', next);
@@ -182,30 +168,24 @@ export function ModerationScreen({ config, roles }: ModerationScreenProps) {
 					onCheckedChange={(next) => {
 						form.set('reasonRequired', next);
 					}}
-					label="Require a reason"
-					description="The command is refused without one. The case log is only useful if it is filled in."
+					label={t('defaults.reasonRequired')}
+					description={t('defaults.reasonRequiredHint')}
 				/>
 			</SettingsSection>
 
-			<SettingsSection
-				title="Telling the member"
-				description="Sent before the punishment lands, so a ban still reaches them."
-			>
+			<SettingsSection title={t('dm.title')} description={t('dm.description')}>
 				<Switch
 					checked={draft.dmOnPunish}
 					onCheckedChange={(next) => {
 						form.set('dmOnPunish', next);
 					}}
-					label="DM the member"
-					description="Silently skipped if they have DMs from the server turned off."
+					label={t('dm.toggle')}
+					description={t('dm.toggleHint')}
 				/>
 
 				{draft.dmOnPunish ? (
 					<>
-						<Field
-							label="Message"
-							hint="{action}, {reason}, {duration} and {server} are filled in."
-						>
+						<Field label={t('dm.message')} hint={t('dm.messageHint')}>
 							<Textarea
 								value={draft.dmTemplate}
 								onChange={(event) => {
@@ -216,7 +196,7 @@ export function ModerationScreen({ config, roles }: ModerationScreenProps) {
 							/>
 						</Field>
 
-						<Field label="Appeal link" help="Added to the bottom of the message when set.">
+						<Field label={t('dm.appeal')} help={t('dm.appealHelp')}>
 							<Input
 								type="url"
 								value={draft.appealUrl}
@@ -230,10 +210,7 @@ export function ModerationScreen({ config, roles }: ModerationScreenProps) {
 				) : null}
 			</SettingsSection>
 
-			<SettingsSection
-				title="Warning escalation"
-				description="Run automatically once a member reaches a warning count."
-			>
+			<SettingsSection title={t('escalation.title')} description={t('escalation.description')}>
 				<EscalationTable
 					rules={draft.escalation}
 					onChange={(next) => {

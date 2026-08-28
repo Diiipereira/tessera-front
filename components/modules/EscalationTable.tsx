@@ -1,27 +1,16 @@
 'use client';
 
 import { Plus, Trash2, TriangleAlert } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/Button';
 import { NumberInput } from '@/components/ui/NumberInput';
 import { Select } from '@/components/ui/Select';
 import type { EscalationRule, ModerationAction } from '@/lib/types/modules';
 import { newId } from '@/lib/utils/id';
 
-const ACTIONS: { value: ModerationAction; label: string }[] = [
-	{ value: 'warn', label: 'Warn again' },
-	{ value: 'timeout', label: 'Timeout' },
-	{ value: 'mute', label: 'Mute' },
-	{ value: 'kick', label: 'Kick' },
-	{ value: 'ban', label: 'Ban' }
-];
+const ACTIONS: ModerationAction[] = ['warn', 'timeout', 'mute', 'kick', 'ban'];
 
-const DURATIONS = [
-	{ value: '10m', label: '10 minutes' },
-	{ value: '1h', label: '1 hour' },
-	{ value: '24h', label: '24 hours' },
-	{ value: '7d', label: '7 days' },
-	{ value: 'permanent', label: 'Permanent' }
-];
+const TIMED = ['10m', '1h', '24h', '7d'] as const;
 
 const INSTANT_ACTIONS: ModerationAction[] = ['warn', 'kick'];
 
@@ -31,6 +20,16 @@ type EscalationTableProps = {
 };
 
 export function EscalationTable({ rules, onChange }: EscalationTableProps) {
+	const t = useTranslations('modules.moderation.escalation');
+	const spans = useTranslations('durations');
+
+	const actionOptions = ACTIONS.map((value) => ({ value, label: t(`actions.${value}`) }));
+
+	const durationOptions = [
+		...TIMED.map((value) => ({ value, label: spans(value) })),
+		{ value: 'permanent', label: t('permanent') }
+	];
+
 	const sorted = [...rules].sort((a, b) => a.atWarnings - b.atWarnings);
 	const duplicates = sorted.filter(
 		(rule, index) => index > 0 && rule.atWarnings === sorted[index - 1]?.atWarnings
@@ -56,25 +55,23 @@ export function EscalationTable({ rules, onChange }: EscalationTableProps) {
 	return (
 		<div className="flex flex-col gap-3">
 			{sorted.length === 0 ? (
-				<p className="text-body-sm text-text-muted">
-					No escalation yet. Warnings will just accumulate.
-				</p>
+				<p className="text-body-sm text-text-muted">{t('empty')}</p>
 			) : (
 				<div className="overflow-x-auto">
 					<table className="w-full min-w-140 border-collapse">
 						<thead>
 							<tr className="border-b border-border text-left">
 								<th className="pb-2 font-mono text-overline font-semibold text-text-muted uppercase">
-									At
+									{t('at')}
 								</th>
 								<th className="pb-2 font-mono text-overline font-semibold text-text-muted uppercase">
-									Action
+									{t('action')}
 								</th>
 								<th className="pb-2 font-mono text-overline font-semibold text-text-muted uppercase">
-									Duration
+									{t('duration')}
 								</th>
 								<th className="pb-2">
-									<span className="sr-only">Remove</span>
+									<span className="sr-only">{t('remove')}</span>
 								</th>
 							</tr>
 						</thead>
@@ -92,17 +89,17 @@ export function EscalationTable({ rules, onChange }: EscalationTableProps) {
 													onValueChange={(next) => {
 														update(rule.id, { atWarnings: next });
 													}}
-													aria-label="Warnings before this rule fires"
+													aria-label={t('atLabel')}
 													className="tabular w-20"
 												/>
 												<span className="text-body-sm whitespace-nowrap text-text-muted">
-													warnings
+													{t('warnings')}
 												</span>
 											</div>
 										</td>
 										<td className="py-2 pr-3 align-top">
 											<Select
-												options={ACTIONS}
+												options={actionOptions}
 												value={rule.action}
 												onValueChange={(next) => {
 													update(rule.id, { action: next as ModerationAction });
@@ -113,11 +110,11 @@ export function EscalationTable({ rules, onChange }: EscalationTableProps) {
 										<td className="py-2 pr-3 align-top">
 											{instant ? (
 												<span className="block py-2 text-body-sm text-text-muted">
-													Not applicable
+													{t('notApplicable')}
 												</span>
 											) : (
 												<Select
-													options={DURATIONS}
+													options={durationOptions}
 													value={rule.duration}
 													onValueChange={(next) => {
 														update(rule.id, { duration: next });
@@ -131,7 +128,7 @@ export function EscalationTable({ rules, onChange }: EscalationTableProps) {
 												variant="ghost-danger"
 												size="sm"
 												iconOnly
-												aria-label={`Remove the rule at ${String(rule.atWarnings)} warnings`}
+												aria-label={t('removeRule', { count: rule.atWarnings })}
 												onClick={() => {
 													onChange(rules.filter((entry) => entry.id !== rule.id));
 												}}
@@ -150,14 +147,14 @@ export function EscalationTable({ rules, onChange }: EscalationTableProps) {
 			{duplicates.length > 0 ? (
 				<p className="flex items-center gap-1.5 text-caption font-normal text-warning-fg">
 					<TriangleAlert className="size-3.5 shrink-0 text-warning" aria-hidden="true" />
-					Two rules fire at the same warning count. Only the first will run.
+					{t('duplicate')}
 				</p>
 			) : null}
 
 			<div>
 				<Button variant="outline" size="sm" onClick={add}>
 					<Plus aria-hidden="true" />
-					Add rule
+					{t('add')}
 				</Button>
 			</div>
 		</div>

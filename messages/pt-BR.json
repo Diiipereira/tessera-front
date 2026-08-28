@@ -522,6 +522,14 @@
 			}
 		}
 	},
+	"durations": {
+		"60s": "60 segundos",
+		"5m": "5 minutos",
+		"10m": "10 minutos",
+		"1h": "1 hora",
+		"24h": "24 horas",
+		"7d": "7 dias"
+	},
 	"confirm": {
 		"type": "Digite {phrase} para confirmar",
 		"mustMatch": "Precisa ser igual, maiúsculas incluídas."
@@ -650,6 +658,78 @@
 			"notHttp": "Use um link que comece com http:// ou https://",
 			"notImage": "Este não é um link direto de imagem — o Discord não vai mostrar nada. Ele precisa terminar em .png, .jpg ou .gif",
 			"expiring": "Link de anexo do Discord expira em menos de um dia e a imagem some. Hospede a figura em algum lugar permanente."
+		},
+		"moderation": {
+			"title": "Moderação",
+			"description": "Advertências, timeouts, silenciamentos e banimentos — todos registrados no log de casos.",
+			"saved": "Configurações de moderação salvas",
+			"who": {
+				"title": "Quem pode moderar",
+				"description": "Estes cargos recebem os comandos de moderação e as ações do painel.",
+				"modRoles": "Cargos de moderação",
+				"modRolesHint": "Cargos acima do cargo do próprio bot ficam bloqueados.",
+				"modRolesPlaceholder": "Escolha os cargos da equipe…",
+				"protectedRoles": "Cargos protegidos",
+				"protectedRolesHint": "Membros com estes cargos não podem ser punidos, nem por um moderador.",
+				"protectedRolesPlaceholder": "Ninguém está protegido…"
+			},
+			"muted": {
+				"title": "Cargo de silenciado",
+				"description": "Usado pelo comando de silenciar. O timeout do Discord não precisa de cargo; um silenciamento que passa de 28 dias precisa.",
+				"role": "Cargo",
+				"noneTitle": "Ainda sem cargo de silenciado",
+				"noneBody": "O silenciamento vai recorrer ao timeout do Discord, que o Discord limita a 28 dias.",
+				"create": "Criar para mim",
+				"using": "Usando @{role} como cargo de silenciado",
+				"usingHint": "Criar um cargo novo depende da API, então por enquanto isto reaproveita um existente."
+			},
+			"defaults": {
+				"title": "Padrões",
+				"description": "O que um moderador recebe quando roda um comando sem informar duração.",
+				"timeout": "Timeout",
+				"mute": "Silenciar",
+				"untilLifted": "Até ser revogado",
+				"onBan": "Ao banir",
+				"onBanHint": "O Discord consegue apagar mensagens recentes junto com o banimento.",
+				"keepMessages": "Manter as mensagens",
+				"delete1": "Apagar as últimas 24 horas",
+				"delete7": "Apagar os últimos 7 dias",
+				"reasonRequired": "Exigir um motivo",
+				"reasonRequiredHint": "O comando é recusado sem motivo. O log de casos só serve se estiver preenchido."
+			},
+			"dm": {
+				"title": "Avisando o membro",
+				"description": "Enviada antes de a punição valer, para que um banimento ainda chegue à pessoa.",
+				"toggle": "Mandar DM para o membro",
+				"toggleHint": "Pulada em silêncio se a pessoa tiver DMs do servidor desligadas.",
+				"message": "Mensagem",
+				"messageHint": "'{'action'}', '{'reason'}', '{'duration'}' e '{'server'}' são preenchidos.",
+				"appeal": "Link de recurso",
+				"appealHelp": "Adicionado ao final da mensagem quando preenchido."
+			},
+			"escalation": {
+				"title": "Escalonamento de advertências",
+				"description": "Executado automaticamente quando um membro atinge um número de advertências.",
+				"empty": "Nenhum escalonamento ainda. As advertências só vão se acumular.",
+				"at": "Em",
+				"action": "Ação",
+				"duration": "Duração",
+				"remove": "Remover",
+				"warnings": "advertências",
+				"atLabel": "Advertências antes de esta regra disparar",
+				"removeRule": "Remover a regra de {count} advertências",
+				"notApplicable": "Não se aplica",
+				"duplicate": "Duas regras disparam no mesmo número de advertências. Só a primeira vai rodar.",
+				"add": "Adicionar regra",
+				"permanent": "Permanente",
+				"actions": {
+					"warn": "Advertir de novo",
+					"timeout": "Timeout",
+					"mute": "Silenciar",
+					"kick": "Expulsar",
+					"ban": "Banir"
+				}
+			}
 		},
 		"welcome": {
 			"title": "Boas-vindas",

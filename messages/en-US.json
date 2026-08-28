@@ -522,6 +522,14 @@
 			}
 		}
 	},
+	"durations": {
+		"60s": "60 seconds",
+		"5m": "5 minutes",
+		"10m": "10 minutes",
+		"1h": "1 hour",
+		"24h": "24 hours",
+		"7d": "7 days"
+	},
 	"confirm": {
 		"type": "Type {phrase} to confirm",
 		"mustMatch": "It has to match exactly, capitals included."
@@ -650,6 +658,78 @@
 			"notHttp": "Use a link that starts with http:// or https://",
 			"notImage": "This is not a direct image link — Discord will show nothing. It should end in .png, .jpg or .gif",
 			"expiring": "A Discord attachment link expires within a day and the image will vanish. Host it somewhere permanent instead."
+		},
+		"moderation": {
+			"title": "Moderation",
+			"description": "Warns, timeouts, mutes and bans — every one of them written to the case log.",
+			"saved": "Moderation settings saved",
+			"who": {
+				"title": "Who can moderate",
+				"description": "These roles get the moderation commands and the dashboard actions.",
+				"modRoles": "Moderator roles",
+				"modRolesHint": "Roles above the bot's own role are locked.",
+				"modRolesPlaceholder": "Pick the staff roles…",
+				"protectedRoles": "Protected roles",
+				"protectedRolesHint": "Members with these roles cannot be punished, even by a moderator.",
+				"protectedRolesPlaceholder": "Nobody is protected…"
+			},
+			"muted": {
+				"title": "Muted role",
+				"description": "Used by the mute command. Discord timeouts do not need one; a mute that outlives 28 days does.",
+				"role": "Role",
+				"noneTitle": "No muted role yet",
+				"noneBody": "Mute will fall back to a Discord timeout, which Discord caps at 28 days.",
+				"create": "Create it for me",
+				"using": "Using @{role} as the muted role",
+				"usingHint": "Creating a fresh role needs the API, so this reuses one for now."
+			},
+			"defaults": {
+				"title": "Defaults",
+				"description": "What a moderator gets when they run a command without a duration.",
+				"timeout": "Timeout",
+				"mute": "Mute",
+				"untilLifted": "Until lifted",
+				"onBan": "On ban",
+				"onBanHint": "Discord can clear recent messages as part of the ban.",
+				"keepMessages": "Keep their messages",
+				"delete1": "Delete the last 24 hours",
+				"delete7": "Delete the last 7 days",
+				"reasonRequired": "Require a reason",
+				"reasonRequiredHint": "The command is refused without one. The case log is only useful if it is filled in."
+			},
+			"dm": {
+				"title": "Telling the member",
+				"description": "Sent before the punishment lands, so a ban still reaches them.",
+				"toggle": "DM the member",
+				"toggleHint": "Silently skipped if they have DMs from the server turned off.",
+				"message": "Message",
+				"messageHint": "'{'action'}', '{'reason'}', '{'duration'}' and '{'server'}' are filled in.",
+				"appeal": "Appeal link",
+				"appealHelp": "Added to the bottom of the message when set."
+			},
+			"escalation": {
+				"title": "Warning escalation",
+				"description": "Run automatically once a member reaches a warning count.",
+				"empty": "No escalation yet. Warnings will just accumulate.",
+				"at": "At",
+				"action": "Action",
+				"duration": "Duration",
+				"remove": "Remove",
+				"warnings": "warnings",
+				"atLabel": "Warnings before this rule fires",
+				"removeRule": "Remove the rule at {count} warnings",
+				"notApplicable": "Not applicable",
+				"duplicate": "Two rules fire at the same warning count. Only the first will run.",
+				"add": "Add rule",
+				"permanent": "Permanent",
+				"actions": {
+					"warn": "Warn again",
+					"timeout": "Timeout",
+					"mute": "Mute",
+					"kick": "Kick",
+					"ban": "Ban"
+				}
+			}
 		},
 		"welcome": {
 			"title": "Welcome",

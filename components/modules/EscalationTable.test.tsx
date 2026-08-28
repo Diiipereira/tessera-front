@@ -1,9 +1,22 @@
-import { render, screen, within } from '@testing-library/react';
+import { render as rtlRender, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useState } from 'react';
+import { createTranslator } from 'next-intl';
+import { useState, type ReactElement } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import type { EscalationRule } from '@/lib/types/modules';
+import enUS from '@/messages/en-US.json';
+import { Translated } from '@/tests/i18n';
 import { EscalationTable } from './EscalationTable';
+
+const copy = enUS.modules.moderation.escalation;
+
+const t = createTranslator({
+	locale: 'en-US',
+	messages: enUS,
+	namespace: 'modules.moderation.escalation'
+});
+
+const render = (ui: ReactElement) => rtlRender(ui, { wrapper: Translated });
 
 function Stateful({ initial }: { initial: EscalationRule[] }) {
 	const [rules, setRules] = useState(initial);
@@ -50,7 +63,7 @@ describe('EscalationTable', () => {
 		const onChange = vi.fn();
 		render(<EscalationTable rules={rules} onChange={onChange} />);
 
-		await user.click(screen.getByRole('button', { name: 'Remove the rule at 5 warnings' }));
+		await user.click(screen.getByRole('button', { name: t('removeRule', { count: 5 }) }));
 
 		const next = onChange.mock.calls[0]?.[0] as EscalationRule[];
 		expect(next.map((rule) => rule.id)).toEqual(['e1', 'e3']);
@@ -66,12 +79,12 @@ describe('EscalationTable', () => {
 				onChange={vi.fn()}
 			/>
 		);
-		expect(screen.getByText(/Only the first will run/)).toBeInTheDocument();
+		expect(screen.getByText(copy.duplicate)).toBeInTheDocument();
 	});
 
 	it('stays quiet when every rule has its own count', () => {
 		render(<EscalationTable rules={rules} onChange={vi.fn()} />);
-		expect(screen.queryByText(/Only the first will run/)).not.toBeInTheDocument();
+		expect(screen.queryByText(copy.duplicate)).not.toBeInTheDocument();
 	});
 
 	it('offers no duration for an action that has none', () => {
@@ -84,7 +97,7 @@ describe('EscalationTable', () => {
 
 		const row = screen.getAllByRole('row')[1];
 		expect(row).toBeDefined();
-		expect(within(row as HTMLElement).getByText('Not applicable')).toBeInTheDocument();
+		expect(within(row as HTMLElement).getByText(copy.notApplicable)).toBeInTheDocument();
 	});
 
 	it('keeps the duration control for actions that do have one', () => {
@@ -97,7 +110,7 @@ describe('EscalationTable', () => {
 
 		const row = screen.getAllByRole('row')[1];
 		expect(row).toBeDefined();
-		expect(within(row as HTMLElement).queryByText('Not applicable')).not.toBeInTheDocument();
+		expect(within(row as HTMLElement).queryByText(copy.notApplicable)).not.toBeInTheDocument();
 	});
 
 	it('reports an edited warning count', async () => {
