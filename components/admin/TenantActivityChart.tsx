@@ -100,7 +100,7 @@ export function TenantActivityChart({ points }: { points: TenantDailyPoint[] }) 
 					</Alert>
 				</div>
 			) : (
-				<div className="px-3 py-4 ">
+				<div className="px-3 py-4">
 					<div
 						ref={containerRef}
 						data-testid="tenant-activity-chart"

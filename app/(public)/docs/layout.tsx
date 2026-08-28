@@ -13,11 +13,11 @@ export default function DocsLayout({ children }: { children: ReactNode }) {
 			<DocsHeader groups={groups} entries={entries} />
 
 			<div className="flex flex-1 lg:min-h-0">
-				<aside className="thin-scroll hidden w-72 shrink-0 overflow-y-auto border-r border-border px-4 py-8 lg:block">
+				<aside className="hidden w-72 shrink-0 thin-scroll overflow-y-auto border-r border-border px-4 py-8 lg:block">
 					<DocsNavTree groups={groups} />
 				</aside>
 
-				<div className="thin-scroll flex min-w-0 flex-1 flex-col lg:min-h-0 lg:overflow-y-auto">
+				<div className="flex min-w-0 flex-1 thin-scroll flex-col lg:min-h-0 lg:overflow-y-auto">
 					<div className="mx-auto flex w-full max-w-300 flex-1 items-start gap-10 px-6 py-10 sm:px-10">
 						{children}
 					</div>

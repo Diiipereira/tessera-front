@@ -173,7 +173,7 @@ export function AuditScreen({ entries }: { entries: AuditEntry[] }) {
 									</button>
 
 									{open ? (
-										<div className="border-t border-border bg-surface-sunken p-4  sm:pl-11">
+										<div className="border-t border-border bg-surface-sunken p-4 sm:pl-11">
 											{rows.length === 0 ? (
 												<p className="text-body-sm text-text-muted">
 													Nothing was written — the values sent matched what was already stored.
