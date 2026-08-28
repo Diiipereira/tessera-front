@@ -2,6 +2,7 @@
 
 import { Building2, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { Avatar } from '@/components/layout/Avatar';
 import { PageHeader } from '@/components/management/PageHeader';
@@ -23,6 +24,7 @@ import {
 } from '@/lib/admin';
 import { dateOnly, relativeTime } from '@/lib/time';
 import type { TenantStatus, TenantSummary } from '@/lib/types/admin';
+import { BRAND } from '@/lib/brand';
 import type { PlanTier } from '@/lib/types/billing';
 
 const PLAN_VARIANTS: Record<PlanTier, BadgeVariant> = {
@@ -47,6 +49,7 @@ function Stat({ label, value }: { label: string; value: string }) {
 }
 
 export function TenantsScreen({ tenants }: { tenants: TenantSummary[] }) {
+	const t = useTranslations('admin.tenants');
 	const [query, setQuery] = useState('');
 	const [status, setStatus] = useState<TenantStatus | 'all'>('active');
 	const [plan, setPlan] = useState<PlanTier | 'all'>('all');
@@ -59,42 +62,39 @@ export function TenantsScreen({ tenants }: { tenants: TenantSummary[] }) {
 
 	return (
 		<div className="w-full p-6 sm:p-8">
-			<PageHeader
-				title="Tenants"
-				description="Every server where Tessera is installed, whoever owns it."
-			/>
+			<PageHeader title={t('title')} description={t('description', { brand: BRAND.name })} />
 
 			<div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
-				<Stat label="Active tenants" value={String(active.length)} />
-				<Stat label="Members reached" value={formatMembers(reach)} />
-				<Stat label="Paying" value={String(plans.pro + plans.ultimate)} />
-				<Stat label="Left" value={String(tenants.length - active.length)} />
+				<Stat label={t('active')} value={String(active.length)} />
+				<Stat label={t('reach')} value={formatMembers(reach)} />
+				<Stat label={t('paying')} value={String(plans.pro + plans.ultimate)} />
+				<Stat label={t('left')} value={String(tenants.length - active.length)} />
 			</div>
 
 			<div className="mt-6 flex flex-wrap items-center gap-3">
 				<SearchInput
 					value={query}
 					onValueChange={setQuery}
-					placeholder="Search by name, owner or id…"
-					aria-label="Search tenants"
+					placeholder={t('search')}
+					aria-label={t('searchLabel')}
 					className="max-w-80"
 				/>
 
 				<SegmentedControl
 					options={[
-						{ value: 'active', label: 'Active' },
-						{ value: 'left', label: 'Left' },
-						{ value: 'all', label: 'All' }
+						{ value: 'active', label: t('statusActive') },
+						{ value: 'left', label: t('statusLeft') },
+						{ value: 'all', label: t('statusAll') }
 					]}
 					value={status}
 					onValueChange={setStatus}
-					label="Filter by status"
+					label={t('status')}
 					size="sm"
 				/>
 
 				<Select
 					options={[
-						{ value: 'all', label: 'Every plan' },
+						{ value: 'all', label: t('everyPlan') },
 						{ value: 'free', label: 'Free' },
 						{ value: 'pro', label: 'Pro' },
 						{ value: 'ultimate', label: 'Ultimate' }
@@ -121,11 +121,7 @@ export function TenantsScreen({ tenants }: { tenants: TenantSummary[] }) {
 
 			<div className="mt-6 overflow-hidden rounded-lg border border-border bg-surface shadow-1">
 				{visible.length === 0 ? (
-					<EmptyState
-						icon={Building2}
-						title="No tenant matches"
-						description="Nothing here fits those filters. Widen the status or clear the search."
-					/>
+					<EmptyState icon={Building2} title={t('emptyTitle')} description={t('emptyBody')} />
 				) : (
 					<ul>
 						{visible.map((tenant) => {
@@ -147,8 +143,10 @@ export function TenantsScreen({ tenants }: { tenants: TenantSummary[] }) {
 										<span className="min-w-0 flex-1">
 											<span className="flex items-center gap-2">
 												<span className="truncate text-body font-medium">{tenant.name}</span>
-												{gone ? <Badge variant="danger">Left</Badge> : null}
-												{tenant.setupCompleted ? null : <Badge variant="warning">Setup</Badge>}
+												{gone ? <Badge variant="danger">{t('badgeLeft')}</Badge> : null}
+												{tenant.setupCompleted ? null : (
+													<Badge variant="warning">{t('badgeSetup')}</Badge>
+												)}
 											</span>
 											<span className="block truncate font-mono text-caption text-text-muted">
 												{tenant.id} · {tenant.ownerName}
@@ -182,7 +180,7 @@ export function TenantsScreen({ tenants }: { tenants: TenantSummary[] }) {
 			</div>
 
 			<p className="mt-3 text-caption font-normal text-text-muted">
-				Showing {visible.length} of {tenants.length} tenants.
+				{t('showing', { shown: visible.length, total: tenants.length })}
 			</p>
 		</div>
 	);

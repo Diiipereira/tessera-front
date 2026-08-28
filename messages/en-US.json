@@ -532,7 +532,8 @@
 		"nothingMatches": "Nothing matches that.",
 		"openTime": "Open the time picker",
 		"openDate": "Open the date picker",
-		"openDatetime": "Open the date and time picker"
+		"openDatetime": "Open the date and time picker",
+		"noChannelMatch": "No channel matches “{query}”."
 	},
 	"catalog": {
 		"enable": "Enable {name}",
@@ -626,7 +627,12 @@
 			"balance": "Balance",
 			"balanceValue": "{amount} {currency}",
 			"rank": "Rank by balance",
-			"rankPending": "Computed once the API exists"
+			"rankPending": "Computed once the API exists",
+			"noNotes": "No notes. Notes are staff-only and never shown to the member.",
+			"noInfractions": "Nothing on record. This member has never been actioned.",
+			"by": "by {who}",
+			"economyElsewhere": "The transaction history for one member lives in the Economy module, filtered by this ID.",
+			"rolesUpstream": "Roles are read from Discord. Changing them here writes back through the bot, which needs its own role above the one it grants."
 		}
 	},
 	"cases": {
@@ -676,7 +682,13 @@
 			"opened": "Opened",
 			"duration": "Duration",
 			"permanent": "Permanent",
-			"liftsIn": "Lifts in"
+			"liftsIn": "Lifts in",
+			"evidence": "Evidence",
+			"noEvidence": "Nothing attached. Screenshots uploaded with the slash command land here.",
+			"otherCases": "Other cases for {name}",
+			"onlyCase": "This is their only case.",
+			"history": "History",
+			"neverEdited": "Never edited since it was opened."
 		}
 	},
 	"modulesList": {
@@ -897,7 +909,8 @@
 				"limitedStockHint": "Once it runs out the item stops selling.",
 				"stock": "Stock",
 				"perUserLimit": "Limit per member",
-				"perUserLabel": "Per-member limit"
+				"perUserLabel": "Per-member limit",
+				"price": "Price"
 			},
 			"transactions": {
 				"title": "Transactions",
@@ -1016,7 +1029,9 @@
 				"exemptRoles": "Never applies to these roles",
 				"exemptRolesPlaceholder": "No exemptions…",
 				"exemptChannel": "Never applies in this channel",
-				"exemptChannelPlaceholder": "Applies everywhere…"
+				"exemptChannelPlaceholder": "Applies everywhere…",
+				"capsHint": "Above this share of letters.",
+				"needAction": "Pick at least one action, or the rule does nothing."
 			}
 		},
 		"tickets": {
@@ -1164,7 +1179,9 @@
 				"labelPlaceholder": "Blue",
 				"role": "Role",
 				"remove": "Remove option {label}",
-				"unlabelled": "without a label"
+				"unlabelled": "without a label",
+				"noneWarning": "No options. The panel would post an empty message.",
+				"emoji": "Emoji"
 			},
 			"mode": {
 				"toggle": {
@@ -1183,7 +1200,9 @@
 					"label": "Drop",
 					"blurb": "One-way — the role can only be removed."
 				}
-			}
+			},
+			"noOptions": "No options yet.",
+			"noPanels": "No panels yet."
 		},
 		"levels": {
 			"title": "Levels",
@@ -1582,7 +1601,9 @@
 			"empty": "(empty)",
 			"emptyList": "(empty list)",
 			"unreadable": "unreadable"
-		}
+		},
+		"noChange": "Nothing was written — the values sent matched what was already stored.",
+		"summary": "{module} · {fields} changed"
 	},
 	"commands": {
 		"title": "Commands",
@@ -1620,7 +1641,8 @@
 			"rolesPlaceholder": "Everyone…",
 			"channel": "Blocked channel",
 			"channelHint": "The command is refused here.",
-			"channelPlaceholder": "Nowhere blocked…"
+			"channelPlaceholder": "Nowhere blocked…",
+			"clear": "Clear restrictions"
 		},
 		"lastSynced": "Last synced {when}.",
 		"access": {
@@ -1702,7 +1724,11 @@
 			"grants": "A {role} gets {granted} of {total} permissions.",
 			"joinAs": "They join as a {role}."
 		},
-		"discordTail": "Remove the Discord permission to remove that access — {brand} cannot override it."
+		"discordTail": "Remove the Discord permission to remove that access — {brand} cannot override it.",
+		"viaDiscord": " · Discord",
+		"revoke": "Revoke",
+		"granted": "granted",
+		"notGranted": "not granted"
 	},
 	"billing": {
 		"title": "Billing",
@@ -1788,6 +1814,171 @@
 		"unlimited": "unlimited",
 		"perMonth": "/month",
 		"save": "save {percent}%",
-		"currentPlan": "{plan} plan"
+		"currentPlan": "{plan} plan",
+		"staysActive": "{plan} stays active until {date}.",
+		"perMonthLong": "per month",
+		"billedYearly": ", billed yearly",
+		"managePayment": "Manage payment",
+		"cancelPlan": "Cancel plan",
+		"cardEnding": "{brand} ending {last4}",
+		"noCard": "No payment method on file.",
+		"youAreHere": "You are here",
+		"upgradeTo": "Upgrade to {plan}",
+		"moveTo": "Move to {plan}",
+		"invoiceNumber": "Number",
+		"invoiceDate": "Date",
+		"invoiceDescription": "Description",
+		"invoiceAmount": "Amount",
+		"invoiceStatus": "Status",
+		"proration": "{left} of {total} days are left, so you are {verb} {amount}.",
+		"chargedVerb": "charged",
+		"creditedVerb": "credited",
+		"dropsToFree": "On {date} this server drops to Free. Anything over the free limits stops working then.",
+		"endingBody": "{plan} stays active until {date}, then the server drops to Free and anything over the Free limits stops running.",
+		"renewLine": "{verb} {relative} — {date}. {left} of {total} days left in this period.",
+		"cardLine": "{brand} ending {last4}, expires {expiry}.",
+		"prorationLine": "{left} of {total} days are left in this period, so you are {verb} that share of the difference. The full price applies from {date}.",
+		"cancelTitle": "Cancel {plan}?",
+		"cancelBody": "On {date} this server drops to Free. Anything above the Free limits stops: rules past the fifth, commands past the tenth, and every scheduled message."
+	},
+	"admin": {
+		"staff": "Staff",
+		"platform": "Platform",
+		"sections": "Platform sections",
+		"nav": {
+			"tenants": "Tenants",
+			"blacklist": "Blacklist"
+		},
+		"tenants": {
+			"title": "Tenants",
+			"description": "Every server where {brand} is installed, whoever owns it.",
+			"active": "Active tenants",
+			"reach": "Members reached",
+			"paying": "Paying",
+			"left": "Left",
+			"search": "Search by name, owner or id…",
+			"searchLabel": "Search tenants",
+			"status": "Filter by status",
+			"statusActive": "Active",
+			"statusLeft": "Left",
+			"statusAll": "All",
+			"everyPlan": "Every plan",
+			"emptyTitle": "No tenant matches",
+			"emptyBody": "Nothing here fits those filters. Widen the status or clear the search.",
+			"badgeLeft": "Left",
+			"badgeSetup": "Setup",
+			"showing": "Showing {shown} of {total} tenants."
+		},
+		"blacklist": {
+			"title": "Blacklist",
+			"description": "Users and servers the platform refuses. Checked when a session is issued, before anything else.",
+			"search": "Search by name, id or reason…",
+			"searchLabel": "Search the blacklist",
+			"target": "Filter by target",
+			"all": "All",
+			"users": "Users",
+			"servers": "Servers",
+			"emptyTitle": "Nothing blacklisted",
+			"emptyBody": "No entry matches. An empty blacklist is the healthy state.",
+			"expired": "Expired",
+			"showing": "Showing {shown} of {total} entries.",
+			"addTitle": "Blacklist a user or server",
+			"addDescription": "The block takes effect the next time a session is issued, not on the session already open.",
+			"notWired": "Not wired yet",
+			"notWiredHint": "The API has no write path for the blacklist table.",
+			"targetId": "Target id",
+			"targetIdHelp": "The Discord snowflake of the user or server.",
+			"reason": "Reason",
+			"reasonHelp": "Written to the audit trail. Future you will want it.",
+			"reasonPlaceholder": "What did they do?",
+			"removeTitle": "Remove this block?",
+			"removeDescription": "They get back in the moment the next session is issued.",
+			"removeLabel": "Remove the block",
+			"showExpired": "Show expired",
+			"badId": "A snowflake is 17 to 20 digits."
+		},
+		"tenant": {
+			"on": "On",
+			"off": "Off",
+			"left": "Left",
+			"active": "Active",
+			"setupPending": "Setup pending",
+			"copied": "Guild id copied",
+			"blacklistFailed": "Blacklisting is not wired yet",
+			"tenantCard": "Tenant",
+			"owner": "Owner",
+			"ownerId": "Owner id",
+			"members": "Members",
+			"locale": "Locale",
+			"joined": "Joined",
+			"leftAt": "Left",
+			"modules": "Modules",
+			"plan": "Plan",
+			"provider": "Provider",
+			"renews": "Renews",
+			"cancelAtEnd": "Cancel at period end",
+			"yes": "Yes",
+			"no": "No",
+			"access": "Dashboard access",
+			"accessDescription": "Who can act on this tenant.",
+			"blacklistFailedHint": "The API has no write path for the blacklist table.",
+			"noSubscription": "No subscription row — this tenant never left the free plan.",
+			"allTenants": "All tenants",
+			"openAsOwner": "Open as owner",
+			"blacklist": "Blacklist",
+			"modulesEnabled": "{enabled} of {total} enabled."
+		},
+		"chart": {
+			"emptyTitle": "No recorded activity in the window",
+			"label": "Messages and commands over the last thirty days",
+			"title": "Activity",
+			"description": "Thirty days of messages and commands. A flat line is the first thing to check when someone reports the bot stopped.",
+			"empty": "Nothing was written for this tenant in the last thirty days. Either the bot is not in the server any more, or it has no permission to see the channels."
+		},
+		"backToServers": "Back to my servers",
+		"subtitle": "Platform administration — every tenant, not just yours."
+	},
+	"setup": {
+		"steps": {
+			"basics": "Basics",
+			"modules": "Modules",
+			"staff": "Staff",
+			"done": "Done"
+		},
+		"basics": {
+			"title": "Where is this server?",
+			"body": "{brand} uses this to format dates and pick its replies.",
+			"language": "Server language",
+			"languageHint": "Slash command replies use this language.",
+			"timezone": "Timezone",
+			"timezoneHint": "Schedules and log timestamps follow it."
+		},
+		"modules": {
+			"title": "What should {brand} do?",
+			"body": "Turn on what you need now — the rest is one switch away later."
+		},
+		"staff": {
+			"title": "Who is staff, and where do logs go?",
+			"body": "Both can change later. Channels {brand} cannot post in are locked here.",
+			"logChannel": "Log channel",
+			"logChannelHint": "Moderation and server events are written here.",
+			"roles": "Moderator roles",
+			"rolesHint": "These roles can use moderation commands."
+		},
+		"done": {
+			"title": "You’re set",
+			"body": "{brand} is live in {guild}. Here is what you chose.",
+			"language": "Language",
+			"timezone": "Timezone",
+			"modulesOn": "Modules on",
+			"noneYet": "None yet",
+			"logChannel": "Log channel",
+			"notSet": "Not set",
+			"roles": "Moderator roles"
+		},
+		"back": "Back",
+		"next": "Next",
+		"dashboard": "Go to dashboard",
+		"skip": "Skip setup"
 	}
 }

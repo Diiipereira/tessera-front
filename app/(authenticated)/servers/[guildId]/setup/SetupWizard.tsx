@@ -14,6 +14,7 @@ import {
 	TrendingUp,
 	type LucideIcon
 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { BrandMark } from '@/components/auth/BrandMark';
 import { ChannelPicker } from '@/components/discord/ChannelPicker';
@@ -28,44 +29,32 @@ import type { Channel, Role } from '@/lib/types/discord';
 import type { Guild } from '@/lib/types/guild';
 import { cn } from '@/lib/utils/cn';
 
-const STEPS = ['Basics', 'Modules', 'Staff', 'Done'];
+const STEPS = ['basics', 'modules', 'staff', 'done'] as const;
 
-const MODULES: { id: string; label: string; description: string; icon: LucideIcon }[] = [
+const MODULES: { id: string; icon: LucideIcon }[] = [
 	{
 		id: 'welcome',
-		label: 'Welcome',
-		description: 'Greet new members and hand out roles.',
 		icon: DoorOpen
 	},
 	{
 		id: 'moderation',
-		label: 'Moderation',
-		description: 'Warns, timeouts, bans and a case log.',
 		icon: Shield
 	},
 	{
 		id: 'automod',
-		label: 'AutoMod',
-		description: 'Rules that act before a human has to.',
 		icon: ShieldAlert
 	},
 	{
 		id: 'logging',
-		label: 'Logging',
-		description: 'Write server events to a channel.',
 		icon: ScrollText
 	},
-	{ id: 'levels', label: 'Levels', description: 'XP, ranks and role rewards.', icon: TrendingUp },
+	{ id: 'levels', icon: TrendingUp },
 	{
 		id: 'tickets',
-		label: 'Tickets',
-		description: 'Private support channels on demand.',
 		icon: Ticket
 	},
 	{
 		id: 'giveaways',
-		label: 'Giveaways',
-		description: 'Timed draws with entry requirements.',
 		icon: Gift
 	}
 ];
@@ -103,6 +92,9 @@ type SetupWizardProps = {
 };
 
 export function SetupWizard({ guild, channels, roles }: SetupWizardProps) {
+	const t = useTranslations('setup');
+	const catalog = useTranslations('catalog');
+	const names = useTranslations('nav');
 	const [step, setStep] = useState(0);
 	const [language, setLanguage] = useState('en');
 	const [timezone, setTimezone] = useState('UTC');
@@ -128,14 +120,14 @@ export function SetupWizard({ guild, channels, roles }: SetupWizardProps) {
 				<span className="text-body font-medium">{guild.name}</span>
 				<div className="flex-1" />
 				<Button variant="ghost" size="sm" href={dashboardHref}>
-					Skip setup
+					{t('skip')}
 				</Button>
 			</header>
 
 			<div className="mx-auto flex w-full max-w-160 flex-1 flex-col gap-8 px-6 py-10 sm:px-8">
 				<ol className="flex items-center gap-2">
-					{STEPS.map((label, index) => (
-						<li key={label} className="flex flex-1 items-center gap-2">
+					{STEPS.map((id, index) => (
+						<li key={id} className="flex flex-1 items-center gap-2">
 							<span
 								className={cn(
 									'grid size-8 shrink-0 place-items-center rounded-full border text-body-sm font-medium transition-colors duration-120 ease-out',
@@ -155,7 +147,7 @@ export function SetupWizard({ guild, channels, roles }: SetupWizardProps) {
 									index === step ? 'font-medium text-text' : 'text-text-muted'
 								)}
 							>
-								{label}
+								{t(`steps.${id}`)}
 							</span>
 							{index < STEPS.length - 1 ? (
 								<span
@@ -170,25 +162,21 @@ export function SetupWizard({ guild, channels, roles }: SetupWizardProps) {
 				{step === 0 ? (
 					<section className="flex flex-col gap-5">
 						<div>
-							<h1 className="text-h2">Where is this server?</h1>
-							<p className="text-body text-text-muted">
-								{BRAND.name} uses this to format dates and pick its replies.
-							</p>
+							<h1 className="text-h2">{t('basics.title')}</h1>
+							<p className="text-body text-text-muted">{t('basics.body', { brand: BRAND.name })}</p>
 						</div>
-						<Field label="Server language" hint="Slash command replies use this language.">
+						<Field label={t('basics.language')} hint={t('basics.languageHint')}>
 							<Select options={LANGUAGES} value={language} onValueChange={setLanguage} />
 						</Field>
-						<Field label="Timezone" hint="Schedules and log timestamps follow it.">
+						<Field label={t('basics.timezone')} hint={t('basics.timezoneHint')}>
 							<Select options={TIMEZONES} value={timezone} onValueChange={setTimezone} />
 						</Field>
 					</section>
 				) : step === 1 ? (
 					<section className="flex flex-col gap-5">
 						<div>
-							<h1 className="text-h2">What should {BRAND.name} do?</h1>
-							<p className="text-body text-text-muted">
-								Turn on what you need now — the rest is one switch away later.
-							</p>
+							<h1 className="text-h2">{t('modules.title', { brand: BRAND.name })}</h1>
+							<p className="text-body text-text-muted">{t('modules.body')}</p>
 						</div>
 						<div className="grid gap-3 sm:grid-cols-2">
 							{MODULES.map((module) => {
@@ -219,10 +207,10 @@ export function SetupWizard({ guild, channels, roles }: SetupWizardProps) {
 													)}
 													aria-hidden="true"
 												/>
-												<span className="text-body font-medium">{module.label}</span>
+												<span className="text-body font-medium">{names(module.id)}</span>
 											</span>
 											<span className="mt-0.5 block text-body-sm text-pretty text-text-muted">
-												{module.description}
+												{catalog(`blurb.${module.id}`)}
 											</span>
 										</span>
 									</label>
@@ -233,15 +221,13 @@ export function SetupWizard({ guild, channels, roles }: SetupWizardProps) {
 				) : step === 2 ? (
 					<section className="flex flex-col gap-5">
 						<div>
-							<h1 className="text-h2">Who is staff, and where do logs go?</h1>
-							<p className="text-body text-text-muted">
-								Both can change later. Channels {BRAND.name} cannot post in are locked here.
-							</p>
+							<h1 className="text-h2">{t('staff.title')}</h1>
+							<p className="text-body text-text-muted">{t('staff.body', { brand: BRAND.name })}</p>
 						</div>
-						<Field label="Log channel" hint="Moderation and server events are written here.">
+						<Field label={t('staff.logChannel')} hint={t('staff.logChannelHint')}>
 							<ChannelPicker channels={channels} value={logChannel} onValueChange={setLogChannel} />
 						</Field>
-						<Field label="Moderator roles" hint="These roles can use moderation commands.">
+						<Field label={t('staff.roles')} hint={t('staff.rolesHint')}>
 							<RolePicker roles={roles} value={modRoles} onValueChange={setModRoles} />
 						</Field>
 					</section>
@@ -252,34 +238,34 @@ export function SetupWizard({ guild, channels, roles }: SetupWizardProps) {
 								<PartyPopper className="size-8" aria-hidden="true" />
 							</span>
 							<div>
-								<h1 className="text-h2">You&rsquo;re set</h1>
+								<h1 className="text-h2">{t('done.title')}</h1>
 								<p className="text-body text-text-muted">
-									{BRAND.name} is live in {guild.name}. Here is what you chose.
+									{t('done.body', { brand: BRAND.name, guild: guild.name })}
 								</p>
 							</div>
 						</div>
 
 						<div className="rounded-lg border border-border bg-surface px-4 shadow-1">
-							<SummaryRow label="Language" value={labelFor(LANGUAGES, language)} />
-							<SummaryRow label="Timezone" value={labelFor(TIMEZONES, timezone)} />
+							<SummaryRow label={t('done.language')} value={labelFor(LANGUAGES, language)} />
+							<SummaryRow label={t('done.timezone')} value={labelFor(TIMEZONES, timezone)} />
 							<SummaryRow
-								label="Modules on"
+								label={t('done.modulesOn')}
 								value={
 									selectedModules.length > 0
-										? selectedModules.map((module) => module.label).join(', ')
-										: 'None yet'
+										? selectedModules.map((module) => names(module.id)).join(', ')
+										: t('done.noneYet')
 								}
 							/>
 							<SummaryRow
-								label="Log channel"
-								value={selectedChannel ? `#${selectedChannel.name}` : 'Not set'}
+								label={t('done.logChannel')}
+								value={selectedChannel ? `#${selectedChannel.name}` : t('done.notSet')}
 							/>
 							<SummaryRow
-								label="Moderator roles"
+								label={t('done.roles')}
 								value={
 									selectedRoles.length > 0
 										? selectedRoles.map((role) => role.name).join(', ')
-										: 'Not set'
+										: t('done.notSet')
 								}
 							/>
 						</div>
@@ -296,12 +282,12 @@ export function SetupWizard({ guild, channels, roles }: SetupWizardProps) {
 					}}
 				>
 					<ArrowLeft aria-hidden="true" />
-					Back
+					{t('back')}
 				</Button>
 				<div className="flex-1" />
 				{isLast ? (
 					<Button href={dashboardHref}>
-						Go to dashboard
+						{t('dashboard')}
 						<ArrowRight aria-hidden="true" />
 					</Button>
 				) : (
@@ -310,7 +296,7 @@ export function SetupWizard({ guild, channels, roles }: SetupWizardProps) {
 							setStep((current) => current + 1);
 						}}
 					>
-						Next
+						{t('next')}
 						<ArrowRight aria-hidden="true" />
 					</Button>
 				)}

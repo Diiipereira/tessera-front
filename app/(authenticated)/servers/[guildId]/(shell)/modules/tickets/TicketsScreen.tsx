@@ -31,6 +31,8 @@ import type {
 import type { MessageVariable } from '@/lib/types/modules';
 import { newId } from '@/lib/utils/id';
 
+const TICKET_COLUMNS = ['number', 'subject', 'openedBy', 'claimedBy', 'age', 'status'];
+
 const STATUS_VARIANTS: Record<TicketStatus, BadgeVariant> = {
 	open: 'warning',
 	claimed: 'info',
@@ -166,7 +168,7 @@ export function TicketsScreen({
 							<table className="w-full min-w-160 border-collapse">
 								<thead>
 									<tr className="border-b border-border text-left">
-										{['number', 'subject', 'openedBy', 'claimedBy', 'age', 'status'].map((head) => (
+										{TICKET_COLUMNS.map((head) => (
 											<th
 												key={head}
 												className="pb-2 font-mono text-overline font-semibold text-text-muted uppercase"

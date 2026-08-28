@@ -24,6 +24,8 @@ import { cn } from '@/lib/utils/cn';
 import { newId } from '@/lib/utils/id';
 import { formatCount } from '@/lib/utils/format';
 
+const COLUMNS = ['command', 'commandDescription', 'uses', 'on', ''];
+
 function blankCommand(): CustomCommand {
 	return {
 		id: newId('cc'),
@@ -148,7 +150,7 @@ export function CustomCommandsScreen({ config, roles, variables }: CustomCommand
 						<table className="w-full min-w-160 border-collapse">
 							<thead>
 								<tr className="border-b border-border text-left">
-									{['command', 'commandDescription', 'uses', 'on', ''].map((head, index) => (
+									{COLUMNS.map((head, index) => (
 										<th
 											key={head + String(index)}
 											className="pb-2 font-mono text-overline font-semibold text-text-muted uppercase"

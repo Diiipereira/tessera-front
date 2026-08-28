@@ -2,6 +2,8 @@ import type { ReactNode } from 'react';
 import { Skeleton, TextSkeleton } from '@/components/ui/Skeleton';
 import { cn } from '@/lib/utils/cn';
 
+const ROW_WIDTHS = ['w-16', 'w-28', 'w-20', 'w-18', 'w-28', 'w-26', 'w-20', 'w-16', 'w-16', 'w-22'];
+
 export function ModulePageSkeleton({
 	label,
 	headerAction = false,
@@ -142,11 +144,9 @@ export function ComposerSkeleton({ embed = false }: { embed?: boolean }) {
 
 			<div className="flex flex-wrap items-center gap-1.5">
 				<TextSkeleton line="caption" width="w-12" />
-				{['w-16', 'w-28', 'w-20', 'w-18', 'w-28', 'w-26', 'w-20', 'w-16', 'w-16', 'w-22'].map(
-					(width, index) => (
-						<Skeleton key={`${width}-${String(index)}`} className={cn('h-6 rounded-sm', width)} />
-					)
-				)}
+				{ROW_WIDTHS.map((width, index) => (
+					<Skeleton key={`${width}-${String(index)}`} className={cn('h-6 rounded-sm', width)} />
+				))}
 			</div>
 
 			{embed ? (

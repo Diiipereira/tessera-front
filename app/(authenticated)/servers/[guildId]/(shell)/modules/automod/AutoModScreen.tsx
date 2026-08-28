@@ -474,7 +474,7 @@ function RuleDialog({ rule, isNew, channels, roles, onCancel, onSave }: RuleDial
 						{needsThreshold ? (
 							<Field
 								label={work.trigger === 'caps' ? t('dialog.percent') : t('dialog.threshold')}
-								hint={work.trigger === 'caps' ? 'Above this share of letters.' : undefined}
+								hint={work.trigger === 'caps' ? t('dialog.capsHint') : undefined}
 							>
 								<NumberInput
 									min={1}
@@ -534,9 +534,7 @@ function RuleDialog({ rule, isNew, channels, roles, onCancel, onSave }: RuleDial
 						})}
 					</div>
 					{work.actions.length === 0 ? (
-						<p className="text-caption font-normal text-danger">
-							Pick at least one action, or the rule does nothing.
-						</p>
+						<p className="text-caption font-normal text-danger">{t('dialog.needAction')}</p>
 					) : null}
 				</div>
 

@@ -46,6 +46,7 @@ type ReactionRolesScreenProps = {
 
 export function ReactionRolesScreen({ config, channels, roles }: ReactionRolesScreenProps) {
 	const t = useTranslations('modules.reactionRoles');
+	const preview = useTranslations('modules.preview');
 	const form = useConfigDraft<ReactionRolesConfig>(config);
 	const draft = form.draft;
 
@@ -74,7 +75,7 @@ export function ReactionRolesScreen({ config, channels, roles }: ReactionRolesSc
 			aria-label={t('previewLabel')}
 			className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-4 shadow-1"
 		>
-			<h2 className="text-h4">Preview</h2>
+			<h2 className="text-h4">{preview('title')}</h2>
 
 			<div className="rounded-lg p-4" style={{ backgroundColor: DISCORD.surface }}>
 				<p className="mb-3 text-[15px] text-white">
@@ -83,7 +84,7 @@ export function ReactionRolesScreen({ config, channels, roles }: ReactionRolesSc
 
 				{selected.options.length === 0 ? (
 					<p className="text-[13px]" style={{ color: DISCORD.muted }}>
-						No options yet.
+						{t('options.empty')}
 					</p>
 				) : selected.useButtons ? (
 					<div className="flex flex-wrap gap-2">
@@ -162,7 +163,7 @@ export function ReactionRolesScreen({ config, channels, roles }: ReactionRolesSc
 				}
 			>
 				{draft.panels.length === 0 ? (
-					<p className="text-body-sm text-text-muted">No panels yet.</p>
+					<p className="text-body-sm text-text-muted">{t('noPanels')}</p>
 				) : (
 					<div className="flex flex-wrap gap-2">
 						{draft.panels.map((panel) => (
@@ -304,9 +305,7 @@ export function ReactionRolesScreen({ config, channels, roles }: ReactionRolesSc
 						}
 					>
 						{selected.options.length === 0 ? (
-							<p className="text-body-sm text-text-muted">
-								No options. The panel would post an empty message.
-							</p>
+							<p className="text-body-sm text-text-muted">{t('options.noneWarning')}</p>
 						) : (
 							selected.options.map((option) => (
 								<div
@@ -320,7 +319,7 @@ export function ReactionRolesScreen({ config, channels, roles }: ReactionRolesSc
 
 									<div className="flex min-w-0 flex-1 flex-col gap-2">
 										<div className="flex flex-wrap items-end gap-2">
-											<Field label="Emoji" className="w-20">
+											<Field label={t('options.emoji')} className="w-20">
 												<Input
 													value={option.emoji}
 													onChange={(event) => {

@@ -415,7 +415,7 @@ function RestrictCell({
 							onChange({ allowedRoleIds: [], deniedChannelIds: [] });
 						}}
 					>
-						Clear restrictions
+						{t('drawer.clear')}
 					</Button>
 				) : null}
 			</div>

@@ -183,11 +183,11 @@ export function CaseDrawer({
 				</dl>
 
 				<div>
-					<p className="mb-1.5 font-mono text-overline text-text-muted uppercase">Evidence</p>
+					<p className="mb-1.5 font-mono text-overline text-text-muted uppercase">
+						{t('drawer.evidence')}
+					</p>
 					{entry.evidence.length === 0 ? (
-						<p className="text-body-sm text-text-muted">
-							Nothing attached. Screenshots uploaded with the slash command land here.
-						</p>
+						<p className="text-body-sm text-text-muted">{t('drawer.noEvidence')}</p>
 					) : (
 						<ul className="flex flex-col gap-1.5">
 							{entry.evidence.map((file) => (
@@ -207,10 +207,10 @@ export function CaseDrawer({
 
 				<div>
 					<p className="mb-1.5 font-mono text-overline text-text-muted uppercase">
-						Other cases for {entry.targetName}
+						{t('drawer.otherCases', { name: entry.targetName })}
 					</p>
 					{related.length === 0 ? (
-						<p className="text-body-sm text-text-muted">This is their only case.</p>
+						<p className="text-body-sm text-text-muted">{t('drawer.onlyCase')}</p>
 					) : (
 						<ul className="flex flex-col gap-1.5">
 							{related.map((other) => (
@@ -238,9 +238,11 @@ export function CaseDrawer({
 				</div>
 
 				<div>
-					<p className="mb-1.5 font-mono text-overline text-text-muted uppercase">History</p>
+					<p className="mb-1.5 font-mono text-overline text-text-muted uppercase">
+						{t('drawer.history')}
+					</p>
 					{entry.history.length === 0 ? (
-						<p className="text-body-sm text-text-muted">Never edited since it was opened.</p>
+						<p className="text-body-sm text-text-muted">{t('drawer.neverEdited')}</p>
 					) : (
 						<ul className="flex flex-col gap-2 border-l border-border pl-3">
 							{entry.history.map((edit) => (

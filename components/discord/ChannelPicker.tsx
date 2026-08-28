@@ -135,9 +135,7 @@ export function ChannelPicker({
 
 			<div className="max-h-70 thin-scroll overflow-y-auto overscroll-contain p-1">
 				{groups.length === 0 ? (
-					<p className="px-2 py-3 text-body-sm text-text-muted">
-						No channel matches &ldquo;{query}&rdquo;.
-					</p>
+					<p className="px-2 py-3 text-body-sm text-text-muted">{t('noChannelMatch', { query })}</p>
 				) : (
 					groups.map((group) => (
 						<div key={group.category} className="contents">

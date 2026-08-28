@@ -46,9 +46,29 @@ const TRANSLATED = [
 	'app/auth/**/*.tsx',
 	'app/login/*.tsx',
 	'app/logout/*.tsx',
-	'app/(authenticated)/servers/*.tsx',
-	'app/(authenticated)/servers/add/*.tsx',
-	'app/(authenticated)/**/OverviewScreen.tsx'
+	'app/(authenticated)/**/*.tsx',
+	'app/(admin)/**/*.tsx',
+	'components/admin/**/*.tsx',
+	'components/discord/**/*.tsx',
+	'components/management/**/*.tsx',
+	'components/modules/**/*.tsx',
+	'components/ui/Combobox.tsx',
+	'components/ui/DateTimeInput.tsx',
+	'components/ui/SearchInput.tsx'
+];
+
+const NOT_COPY = [
+	'[0-9!-/:-@[-`{-~]+',
+	'[A-Z_-]+',
+	/^\p{Emoji}+$/u,
+	/^[\s\p{P}\p{S}]+$/u,
+	'Pro',
+	'v',
+	'https://',
+	'@someone',
+	'\\{number\\}',
+	'\\{user\\}',
+	'novato'
 ];
 
 const house = {
@@ -143,7 +163,8 @@ export default ts.config(
 				'error',
 				{
 					mode: 'jsx-only',
-					'jsx-attributes': { include: COPY_ATTRIBUTES }
+					'jsx-attributes': { include: COPY_ATTRIBUTES },
+					words: { exclude: NOT_COPY }
 				}
 			]
 		}

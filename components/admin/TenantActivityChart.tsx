@@ -4,6 +4,7 @@ import { LineChart } from 'echarts/charts';
 import { GridComponent, TooltipComponent } from 'echarts/components';
 import * as echarts from 'echarts/core';
 import { SVGRenderer } from 'echarts/renderers';
+import { useTranslations } from 'next-intl';
 import { useEffect, useRef } from 'react';
 import { useTheme } from '@/components/providers/theme-context';
 import { Alert } from '@/components/ui/Alert';
@@ -39,6 +40,7 @@ function readPalette(): TenantChartPalette {
 }
 
 export function TenantActivityChart({ points }: { points: TenantDailyPoint[] }) {
+	const t = useTranslations('admin');
 	const { resolved } = useTheme();
 	const containerRef = useRef<HTMLDivElement>(null);
 	const chartRef = useRef<echarts.ECharts | null>(null);
@@ -72,11 +74,8 @@ export function TenantActivityChart({ points }: { points: TenantDailyPoint[] }) 
 		<div className="flex flex-col rounded-lg border border-border bg-surface shadow-1">
 			<div className="flex flex-wrap items-center gap-3 border-b border-border p-5">
 				<div className="min-w-40 flex-1">
-					<h2 className="text-h4">Activity</h2>
-					<p className="text-body-sm text-text-muted">
-						Thirty days of messages and commands. A flat line is the first thing to check when
-						someone reports the bot stopped.
-					</p>
+					<h2 className="text-h4">{t('chart.title')}</h2>
+					<p className="text-body-sm text-text-muted">{t('chart.description')}</p>
 				</div>
 
 				<div className="flex flex-wrap gap-4">
@@ -94,9 +93,8 @@ export function TenantActivityChart({ points }: { points: TenantDailyPoint[] }) 
 
 			{isSilent(points) ? (
 				<div className="p-5">
-					<Alert variant="warning" title="No recorded activity in the window">
-						Nothing was written for this tenant in the last thirty days. Either the bot is not in
-						the server any more, or it has no permission to see the channels.
+					<Alert variant="warning" title={t('chart.emptyTitle')}>
+						{t('chart.empty')}
 					</Alert>
 				</div>
 			) : (
@@ -105,7 +103,7 @@ export function TenantActivityChart({ points }: { points: TenantDailyPoint[] }) 
 						ref={containerRef}
 						data-testid="tenant-activity-chart"
 						role="img"
-						aria-label="Messages and commands over the last thirty days"
+						aria-label={t('chart.label')}
 						className="h-56 w-full"
 					/>
 				</div>

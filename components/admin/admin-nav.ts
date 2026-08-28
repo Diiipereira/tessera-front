@@ -1,8 +1,8 @@
 import { Ban, Building2 } from 'lucide-react';
 
 export const adminNav = [
-	{ id: 'tenants', label: 'Tenants', href: '/admin/tenants', icon: Building2 },
-	{ id: 'blacklist', label: 'Blacklist', href: '/admin/blacklist', icon: Ban }
+	{ id: 'tenants', href: '/admin/tenants', icon: Building2 },
+	{ id: 'blacklist', href: '/admin/blacklist', icon: Ban }
 ] as const;
 
 export type AdminNavItem = (typeof adminNav)[number];

@@ -1,6 +1,7 @@
 'use client';
 
 import { Ban, Plus, ShieldX, Trash2 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { ConfirmDialog } from '@/components/management/ConfirmDialog';
@@ -20,6 +21,7 @@ import { absoluteTime, dateOnly, relativeTime } from '@/lib/time';
 import type { BlacklistEntry, BlacklistTargetType } from '@/lib/types/admin';
 
 export function BlacklistScreen({ entries }: { entries: BlacklistEntry[] }) {
+	const t = useTranslations('admin.blacklist');
 	const [query, setQuery] = useState('');
 	const [targetType, setTargetType] = useState<BlacklistTargetType | 'all'>('all');
 	const [includeExpired, setIncludeExpired] = useState(false);
@@ -41,8 +43,8 @@ export function BlacklistScreen({ entries }: { entries: BlacklistEntry[] }) {
 	return (
 		<div className="w-full p-6 sm:p-8">
 			<PageHeader
-				title="Blacklist"
-				description="Users and servers the platform refuses. Checked when a session is issued, before anything else."
+				title={t('title')}
+				description={t('description')}
 				action={
 					<Button
 						onClick={() => {
@@ -59,20 +61,20 @@ export function BlacklistScreen({ entries }: { entries: BlacklistEntry[] }) {
 				<SearchInput
 					value={query}
 					onValueChange={setQuery}
-					placeholder="Search by name, id or reason…"
-					aria-label="Search the blacklist"
+					placeholder={t('search')}
+					aria-label={t('searchLabel')}
 					className="max-w-80"
 				/>
 
 				<SegmentedControl
 					options={[
-						{ value: 'all', label: 'All' },
-						{ value: 'user', label: 'Users' },
-						{ value: 'guild', label: 'Servers' }
+						{ value: 'all', label: t('all') },
+						{ value: 'user', label: t('users') },
+						{ value: 'guild', label: t('servers') }
 					]}
 					value={targetType}
 					onValueChange={setTargetType}
-					label="Filter by target"
+					label={t('target')}
 					size="sm"
 				/>
 
@@ -83,17 +85,13 @@ export function BlacklistScreen({ entries }: { entries: BlacklistEntry[] }) {
 							setIncludeExpired(next === true);
 						}}
 					/>
-					Show expired
+					{t('showExpired')}
 				</label>
 			</div>
 
 			<div className="mt-6 overflow-hidden rounded-lg border border-border bg-surface shadow-1">
 				{visible.length === 0 ? (
-					<EmptyState
-						icon={ShieldX}
-						title="Nothing blacklisted"
-						description="No entry matches. An empty blacklist is the healthy state."
-					/>
+					<EmptyState icon={ShieldX} title={t('emptyTitle')} description={t('emptyBody')} />
 				) : (
 					<ul>
 						{visible.map((entry) => {
@@ -114,7 +112,7 @@ export function BlacklistScreen({ entries }: { entries: BlacklistEntry[] }) {
 											<Badge variant={entry.targetType === 'user' ? 'neutral' : 'info'}>
 												{entry.targetType}
 											</Badge>
-											{expired ? <Badge variant="outline">Expired</Badge> : null}
+											{expired ? <Badge variant="outline">{t('expired')}</Badge> : null}
 										</span>
 										<span className="block truncate font-mono text-caption text-text-muted">
 											{entry.targetId}
@@ -154,7 +152,7 @@ export function BlacklistScreen({ entries }: { entries: BlacklistEntry[] }) {
 			</div>
 
 			<p className="mt-3 text-caption font-normal text-text-muted">
-				Showing {visible.length} of {entries.length} entries.
+				{t('showing', { shown: visible.length, total: entries.length })}
 			</p>
 
 			<Dialog
@@ -163,8 +161,8 @@ export function BlacklistScreen({ entries }: { entries: BlacklistEntry[] }) {
 					if (!next) closeAdd();
 					else setAdding(true);
 				}}
-				title="Blacklist a user or server"
-				description="The block takes effect the next time a session is issued, not on the session already open."
+				title={t('addTitle')}
+				description={t('addDescription')}
 				footer={
 					<>
 						<Button variant="ghost" onClick={closeAdd}>
@@ -174,8 +172,8 @@ export function BlacklistScreen({ entries }: { entries: BlacklistEntry[] }) {
 							variant="danger"
 							disabled={!idValid}
 							onClick={() => {
-								toast.error('Not wired yet', {
-									description: 'The API has no write path for the blacklist table.'
+								toast.error(t('notWired'), {
+									description: t('notWiredHint')
 								});
 								closeAdd();
 							}}
@@ -187,9 +185,9 @@ export function BlacklistScreen({ entries }: { entries: BlacklistEntry[] }) {
 			>
 				<div className="flex flex-col gap-4">
 					<Field
-						label="Target id"
-						help="The Discord snowflake of the user or server."
-						error={draftId !== '' && !idValid ? 'A snowflake is 17 to 20 digits.' : undefined}
+						label={t('targetId')}
+						help={t('targetIdHelp')}
+						error={draftId !== '' && !idValid ? t('badId') : undefined}
 					>
 						<Input
 							value={draftId}
@@ -202,14 +200,14 @@ export function BlacklistScreen({ entries }: { entries: BlacklistEntry[] }) {
 						/>
 					</Field>
 
-					<Field label="Reason" help="Written to the audit trail. Future you will want it.">
+					<Field label={t('reason')} help={t('reasonHelp')}>
 						<Textarea
 							value={draftReason}
 							onChange={(event) => {
 								setDraftReason(event.target.value);
 							}}
 							rows={3}
-							placeholder="What did they do?"
+							placeholder={t('reasonPlaceholder')}
 						/>
 					</Field>
 				</div>
@@ -220,13 +218,13 @@ export function BlacklistScreen({ entries }: { entries: BlacklistEntry[] }) {
 				onOpenChange={(next) => {
 					if (!next) setRemoving(null);
 				}}
-				title="Remove this block?"
-				description="They get back in the moment the next session is issued."
+				title={t('removeTitle')}
+				description={t('removeDescription')}
 				confirmPhrase={removing?.name ?? ''}
-				confirmLabel="Remove the block"
+				confirmLabel={t('removeLabel')}
 				onConfirm={() => {
-					toast.error('Not wired yet', {
-						description: 'The API has no write path for the blacklist table.'
+					toast.error(t('notWired'), {
+						description: t('notWiredHint')
 					});
 					setRemoving(null);
 				}}

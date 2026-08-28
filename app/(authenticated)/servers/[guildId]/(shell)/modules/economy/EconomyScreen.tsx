@@ -568,7 +568,7 @@ function ItemDialog({ item, isNew, roles, symbol, onCancel, onSave }: ItemDialog
 					/>
 				</Field>
 
-				<Field label="Price" className="w-40">
+				<Field label={t('price')} className="w-40">
 					<NumberInput
 						min={0}
 						max={10000000}

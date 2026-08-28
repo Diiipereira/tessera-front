@@ -30,6 +30,8 @@ const LevelCurveChart = dynamic(
 	{ ssr: false, loading: () => <Skeleton className="h-40 w-full rounded-md" /> }
 );
 
+const REWARD_COLUMNS = ['level', 'role', 'replace', ''];
+
 const MEDALS = ['text-warning', 'text-text-muted', 'text-text-muted'];
 
 type LevelsScreenProps = {
@@ -294,7 +296,7 @@ export function LevelsScreen({
 						<table className="w-full min-w-140 border-collapse">
 							<thead>
 								<tr className="border-b border-border text-left">
-									{['level', 'role', 'replace', ''].map((head, index) => (
+									{REWARD_COLUMNS.map((head, index) => (
 										<th
 											key={head + String(index)}
 											className="pb-2 font-mono text-overline font-semibold text-text-muted uppercase"

@@ -52,8 +52,7 @@ export function BillingScreen({ billing }: { billing: BillingState }) {
 			<div className="mt-6 flex flex-col gap-6">
 				{billing.cancelAtPeriodEnd ? (
 					<Alert variant="warning" title={t('endingTitle')}>
-						{current.name} stays active until {dateOnly(billing.renewsAt)}, then the server drops to
-						Free and anything over the Free limits stops running.
+						{t('endingBody', { plan: current.name, date: dateOnly(billing.renewsAt) })}
 					</Alert>
 				) : null}
 
@@ -71,15 +70,20 @@ export function BillingScreen({ billing }: { billing: BillingState }) {
 							<span className="text-h1">{formatPrice(monthlyEquivalentCents(current, cycle))}</span>
 							{current.monthlyCents === 0 ? null : (
 								<span className="text-body text-text-muted">
-									per month{cycle === 'yearly' ? ', billed yearly' : ''}
+									{t('perMonthLong')}
+									{cycle === 'yearly' ? t('billedYearly') : ''}
 								</span>
 							)}
 						</div>
 
 						<p className="text-body-sm text-text-muted">
-							{billing.cancelAtPeriodEnd ? t('ends') : t('renews')} {relativeTime(billing.renewsAt)}{' '}
-							— {dateOnly(billing.renewsAt)}. {billing.daysLeftInPeriod} of {billing.daysInPeriod}{' '}
-							days left in this period.
+							{t('renewLine', {
+								verb: billing.cancelAtPeriodEnd ? t('ends') : t('renews'),
+								relative: relativeTime(billing.renewsAt),
+								date: dateOnly(billing.renewsAt),
+								left: billing.daysLeftInPeriod,
+								total: billing.daysInPeriod
+							})}
 						</p>
 
 						<div className="flex flex-wrap gap-2">
@@ -92,7 +96,7 @@ export function BillingScreen({ billing }: { billing: BillingState }) {
 								}}
 							>
 								<CreditCard aria-hidden="true" />
-								Manage payment
+								{t('managePayment')}
 							</Button>
 							<Button
 								variant="ghost-danger"
@@ -101,17 +105,20 @@ export function BillingScreen({ billing }: { billing: BillingState }) {
 									setCancelling(true);
 								}}
 							>
-								Cancel plan
+								{t('cancelPlan')}
 							</Button>
 						</div>
 
 						{billing.paymentMethod ? (
 							<p className="text-caption font-normal text-text-muted">
-								{billing.paymentMethod.brand} ending {billing.paymentMethod.last4}, expires{' '}
-								{billing.paymentMethod.expiry}.
+								{t('cardLine', {
+									brand: billing.paymentMethod.brand,
+									last4: billing.paymentMethod.last4,
+									expiry: billing.paymentMethod.expiry
+								})}
 							</p>
 						) : (
-							<p className="text-caption font-normal text-warning-fg">No payment method on file.</p>
+							<p className="text-caption font-normal text-warning-fg">{t('noCard')}</p>
 						)}
 					</SettingsSection>
 
@@ -229,10 +236,10 @@ export function BillingScreen({ billing }: { billing: BillingState }) {
 										}}
 									>
 										{isCurrent
-											? 'You are here'
+											? t('youAreHere')
 											: isUpgrade
-												? `Upgrade to ${plan.name}`
-												: `Move to ${plan.name}`}
+												? t('upgradeTo', { plan: plan.name })
+												: t('moveTo', { plan: plan.name })}
 									</Button>
 								</div>
 							);
@@ -245,11 +252,13 @@ export function BillingScreen({ billing }: { billing: BillingState }) {
 						<table className="w-full min-w-140 border-collapse text-left">
 							<thead>
 								<tr className="border-b border-border text-overline text-text-muted uppercase">
-									<th className="py-2 pr-4 font-mono font-semibold">Number</th>
-									<th className="py-2 pr-4 font-mono font-semibold">Date</th>
-									<th className="py-2 pr-4 font-mono font-semibold">Description</th>
-									<th className="py-2 pr-4 text-right font-mono font-semibold">Amount</th>
-									<th className="py-2 pr-4 font-mono font-semibold">Status</th>
+									<th className="py-2 pr-4 font-mono font-semibold">{t('invoiceNumber')}</th>
+									<th className="py-2 pr-4 font-mono font-semibold">{t('invoiceDate')}</th>
+									<th className="py-2 pr-4 font-mono font-semibold">{t('invoiceDescription')}</th>
+									<th className="py-2 pr-4 text-right font-mono font-semibold">
+										{t('invoiceAmount')}
+									</th>
+									<th className="py-2 pr-4 font-mono font-semibold">{t('invoiceStatus')}</th>
 									<th className="w-12 py-2 font-mono font-semibold" />
 								</tr>
 							</thead>
@@ -374,9 +383,12 @@ export function BillingScreen({ billing }: { billing: BillingState }) {
 						</dl>
 
 						<p className="text-body-sm text-text-muted">
-							{billing.daysLeftInPeriod} of {billing.daysInPeriod} days are left in this period, so
-							you are {proration >= 0 ? 'charged' : 'credited'} that share of the difference. The
-							full price applies from {dateOnly(billing.renewsAt)}.
+							{t('prorationLine', {
+								left: billing.daysLeftInPeriod,
+								total: billing.daysInPeriod,
+								verb: proration >= 0 ? t('chargedVerb') : t('creditedVerb'),
+								date: dateOnly(billing.renewsAt)
+							})}
 						</p>
 					</div>
 				)}
@@ -385,7 +397,7 @@ export function BillingScreen({ billing }: { billing: BillingState }) {
 			<Dialog
 				open={cancelling}
 				onOpenChange={setCancelling}
-				title={`Cancel ${current.name}?`}
+				title={t('cancelTitle', { plan: current.name })}
 				danger
 				description={t('cancel.description')}
 				footer={
@@ -407,14 +419,13 @@ export function BillingScreen({ billing }: { billing: BillingState }) {
 								});
 							}}
 						>
-							Cancel plan
+							{t('cancelPlan')}
 						</Button>
 					</>
 				}
 			>
 				<p className="text-body text-text-muted">
-					On {dateOnly(billing.renewsAt)} this server drops to Free. Anything above the Free limits
-					stops: rules past the fifth, commands past the tenth, and every scheduled message.
+					{t('cancelBody', { date: dateOnly(billing.renewsAt) })}
 				</p>
 			</Dialog>
 		</div>

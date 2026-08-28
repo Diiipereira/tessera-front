@@ -183,9 +183,7 @@ export function MemberDrawer({ member, roles, currency, onClose }: MemberDrawerP
 						<div>
 							<p className="mb-2 font-mono text-overline text-text-muted uppercase">{t('notes')}</p>
 							{member.notes.length === 0 ? (
-								<p className="text-body-sm text-text-muted">
-									No notes. Notes are staff-only and never shown to the member.
-								</p>
+								<p className="text-body-sm text-text-muted">{t('noNotes')}</p>
 							) : (
 								<ul className="flex flex-col gap-2">
 									{member.notes.map((note) => (
@@ -207,9 +205,7 @@ export function MemberDrawer({ member, roles, currency, onClose }: MemberDrawerP
 
 				{tab === 'infractions' ? (
 					member.infractions.length === 0 ? (
-						<p className="text-body-sm text-text-muted">
-							Nothing on record. This member has never been actioned.
-						</p>
+						<p className="text-body-sm text-text-muted">{t('noInfractions')}</p>
 					) : (
 						<ul className="flex flex-col gap-2">
 							{member.infractions.map((infraction) => (
@@ -230,7 +226,7 @@ export function MemberDrawer({ member, roles, currency, onClose }: MemberDrawerP
 									</div>
 									<p className="mt-2 text-body-sm">{infraction.reason}</p>
 									<p className="mt-1 text-caption font-normal text-text-muted">
-										by {infraction.moderator}
+										{t('by', { who: infraction.moderator })}
 									</p>
 								</li>
 							))}
@@ -245,20 +241,14 @@ export function MemberDrawer({ member, roles, currency, onClose }: MemberDrawerP
 							value={t('balanceValue', { amount: formatCount(member.balance), currency })}
 						/>
 						<Row label={t('rank')} value={t('rankPending')} />
-						<p className="text-body-sm text-text-muted">
-							The transaction history for one member lives in the Economy module, filtered by this
-							ID.
-						</p>
+						<p className="text-body-sm text-text-muted">{t('economyElsewhere')}</p>
 					</div>
 				) : null}
 
 				{tab === 'roles' ? (
 					<div className="flex flex-col gap-3">
 						<RoleChips roles={roles} roleIds={member.roleIds} max={20} />
-						<p className="text-body-sm text-text-muted">
-							Roles are read from Discord. Changing them here writes back through the bot, which
-							needs its own role above the one it grants.
-						</p>
+						<p className="text-body-sm text-text-muted">{t('rolesUpstream')}</p>
 					</div>
 				) : null}
 			</div>

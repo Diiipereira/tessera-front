@@ -164,7 +164,10 @@ export function AuditScreen({ entries }: { entries: AuditEntry[] }) {
 												<span className="text-text-muted">{entry.action}</span>
 											</span>
 											<span className="block truncate text-caption font-normal text-text-muted">
-												{entry.module} · {t('fields', { count: rows.length })} changed
+												{t('summary', {
+													module: entry.module,
+													fields: t('fields', { count: rows.length })
+												})}
 											</span>
 										</span>
 
@@ -183,9 +186,7 @@ export function AuditScreen({ entries }: { entries: AuditEntry[] }) {
 									{open ? (
 										<div className="border-t border-border bg-surface-sunken p-4 sm:pl-11">
 											{rows.length === 0 ? (
-												<p className="text-body-sm text-text-muted">
-													Nothing was written — the values sent matched what was already stored.
-												</p>
+												<p className="text-body-sm text-text-muted">{t('noChange')}</p>
 											) : (
 												<div className="overflow-x-auto">
 													<table className="w-full min-w-140 border-collapse text-left">

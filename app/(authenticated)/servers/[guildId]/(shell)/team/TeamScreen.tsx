@@ -103,7 +103,7 @@ export function TeamScreen({ team, invites, viewerRole }: TeamScreenProps) {
 											{member.role === 'owner' || member.viaDiscord ? (
 												<Badge variant={member.role === 'owner' ? 'primary' : 'outline'}>
 													{t(`role.${member.role}`)}
-													{member.viaDiscord && member.role !== 'owner' ? ' · Discord' : ''}
+													{member.viaDiscord && member.role !== 'owner' ? t('viaDiscord') : ''}
 												</Badge>
 											) : (
 												<Select
@@ -187,7 +187,7 @@ export function TeamScreen({ team, invites, viewerRole }: TeamScreenProps) {
 											toast.success(t('pending.revoked', { handle: invite.handle }));
 										}}
 									>
-										Revoke
+										{t('revoke')}
 									</Button>
 								</li>
 							))}
@@ -235,7 +235,9 @@ export function TeamScreen({ team, invites, viewerRole }: TeamScreenProps) {
 														) : (
 															<Minus className="size-3.5 text-text-subtle" aria-hidden="true" />
 														)}
-														<span className="sr-only">{granted ? 'granted' : 'not granted'}</span>
+														<span className="sr-only">
+															{granted ? t('granted') : t('notGranted')}
+														</span>
 													</span>
 												</td>
 											);

@@ -1,6 +1,7 @@
 'use client';
 
 import { ArrowLeft, Ban, Blocks, Copy, ExternalLink, Users } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { TenantActivityChart } from '@/components/admin/TenantActivityChart';
@@ -49,6 +50,7 @@ function Fact({ label, value }: { label: string; value: string }) {
 }
 
 function ModuleRow({ module }: { module: TenantModuleState }) {
+	const t = useTranslations('admin.tenant');
 	return (
 		<li className="flex items-center gap-3 border-b border-border px-5 py-2.5 last:border-0">
 			<span className="min-w-0 flex-1 truncate text-body-sm">{module.label}</span>
@@ -65,13 +67,14 @@ function ModuleRow({ module }: { module: TenantModuleState }) {
 			</span>
 
 			<Badge variant={module.enabled ? 'success' : 'neutral'} dot>
-				{module.enabled ? 'On' : 'Off'}
+				{module.enabled ? t('on') : t('off')}
 			</Badge>
 		</li>
 	);
 }
 
 export function TenantScreen({ detail }: { detail: TenantDetail }) {
+	const t = useTranslations('admin.tenant');
 	const { summary, modules, staff, activity, subscription } = detail;
 	const gone = tenantStatus(summary) === 'left';
 	const enabled = modules.filter((module) => module.enabled).length;
@@ -83,7 +86,7 @@ export function TenantScreen({ detail }: { detail: TenantDetail }) {
 				className="inline-flex items-center gap-2 text-body-sm text-text-muted transition-colors duration-120 ease-out hover:text-text"
 			>
 				<ArrowLeft className="size-4 shrink-0" aria-hidden="true" />
-				All tenants
+				{t('allTenants')}
 			</Link>
 
 			<header className="mt-4 flex flex-wrap items-start gap-4">
@@ -93,16 +96,16 @@ export function TenantScreen({ detail }: { detail: TenantDetail }) {
 					<div className="flex flex-wrap items-center gap-2">
 						<h1 className="text-h2">{summary.name}</h1>
 						<Badge variant={gone ? 'danger' : 'success'} dot>
-							{gone ? 'Left' : 'Active'}
+							{gone ? t('left') : t('active')}
 						</Badge>
-						{summary.setupCompleted ? null : <Badge variant="warning">Setup pending</Badge>}
+						{summary.setupCompleted ? null : <Badge variant="warning">{t('setupPending')}</Badge>}
 					</div>
 
 					<button
 						type="button"
 						className="mt-1 inline-flex items-center gap-1.5 font-mono text-caption text-text-muted transition-colors duration-120 ease-out hover:text-text"
 						onClick={() => {
-							toast.success('Guild id copied', { description: summary.id });
+							toast.success(t('copied'), { description: summary.id });
 						}}
 					>
 						{summary.id}
@@ -112,19 +115,19 @@ export function TenantScreen({ detail }: { detail: TenantDetail }) {
 
 				<div className="flex shrink-0 flex-wrap items-center gap-2">
 					<Button variant="outline" href={`/servers/${summary.id}`}>
-						Open as owner
+						{t('openAsOwner')}
 						<ExternalLink aria-hidden="true" />
 					</Button>
 					<Button
 						variant="danger"
 						onClick={() => {
-							toast.error('Blacklisting is not wired yet', {
-								description: 'The API has no write path for the blacklist table.'
+							toast.error(t('blacklistFailed'), {
+								description: t('blacklistFailedHint')
 							});
 						}}
 					>
 						<Ban aria-hidden="true" />
-						Blacklist
+						{t('blacklist')}
 					</Button>
 				</div>
 			</header>
@@ -134,22 +137,25 @@ export function TenantScreen({ detail }: { detail: TenantDetail }) {
 					<TenantActivityChart points={activity} />
 				</div>
 
-				<Card title="Tenant">
+				<Card title={t('tenantCard')}>
 					<dl className="grid grid-cols-2 gap-4">
-						<Fact label="Owner" value={summary.ownerName} />
-						<Fact label="Owner id" value={summary.ownerId} />
-						<Fact label="Members" value={formatMembers(summary.memberCount)} />
-						<Fact label="Locale" value={summary.locale} />
-						<Fact label="Joined" value={dateOnly(summary.joinedAt)} />
-						<Fact label="Left" value={summary.leftAt === null ? '—' : dateOnly(summary.leftAt)} />
+						<Fact label={t('owner')} value={summary.ownerName} />
+						<Fact label={t('ownerId')} value={summary.ownerId} />
+						<Fact label={t('members')} value={formatMembers(summary.memberCount)} />
+						<Fact label={t('locale')} value={summary.locale} />
+						<Fact label={t('joined')} value={dateOnly(summary.joinedAt)} />
+						<Fact
+							label={t('leftAt')}
+							value={summary.leftAt === null ? '—' : dateOnly(summary.leftAt)}
+						/>
 					</dl>
 				</Card>
 			</div>
 
 			<div className="mt-4 grid gap-4 lg:grid-cols-3">
 				<Card
-					title="Modules"
-					description={`${String(enabled)} of ${String(modules.length)} enabled.`}
+					title={t('modules')}
+					description={t('modulesEnabled', { enabled, total: modules.length })}
 					padded={false}
 					className="lg:col-span-2"
 					action={<Blocks className="size-4 text-text-subtle" aria-hidden="true" />}
@@ -162,7 +168,7 @@ export function TenantScreen({ detail }: { detail: TenantDetail }) {
 				</Card>
 
 				<div className="flex flex-col gap-4">
-					<Card title="Plan">
+					<Card title={t('plan')}>
 						<div className="flex items-center gap-2">
 							<Badge variant={summary.planKey === 'free' ? 'neutral' : 'primary'}>
 								{PLAN_LABELS[summary.planKey]}
@@ -175,14 +181,12 @@ export function TenantScreen({ detail }: { detail: TenantDetail }) {
 						</div>
 
 						{subscription === null ? (
-							<p className="mt-3 text-body-sm text-text-muted">
-								No subscription row — this tenant never left the free plan.
-							</p>
+							<p className="mt-3 text-body-sm text-text-muted">{t('noSubscription')}</p>
 						) : (
 							<dl className="mt-4 grid grid-cols-2 gap-4">
-								<Fact label="Provider" value={subscription.provider} />
+								<Fact label={t('provider')} value={subscription.provider} />
 								<Fact
-									label="Renews"
+									label={t('renews')}
 									value={
 										subscription.currentPeriodEnd === null
 											? '—'
@@ -190,16 +194,16 @@ export function TenantScreen({ detail }: { detail: TenantDetail }) {
 									}
 								/>
 								<Fact
-									label="Cancel at period end"
-									value={subscription.cancelAtPeriodEnd ? 'Yes' : 'No'}
+									label={t('cancelAtEnd')}
+									value={subscription.cancelAtPeriodEnd ? t('yes') : t('no')}
 								/>
 							</dl>
 						)}
 					</Card>
 
 					<Card
-						title="Dashboard access"
-						description="Who can act on this tenant."
+						title={t('access')}
+						description={t('accessDescription')}
 						padded={false}
 						action={<Users className="size-4 text-text-subtle" aria-hidden="true" />}
 					>
