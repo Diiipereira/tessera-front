@@ -1,3 +1,5 @@
+import type { TeamRole } from '@/lib/types/management';
+
 const FALLBACK_API_URL = 'http://localhost:3001';
 
 export const SESSION_COOKIE = '__Host-session';
@@ -63,4 +65,16 @@ export type AuthenticatedUserDto = {
 	avatarHash: string | null;
 	locale: string;
 	isPlatformStaff: boolean;
+};
+
+export type CapabilityDto = {
+	key: string;
+	label: string;
+	description: string;
+};
+
+export type CapabilityCatalogDto = {
+	capabilities: CapabilityDto[];
+	roles: TeamRole[];
+	presets: Partial<Record<TeamRole, string[]>>;
 };

@@ -1694,32 +1694,6 @@
 			"moderator": "Moderador",
 			"viewer": "Observador"
 		},
-		"permission": {
-			"view": {
-				"label": "Ver o painel",
-				"body": "Lê todas as telas, não muda nada."
-			},
-			"moderate": {
-				"label": "Agir sobre membros",
-				"body": "Advertir, timeout, expulsar e banir."
-			},
-			"cases": {
-				"label": "Editar casos",
-				"body": "Mudar um motivo, revogar uma punição."
-			},
-			"modules": {
-				"label": "Configurar módulos",
-				"body": "Todas as telas de configuração de módulo."
-			},
-			"team": {
-				"label": "Gerenciar a equipe",
-				"body": "Conceder e revogar acesso ao painel."
-			},
-			"billing": {
-				"label": "Gerenciar a assinatura",
-				"body": "Mudar o plano e a forma de pagamento."
-			}
-		},
 		"dialog": {
 			"title": "Convidar para o painel",
 			"description": "A pessoa recebe um link de convite. O acesso começa quando ela entra com o Discord.",
@@ -1987,5 +1961,87 @@
 		"next": "Avançar",
 		"dashboard": "Ir para o painel",
 		"skip": "Pular a configuração"
+	},
+	"capabilities": {
+		"guild": {
+			"shape": {
+				"read": {
+					"label": "Ver canais e cargos",
+					"description": "Todo formulário que aponta para um precisa disto."
+				}
+			}
+		},
+		"modules": {
+			"read": {
+				"label": "Ver configurações de módulo",
+				"description": "Abrir a tela de um módulo sem alterá-la."
+			},
+			"write": {
+				"label": "Configurar módulos",
+				"description": "Salvar em qualquer tela de módulo."
+			}
+		},
+		"settings": {
+			"read": {
+				"label": "Ver configurações do servidor",
+				"description": "Idioma, fuso, cor dos embeds e apelido."
+			},
+			"write": {
+				"label": "Alterar configurações do servidor",
+				"description": "Salvar na tela de configurações."
+			}
+		},
+		"cases": {
+			"read": {
+				"label": "Ver o registro de casos",
+				"description": "Toda advertência, expulsão, banimento e castigo registrados."
+			},
+			"write": {
+				"label": "Editar casos",
+				"description": "Mudar um motivo, revogar uma punição."
+			}
+		},
+		"members": {
+			"read": {
+				"label": "Ver membros",
+				"description": "A lista de membros e o perfil de cada um."
+			},
+			"moderate": {
+				"label": "Agir sobre membros",
+				"description": "Advertir, castigar, expulsar e banir pelo painel."
+			}
+		},
+		"audit": {
+			"read": {
+				"label": "Ver o registro de auditoria",
+				"description": "Quem alterou qual configuração, e quando."
+			}
+		},
+		"team": {
+			"read": {
+				"label": "Ver quem tem acesso",
+				"description": "A lista de assentos e como cada um foi concedido."
+			},
+			"manage": {
+				"label": "Gerenciar acesso",
+				"description": "Conceder e revogar um assento no painel."
+			}
+		},
+		"billing": {
+			"read": {
+				"label": "Ver o plano",
+				"description": "Plano atual, uso e faturas."
+			},
+			"manage": {
+				"label": "Alterar o plano",
+				"description": "Subir, descer de plano e forma de pagamento."
+			}
+		},
+		"bot": {
+			"remove": {
+				"label": "Remover a Tessera",
+				"description": "Tirar o bot deste servidor."
+			}
+		}
 	}
 }

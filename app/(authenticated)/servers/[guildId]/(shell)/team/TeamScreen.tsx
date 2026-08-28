@@ -15,7 +15,8 @@ import { Field } from '@/components/ui/Field';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { BRAND } from '@/lib/brand';
-import { assignableRoles, can, grantedCount, PERMISSIONS, ROLE_ORDER } from '@/lib/team';
+import type { CapabilityCatalogDto } from '@/lib/api-url';
+import { assignableRoles, can, grantedCount } from '@/lib/team';
 import { relativeTime } from '@/lib/time';
 import type { TeamInvite, TeamMember, TeamRole } from '@/lib/types/management';
 import { cn } from '@/lib/utils/cn';
@@ -25,17 +26,19 @@ type TeamScreenProps = {
 	team: TeamMember[];
 	invites: TeamInvite[];
 	viewerRole: TeamRole;
+	catalog: CapabilityCatalogDto;
 };
 
-export function TeamScreen({ team, invites, viewerRole }: TeamScreenProps) {
+export function TeamScreen({ team, invites, viewerRole, catalog }: TeamScreenProps) {
 	const t = useTranslations('team');
+	const names = useTranslations('capabilities');
 	const [members, setMembers] = useState(team);
 	const [pending, setPending] = useState(invites);
 	const [inviting, setInviting] = useState(false);
 	const [handle, setHandle] = useState('');
 	const [inviteRole, setInviteRole] = useState<TeamRole>('viewer');
 
-	const options = assignableRoles(viewerRole);
+	const options = assignableRoles(catalog, viewerRole);
 	const canManage = options.length > 0;
 
 	return (
@@ -201,27 +204,27 @@ export function TeamScreen({ team, invites, viewerRole }: TeamScreenProps) {
 							<thead>
 								<tr className="border-b border-border text-overline text-text-muted uppercase">
 									<th className="py-2 pr-4 font-mono font-semibold">{t('matrix.permission')}</th>
-									{ROLE_ORDER.map((role) => (
+									{catalog.roles.map((role) => (
 										<th key={role} className="w-24 py-2 text-center font-mono font-semibold">
 											{t(`role.${role}`)}
 											<span className="tabular block text-caption font-normal text-text-muted normal-case">
-												{grantedCount(role)}
+												{grantedCount(catalog, role)}
 											</span>
 										</th>
 									))}
 								</tr>
 							</thead>
 							<tbody>
-								{PERMISSIONS.map((permission) => (
-									<tr key={permission} className="border-b border-border last:border-0">
+								{catalog.capabilities.map((capability) => (
+									<tr key={capability.key} className="border-b border-border last:border-0">
 										<td className="py-3 pr-4">
-											<p className="text-body">{t(`permission.${permission}.label`)}</p>
+											<p className="text-body">{names(`${capability.key}.label`)}</p>
 											<p className="text-caption font-normal text-text-muted">
-												{t(`permission.${permission}.body`)}
+												{names(`${capability.key}.description`)}
 											</p>
 										</td>
-										{ROLE_ORDER.map((role) => {
-											const granted = can(role, permission);
+										{catalog.roles.map((role) => {
+											const granted = can(catalog, role, capability.key);
 											return (
 												<td key={role} className="py-3 text-center">
 													<span
@@ -315,9 +318,9 @@ export function TeamScreen({ team, invites, viewerRole }: TeamScreenProps) {
 
 					<p className="text-body-sm text-text-muted">
 						{t('dialog.grants', {
-							role: t(`role.`),
-							granted: grantedCount(inviteRole),
-							total: PERMISSIONS.length
+							role: t(`role.${inviteRole}`),
+							granted: grantedCount(catalog, inviteRole),
+							total: catalog.capabilities.length
 						})}
 					</p>
 				</div>

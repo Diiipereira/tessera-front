@@ -1694,32 +1694,6 @@
 			"moderator": "Moderator",
 			"viewer": "Viewer"
 		},
-		"permission": {
-			"view": {
-				"label": "View dashboard",
-				"body": "Read every screen, change nothing."
-			},
-			"moderate": {
-				"label": "Act on members",
-				"body": "Warn, timeout, kick and ban."
-			},
-			"cases": {
-				"label": "Edit cases",
-				"body": "Change a reason, revoke a punishment."
-			},
-			"modules": {
-				"label": "Configure modules",
-				"body": "Every module settings screen."
-			},
-			"team": {
-				"label": "Manage team",
-				"body": "Grant and revoke dashboard access."
-			},
-			"billing": {
-				"label": "Manage billing",
-				"body": "Change plan and payment method."
-			}
-		},
 		"dialog": {
 			"title": "Invite to the dashboard",
 			"description": "They get an invite link. Access starts when they sign in with Discord.",
@@ -1987,5 +1961,87 @@
 		"next": "Next",
 		"dashboard": "Go to dashboard",
 		"skip": "Skip setup"
+	},
+	"capabilities": {
+		"guild": {
+			"shape": {
+				"read": {
+					"label": "See channels and roles",
+					"description": "Needed by every form that points at one."
+				}
+			}
+		},
+		"modules": {
+			"read": {
+				"label": "See module settings",
+				"description": "Open a module screen without changing it."
+			},
+			"write": {
+				"label": "Configure modules",
+				"description": "Save settings on any module screen."
+			}
+		},
+		"settings": {
+			"read": {
+				"label": "See server settings",
+				"description": "Language, timezone, embed colour and nickname."
+			},
+			"write": {
+				"label": "Change server settings",
+				"description": "Save on the settings screen."
+			}
+		},
+		"cases": {
+			"read": {
+				"label": "See the case log",
+				"description": "Every warn, kick, ban and timeout on record."
+			},
+			"write": {
+				"label": "Edit cases",
+				"description": "Change a reason, revoke a punishment."
+			}
+		},
+		"members": {
+			"read": {
+				"label": "See members",
+				"description": "The member list and each profile."
+			},
+			"moderate": {
+				"label": "Act on members",
+				"description": "Warn, timeout, kick and ban from the dashboard."
+			}
+		},
+		"audit": {
+			"read": {
+				"label": "See the audit log",
+				"description": "Who changed which setting, and when."
+			}
+		},
+		"team": {
+			"read": {
+				"label": "See who has access",
+				"description": "The list of seats and how each was granted."
+			},
+			"manage": {
+				"label": "Manage access",
+				"description": "Grant and revoke a seat on the dashboard."
+			}
+		},
+		"billing": {
+			"read": {
+				"label": "See the plan",
+				"description": "Current plan, usage and invoices."
+			},
+			"manage": {
+				"label": "Change the plan",
+				"description": "Upgrade, downgrade and payment method."
+			}
+		},
+		"bot": {
+			"remove": {
+				"label": "Remove Tessera",
+				"description": "Take the bot out of this server."
+			}
+		}
 	}
 }

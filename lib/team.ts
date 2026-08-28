@@ -1,25 +1,18 @@
+import type { CapabilityCatalogDto } from '@/lib/api-url';
 import type { TeamRole } from '@/lib/types/management';
 
-export const PERMISSIONS = ['view', 'moderate', 'cases', 'modules', 'team', 'billing'] as const;
+export const MANAGE_TEAM = 'team.manage';
 
-export const ROLE_ORDER: TeamRole[] = ['owner', 'admin', 'moderator', 'viewer'];
-
-const GRANTS: Record<TeamRole, string[]> = {
-	owner: [...PERMISSIONS],
-	admin: ['view', 'moderate', 'cases', 'modules', 'team'],
-	moderator: ['view', 'moderate', 'cases'],
-	viewer: ['view']
-};
-
-export function can(role: TeamRole, permission: string): boolean {
-	return GRANTS[role].includes(permission);
+export function can(catalog: CapabilityCatalogDto, role: TeamRole, capability: string): boolean {
+	return (catalog.presets[role] ?? []).includes(capability);
 }
 
-export function grantedCount(role: TeamRole): number {
-	return GRANTS[role].length;
+export function grantedCount(catalog: CapabilityCatalogDto, role: TeamRole): number {
+	return (catalog.presets[role] ?? []).length;
 }
 
-export function assignableRoles(actor: TeamRole): TeamRole[] {
-	if (!can(actor, 'team')) return [];
-	return ['admin', 'moderator', 'viewer'];
+export function assignableRoles(catalog: CapabilityCatalogDto, actor: TeamRole): TeamRole[] {
+	if (!can(catalog, actor, MANAGE_TEAM)) return [];
+
+	return catalog.roles.filter((role) => role !== 'owner');
 }
