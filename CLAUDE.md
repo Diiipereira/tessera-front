@@ -203,6 +203,17 @@ wordmark reads `BRAND.name`. Swapping the glyph is one import.
 
 ## Placeholders que não podem ir ao ar
 
+**Botão de tela mock nunca anuncia sucesso.** Quatro ações da tela de Settings disparavam um
+`toast.success` e nenhuma chamada — _"Settings reset"_ e _"Tessera left {servidor}"_ entre
+elas, as duas atrás de um diálogo que pedia para digitar o nome do servidor. Quem clicasse
+ficaria procurando por que o bot continua respondendo. Enquanto a rota não existir, o botão é
+`disabled` com o selo _"Not available yet"_ do `ActionRow`, e o diálogo não existe.
+
+O que torna isso perigoso é a mistura, não o mock em si: só **três** telas chamam a API de
+verdade (`AccountPanel`, `SettingsScreen`, `WelcomeScreen`) e as outras são mock declarado da
+fase 7. Numa tela que salva de verdade, o usuário não tem como saber qual botão é qual — então
+ação falsa em tela real é bug, e em tela mock é o combinado.
+
 Três valores na landing são inventados e **só são aceitáveis enquanto o site não é público**:
 `TRUST_STATS` em `lib/marketing.ts` (12.400 servidores, 4.1M membros, 99,9% de uptime),
 `BRAND.supportUrl` (`discord.gg/placeholder`) e `BRAND.statusUrl`. A lista completa, com o que

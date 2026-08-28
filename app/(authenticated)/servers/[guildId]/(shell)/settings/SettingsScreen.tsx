@@ -1,8 +1,10 @@
 'use client';
 
 import { Download, RotateCcw, Trash2, Upload } from 'lucide-react';
-import { useCallback, useMemo, type ReactNode } from 'react';
+import { useRouter } from 'next/navigation';
+import { useCallback, useMemo, useState, type ReactNode } from 'react';
 import { toast } from 'sonner';
+import { ConfirmDialog } from '@/components/management/ConfirmDialog';
 import { PageHeader } from '@/components/management/PageHeader';
 import { SaveBar } from '@/components/modules/SaveBar';
 import { SettingsSection } from '@/components/modules/SettingsSection';
@@ -14,6 +16,7 @@ import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { BRAND } from '@/lib/brand';
 import { EMBED_SWATCHES } from '@/lib/discord-colors';
+import { removeBot } from '@/lib/guild-bot-client';
 import { useConfigDraft, type SaveOutcome } from '@/lib/hooks/useConfigDraft';
 import { patchSettings } from '@/lib/settings-client';
 import { timezoneOptions } from '@/lib/timezones';
@@ -45,6 +48,35 @@ export function SettingsScreen({ guildId, settings, guildName }: SettingsScreenP
 	const form = useConfigDraft<GuildSettings>(settings, { save });
 	const draft = form.draft;
 	const timezones = useMemo(() => timezoneOptions(), []);
+	const router = useRouter();
+	const [confirmingRemoval, setConfirmingRemoval] = useState(false);
+	const [removing, setRemoving] = useState(false);
+
+	const leave = useCallback(() => {
+		setRemoving(true);
+
+		void removeBot(guildId).then(
+			(result) => {
+				if (result.status === 'error') {
+					setRemoving(false);
+					toast.error('Could not remove the bot', { description: result.message });
+
+					return;
+				}
+
+				toast.success(`${BRAND.name} left ${guildName}`, {
+					description: 'Your configuration is kept for 30 days.'
+				});
+				router.push('/servers');
+			},
+			(error: unknown) => {
+				setRemoving(false);
+				toast.error('Could not remove the bot', {
+					description: error instanceof Error ? error.message : 'Unknown failure'
+				});
+			}
+		);
+	}, [guildId, guildName, router]);
 
 	return (
 		<div className="w-full p-6 sm:p-8">
@@ -188,11 +220,17 @@ export function SettingsScreen({ guildId, settings, guildName }: SettingsScreenP
 					/>
 
 					<ActionRow
-						pending
 						title={`Remove ${BRAND.name} from ${guildName}`}
 						body="The bot leaves the server. Your configuration is kept for 30 days in case you invite it back."
 						action={
-							<Button variant="danger" size="sm" disabled>
+							<Button
+								variant="danger"
+								size="sm"
+								loading={removing}
+								onClick={() => {
+									setConfirmingRemoval(true);
+								}}
+							>
 								<Trash2 aria-hidden="true" />
 								Remove bot
 							</Button>
@@ -200,6 +238,21 @@ export function SettingsScreen({ guildId, settings, guildName }: SettingsScreenP
 					/>
 				</SettingsSection>
 			</div>
+
+			<ConfirmDialog
+				open={confirmingRemoval}
+				onOpenChange={setConfirmingRemoval}
+				title={`Remove ${BRAND.name} from ${guildName}?`}
+				description="The bot leaves immediately. Nothing it was running keeps running."
+				confirmPhrase={guildName}
+				confirmLabel="Remove the bot"
+				onConfirm={leave}
+			>
+				<p className="text-body-sm text-text-muted">
+					Open tickets stay as channels but stop being managed. Active giveaways never draw a
+					winner. Scheduled messages stop.
+				</p>
+			</ConfirmDialog>
 
 			<SaveBar
 				dirty={form.dirty}
