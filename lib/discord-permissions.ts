@@ -1,0 +1,70 @@
+export const PERMISSION_BITS = {
+	CREATE_INSTANT_INVITE: 0n,
+	KICK_MEMBERS: 1n,
+	BAN_MEMBERS: 2n,
+	ADMINISTRATOR: 3n,
+	MANAGE_CHANNELS: 4n,
+	MANAGE_GUILD: 5n,
+	ADD_REACTIONS: 6n,
+	VIEW_AUDIT_LOG: 7n,
+	PRIORITY_SPEAKER: 8n,
+	STREAM: 9n,
+	VIEW_CHANNEL: 10n,
+	SEND_MESSAGES: 11n,
+	SEND_TTS_MESSAGES: 12n,
+	MANAGE_MESSAGES: 13n,
+	EMBED_LINKS: 14n,
+	ATTACH_FILES: 15n,
+	READ_MESSAGE_HISTORY: 16n,
+	MENTION_EVERYONE: 17n,
+	USE_EXTERNAL_EMOJIS: 18n,
+	VIEW_GUILD_INSIGHTS: 19n,
+	CONNECT: 20n,
+	SPEAK: 21n,
+	MUTE_MEMBERS: 22n,
+	DEAFEN_MEMBERS: 23n,
+	MOVE_MEMBERS: 24n,
+	USE_VAD: 25n,
+	CHANGE_NICKNAME: 26n,
+	MANAGE_NICKNAMES: 27n,
+	MANAGE_ROLES: 28n,
+	MANAGE_WEBHOOKS: 29n,
+	MANAGE_GUILD_EXPRESSIONS: 30n,
+	USE_APPLICATION_COMMANDS: 31n,
+	REQUEST_TO_SPEAK: 32n,
+	MANAGE_EVENTS: 33n,
+	MANAGE_THREADS: 34n,
+	CREATE_PUBLIC_THREADS: 35n,
+	CREATE_PRIVATE_THREADS: 36n,
+	USE_EXTERNAL_STICKERS: 37n,
+	SEND_MESSAGES_IN_THREADS: 38n,
+	USE_EMBEDDED_ACTIVITIES: 39n,
+	MODERATE_MEMBERS: 40n,
+	VIEW_CREATOR_MONETIZATION_ANALYTICS: 41n,
+	USE_SOUNDBOARD: 42n,
+	CREATE_GUILD_EXPRESSIONS: 43n,
+	CREATE_EVENTS: 44n,
+	USE_EXTERNAL_SOUNDS: 45n,
+	SEND_VOICE_MESSAGES: 46n,
+	SET_VOICE_CHANNEL_STATUS: 48n,
+	SEND_POLLS: 49n,
+	USE_EXTERNAL_APPS: 50n,
+	PIN_MESSAGES: 51n,
+	BYPASS_SLOWMODE: 52n
+} as const;
+
+export type PermissionName = keyof typeof PERMISSION_BITS;
+
+export const PERMISSION_NAMES = Object.keys(PERMISSION_BITS) as readonly PermissionName[];
+
+export function permissionMask(names: readonly PermissionName[]): bigint {
+	return names.reduce((mask, name) => mask | (1n << PERMISSION_BITS[name]), 0n);
+}
+
+export function permissionsExcept(refused: readonly PermissionName[]): readonly PermissionName[] {
+	return PERMISSION_NAMES.filter((name) => !refused.includes(name));
+}
+
+export function grants(mask: bigint, name: PermissionName): boolean {
+	return (mask & (1n << PERMISSION_BITS[name])) !== 0n;
+}

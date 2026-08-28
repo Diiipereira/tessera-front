@@ -214,6 +214,20 @@ O convite do bot saiu dessa lista: ele é montado em `lib/discord-invite.ts` a p
 `NEXT_PUBLIC_DISCORD_CLIENT_ID`, com o inteiro de permissões derivado dos bits da doc oficial.
 Não voltar a hardcodar client id em `lib/brand.ts`.
 
+**O inteiro de permissões é calculado, nunca digitado.** A tabela de bits do Discord mora em
+`lib/discord-permissions.ts` e `INVITE_PERMISSIONS` sai de `permissionMask(permissionsExcept(...))`.
+O número cru (`8866461766385655`) não diz a ninguém o que está sendo pedido, e conferir exigia
+uma calculadora; a lista de nomes diz. Mudar o que o convite pede é editar `REFUSED_PERMISSIONS`,
+e há teste que ancora o valor resultante — se ele mudar sem querer, a suíte avisa.
+
+**O bit 47 não existe, e a tabela deixa o buraco à mostra.** O Discord define 0–46 e 48–52; quem
+tentar simplificar para "todos os bits até 52 menos o 3" vai pedir uma permissão inexistente. Há
+teste que falha se alguém ocupar o 47 ou abrir um segundo buraco.
+
+**Permissão trocada no convite só vale para quem instalar depois.** O Discord grava as permissões
+no cargo do bot na hora da instalação; servidor que já tem a Tessera continua com as permissões
+antigas até ser reconvidado.
+
 ## Public pages
 
 `components/marketing/` holds the landing, and `lib/marketing.ts` holds everything it says:

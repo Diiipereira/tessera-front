@@ -1,12 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import {
 	INSTALL_RETURN_PATH,
-	ADMINISTRATOR_BIT,
 	INVITE_PERMISSIONS,
 	INVITE_SCOPES,
+	REFUSED_PERMISSIONS,
+	REQUESTED_PERMISSIONS,
 	installReturnUri,
 	inviteUrl
 } from './discord-invite';
+import { PERMISSION_NAMES, grants } from './discord-permissions';
 
 const CLIENT_ID = '1542230629700079630';
 const GUILD_ID = '842315097461823104';
@@ -62,29 +64,22 @@ describe('inviteUrl', () => {
 		expect(inviteUrl('', GUILD_ID)).toBeNull();
 	});
 
-	it('keeps the permission integer exact, not rounded through a float', () => {
+	it('resolves to one exact integer, whichever order the table is written in', () => {
 		expect(INVITE_PERMISSIONS).toBe('8866461766385655');
-		expect(BigInt(INVITE_PERMISSIONS) & (1n << 40n)).toBe(1n << 40n);
 	});
 
 	it('never asks for Administrator, which hierarchy would not honour anyway', () => {
-		expect(BigInt(INVITE_PERMISSIONS) & (1n << ADMINISTRATOR_BIT)).toBe(0n);
+		expect(REFUSED_PERMISSIONS).toEqual(['ADMINISTRATOR']);
+		expect(grants(BigInt(INVITE_PERMISSIONS), 'ADMINISTRATOR')).toBe(false);
 	});
 
 	it('asks for every other permission Discord defines', () => {
-		const DEFINED = [
-			...Array.from({ length: 47 }, (_, bit) => BigInt(bit)),
-			48n,
-			49n,
-			50n,
-			51n,
-			52n
-		];
-		const granted = BigInt(INVITE_PERMISSIONS);
-		const missing = DEFINED.filter(
-			(bit) => bit !== ADMINISTRATOR_BIT && (granted & (1n << bit)) === 0n
+		const missing = PERMISSION_NAMES.filter(
+			(name) => !REFUSED_PERMISSIONS.includes(name) && !grants(BigInt(INVITE_PERMISSIONS), name)
 		);
 
 		expect(missing).toEqual([]);
+		expect(REQUESTED_PERMISSIONS).toHaveLength(PERMISSION_NAMES.length - 1);
+		expect(REQUESTED_PERMISSIONS).toHaveLength(51);
 	});
 });

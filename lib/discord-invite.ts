@@ -1,4 +1,5 @@
 import { apiBaseUrl } from '@/lib/api-url';
+import { permissionMask, permissionsExcept, type PermissionName } from '@/lib/discord-permissions';
 
 const AUTHORIZE_URL = 'https://discord.com/oauth2/authorize';
 
@@ -6,9 +7,11 @@ export type ExternalHref = `${typeof AUTHORIZE_URL}?${string}`;
 
 export const INVITE_SCOPES = ['bot', 'applications.commands', 'identify'] as const;
 
-export const INVITE_PERMISSIONS = '8866461766385655';
+export const REFUSED_PERMISSIONS: readonly PermissionName[] = ['ADMINISTRATOR'];
 
-export const ADMINISTRATOR_BIT = 3n;
+export const REQUESTED_PERMISSIONS = permissionsExcept(REFUSED_PERMISSIONS);
+
+export const INVITE_PERMISSIONS = permissionMask(REQUESTED_PERMISSIONS).toString();
 
 export const INSTALL_RETURN_PATH = '/auth/discord/install';
 
