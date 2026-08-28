@@ -4,6 +4,8 @@ import { createRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import { mockAccountPreferences, mockAccountSessions, mockGuilds, mockUser } from '@/lib/mock';
+import type { SupportedLocale } from '@/lib/locale';
+import ptBR from '@/messages/pt-BR.json';
 import { Translated } from '@/tests/i18n';
 import { AccountPanel } from './AccountPanel';
 
@@ -11,16 +13,16 @@ vi.mock('next/navigation', () => ({
 	useRouter: () => ({ refresh: () => undefined })
 }));
 
-function renderPanel() {
+function renderPanel(locale: SupportedLocale = 'en-US') {
 	return render(
-		<Translated>
+		<Translated locale={locale}>
 			<ThemeProvider>
 				<AccountPanel
 					open
 					onOpenChange={() => undefined}
 					returnFocusTo={createRef<HTMLElement>()}
 					user={mockUser}
-					preferences={mockAccountPreferences}
+					preferences={{ ...mockAccountPreferences, locale }}
 					sessions={mockAccountSessions}
 					guilds={mockGuilds}
 				/>
@@ -95,5 +97,16 @@ describe('AccountPanel', () => {
 		);
 
 		expect(screen.getByRole('region', { name: 'Unsaved changes' })).toBeInTheDocument();
+	});
+
+	it('shows the language the app is actually rendering in, not a hardcoded default', async () => {
+		const user = userEvent.setup();
+		renderPanel('pt-BR');
+
+		await user.click(tab(ptBR.account.tabs.interface));
+
+		expect(
+			screen.getByRole('combobox', { name: ptBR.account.interface.language })
+		).toHaveTextContent(ptBR.locales['pt-BR']);
 	});
 });

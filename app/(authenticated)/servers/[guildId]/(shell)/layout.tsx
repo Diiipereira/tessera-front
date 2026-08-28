@@ -4,6 +4,7 @@ import { apiGet } from '@/lib/api';
 import type { AuthenticatedUserDto } from '@/lib/api-url';
 import { loadGuilds, resolveGuild } from '@/lib/guild-access';
 import { toSessionUser } from '@/lib/guild-presentation';
+import { readLocale } from '@/lib/locale-server';
 import {
 	mockAccountPreferences,
 	mockAccountSessions,
@@ -20,10 +21,11 @@ export default async function GuildLayout({
 	params: Promise<{ guildId: string }>;
 }) {
 	const { guildId } = await params;
-	const [guild, directory, meResult] = await Promise.all([
+	const [guild, directory, meResult, locale] = await Promise.all([
 		resolveGuild(guildId),
 		loadGuilds(),
-		apiGet<AuthenticatedUserDto>('/auth/me')
+		apiGet<AuthenticatedUserDto>('/auth/me'),
+		readLocale()
 	]);
 
 	return (
@@ -33,7 +35,7 @@ export default async function GuildLayout({
 			user={meResult.status === 'ok' ? toSessionUser(meResult.data) : mockUser}
 			plan={mockPlan}
 			botOnline={mockBotOnline}
-			preferences={mockAccountPreferences}
+			preferences={{ ...mockAccountPreferences, locale }}
 			sessions={mockAccountSessions}
 		>
 			{children}
