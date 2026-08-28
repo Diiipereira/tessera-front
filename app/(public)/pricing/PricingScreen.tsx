@@ -21,17 +21,18 @@ import {
 } from '@/lib/billing';
 import { BRAND } from '@/lib/brand';
 import { INVITE_HREF } from '@/lib/discord-invite';
+import type { PlanTier } from '@/lib/types/billing';
 import type { BillingCycle } from '@/lib/types/management';
 import { cn } from '@/lib/utils/cn';
 
-const LIMIT_ROWS = findPlan('free').limits.map((limit) => ({
-	id: limit.id,
-	label: limit.label,
-	unit: limit.unit
-}));
+const LIMIT_ROWS = findPlan('free').limits.map((limit) => ({ id: limit.id, unit: limit.unit }));
 
 export function PricingScreen() {
 	const t = useTranslations('pricing');
+	const billing = useTranslations('billing');
+
+	const featuresOf = (tier: PlanTier): string[] =>
+		Object.values(billing.raw(`plan.${tier}.features`) as Record<string, string>);
 	const [cycle, setCycle] = useState<BillingCycle>('monthly');
 	const savings = yearlySavingsPercent(findPlan('pro'));
 
@@ -46,7 +47,9 @@ export function PricingScreen() {
 		if (!limit) return t('absent');
 		if (limit.max === null) return t('unlimited');
 		if (limit.max === 0) return t('notIncluded');
-		return unit === undefined ? String(limit.max) : `${String(limit.max)} ${unit}`;
+		return unit === undefined
+			? String(limit.max)
+			: `${String(limit.max)} ${billing(`unit.${unit}`)}`;
 	}
 
 	return (
@@ -87,7 +90,9 @@ export function PricingScreen() {
 											<h3 className="text-h4">{plan.name}</h3>
 											{popular ? <Badge variant="primary">{t('popular')}</Badge> : null}
 										</div>
-										<p className="mt-1 text-body-sm text-pretty text-text-muted">{plan.blurb}</p>
+										<p className="mt-1 text-body-sm text-pretty text-text-muted">
+											{billing(`plan.${plan.tier}.blurb`)}
+										</p>
 									</div>
 
 									<div>
@@ -109,7 +114,7 @@ export function PricingScreen() {
 									)}
 
 									<ul className="flex flex-col gap-2.5">
-										{plan.features.map((feature) => (
+										{featuresOf(plan.tier).map((feature) => (
 											<li key={feature} className="flex items-start gap-2.5">
 												<span className="mt-0.75 grid size-5 shrink-0 place-items-center rounded-full bg-primary-subtle text-primary">
 													<Check className="size-3 stroke-[2.5]" aria-hidden="true" />
@@ -149,7 +154,7 @@ export function PricingScreen() {
 								{LIMIT_ROWS.map((row) => (
 									<tr key={row.id} className="border-b border-border">
 										<th scope="row" className="py-3 pr-4 text-body font-medium">
-											{row.label}
+											{billing(`limit.${row.id}`)}
 										</th>
 										{PLANS.map((plan) => (
 											<td key={plan.tier} className="tabular py-3 pr-4 text-body text-text-muted">

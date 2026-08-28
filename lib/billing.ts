@@ -5,7 +5,6 @@ export type LimitKind = 'quota' | 'allowance';
 
 export type PlanLimit = {
 	id: string;
-	label: string;
 	max: number | null;
 	kind: LimitKind;
 	unit?: string;
@@ -14,10 +13,8 @@ export type PlanLimit = {
 export type PlanDefinition = {
 	tier: PlanTier;
 	name: string;
-	blurb: string;
 	monthlyCents: number;
 	yearlyCents: number;
-	features: string[];
 	limits: PlanLimit[];
 };
 
@@ -25,58 +22,41 @@ export const PLANS: PlanDefinition[] = [
 	{
 		tier: 'free',
 		name: 'Free',
-		blurb: 'Everything a small server needs to run itself.',
 		monthlyCents: 0,
 		yearlyCents: 0,
-		features: ['Every core module', 'Community support', '30 days of audit history'],
 		limits: [
-			{ id: 'automod-rules', label: 'AutoMod rules', max: 5, kind: 'quota' },
-			{ id: 'custom-commands', label: 'Custom commands', max: 10, kind: 'quota' },
-			{ id: 'ticket-panels', label: 'Ticket panels', max: 1, kind: 'quota' },
-			{ id: 'scheduled', label: 'Scheduled messages', max: 0, kind: 'quota' },
-			{ id: 'audit-retention', label: 'Audit retention', max: 30, kind: 'allowance', unit: 'days' }
+			{ id: 'automod-rules', max: 5, kind: 'quota' },
+			{ id: 'custom-commands', max: 10, kind: 'quota' },
+			{ id: 'ticket-panels', max: 1, kind: 'quota' },
+			{ id: 'scheduled', max: 0, kind: 'quota' },
+			{ id: 'audit-retention', max: 30, kind: 'allowance', unit: 'days' }
 		]
 	},
 	{
 		tier: 'pro',
 		name: 'Pro',
-		blurb: 'For servers where staff work in shifts.',
 		monthlyCents: 599,
 		yearlyCents: 5990,
-		features: [
-			'Economy and Scheduled messages',
-			'Embed builder',
-			'Priority support',
-			'365 days of audit history'
-		],
 		limits: [
-			{ id: 'automod-rules', label: 'AutoMod rules', max: 20, kind: 'quota' },
-			{ id: 'custom-commands', label: 'Custom commands', max: 100, kind: 'quota' },
-			{ id: 'ticket-panels', label: 'Ticket panels', max: 5, kind: 'quota' },
-			{ id: 'scheduled', label: 'Scheduled messages', max: 25, kind: 'quota' },
-			{ id: 'audit-retention', label: 'Audit retention', max: 365, kind: 'allowance', unit: 'days' }
+			{ id: 'automod-rules', max: 20, kind: 'quota' },
+			{ id: 'custom-commands', max: 100, kind: 'quota' },
+			{ id: 'ticket-panels', max: 5, kind: 'quota' },
+			{ id: 'scheduled', max: 25, kind: 'quota' },
+			{ id: 'audit-retention', max: 365, kind: 'allowance', unit: 'days' }
 		]
 	},
 	{
 		tier: 'ultimate',
 		name: 'Ultimate',
-		blurb: 'No ceilings, and a person to call.',
 		monthlyCents: 1499,
 		yearlyCents: 14990,
-		features: [
-			'Everything in Pro, uncapped',
-			'Custom bot name and avatar',
-			'API access',
-			'Dedicated support channel'
-		],
 		limits: [
-			{ id: 'automod-rules', label: 'AutoMod rules', max: null, kind: 'quota' },
-			{ id: 'custom-commands', label: 'Custom commands', max: null, kind: 'quota' },
-			{ id: 'ticket-panels', label: 'Ticket panels', max: null, kind: 'quota' },
-			{ id: 'scheduled', label: 'Scheduled messages', max: null, kind: 'quota' },
+			{ id: 'automod-rules', max: null, kind: 'quota' },
+			{ id: 'custom-commands', max: null, kind: 'quota' },
+			{ id: 'ticket-panels', max: null, kind: 'quota' },
+			{ id: 'scheduled', max: null, kind: 'quota' },
 			{
 				id: 'audit-retention',
-				label: 'Audit retention',
 				max: null,
 				kind: 'allowance',
 				unit: 'days'

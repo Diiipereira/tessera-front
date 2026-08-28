@@ -1631,5 +1631,163 @@
 		},
 		"selectAll": "Selecionar todos os comandos visíveis",
 		"selectOne": "Selecionar /{name}"
+	},
+	"team": {
+		"title": "Equipe",
+		"description": "Quem pode abrir este painel, e até onde cada um alcança.",
+		"invite": "Convidar",
+		"discordTitle": "Permissões do Discord também dão acesso",
+		"discordBody": "Qualquer um com <b>Gerenciar Servidor</b> no Discord consegue abrir este painel como {role}, esteja ou não listado aqui.",
+		"access": {
+			"title": "Acesso ao painel",
+			"person": "Pessoa",
+			"seat": "Posto",
+			"grantedBy": "Concedido por",
+			"lastSeen": "Visto por último",
+			"changed": "{name} agora é {role}",
+			"removed": "{name} não tem mais acesso",
+			"remove": "Remover {name}"
+		},
+		"pending": {
+			"title": "Convites pendentes",
+			"description": "Eles assumem o posto no instante em que entram.",
+			"revoked": "Convite para {handle} revogado",
+			"invitedBy": "convidado por {who}"
+		},
+		"matrix": {
+			"title": "O que cada posto pode fazer",
+			"description": "Os postos são cumulativos — toda linha que um Admin tem, um Moderador também tem, menos as marcadas como negadas.",
+			"permission": "Permissão"
+		},
+		"role": {
+			"owner": "Dono",
+			"admin": "Admin",
+			"moderator": "Moderador",
+			"viewer": "Observador"
+		},
+		"permission": {
+			"view": {
+				"label": "Ver o painel",
+				"body": "Lê todas as telas, não muda nada."
+			},
+			"moderate": {
+				"label": "Agir sobre membros",
+				"body": "Advertir, timeout, expulsar e banir."
+			},
+			"cases": {
+				"label": "Editar casos",
+				"body": "Mudar um motivo, revogar uma punição."
+			},
+			"modules": {
+				"label": "Configurar módulos",
+				"body": "Todas as telas de configuração de módulo."
+			},
+			"team": {
+				"label": "Gerenciar a equipe",
+				"body": "Conceder e revogar acesso ao painel."
+			},
+			"billing": {
+				"label": "Gerenciar a assinatura",
+				"body": "Mudar o plano e a forma de pagamento."
+			}
+		},
+		"dialog": {
+			"title": "Convidar para o painel",
+			"description": "A pessoa recebe um link de convite. O acesso começa quando ela entra com o Discord.",
+			"submit": "Enviar convite",
+			"invited": "{handle} convidado",
+			"handle": "Usuário do Discord",
+			"handleHint": "O @nome, não o nome de exibição.",
+			"seat": "Posto",
+			"grants": "Um {role} recebe {granted} de {total} permissões.",
+			"joinAs": "A pessoa entra como {role}."
+		},
+		"discordTail": "Tire a permissão no Discord para tirar esse acesso — a {brand} não consegue passar por cima dela."
+	},
+	"billing": {
+		"title": "Assinatura",
+		"description": "Em que plano este servidor está, o que ele usa, e o que já foi cobrado.",
+		"endingTitle": "Este plano termina na data de renovação",
+		"ends": "Termina",
+		"renews": "Renova",
+		"portal": "Abrindo o portal de pagamento",
+		"portalHint": "Mudanças de cartão acontecem no provedor de pagamento, não aqui.",
+		"usage": {
+			"title": "Uso",
+			"description": "Em relação aos limites do plano atual."
+		},
+		"plans": {
+			"title": "Planos",
+			"description": "Trocar no meio do período é rateado por dia.",
+			"cycle": "Ciclo de cobrança",
+			"monthly": "Mensal",
+			"yearly": "Anual",
+			"current": "Atual"
+		},
+		"invoices": {
+			"title": "Faturas",
+			"description": "Toda cobrança deste servidor.",
+			"opened": "Fatura {number}",
+			"openedHint": "O PDF vem do provedor de pagamento."
+		},
+		"status": {
+			"paid": "Paga",
+			"open": "Em aberto",
+			"refunded": "Estornada"
+		},
+		"change": {
+			"description": "Nada é cobrado até você confirmar.",
+			"now": "Agora no {plan}",
+			"nothing": "Nada a cobrar.",
+			"charged": "Cobrado hoje",
+			"credited": "Creditado",
+			"cycle": "Ciclo de cobrança"
+		},
+		"cancel": {
+			"description": "O plano continua rodando até o fim do período que você já pagou.",
+			"done": "Plano cancelado"
+		},
+		"limit": {
+			"automod-rules": "Regras do AutoMod",
+			"custom-commands": "Comandos personalizados",
+			"ticket-panels": "Painéis de ticket",
+			"scheduled": "Mensagens agendadas",
+			"audit-retention": "Retenção de auditoria"
+		},
+		"unit": {
+			"days": "dias"
+		},
+		"plan": {
+			"free": {
+				"blurb": "Tudo o que um servidor pequeno precisa para se virar sozinho.",
+				"features": {
+					"1": "Todos os módulos principais",
+					"2": "Suporte da comunidade",
+					"3": "30 dias de histórico de auditoria"
+				}
+			},
+			"pro": {
+				"blurb": "Para servidores onde a equipe trabalha em turnos.",
+				"features": {
+					"1": "Economia e Mensagens agendadas",
+					"2": "Construtor de embed",
+					"3": "Suporte prioritário",
+					"4": "365 dias de histórico de auditoria"
+				}
+			},
+			"ultimate": {
+				"blurb": "Sem tetos, e uma pessoa para ligar.",
+				"features": {
+					"1": "Tudo do Pro, sem limite",
+					"2": "Nome e avatar do bot personalizados",
+					"3": "Acesso à API",
+					"4": "Canal de suporte dedicado"
+				}
+			}
+		},
+		"unlimited": "ilimitado",
+		"perMonth": "/mês",
+		"save": "economize {percent}%",
+		"currentPlan": "Plano {plan}"
 	}
 }

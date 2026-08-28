@@ -1,6 +1,7 @@
 'use client';
 
 import { Check, Minus, Trash2, UserPlus } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { PageHeader } from '@/components/management/PageHeader';
@@ -14,14 +15,7 @@ import { Field } from '@/components/ui/Field';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { BRAND } from '@/lib/brand';
-import {
-	assignableRoles,
-	can,
-	grantedCount,
-	PERMISSIONS,
-	ROLE_LABELS,
-	ROLE_ORDER
-} from '@/lib/team';
+import { assignableRoles, can, grantedCount, PERMISSIONS, ROLE_ORDER } from '@/lib/team';
 import { relativeTime } from '@/lib/time';
 import type { TeamInvite, TeamMember, TeamRole } from '@/lib/types/management';
 import { cn } from '@/lib/utils/cn';
@@ -34,6 +28,7 @@ type TeamScreenProps = {
 };
 
 export function TeamScreen({ team, invites, viewerRole }: TeamScreenProps) {
+	const t = useTranslations('team');
 	const [members, setMembers] = useState(team);
 	const [pending, setPending] = useState(invites);
 	const [inviting, setInviting] = useState(false);
@@ -46,8 +41,8 @@ export function TeamScreen({ team, invites, viewerRole }: TeamScreenProps) {
 	return (
 		<div className="w-full p-6 sm:p-8">
 			<PageHeader
-				title="Team"
-				description="Who can open this dashboard, and how far each of them can reach."
+				title={t('title')}
+				description={t('description')}
 				action={
 					<Button
 						disabled={!canManage}
@@ -56,30 +51,32 @@ export function TeamScreen({ team, invites, viewerRole }: TeamScreenProps) {
 						}}
 					>
 						<UserPlus aria-hidden="true" />
-						Invite
+						{t('invite')}
 					</Button>
 				}
 			/>
 
 			<div className="mt-6 flex flex-col gap-6">
-				<Alert variant="info" title="Discord permissions grant access too">
-					Anyone with <strong>Manage Server</strong> in Discord can open this dashboard as a
-					Moderator, whether or not they appear below. Remove the Discord permission to remove that
-					access — {BRAND.name} cannot override it.
+				<Alert variant="info" title={t('discordTitle')}>
+					{t.rich('discordBody', {
+						role: t('role.moderator'),
+						b: (chunks) => <strong>{chunks}</strong>
+					})}{' '}
+					{t('discordTail', { brand: BRAND.name })}
 				</Alert>
 
 				<SettingsSection
-					title="Dashboard access"
+					title={t('access.title')}
 					description={`${String(members.length)} people, ${String(members.filter((member) => member.viaDiscord).length)} of them through Discord.`}
 				>
 					<div className="overflow-x-auto">
 						<table className="w-full min-w-180 border-collapse text-left">
 							<thead>
 								<tr className="border-b border-border text-overline text-text-muted uppercase">
-									<th className="py-2 pr-4 font-mono font-semibold">Person</th>
-									<th className="py-2 pr-4 font-mono font-semibold">Seat</th>
-									<th className="py-2 pr-4 font-mono font-semibold">Granted by</th>
-									<th className="py-2 pr-4 font-mono font-semibold">Last seen</th>
+									<th className="py-2 pr-4 font-mono font-semibold">{t('access.person')}</th>
+									<th className="py-2 pr-4 font-mono font-semibold">{t('access.seat')}</th>
+									<th className="py-2 pr-4 font-mono font-semibold">{t('access.grantedBy')}</th>
+									<th className="py-2 pr-4 font-mono font-semibold">{t('access.lastSeen')}</th>
 									<th className="w-12 py-2 font-mono font-semibold" />
 								</tr>
 							</thead>
@@ -105,14 +102,14 @@ export function TeamScreen({ team, invites, viewerRole }: TeamScreenProps) {
 										<td className="py-3 pr-4">
 											{member.role === 'owner' || member.viaDiscord ? (
 												<Badge variant={member.role === 'owner' ? 'primary' : 'outline'}>
-													{ROLE_LABELS[member.role]}
+													{t(`role.${member.role}`)}
 													{member.viaDiscord && member.role !== 'owner' ? ' · Discord' : ''}
 												</Badge>
 											) : (
 												<Select
 													options={options.map((role) => ({
 														value: role,
-														label: ROLE_LABELS[role]
+														label: t(`role.${role}`)
 													}))}
 													value={member.role}
 													onValueChange={(next) => {
@@ -123,7 +120,9 @@ export function TeamScreen({ team, invites, viewerRole }: TeamScreenProps) {
 																entry.id === member.id ? { ...entry, role } : entry
 															)
 														);
-														toast.success(`${member.name} is now a ${ROLE_LABELS[role]}`);
+														toast.success(
+															t('access.changed', { name: member.name, role: t(`role.${role}`) })
+														);
 													}}
 													disabled={!canManage}
 													className="w-36"
@@ -146,12 +145,12 @@ export function TeamScreen({ team, invites, viewerRole }: TeamScreenProps) {
 													size="sm"
 													iconOnly
 													disabled={!canManage}
-													aria-label={`Remove ${member.name}`}
+													aria-label={t('access.remove', { name: member.name })}
 													onClick={() => {
 														setMembers((current) =>
 															current.filter((entry) => entry.id !== member.id)
 														);
-														toast.success(`${member.name} no longer has access`);
+														toast.success(t('access.removed', { name: member.name }));
 													}}
 												>
 													<Trash2 aria-hidden="true" />
@@ -166,10 +165,7 @@ export function TeamScreen({ team, invites, viewerRole }: TeamScreenProps) {
 				</SettingsSection>
 
 				{pending.length > 0 ? (
-					<SettingsSection
-						title="Pending invites"
-						description="They take the seat the moment they sign in."
-					>
+					<SettingsSection title={t('pending.title')} description={t('pending.description')}>
 						<ul className="flex flex-col">
 							{pending.map((invite) => (
 								<li
@@ -177,9 +173,10 @@ export function TeamScreen({ team, invites, viewerRole }: TeamScreenProps) {
 									className="flex flex-wrap items-center gap-3 border-b border-border py-3 last:border-0"
 								>
 									<span className="font-mono text-body">{invite.handle}</span>
-									<Badge variant="outline">{ROLE_LABELS[invite.role]}</Badge>
+									<Badge variant="outline">{t(`role.${invite.role}`)}</Badge>
 									<span className="text-caption font-normal text-text-muted">
-										invited by {invite.invitedBy} · {relativeTime(invite.invitedAt)}
+										{t('pending.invitedBy', { who: invite.invitedBy })} ·{' '}
+										{relativeTime(invite.invitedAt)}
 									</span>
 									<Button
 										variant="ghost-danger"
@@ -187,7 +184,7 @@ export function TeamScreen({ team, invites, viewerRole }: TeamScreenProps) {
 										className="ml-auto"
 										onClick={() => {
 											setPending((current) => current.filter((entry) => entry.id !== invite.id));
-											toast.success(`Invite to ${invite.handle} revoked`);
+											toast.success(t('pending.revoked', { handle: invite.handle }));
 										}}
 									>
 										Revoke
@@ -198,18 +195,15 @@ export function TeamScreen({ team, invites, viewerRole }: TeamScreenProps) {
 					</SettingsSection>
 				) : null}
 
-				<SettingsSection
-					title="What each seat can do"
-					description="Seats are cumulative — every row an Admin has, a Moderator has too, minus the ones marked off."
-				>
+				<SettingsSection title={t('matrix.title')} description={t('matrix.description')}>
 					<div className="overflow-x-auto">
 						<table className="w-full min-w-160 border-collapse text-left">
 							<thead>
 								<tr className="border-b border-border text-overline text-text-muted uppercase">
-									<th className="py-2 pr-4 font-mono font-semibold">Permission</th>
+									<th className="py-2 pr-4 font-mono font-semibold">{t('matrix.permission')}</th>
 									{ROLE_ORDER.map((role) => (
 										<th key={role} className="w-24 py-2 text-center font-mono font-semibold">
-											{ROLE_LABELS[role]}
+											{t(`role.${role}`)}
 											<span className="tabular block text-caption font-normal text-text-muted normal-case">
 												{grantedCount(role)}
 											</span>
@@ -219,15 +213,15 @@ export function TeamScreen({ team, invites, viewerRole }: TeamScreenProps) {
 							</thead>
 							<tbody>
 								{PERMISSIONS.map((permission) => (
-									<tr key={permission.id} className="border-b border-border last:border-0">
+									<tr key={permission} className="border-b border-border last:border-0">
 										<td className="py-3 pr-4">
-											<p className="text-body">{permission.label}</p>
+											<p className="text-body">{t(`permission.${permission}.label`)}</p>
 											<p className="text-caption font-normal text-text-muted">
-												{permission.description}
+												{t(`permission.${permission}.body`)}
 											</p>
 										</td>
 										{ROLE_ORDER.map((role) => {
-											const granted = can(role, permission.id);
+											const granted = can(role, permission);
 											return (
 												<td key={role} className="py-3 text-center">
 													<span
@@ -257,8 +251,8 @@ export function TeamScreen({ team, invites, viewerRole }: TeamScreenProps) {
 			<Dialog
 				open={inviting}
 				onOpenChange={setInviting}
-				title="Invite to the dashboard"
-				description="They get an invite link. Access starts when they sign in with Discord."
+				title={t('dialog.title')}
+				description={t('dialog.description')}
 				footer={
 					<>
 						<Button
@@ -282,21 +276,21 @@ export function TeamScreen({ team, invites, viewerRole }: TeamScreenProps) {
 										invitedAt: new Date().toISOString()
 									}
 								]);
-								toast.success(`Invited ${handle.trim()}`, {
-									description: `They join as a ${ROLE_LABELS[inviteRole]}.`
+								toast.success(t('dialog.invited', { handle: handle.trim() }), {
+									description: t('dialog.joinAs', { role: t(`role.${inviteRole}`) })
 								});
 								setHandle('');
 								setInviteRole('viewer');
 								setInviting(false);
 							}}
 						>
-							Send invite
+							{t('dialog.submit')}
 						</Button>
 					</>
 				}
 			>
 				<div className="flex flex-col gap-4">
-					<Field label="Discord handle" hint="The @name, not the display name.">
+					<Field label={t('dialog.handle')} hint={t('dialog.handleHint')}>
 						<Input
 							value={handle}
 							onChange={(event) => {
@@ -306,9 +300,9 @@ export function TeamScreen({ team, invites, viewerRole }: TeamScreenProps) {
 						/>
 					</Field>
 
-					<Field label="Seat">
+					<Field label={t('dialog.seat')}>
 						<Select
-							options={options.map((role) => ({ value: role, label: ROLE_LABELS[role] }))}
+							options={options.map((role) => ({ value: role, label: t(`role.${role}`) }))}
 							value={inviteRole}
 							onValueChange={(next) => {
 								const role = options.find((entry) => entry === next);
@@ -318,8 +312,11 @@ export function TeamScreen({ team, invites, viewerRole }: TeamScreenProps) {
 					</Field>
 
 					<p className="text-body-sm text-text-muted">
-						A {ROLE_LABELS[inviteRole]} gets {grantedCount(inviteRole)} of {PERMISSIONS.length}{' '}
-						permissions.
+						{t('dialog.grants', {
+							role: t(`role.`),
+							granted: grantedCount(inviteRole),
+							total: PERMISSIONS.length
+						})}
 					</p>
 				</div>
 			</Dialog>

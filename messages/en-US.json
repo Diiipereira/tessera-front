@@ -1631,5 +1631,163 @@
 		},
 		"selectAll": "Select every visible command",
 		"selectOne": "Select /{name}"
+	},
+	"team": {
+		"title": "Team",
+		"description": "Who can open this dashboard, and how far each of them can reach.",
+		"invite": "Invite",
+		"discordTitle": "Discord permissions grant access too",
+		"discordBody": "Anyone with <b>Manage Server</b> in Discord can open this dashboard as a {role}, whether or not they are listed here.",
+		"access": {
+			"title": "Dashboard access",
+			"person": "Person",
+			"seat": "Seat",
+			"grantedBy": "Granted by",
+			"lastSeen": "Last seen",
+			"changed": "{name} is now a {role}",
+			"removed": "{name} no longer has access",
+			"remove": "Remove {name}"
+		},
+		"pending": {
+			"title": "Pending invites",
+			"description": "They take the seat the moment they sign in.",
+			"revoked": "Invite to {handle} revoked",
+			"invitedBy": "invited by {who}"
+		},
+		"matrix": {
+			"title": "What each seat can do",
+			"description": "Seats are cumulative — every row an Admin has, a Moderator has too, minus the ones marked off.",
+			"permission": "Permission"
+		},
+		"role": {
+			"owner": "Owner",
+			"admin": "Admin",
+			"moderator": "Moderator",
+			"viewer": "Viewer"
+		},
+		"permission": {
+			"view": {
+				"label": "View dashboard",
+				"body": "Read every screen, change nothing."
+			},
+			"moderate": {
+				"label": "Act on members",
+				"body": "Warn, timeout, kick and ban."
+			},
+			"cases": {
+				"label": "Edit cases",
+				"body": "Change a reason, revoke a punishment."
+			},
+			"modules": {
+				"label": "Configure modules",
+				"body": "Every module settings screen."
+			},
+			"team": {
+				"label": "Manage team",
+				"body": "Grant and revoke dashboard access."
+			},
+			"billing": {
+				"label": "Manage billing",
+				"body": "Change plan and payment method."
+			}
+		},
+		"dialog": {
+			"title": "Invite to the dashboard",
+			"description": "They get an invite link. Access starts when they sign in with Discord.",
+			"submit": "Send invite",
+			"invited": "Invited {handle}",
+			"handle": "Discord handle",
+			"handleHint": "The @name, not the display name.",
+			"seat": "Seat",
+			"grants": "A {role} gets {granted} of {total} permissions.",
+			"joinAs": "They join as a {role}."
+		},
+		"discordTail": "Remove the Discord permission to remove that access — {brand} cannot override it."
+	},
+	"billing": {
+		"title": "Billing",
+		"description": "What this server is on, what it is using, and what it has been charged.",
+		"endingTitle": "This plan ends on the renewal date",
+		"ends": "Ends",
+		"renews": "Renews",
+		"portal": "Opening the payment portal",
+		"portalHint": "Card changes happen with the payment provider, not here.",
+		"usage": {
+			"title": "Usage",
+			"description": "Against the limits of the current plan."
+		},
+		"plans": {
+			"title": "Plans",
+			"description": "Changing mid-period is prorated to the day.",
+			"cycle": "Billing cycle",
+			"monthly": "Monthly",
+			"yearly": "Yearly",
+			"current": "Current"
+		},
+		"invoices": {
+			"title": "Invoices",
+			"description": "Every charge on this server.",
+			"opened": "Invoice {number}",
+			"openedHint": "The PDF comes from the payment provider."
+		},
+		"status": {
+			"paid": "Paid",
+			"open": "Open",
+			"refunded": "Refunded"
+		},
+		"change": {
+			"description": "Nothing is charged until you confirm.",
+			"now": "Now on {plan}",
+			"nothing": "Nothing to charge.",
+			"charged": "Charged today",
+			"credited": "Credited",
+			"cycle": "Billing cycle"
+		},
+		"cancel": {
+			"description": "The plan keeps running until the end of the period you already paid for.",
+			"done": "Plan cancelled"
+		},
+		"limit": {
+			"automod-rules": "AutoMod rules",
+			"custom-commands": "Custom commands",
+			"ticket-panels": "Ticket panels",
+			"scheduled": "Scheduled messages",
+			"audit-retention": "Audit retention"
+		},
+		"unit": {
+			"days": "days"
+		},
+		"plan": {
+			"free": {
+				"blurb": "Everything a small server needs to run itself.",
+				"features": {
+					"1": "Every core module",
+					"2": "Community support",
+					"3": "30 days of audit history"
+				}
+			},
+			"pro": {
+				"blurb": "For servers where staff work in shifts.",
+				"features": {
+					"1": "Economy and Scheduled messages",
+					"2": "Embed builder",
+					"3": "Priority support",
+					"4": "365 days of audit history"
+				}
+			},
+			"ultimate": {
+				"blurb": "No ceilings, and a person to call.",
+				"features": {
+					"1": "Everything in Pro, uncapped",
+					"2": "Custom bot name and avatar",
+					"3": "API access",
+					"4": "Dedicated support channel"
+				}
+			}
+		},
+		"unlimited": "unlimited",
+		"perMonth": "/month",
+		"save": "save {percent}%",
+		"currentPlan": "{plan} plan"
 	}
 }

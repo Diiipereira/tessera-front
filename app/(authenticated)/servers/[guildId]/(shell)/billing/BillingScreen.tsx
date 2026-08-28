@@ -1,6 +1,7 @@
 'use client';
 
 import { Check, CreditCard, Crown, Download, Infinity as InfinityIcon } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { PageHeader } from '@/components/management/PageHeader';
@@ -24,17 +25,15 @@ import {
 } from '@/lib/billing';
 import { dateOnly, relativeTime } from '@/lib/time';
 import type { PlanTier } from '@/lib/types/billing';
-import type { BillingCycle, BillingState, InvoiceStatus } from '@/lib/types/management';
+import type { BillingCycle, BillingState } from '@/lib/types/management';
 import { cn } from '@/lib/utils/cn';
 import { formatCount } from '@/lib/utils/format';
 
-const INVOICE_LABELS: Record<InvoiceStatus, string> = {
-	paid: 'Paid',
-	open: 'Open',
-	refunded: 'Refunded'
-};
-
 export function BillingScreen({ billing }: { billing: BillingState }) {
+	const t = useTranslations('billing');
+
+	const featuresOf = (plan: PlanTier): string[] =>
+		Object.values(t.raw(`plan.${plan}.features`) as Record<string, string>);
 	const [tier, setTier] = useState<PlanTier>(billing.tier);
 	const [cycle, setCycle] = useState<BillingCycle>(billing.cycle);
 	const [target, setTarget] = useState<PlanDefinition | null>(null);
@@ -48,14 +47,11 @@ export function BillingScreen({ billing }: { billing: BillingState }) {
 
 	return (
 		<div className="w-full p-6 sm:p-8">
-			<PageHeader
-				title="Billing"
-				description="What this server is on, what it is using, and what it has been charged."
-			/>
+			<PageHeader title={t('title')} description={t('description')} />
 
 			<div className="mt-6 flex flex-col gap-6">
 				{billing.cancelAtPeriodEnd ? (
-					<Alert variant="warning" title="This plan ends on the renewal date">
+					<Alert variant="warning" title={t('endingTitle')}>
 						{current.name} stays active until {dateOnly(billing.renewsAt)}, then the server drops to
 						Free and anything over the Free limits stops running.
 					</Alert>
@@ -63,11 +59,11 @@ export function BillingScreen({ billing }: { billing: BillingState }) {
 
 				<div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
 					<SettingsSection
-						title={`${current.name} plan`}
-						description={current.blurb}
+						title={t('currentPlan', { plan: current.name })}
+						description={t(`plan.${current.tier}.blurb`)}
 						action={
 							<Badge variant="primary" dot>
-								Current
+								{t('plans.current')}
 							</Badge>
 						}
 					>
@@ -81,8 +77,8 @@ export function BillingScreen({ billing }: { billing: BillingState }) {
 						</div>
 
 						<p className="text-body-sm text-text-muted">
-							{billing.cancelAtPeriodEnd ? 'Ends' : 'Renews'} {relativeTime(billing.renewsAt)} —{' '}
-							{dateOnly(billing.renewsAt)}. {billing.daysLeftInPeriod} of {billing.daysInPeriod}{' '}
+							{billing.cancelAtPeriodEnd ? t('ends') : t('renews')} {relativeTime(billing.renewsAt)}{' '}
+							— {dateOnly(billing.renewsAt)}. {billing.daysLeftInPeriod} of {billing.daysInPeriod}{' '}
 							days left in this period.
 						</p>
 
@@ -90,8 +86,8 @@ export function BillingScreen({ billing }: { billing: BillingState }) {
 							<Button
 								variant="outline"
 								onClick={() => {
-									toast.success('Opening the payment portal', {
-										description: 'Card changes happen with the payment provider, not here.'
+									toast.success(t('portal'), {
+										description: t('portalHint')
 									});
 								}}
 							>
@@ -119,7 +115,7 @@ export function BillingScreen({ billing }: { billing: BillingState }) {
 						)}
 					</SettingsSection>
 
-					<SettingsSection title="Usage" description="Against the limits of the current plan.">
+					<SettingsSection title={t('usage.title')} description={t('usage.description')}>
 						{billing.usage.map((usage) => {
 							const limit = limitFor(current, usage.limitId);
 							if (!limit) return null;
@@ -127,16 +123,16 @@ export function BillingScreen({ billing }: { billing: BillingState }) {
 							if (limit.max === null || limit.kind === 'allowance') {
 								return (
 									<div key={usage.limitId} className="flex items-center justify-between gap-3">
-										<span className="text-body-sm">{limit.label}</span>
+										<span className="text-body-sm">{t(`limit.${limit.id}`)}</span>
 										{limit.max === null ? (
 											<span className="flex items-center gap-1.5 text-body-sm text-text-muted">
 												<InfinityIcon className="size-4 text-success" aria-hidden="true" />
-												<span className="sr-only">unlimited</span>
+												<span className="sr-only">{t('unlimited')}</span>
 											</span>
 										) : (
 											<span className="tabular font-mono text-caption text-text-muted">
 												{formatCount(limit.max)}
-												{limit.unit ? ` ${limit.unit}` : ''}
+												{limit.unit ? ` ${t(`unit.${limit.unit}`)}` : ''}
 											</span>
 										)}
 									</div>
@@ -148,8 +144,8 @@ export function BillingScreen({ billing }: { billing: BillingState }) {
 									key={usage.limitId}
 									value={usage.value}
 									max={limit.max}
-									label={limit.label}
-									valueLabel={`${formatCount(usage.value)} / ${formatCount(limit.max)}${limit.unit ? ` ${limit.unit}` : ''}`}
+									label={t(`limit.${limit.id}`)}
+									valueLabel={`${formatCount(usage.value)} / ${formatCount(limit.max)}${limit.unit ? ` ${t(`unit.${limit.unit}`)}` : ''}`}
 								/>
 							);
 						})}
@@ -157,17 +153,17 @@ export function BillingScreen({ billing }: { billing: BillingState }) {
 				</div>
 
 				<SettingsSection
-					title="Plans"
-					description="Changing mid-period is prorated to the day."
+					title={t('plans.title')}
+					description={t('plans.description')}
 					action={
 						<SegmentedControl
 							options={[
-								{ value: 'monthly', label: 'Monthly' },
-								{ value: 'yearly', label: 'Yearly' }
+								{ value: 'monthly', label: t('plans.monthly') },
+								{ value: 'yearly', label: t('plans.yearly') }
 							]}
 							value={cycle}
 							onValueChange={setCycle}
-							label="Billing cycle"
+							label={t('plans.cycle')}
 							size="sm"
 						/>
 					}
@@ -192,9 +188,11 @@ export function BillingScreen({ billing }: { billing: BillingState }) {
 											{plan.tier === 'ultimate' ? (
 												<Crown className="size-4 text-warning" aria-hidden="true" />
 											) : null}
-											{isCurrent ? <Badge variant="primary">Current</Badge> : null}
+											{isCurrent ? <Badge variant="primary">{t('plans.current')}</Badge> : null}
 										</div>
-										<p className="mt-0.5 text-caption font-normal text-text-muted">{plan.blurb}</p>
+										<p className="mt-0.5 text-caption font-normal text-text-muted">
+											{t(`plan.${plan.tier}.blurb`)}
+										</p>
 									</div>
 
 									<div className="flex items-baseline gap-1.5">
@@ -202,17 +200,19 @@ export function BillingScreen({ billing }: { billing: BillingState }) {
 											{formatPrice(monthlyEquivalentCents(plan, cycle))}
 										</span>
 										{plan.monthlyCents === 0 ? null : (
-											<span className="text-caption font-normal text-text-muted">/month</span>
+											<span className="text-caption font-normal text-text-muted">
+												{t('perMonth')}
+											</span>
 										)}
 										{cycle === 'yearly' && savings > 0 ? (
 											<Badge variant="success" className="ml-auto">
-												save {savings}%
+												{t('save', { percent: savings })}
 											</Badge>
 										) : null}
 									</div>
 
 									<ul className="flex flex-col gap-1.5">
-										{plan.features.map((feature) => (
+										{featuresOf(plan.tier).map((feature) => (
 											<li key={feature} className="flex items-start gap-2 text-body-sm">
 												<Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
 												<span className="text-text-muted">{feature}</span>
@@ -240,7 +240,7 @@ export function BillingScreen({ billing }: { billing: BillingState }) {
 					</div>
 				</SettingsSection>
 
-				<SettingsSection title="Invoices" description="Every charge on this server.">
+				<SettingsSection title={t('invoices.title')} description={t('invoices.description')}>
 					<div className="overflow-x-auto">
 						<table className="w-full min-w-140 border-collapse text-left">
 							<thead>
@@ -276,7 +276,7 @@ export function BillingScreen({ billing }: { billing: BillingState }) {
 															: 'neutral'
 												}
 											>
-												{INVOICE_LABELS[invoice.status]}
+												{t(`status.${invoice.status}`)}
 											</Badge>
 										</td>
 										<td className="py-3">
@@ -286,8 +286,8 @@ export function BillingScreen({ billing }: { billing: BillingState }) {
 												iconOnly
 												aria-label={`Download invoice ${invoice.number}`}
 												onClick={() => {
-													toast.success(`Invoice ${invoice.number}`, {
-														description: 'The PDF comes from the payment provider.'
+													toast.success(t('invoices.opened', { number: invoice.number }), {
+														description: t('invoices.openedHint')
 													});
 												}}
 											>
@@ -308,7 +308,7 @@ export function BillingScreen({ billing }: { billing: BillingState }) {
 					if (!open) setTarget(null);
 				}}
 				title={target === null ? '' : `Move to ${target.name}`}
-				description="Nothing is charged until you confirm."
+				description={t('change.description')}
 				footer={
 					<>
 						<Button
@@ -323,13 +323,13 @@ export function BillingScreen({ billing }: { billing: BillingState }) {
 							onClick={() => {
 								if (!target) return;
 								setTier(target.tier);
-								toast.success(`Now on ${target.name}`, {
+								toast.success(t('change.now', { plan: target.name }), {
 									description:
 										proration > 0
 											? `${formatPrice(proration)} charged today.`
 											: proration < 0
 												? `${formatPrice(Math.abs(proration))} credited to the next invoice.`
-												: 'Nothing to charge.'
+												: t('change.nothing')
 								});
 								setTarget(null);
 							}}
@@ -343,7 +343,7 @@ export function BillingScreen({ billing }: { billing: BillingState }) {
 					<div className="flex flex-col gap-4">
 						<SegmentedControl
 							options={[
-								{ value: 'monthly', label: 'Monthly' },
+								{ value: 'monthly', label: t('plans.monthly') },
 								{
 									value: 'yearly',
 									label:
@@ -354,7 +354,7 @@ export function BillingScreen({ billing }: { billing: BillingState }) {
 							]}
 							value={cycle}
 							onValueChange={setCycle}
-							label="Billing cycle"
+							label={t('plans.cycle')}
 						/>
 
 						<dl className="flex flex-col gap-2 rounded-md border border-border bg-surface-sunken p-3">
@@ -367,7 +367,7 @@ export function BillingScreen({ billing }: { billing: BillingState }) {
 								value={formatPrice(cycleTotalCents(target, cycle))}
 							/>
 							<Row
-								label={proration >= 0 ? 'Charged today' : 'Credited'}
+								label={proration >= 0 ? t('change.charged') : t('change.credited')}
 								value={formatPrice(Math.abs(proration))}
 								strong
 							/>
@@ -387,7 +387,7 @@ export function BillingScreen({ billing }: { billing: BillingState }) {
 				onOpenChange={setCancelling}
 				title={`Cancel ${current.name}?`}
 				danger
-				description="The plan keeps running until the end of the period you already paid for."
+				description={t('cancel.description')}
 				footer={
 					<>
 						<Button
@@ -402,7 +402,7 @@ export function BillingScreen({ billing }: { billing: BillingState }) {
 							variant="danger"
 							onClick={() => {
 								setCancelling(false);
-								toast.success('Plan cancelled', {
+								toast.success(t('cancel.done'), {
 									description: `It stays active until ${dateOnly(billing.renewsAt)}.`
 								});
 							}}

@@ -3,7 +3,7 @@ import { assignableRoles, can, grantedCount, PERMISSIONS, ROLE_ORDER } from '@/l
 
 describe('can', () => {
 	it('gives the owner every permission there is', () => {
-		expect(PERMISSIONS.every((permission) => can('owner', permission.id))).toBe(true);
+		expect(PERMISSIONS.every((permission) => can('owner', permission))).toBe(true);
 	});
 
 	it('stops an admin short of billing', () => {
