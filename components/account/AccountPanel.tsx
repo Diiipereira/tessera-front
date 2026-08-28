@@ -15,7 +15,7 @@ import {
 	X,
 	type LucideIcon
 } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useRef, useState, type KeyboardEvent, type ReactNode, type RefObject } from 'react';
 import { toast } from 'sonner';
@@ -31,8 +31,9 @@ import { Select } from '@/components/ui/Select';
 import { Switch } from '@/components/ui/Switch';
 import { BRAND } from '@/lib/brand';
 import { useConfigDraft } from '@/lib/hooks/useConfigDraft';
-import { SUPPORTED_LOCALES } from '@/lib/locale';
+import { SUPPORTED_LOCALES, toLocale } from '@/lib/locale';
 import { rememberLocale } from '@/lib/locale-client';
+import { translateIn } from '@/lib/locale-message';
 import { guildHref } from '@/lib/navigation';
 import { relativeTime } from '@/lib/time';
 import type { AccountPreferences, AccountSession } from '@/lib/types/account';
@@ -82,6 +83,7 @@ export function AccountPanel({
 }: AccountPanelProps) {
 	const t = useTranslations('account');
 	const localeNames = useTranslations('locales');
+	const locale = useLocale();
 	const shared = useTranslations('common');
 	const router = useRouter();
 	const form = useConfigDraft<AccountPreferences>(preferences);
@@ -426,10 +428,14 @@ export function AccountPanel({
 						state={form.state}
 						onDiscard={form.discard}
 						onSave={() => {
-							void form.save().then(() => {
-								rememberLocale(draft.locale);
+							void form.save().then(async () => {
+								const next = toLocale(draft.locale);
+
+								rememberLocale(next);
 								router.refresh();
-								toast.success(t('saved'));
+								toast.success(
+									next === locale ? t('saved') : await translateIn(next, 'account.saved')
+								);
 							});
 						}}
 						onResolveConflict={form.resolveConflict}

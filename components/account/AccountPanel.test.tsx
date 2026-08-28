@@ -1,17 +1,31 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import { mockAccountPreferences, mockAccountSessions, mockGuilds, mockUser } from '@/lib/mock';
 import type { SupportedLocale } from '@/lib/locale';
+import enUS from '@/messages/en-US.json';
 import ptBR from '@/messages/pt-BR.json';
 import { Translated } from '@/tests/i18n';
 import { AccountPanel } from './AccountPanel';
 
+const success = vi.fn();
+
 vi.mock('next/navigation', () => ({
 	useRouter: () => ({ refresh: () => undefined })
 }));
+
+vi.mock('sonner', () => ({
+	toast: {
+		success: (...args: unknown[]) => success(...args) as unknown,
+		error: () => undefined
+	}
+}));
+
+beforeEach(() => {
+	success.mockClear();
+});
 
 function renderPanel(locale: SupportedLocale = 'en-US') {
 	return render(
@@ -108,5 +122,50 @@ describe('AccountPanel', () => {
 		expect(
 			screen.getByRole('combobox', { name: ptBR.account.interface.language })
 		).toHaveTextContent(ptBR.locales['pt-BR']);
+	});
+
+	async function switchLanguageTo(from: SupportedLocale, target: string): Promise<unknown> {
+		const user = userEvent.setup();
+		const copy = from === 'pt-BR' ? ptBR : enUS;
+
+		renderPanel(from);
+
+		await user.click(tab(copy.account.tabs.interface));
+		await user.click(screen.getByRole('combobox', { name: copy.account.interface.language }));
+		await user.click(await screen.findByRole('option', { name: target }));
+		await user.click(screen.getByRole('button', { name: copy.modules.save.submit }));
+
+		await waitFor(() => {
+			expect(success).toHaveBeenCalled();
+		});
+
+		return success.mock.calls.at(-1)?.[0];
+	}
+
+	it('confirms in the language being switched to, not the one being left', async () => {
+		const said = await switchLanguageTo('en-US', ptBR.locales['pt-BR']);
+
+		expect(said).toBe(ptBR.account.saved);
+		expect(said).not.toBe(enUS.account.saved);
+	});
+
+	it('confirms in English when English is the one being switched to', async () => {
+		const said = await switchLanguageTo('pt-BR', enUS.locales['en-US']);
+
+		expect(said).toBe(enUS.account.saved);
+		expect(said).not.toBe(ptBR.account.saved);
+	});
+
+	it('keeps the current language when the save changed something else', async () => {
+		const user = userEvent.setup();
+		renderPanel('pt-BR');
+
+		await user.click(tab(ptBR.account.tabs.email));
+		await user.click(screen.getAllByRole('switch')[0] as HTMLElement);
+		await user.click(screen.getByRole('button', { name: ptBR.modules.save.submit }));
+
+		await waitFor(() => {
+			expect(success).toHaveBeenCalledWith(ptBR.account.saved);
+		});
 	});
 });
