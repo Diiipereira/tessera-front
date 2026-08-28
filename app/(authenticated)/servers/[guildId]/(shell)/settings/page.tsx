@@ -17,7 +17,8 @@ export default async function Page({ params, searchParams }: GuildPageProps) {
 	const settings = await apiGet<GuildSettings>(`/guilds/${guildId}/settings`);
 
 	if (settings.status === 'unauthenticated') redirect('/login');
-	if (settings.status === 'unreachable') throw new ApiUnreachableError(settings.reason);
+	if (settings.status === 'unreachable')
+		throw new ApiUnreachableError(settings.reason, settings.answered);
 
 	return <SettingsScreen guildId={guildId} settings={settings.data} guildName={guild.name} />;
 }

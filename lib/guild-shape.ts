@@ -20,7 +20,9 @@ const kindOf = (type: number): ChannelKind | null => KINDS[type] ?? null;
 
 const unwrap = <T>(result: Awaited<ReturnType<typeof apiGet<T>>>, path: string): T => {
 	if (result.status === 'unauthenticated') redirect('/login');
-	if (result.status === 'unreachable') throw new ApiUnreachableError(`${path}: ${result.reason}`);
+	if (result.status === 'unreachable') {
+		throw new ApiUnreachableError(`${path}: ${result.reason}`, result.answered);
+	}
 
 	return result.data;
 };

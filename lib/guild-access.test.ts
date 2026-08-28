@@ -91,12 +91,33 @@ describe('resolveGuild', () => {
 	});
 
 	it('names the API when it cannot be reached, instead of pretending the guild is gone', async () => {
-		answer.current = { status: 'unreachable', reason: 'connect ECONNREFUSED' };
+		answer.current = { status: 'unreachable', answered: false, reason: 'connect ECONNREFUSED' };
 
 		const { resolveGuild } = await load();
 
 		await expect(resolveGuild(MANAGED)).rejects.toThrow('connect ECONNREFUSED');
 		expect(notFound).not.toHaveBeenCalled();
+	});
+
+	it('tells you to start the API only when the API never answered', async () => {
+		answer.current = { status: 'unreachable', answered: false, reason: 'fetch failed' };
+
+		const { resolveGuild } = await load();
+
+		await expect(resolveGuild(MANAGED)).rejects.toThrow('npm run dev:api');
+	});
+
+	it('does not tell you to start the API when the API answered and failed', async () => {
+		answer.current = {
+			status: 'unreachable',
+			answered: true,
+			reason: 'The API answered 503 (DISCORD_UNREACHABLE): Discord did not answer.'
+		};
+
+		const { resolveGuild } = await load();
+
+		await expect(resolveGuild(MANAGED)).rejects.toThrow('DISCORD_UNREACHABLE');
+		await expect(resolveGuild(MANAGED)).rejects.not.toThrow('npm run dev:api');
 	});
 });
 
