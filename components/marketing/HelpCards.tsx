@@ -1,4 +1,5 @@
 import { ArrowUpRight, ExternalLink } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { HELP_CARDS, type HelpCard } from '@/lib/marketing';
@@ -25,12 +26,14 @@ function CardShell({ card, children }: { card: HelpCard; children: ReactNode }) 
 }
 
 export function HelpCards() {
+	const t = useTranslations('marketing.help');
+
 	return (
 		<Section id="support">
 			<SectionIntro
-				overline="Docs & support"
-				title="Help before you need it, and a human when you do"
-				lead="Every module page links straight to its own docs page. If something is genuinely broken, the support server is the fastest route."
+				overline={t('overline')}
+				title={t('title')}
+				lead={t('lead')}
 				className="mb-12"
 			/>
 
@@ -47,12 +50,12 @@ export function HelpCards() {
 								>
 									<Icon className="size-5" aria-hidden="true" />
 								</span>
-								<span className="min-w-0 flex-1 text-h4">{card.title}</span>
+								<span className="min-w-0 flex-1 text-h4">{t(`${card.id}.title`)}</span>
 								<Arrow className="size-3.5 shrink-0 text-text-subtle" aria-hidden="true" />
 							</div>
-							<p className="text-body text-pretty text-text-muted">{card.body}</p>
+							<p className="text-body text-pretty text-text-muted">{t(`${card.id}.body`)}</p>
 							<span className="font-mono text-caption font-normal text-text-muted">
-								{card.meta}
+								{t(`${card.id}.meta`)}
 							</span>
 						</CardShell>
 					);

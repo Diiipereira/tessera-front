@@ -1,14 +1,17 @@
+import { useTranslations } from 'next-intl';
 import { BRAND } from '@/lib/brand';
 import { MODULE_HIGHLIGHTS } from '@/lib/marketing';
 import { Section, SectionIntro } from './Section';
 
 export function ModuleGrid() {
+	const t = useTranslations('marketing.modules');
+
 	return (
 		<Section id="features">
 			<SectionIntro
-				overline="Modules"
-				title="Turn on what you need, ignore the rest"
-				lead={`Each module is off until you enable it, and each one has its own page with a live preview of whatever ${BRAND.name} will post.`}
+				overline={t('overline')}
+				title={t('title')}
+				lead={t('lead', { brand: BRAND.name })}
 				className="mb-12"
 			/>
 
@@ -23,8 +26,10 @@ export function ModuleGrid() {
 							<span className="mb-4 grid size-10 place-items-center rounded-lg bg-primary-subtle text-primary">
 								<Icon className="size-5" aria-hidden="true" />
 							</span>
-							<h3 className="text-h4">{module.title}</h3>
-							<p className="mt-1.5 text-body text-pretty text-text-muted">{module.body}</p>
+							<h3 className="text-h4">{t(`${module.id}.title`)}</h3>
+							<p className="mt-1.5 text-body text-pretty text-text-muted">
+								{t(`${module.id}.body`)}
+							</p>
 						</div>
 					);
 				})}

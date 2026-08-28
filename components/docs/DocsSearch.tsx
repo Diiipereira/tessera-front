@@ -2,6 +2,7 @@
 
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { Search } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState, type KeyboardEvent } from 'react';
 import { searchDocs, type DocSearchEntry } from '@/lib/docs';
@@ -9,6 +10,7 @@ import { docsHref } from '@/lib/docs/types';
 import { cn } from '@/lib/utils/cn';
 
 export function DocsSearch({ entries }: { entries: DocSearchEntry[] }) {
+	const t = useTranslations('docs.search');
 	const router = useRouter();
 	const [open, setOpen] = useState(false);
 	const [query, setQuery] = useState('');
@@ -63,13 +65,13 @@ export function DocsSearch({ entries }: { entries: DocSearchEntry[] }) {
 				onClick={() => {
 					setOpen(true);
 				}}
-				aria-label="Search the documentation"
+				aria-label={t('label')}
 				className="flex size-9 items-center justify-center rounded-md border border-border bg-surface text-left text-body text-text-muted transition-colors duration-120 ease-out hover:border-border-strong hover:text-text sm:w-full sm:justify-start sm:gap-2 sm:px-3"
 			>
 				<Search className="size-4 shrink-0" aria-hidden="true" />
-				<span className="hidden min-w-0 flex-1 truncate sm:block">Search docs…</span>
+				<span className="hidden min-w-0 flex-1 truncate sm:block">{t('trigger')}</span>
 				<span className="hidden shrink-0 rounded-sm border border-border px-1.5 py-0.5 font-mono text-caption font-normal md:block">
-					Ctrl K
+					{t('shortcut')}
 				</span>
 			</button>
 
@@ -77,9 +79,7 @@ export function DocsSearch({ entries }: { entries: DocSearchEntry[] }) {
 				<DialogPrimitive.Portal>
 					<DialogPrimitive.Overlay className="fixed inset-0 z-40 bg-overlay backdrop-blur-xs data-[state=closed]:animate-fade-out data-[state=open]:animate-pop" />
 					<DialogPrimitive.Content className="fixed inset-x-6 top-24 z-50 mx-auto flex max-w-160 flex-col overflow-hidden rounded-xl border border-border-strong bg-surface-raised shadow-3 data-[state=open]:animate-pop">
-						<DialogPrimitive.Title className="sr-only">
-							Search the documentation
-						</DialogPrimitive.Title>
+						<DialogPrimitive.Title className="sr-only">{t('label')}</DialogPrimitive.Title>
 
 						<div className="flex items-center gap-3 border-b border-border px-5 py-4">
 							<Search className="size-5 shrink-0 text-text-subtle" aria-hidden="true" />
@@ -90,26 +90,26 @@ export function DocsSearch({ entries }: { entries: DocSearchEntry[] }) {
 								}}
 								onKeyDown={handleKeydown}
 								type="text"
-								placeholder="Search every page…"
-								aria-label="Search the documentation"
+								placeholder={t('placeholder')}
+								aria-label={t('label')}
 								role="combobox"
 								aria-expanded="true"
 								aria-controls="docs-search-results"
 								className="min-w-0 flex-1 bg-transparent text-body-lg text-text outline-none"
 							/>
 							<span className="rounded-sm border border-border px-1.5 py-0.5 font-mono text-caption font-normal text-text-muted">
-								esc
+								{t('escape')}
 							</span>
 						</div>
 
 						<div id="docs-search-results" role="listbox" className="max-h-105 overflow-y-auto p-2">
 							{query.trim() === '' ? (
 								<p className="px-2 py-6 text-center text-body-sm text-text-muted">
-									Type to search {entries.length} pages.
+									{t('empty', { count: entries.length })}
 								</p>
 							) : matches.length === 0 ? (
 								<p className="px-2 py-6 text-center text-body-sm text-text-muted">
-									Nothing matches &ldquo;{query}&rdquo;.
+									{t('noMatch', { query })}
 								</p>
 							) : (
 								matches.map((entry, index) => {

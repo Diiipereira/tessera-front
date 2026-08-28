@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { ThemeToggle } from '@/components/layout/ThemeToggle';
@@ -10,6 +11,7 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { signInHref } from '@/lib/api-url';
 
 export function PublicHeaderActions() {
+	const t = useTranslations('marketing.nav');
 	const { status, user } = useSession();
 	const pathname = usePathname();
 	const [redirecting, setRedirecting] = useState(false);
@@ -26,7 +28,7 @@ export function PublicHeaderActions() {
 			<UserMenu user={user} compact />
 		) : status === 'unconfirmed' || pathname === '/login' ? null : (
 			<Button variant="outline" onClick={start} loading={redirecting}>
-				Sign in
+				{t('signIn')}
 			</Button>
 		);
 

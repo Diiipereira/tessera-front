@@ -1,9 +1,12 @@
 import { Plus } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/Button';
 import { BRAND } from '@/lib/brand';
 import { INVITE_HREF } from '@/lib/discord-invite';
 
 export function ClosingCta() {
+	const t = useTranslations('marketing.cta');
+
 	return (
 		<section className="border-b border-border">
 			<div className="mx-auto max-w-300 px-6 py-20 sm:px-8">
@@ -11,18 +14,17 @@ export function ClosingCta() {
 					<div className="absolute inset-0 brand-mesh" aria-hidden="true" />
 
 					<div className="relative">
-						<h2 className="text-h1 text-pretty">Add {BRAND.name} to a server in about a minute</h2>
+						<h2 className="text-h1 text-pretty">{t('title', { brand: BRAND.name })}</h2>
 						<p className="mx-auto mt-3 max-w-[52ch] text-body-lg text-pretty text-text-muted">
-							Free on unlimited servers. The setup wizard walks you through the log channel and
-							moderator roles, and you can skip it.
+							{t('lead')}
 						</p>
 						<div className="mt-7 flex flex-wrap justify-center gap-3">
 							<Button size="xl" href={INVITE_HREF} rel="external">
 								<Plus aria-hidden="true" />
-								Add {BRAND.name} to Discord
+								{t('invite', { brand: BRAND.name })}
 							</Button>
 							<Button size="xl" variant="outline" href="/docs">
-								Read the docs
+								{t('docs')}
 							</Button>
 						</div>
 					</div>

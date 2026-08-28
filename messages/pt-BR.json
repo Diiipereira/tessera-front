@@ -167,5 +167,214 @@
 			"scheduled": "Conta agendada para exclusão",
 			"scheduledHint": "Você tem 7 dias para entrar de novo e cancelar."
 		}
+	},
+	"marketing": {
+		"nav": {
+			"main": "Principal",
+			"features": "Recursos",
+			"pricing": "Preços",
+			"docs": "Documentação",
+			"support": "Suporte",
+			"signIn": "Entrar"
+		},
+		"hero": {
+			"eyebrow": "11 módulos · um painel",
+			"title": "Cuide do seu servidor do Discord sem deixar uma tela de configuração aberta.",
+			"lead": "O {brand} cuida de moderação, boas-vindas, níveis, tickets e sorteios em todos os servidores que você gerencia. Mude uma configuração aqui ou por comando de barra — os dois sempre mostram o mesmo estado.",
+			"invite": "Adicionar o {brand} ao Discord",
+			"dashboard": "Abrir o painel"
+		},
+		"trust": {
+			"servers": "servidores usando",
+			"members": "membros atendidos",
+			"uptime": "no ar nos últimos 90 dias"
+		},
+		"modules": {
+			"overline": "Módulos",
+			"title": "Ligue o que você precisa, ignore o resto",
+			"lead": "Cada módulo nasce desligado, e cada um tem a sua própria tela com uma prévia ao vivo do que o {brand} vai publicar.",
+			"moderation": {
+				"title": "Moderação",
+				"body": "Advertir, silenciar, expulsar e banir com motivo anexado. O escalonamento de advertências percorre a escada de punições por você."
+			},
+			"automod": {
+				"title": "AutoMod",
+				"body": "Regras para convites, spam, links e palavras, com um playground que mostra quais regras uma mensagem de exemplo dispara."
+			},
+			"welcome": {
+				"title": "Boas-vindas",
+				"body": "Receba quem entra com texto simples ou embed, e entregue os primeiros cargos já na chegada."
+			},
+			"levels": {
+				"title": "Níveis",
+				"body": "XP por mensagem e por voz, cargos de recompensa por nível, e um ranking que seus membros conseguem ver de verdade."
+			},
+			"tickets": {
+				"title": "Tickets",
+				"body": "Painéis que abrem um canal privado, com construtor de formulário, transcrições e fechamento automático."
+			},
+			"giveaways": {
+				"title": "Sorteios",
+				"body": "Requisitos de entrada por cargo ou nível, entradas bônus, contagem regressiva ao vivo e resorteio com um clique."
+			}
+		},
+		"mirror": {
+			"overline": "Configure de onde quiser",
+			"title": "O painel e os comandos de barra são a mesma coisa",
+			"lead": "Seus moderadores vivem no Discord e nunca abrem um navegador. Você quer uma tela de configuração de verdade. Os dois escrevem no mesmo estado, então nenhuma das visões fica desatualizada — e se alguém mudar uma configuração com o seu formulário aberto, o {brand} avisa em vez de sobrescrever.",
+			"saveBar": "Nada salva sozinho. Uma barra de salvamento diz quantas configurações mudaram antes de qualquer coisa chegar ao seu servidor.",
+			"conflict": "Se um comando de barra mudar a mesma configuração com o seu formulário aberto, a barra oferece Recarregar ou Manter o meu.",
+			"audit": "Toda mudança fica no log de auditoria com o autor, o antes e depois, e se veio da Web ou do Slash.",
+			"sameState": "mesmo estado",
+			"dashboardPanel": "painel · {path}",
+			"discordPanel": "no Discord · {channel}",
+			"channelField": "Canal de boas-vindas",
+			"timestamp": "Hoje às 14:02",
+			"applied": "Aplicado"
+		},
+		"help": {
+			"overline": "Documentação e suporte",
+			"title": "Ajuda antes de você precisar, e gente de verdade quando precisar",
+			"lead": "A tela de cada módulo leva direto à página dele na documentação. Se algo estiver realmente quebrado, o servidor de suporte é o caminho mais rápido.",
+			"docs": {
+				"title": "Documentação",
+				"body": "Guias de instalação e uma página por módulo, com as permissões exatas que cada um precisa.",
+				"meta": "onze módulos, uma página cada"
+			},
+			"support": {
+				"title": "Servidor de suporte",
+				"body": "Pergunte no Discord e receba resposta de quem trabalha no bot.",
+				"meta": "normalmente em menos de 2 horas"
+			},
+			"commands": {
+				"title": "Referência de comandos",
+				"body": "Todo comando de barra com uso, permissão exigida e tempo de espera.",
+				"meta": "agrupados por categoria"
+			},
+			"status": {
+				"title": "Status e incidentes",
+				"body": "Saúde dos shards ao vivo, latência e o histórico de tudo que deu errado.",
+				"meta": "todos os sistemas operando"
+			}
+		},
+		"faq": {
+			"title": "Perguntas frequentes",
+			"free": {
+				"question": "É de graça?",
+				"answer": "Sim, em servidores ilimitados. O Pro aumenta os limites dos módulos — mais regras de AutoMod, mais comandos personalizados, retenção de auditoria mais longa — e o Ultimate adiciona o módulo de economia."
+			},
+			"administrator": {
+				"question": "Preciso dar Administrador para ele?",
+				"answer": "Não. O {brand} pede as permissões que cada módulo precisa, e o painel diz exatamente qual permissão está faltando no ponto em que você faz a escolha — não depois de salvar."
+			},
+			"slash": {
+				"question": "O que acontece se meus moderadores usarem comandos de barra?",
+				"answer": "Nada quebra. Os dois escrevem o mesmo estado, e toda mudança cai no log de auditoria marcada como Web ou Slash, então dá para ver de onde veio."
+			},
+			"export": {
+				"question": "Dá para exportar minha configuração?",
+				"answer": "Dá. As configurações saem em um único arquivo, e a importação mostra o que mudaria antes de aplicar qualquer coisa."
+			}
+		},
+		"cta": {
+			"title": "Adicione o {brand} a um servidor em cerca de um minuto",
+			"lead": "De graça em servidores ilimitados. O assistente de instalação te guia pelo canal de log e pelos cargos de moderação, e você pode pular.",
+			"invite": "Adicionar o {brand} ao Discord",
+			"docs": "Ler a documentação"
+		},
+		"footer": {
+			"tagline": "Um painel de configuração para um bot do Discord que fica em sincronia com os seus comandos de barra.",
+			"status": "Todos os sistemas operando",
+			"product": "Produto",
+			"help": "Ajuda",
+			"legal": "Legal",
+			"links": {
+				"features": "Recursos",
+				"pricing": "Preços",
+				"invite": "Adicionar ao Discord",
+				"documentation": "Documentação",
+				"supportServer": "Servidor de suporte",
+				"terms": "Termos",
+				"privacy": "Privacidade"
+			}
+		},
+		"signIn": {
+			"titleSignedIn": "Você já está conectado",
+			"titleSignedOut": "Entrar no painel",
+			"leadSignedIn": "Continue como você mesmo, ou troque para outra conta do Discord.",
+			"leadSignedOut": "O Discord é o único login — não existe senha separada para gerenciar.",
+			"badge": "Conectado",
+			"continueAs": "Continuar como {handle}",
+			"redirecting": "Redirecionando para o Discord…",
+			"discord": "Continuar com o Discord",
+			"retry": "Tentar de novo",
+			"otherAccount": "Usar outra conta",
+			"scopes": "Vamos ler seu nome de usuário, avatar e os servidores que você pode gerenciar. Nunca lemos suas mensagens.",
+			"agreement": "Ao continuar, você concorda com os <terms>Termos</terms> e com a <privacy>Política de privacidade</privacy>.",
+			"requirement": "Você precisa de <permission>Gerenciar servidor</permission> em pelo menos um servidor do Discord."
+		}
+	},
+	"legal": {
+		"terms": "Termos",
+		"privacy": "Política de privacidade",
+		"body": "O texto legal do {brand} ainda não foi escrito. Esta página existe para que a tela de login nunca leve a lugar nenhum.",
+		"back": "Voltar para o login"
+	},
+	"brand": {
+		"tagline": "Configure seu bot do Discord de onde estiver"
+	},
+	"pricing": {
+		"overline": "Preços",
+		"title": "De graça onde importa, pago onde escala",
+		"lead": "Todos os módulos estão no plano gratuito. Pagar aumenta os tetos e adiciona os módulos que custam dinheiro para manter no ar.",
+		"cycle": "Ciclo de cobrança",
+		"monthly": "Mensal",
+		"yearly": "Anual",
+		"save": "Economize {percent}%",
+		"popular": "Mais popular",
+		"forever": "para sempre, em servidores ilimitados",
+		"perMonthYearly": "por mês, cobrado {price} por ano",
+		"perMonth": "por mês, por servidor",
+		"invite": "Adicionar o {brand} ao Discord",
+		"start": "Começar com o {plan}",
+		"limitsOverline": "Limites",
+		"limitsTitle": "O que cada plano deixa você manter",
+		"limit": "Limite",
+		"unlimited": "Ilimitado",
+		"notIncluded": "Não incluso",
+		"absent": "—"
+	},
+	"docs": {
+		"title": "Documentação",
+		"badge": "Docs",
+		"root": "Documentação",
+		"breadcrumb": "Trilha",
+		"dashboard": "Painel",
+		"menu": "Menu da documentação",
+		"menuShowing": "Menu da documentação, mostrando {page}",
+		"onThisPage": "Nesta página",
+		"pagination": "Paginação",
+		"previous": "Anterior",
+		"next": "Próxima",
+		"copyCode": "Copiar código",
+		"copied": "Copiado",
+		"noCommands": "Este módulo não tem comandos de barra próprios — depois de configurado, ele funciona sozinho.",
+		"table": {
+			"option": "Opção",
+			"type": "Tipo",
+			"default": "Padrão",
+			"whatItDoes": "O que faz",
+			"command": "Comando",
+			"cooldown": "Tempo de espera"
+		},
+		"search": {
+			"label": "Buscar na documentação",
+			"trigger": "Buscar na documentação…",
+			"placeholder": "Buscar em todas as páginas…",
+			"shortcut": "Ctrl K",
+			"escape": "esc",
+			"empty": "Digite para buscar em {count} páginas.",
+			"noMatch": "Nada corresponde a “{query}”."
+		}
 	}
 }

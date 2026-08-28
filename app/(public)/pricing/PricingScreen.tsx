@@ -1,6 +1,7 @@
 'use client';
 
 import { Check, Plus } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { ClosingCta } from '@/components/marketing/ClosingCta';
 import { PublicFooter } from '@/components/marketing/PublicFooter';
@@ -29,23 +30,24 @@ const LIMIT_ROWS = findPlan('free').limits.map((limit) => ({
 	unit: limit.unit
 }));
 
-function priceNote(plan: PlanDefinition, cycle: BillingCycle): string {
-	if (plan.monthlyCents === 0) return 'forever, on unlimited servers';
-	if (cycle === 'yearly') return `per month, billed ${formatPrice(plan.yearlyCents)} yearly`;
-	return 'per month, per server';
-}
-
-function limitValue(plan: PlanDefinition, limitId: string, unit: string | undefined): string {
-	const limit = limitFor(plan, limitId);
-	if (!limit) return '—';
-	if (limit.max === null) return 'Unlimited';
-	if (limit.max === 0) return 'Not included';
-	return unit === undefined ? String(limit.max) : `${String(limit.max)} ${unit}`;
-}
-
 export function PricingScreen() {
+	const t = useTranslations('pricing');
 	const [cycle, setCycle] = useState<BillingCycle>('monthly');
 	const savings = yearlySavingsPercent(findPlan('pro'));
+
+	function priceNote(plan: PlanDefinition): string {
+		if (plan.monthlyCents === 0) return t('forever');
+		if (cycle === 'yearly') return t('perMonthYearly', { price: formatPrice(plan.yearlyCents) });
+		return t('perMonth');
+	}
+
+	function limitValue(plan: PlanDefinition, limitId: string, unit: string | undefined): string {
+		const limit = limitFor(plan, limitId);
+		if (!limit) return t('absent');
+		if (limit.max === null) return t('unlimited');
+		if (limit.max === 0) return t('notIncluded');
+		return unit === undefined ? String(limit.max) : `${String(limit.max)} ${unit}`;
+	}
 
 	return (
 		<div className="min-h-svh bg-bg">
@@ -54,22 +56,18 @@ export function PricingScreen() {
 			<main>
 				<Section>
 					<div className="flex flex-wrap items-end justify-between gap-6">
-						<SectionIntro
-							overline="Pricing"
-							title="Free where it counts, paid where it scales"
-							lead={`Every module is on the free plan. Paying raises the ceilings and adds the modules that cost us money to run.`}
-						/>
+						<SectionIntro overline={t('overline')} title={t('title')} lead={t('lead')} />
 						<div className="flex items-center gap-3">
 							<SegmentedControl
-								label="Billing cycle"
+								label={t('cycle')}
 								value={cycle}
 								onValueChange={setCycle}
 								options={[
-									{ value: 'monthly', label: 'Monthly' },
-									{ value: 'yearly', label: 'Yearly' }
+									{ value: 'monthly', label: t('monthly') },
+									{ value: 'yearly', label: t('yearly') }
 								]}
 							/>
-							<Badge variant="success">Save {savings}%</Badge>
+							<Badge variant="success">{t('save', { percent: savings })}</Badge>
 						</div>
 					</div>
 
@@ -87,7 +85,7 @@ export function PricingScreen() {
 									<div>
 										<div className="flex items-center gap-2">
 											<h3 className="text-h4">{plan.name}</h3>
-											{popular ? <Badge variant="primary">Most popular</Badge> : null}
+											{popular ? <Badge variant="primary">{t('popular')}</Badge> : null}
 										</div>
 										<p className="mt-1 text-body-sm text-pretty text-text-muted">{plan.blurb}</p>
 									</div>
@@ -96,17 +94,17 @@ export function PricingScreen() {
 										<p className="tabular text-display-sm">
 											{formatPrice(monthlyEquivalentCents(plan, cycle))}
 										</p>
-										<p className="mt-1 text-body-sm text-text-muted">{priceNote(plan, cycle)}</p>
+										<p className="mt-1 text-body-sm text-text-muted">{priceNote(plan)}</p>
 									</div>
 
 									{plan.monthlyCents === 0 ? (
 										<Button variant="outline" href={INVITE_HREF} rel="external">
 											<Plus aria-hidden="true" />
-											Add {BRAND.name} to Discord
+											{t('invite', { brand: BRAND.name })}
 										</Button>
 									) : (
 										<Button variant={popular ? 'primary' : 'outline'} href="/login">
-											Start with {plan.name}
+											{t('start', { plan: plan.name })}
 										</Button>
 									)}
 
@@ -127,14 +125,14 @@ export function PricingScreen() {
 				</Section>
 
 				<Section subtle>
-					<SectionIntro overline="Limits" title="What each plan lets you keep" className="mb-12" />
+					<SectionIntro overline={t('limitsOverline')} title={t('limitsTitle')} className="mb-12" />
 
 					<div className="overflow-x-auto">
 						<table className="w-full min-w-160 border-collapse text-left">
 							<thead>
 								<tr className="border-b border-border">
 									<th scope="col" className="py-3 pr-4 text-body-sm font-medium text-text-muted">
-										Limit
+										{t('limit')}
 									</th>
 									{PLANS.map((plan) => (
 										<th

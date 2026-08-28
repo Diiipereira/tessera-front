@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { NextIntlClientProvider } from 'next-intl';
-import { getLocale } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
 import type { ReactNode } from 'react';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import { Toaster } from '@/components/ui/Toaster';
@@ -8,14 +8,18 @@ import { TooltipProvider } from '@/components/ui/tooltip-provider';
 import { BRAND } from '@/lib/brand';
 import './globals.css';
 
-export const metadata: Metadata = {
-	title: {
-		default: BRAND.name,
-		template: `%s · ${BRAND.name}`
-	},
-	description: BRAND.tagline,
-	icons: { icon: '/favicon.svg' }
-};
+export async function generateMetadata(): Promise<Metadata> {
+	const t = await getTranslations('brand');
+
+	return {
+		title: {
+			default: BRAND.name,
+			template: `%s · ${BRAND.name}`
+		},
+		description: t('tagline'),
+		icons: { icon: '/favicon.svg' }
+	};
+}
 
 const PRE_PAINT = `(function () {
 	var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;

@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import { Alert } from '@/components/ui/Alert';
 import { cooldownLabel } from '@/lib/commands';
 import { commandsForModule } from '@/lib/docs/pages/commands';
@@ -41,6 +42,8 @@ function DocTable({ head, rows, widths }: { head: string[]; rows: string[][]; wi
 }
 
 function Block({ block }: { block: DocBlock }) {
+	const t = useTranslations('docs');
+
 	switch (block.kind) {
 		case 'heading':
 			return (
@@ -112,7 +115,7 @@ function Block({ block }: { block: DocBlock }) {
 		case 'options':
 			return (
 				<DocTable
-					head={['Option', 'Type', 'Default', 'What it does']}
+					head={[t('table.option'), t('table.type'), t('table.default'), t('table.whatItDoes')]}
 					widths={OPTION_WIDTHS}
 					rows={block.rows.map((row) => [`**${row.name}**`, row.type, row.fallback, row.text])}
 				/>
@@ -121,16 +124,12 @@ function Block({ block }: { block: DocBlock }) {
 		case 'commands': {
 			const commands = commandsForModule(block.module);
 			if (commands.length === 0) {
-				return (
-					<p className="text-body text-text">
-						This module has no slash commands of its own — it runs on its own once configured.
-					</p>
-				);
+				return <p className="text-body text-text">{t('noCommands')}</p>;
 			}
 
 			return (
 				<DocTable
-					head={['Command', 'What it does', 'Cooldown']}
+					head={[t('table.command'), t('table.whatItDoes'), t('table.cooldown')]}
 					rows={commands.map((command) => [
 						`\`/${command.name}\``,
 						command.description,

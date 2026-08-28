@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { BrandMark } from '@/components/auth/BrandMark';
 import { BRAND } from '@/lib/brand';
@@ -7,6 +8,8 @@ import { MOCK_NOW } from '@/lib/time';
 const footerLink = 'text-body-sm text-link';
 
 export function PublicFooter() {
+	const t = useTranslations('marketing.footer');
+
 	return (
 		<footer>
 			<div className="mx-auto max-w-300 px-6 pt-16 pb-8 sm:px-8">
@@ -16,26 +19,23 @@ export function PublicFooter() {
 							<BrandMark tone="primary" size="xs" />
 							<span className="text-h4">{BRAND.name}</span>
 						</div>
-						<p className="max-w-[32ch] text-body-sm text-pretty text-text-muted">
-							A configuration dashboard for a Discord bot that stays in sync with your slash
-							commands.
-						</p>
+						<p className="max-w-[32ch] text-body-sm text-pretty text-text-muted">{t('tagline')}</p>
 					</div>
 
 					{FOOTER_COLUMNS.map((column) => (
-						<div key={column.title} className="min-w-0">
+						<div key={column.id} className="min-w-0">
 							<p className="mb-3 font-mono text-overline text-text-muted uppercase">
-								{column.title}
+								{t(column.id)}
 							</p>
 							<div className="flex flex-col items-start gap-2">
 								{column.links.map((link) =>
 									link.external ? (
-										<a key={link.label} href={link.href} rel="external" className={footerLink}>
-											{link.label}
+										<a key={link.id} href={link.href} rel="external" className={footerLink}>
+											{t(`links.${link.id}`)}
 										</a>
 									) : (
-										<Link key={link.label} href={link.href} className={footerLink}>
-											{link.label}
+										<Link key={link.id} href={link.href} className={footerLink}>
+											{t(`links.${link.id}`)}
 										</Link>
 									)
 								)}
@@ -50,7 +50,7 @@ export function PublicFooter() {
 					</p>
 					<p className="flex items-center gap-2 text-caption font-normal text-text-muted">
 						<span className="size-1.5 shrink-0 rounded-full bg-success" aria-hidden="true" />
-						All systems operational
+						{t('status')}
 					</p>
 				</div>
 			</div>

@@ -9,6 +9,8 @@ const DICTIONARIES: Record<string, Tree> = { 'en-US': enUS, 'pt-BR': ptBR };
 
 const PLACEHOLDER = /\{(\w+)/g;
 
+const RICH_TAG = /<(\w+)>/g;
+
 function flatten(tree: Tree, prefix = ''): Map<string, string> {
 	const flat = new Map<string, string>();
 
@@ -28,6 +30,9 @@ function flatten(tree: Tree, prefix = ''): Map<string, string> {
 
 const placeholdersOf = (text: string): string[] =>
 	[...text.matchAll(PLACEHOLDER)].map((match) => match[1] ?? '').sort();
+
+const richTagsOf = (text: string): string[] =>
+	[...text.matchAll(RICH_TAG)].map((match) => match[1] ?? '').sort();
 
 const english = flatten(enUS);
 const portuguese = flatten(ptBR);
@@ -65,6 +70,20 @@ describe('message dictionaries', () => {
 				return (
 					translated !== undefined &&
 					placeholdersOf(text).join() !== placeholdersOf(translated).join()
+				);
+			})
+			.map(([key]) => key);
+
+		expect(mismatched).toEqual([]);
+	});
+
+	it('keeps the same rich tags on both sides, which t.rich throws without', () => {
+		const mismatched = [...english]
+			.filter(([key, text]) => {
+				const translated = portuguese.get(key);
+
+				return (
+					translated !== undefined && richTagsOf(text).join() !== richTagsOf(translated).join()
 				);
 			})
 			.map(([key]) => key);

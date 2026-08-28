@@ -167,5 +167,214 @@
 			"scheduled": "Account scheduled for deletion",
 			"scheduledHint": "You have 7 days to sign in again and stop it."
 		}
+	},
+	"marketing": {
+		"nav": {
+			"main": "Main",
+			"features": "Features",
+			"pricing": "Pricing",
+			"docs": "Docs",
+			"support": "Support",
+			"signIn": "Sign in"
+		},
+		"hero": {
+			"eyebrow": "11 modules · one dashboard",
+			"title": "Run your Discord server without leaving a settings page open.",
+			"lead": "{brand} handles moderation, welcomes, levels, tickets and giveaways across every server you manage. Change a setting here or with a slash command — both always show the same live state.",
+			"invite": "Add {brand} to Discord",
+			"dashboard": "Open dashboard"
+		},
+		"trust": {
+			"servers": "servers running it",
+			"members": "members covered",
+			"uptime": "uptime last 90 days"
+		},
+		"modules": {
+			"overline": "Modules",
+			"title": "Turn on what you need, ignore the rest",
+			"lead": "Each module is off until you enable it, and each one has its own page with a live preview of whatever {brand} will post.",
+			"moderation": {
+				"title": "Moderation",
+				"body": "Warn, timeout, kick and ban with a reason attached. Warning escalation runs the punishment ladder for you."
+			},
+			"automod": {
+				"title": "AutoMod",
+				"body": "Rules for invites, spam, links and words, with a playground that shows which rules a sample message trips."
+			},
+			"welcome": {
+				"title": "Welcome",
+				"body": "Greet new members with plain text or an embed, and hand out their first roles on the way in."
+			},
+			"levels": {
+				"title": "Levels",
+				"body": "XP from messages and voice, role rewards per level, and a leaderboard your members can actually see."
+			},
+			"tickets": {
+				"title": "Tickets",
+				"body": "Panels that open a private channel, with a form builder, transcripts and auto-close."
+			},
+			"giveaways": {
+				"title": "Giveaways",
+				"body": "Entry requirements by role or level, bonus entries, live countdowns and a one-click reroll."
+			}
+		},
+		"mirror": {
+			"overline": "Configure anywhere",
+			"title": "The dashboard and the slash commands are the same thing",
+			"lead": "Your moderators live in Discord and never open a browser. You want a real settings page. Both write to the same state, so neither view is ever stale — and if someone changes a setting while your form is open, {brand} tells you instead of overwriting it.",
+			"saveBar": "Nothing auto-saves. A save bar names how many settings changed before anything reaches your server.",
+			"conflict": "If a slash command changes the same setting while your form is open, the bar offers Reload or Keep mine.",
+			"audit": "Every change is in the audit log with the actor, a before/after diff and whether it came from Web or Slash.",
+			"sameState": "same state",
+			"dashboardPanel": "dashboard · {path}",
+			"discordPanel": "in Discord · {channel}",
+			"channelField": "Welcome channel",
+			"timestamp": "Today at 14:02",
+			"applied": "Applied"
+		},
+		"help": {
+			"overline": "Docs & support",
+			"title": "Help before you need it, and a human when you do",
+			"lead": "Every module page links straight to its own docs page. If something is genuinely broken, the support server is the fastest route.",
+			"docs": {
+				"title": "Documentation",
+				"body": "Setup guides and a page per module, with the exact permissions each one needs.",
+				"meta": "eleven modules, one page each"
+			},
+			"support": {
+				"title": "Support server",
+				"body": "Ask in Discord and get an answer from someone who works on the bot.",
+				"meta": "usually under 2 hours"
+			},
+			"commands": {
+				"title": "Command reference",
+				"body": "Every slash command with its usage, required permission and cooldown.",
+				"meta": "grouped by category"
+			},
+			"status": {
+				"title": "Status & incidents",
+				"body": "Live shard health, latency and a history of anything that went wrong.",
+				"meta": "all systems operational"
+			}
+		},
+		"faq": {
+			"title": "Common questions",
+			"free": {
+				"question": "Is it free?",
+				"answer": "Yes, on unlimited servers. Pro raises the module limits — more AutoMod rules, more custom commands, longer audit retention — and Ultimate adds the economy module."
+			},
+			"administrator": {
+				"question": "Do I need to give it Administrator?",
+				"answer": "No. {brand} asks for the permissions each module needs, and the dashboard tells you exactly which permission is missing where you make the choice — not after you save."
+			},
+			"slash": {
+				"question": "What happens if my moderators use slash commands instead?",
+				"answer": "Nothing breaks. Both write the same state, and every change lands in the audit log tagged Web or Slash so you can see where it came from."
+			},
+			"export": {
+				"question": "Can I export my configuration?",
+				"answer": "Yes. Settings export to a single file, and importing shows a diff of what would change before anything is applied."
+			}
+		},
+		"cta": {
+			"title": "Add {brand} to a server in about a minute",
+			"lead": "Free on unlimited servers. The setup wizard walks you through the log channel and moderator roles, and you can skip it.",
+			"invite": "Add {brand} to Discord",
+			"docs": "Read the docs"
+		},
+		"footer": {
+			"tagline": "A configuration dashboard for a Discord bot that stays in sync with your slash commands.",
+			"status": "All systems operational",
+			"product": "Product",
+			"help": "Help",
+			"legal": "Legal",
+			"links": {
+				"features": "Features",
+				"pricing": "Pricing",
+				"invite": "Add to Discord",
+				"documentation": "Documentation",
+				"supportServer": "Support server",
+				"terms": "Terms",
+				"privacy": "Privacy"
+			}
+		},
+		"signIn": {
+			"titleSignedIn": "You're already signed in",
+			"titleSignedOut": "Sign in to the dashboard",
+			"leadSignedIn": "Continue as yourself, or switch to another Discord account.",
+			"leadSignedOut": "Discord is the only sign-in — there is no separate password to manage.",
+			"badge": "Signed in",
+			"continueAs": "Continue as {handle}",
+			"redirecting": "Redirecting to Discord…",
+			"discord": "Continue with Discord",
+			"retry": "Try again",
+			"otherAccount": "Use another account",
+			"scopes": "We’ll read your username, avatar and the servers you can manage. We never read your messages.",
+			"agreement": "By continuing you agree to the <terms>Terms</terms> and the <privacy>Privacy policy</privacy>.",
+			"requirement": "You need <permission>Manage Server</permission> on at least one Discord server."
+		}
+	},
+	"legal": {
+		"terms": "Terms",
+		"privacy": "Privacy policy",
+		"body": "The legal copy for {brand} has not been written yet. This page exists so the sign-in screen never links into a dead end.",
+		"back": "Back to sign in"
+	},
+	"brand": {
+		"tagline": "Configure your Discord bot from anywhere"
+	},
+	"pricing": {
+		"overline": "Pricing",
+		"title": "Free where it counts, paid where it scales",
+		"lead": "Every module is on the free plan. Paying raises the ceilings and adds the modules that cost us money to run.",
+		"cycle": "Billing cycle",
+		"monthly": "Monthly",
+		"yearly": "Yearly",
+		"save": "Save {percent}%",
+		"popular": "Most popular",
+		"forever": "forever, on unlimited servers",
+		"perMonthYearly": "per month, billed {price} yearly",
+		"perMonth": "per month, per server",
+		"invite": "Add {brand} to Discord",
+		"start": "Start with {plan}",
+		"limitsOverline": "Limits",
+		"limitsTitle": "What each plan lets you keep",
+		"limit": "Limit",
+		"unlimited": "Unlimited",
+		"notIncluded": "Not included",
+		"absent": "—"
+	},
+	"docs": {
+		"title": "Documentation",
+		"badge": "Docs",
+		"root": "Docs",
+		"breadcrumb": "Breadcrumb",
+		"dashboard": "Dashboard",
+		"menu": "Documentation menu",
+		"menuShowing": "Documentation menu, showing {page}",
+		"onThisPage": "On this page",
+		"pagination": "Pagination",
+		"previous": "Previous",
+		"next": "Next",
+		"copyCode": "Copy code",
+		"copied": "Copied",
+		"noCommands": "This module has no slash commands of its own — it runs on its own once configured.",
+		"table": {
+			"option": "Option",
+			"type": "Type",
+			"default": "Default",
+			"whatItDoes": "What it does",
+			"command": "Command",
+			"cooldown": "Cooldown"
+		},
+		"search": {
+			"label": "Search the documentation",
+			"trigger": "Search docs…",
+			"placeholder": "Search every page…",
+			"shortcut": "Ctrl K",
+			"escape": "esc",
+			"empty": "Type to search {count} pages.",
+			"noMatch": "Nothing matches “{query}”."
+		}
 	}
 }

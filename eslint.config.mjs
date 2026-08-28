@@ -33,7 +33,14 @@ const COPY_ATTRIBUTES = [
 	'title'
 ];
 
-const TRANSLATED = ['app/layout.tsx', 'components/account/**/*.tsx', 'components/layout/**/*.tsx'];
+const TRANSLATED = [
+	'app/layout.tsx',
+	'components/account/**/*.tsx',
+	'components/layout/**/*.tsx',
+	'components/marketing/**/*.tsx',
+	'components/docs/**/*.tsx',
+	'app/(public)/**/*.tsx'
+];
 
 const house = {
 	rules: {

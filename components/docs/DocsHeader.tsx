@@ -1,6 +1,7 @@
 'use client';
 
 import { LayoutDashboard } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { BrandMark } from '@/components/auth/BrandMark';
 import { ThemeToggle } from '@/components/layout/ThemeToggle';
@@ -18,6 +19,7 @@ export function DocsHeader({
 	groups: DocNavGroup[];
 	entries: DocSearchEntry[];
 }) {
+	const t = useTranslations('docs');
 	const dashboardHref = useDashboardHref();
 
 	return (
@@ -30,7 +32,7 @@ export function DocsHeader({
 					<BrandMark tone="primary" size="sm" />
 					<span className="hidden text-h4 sm:inline">{BRAND.name}</span>
 					<span className="rounded-sm bg-surface-sunken px-1.5 py-0.5 font-mono text-overline text-text-muted uppercase">
-						Docs
+						{t('badge')}
 					</span>
 				</Link>
 
@@ -42,9 +44,9 @@ export function DocsHeader({
 
 				<div className="flex shrink-0 items-center gap-2 sm:gap-3">
 					<ThemeToggle />
-					<Button variant="outline" href={dashboardHref} aria-label="Dashboard">
+					<Button variant="outline" href={dashboardHref} aria-label={t('dashboard')}>
 						<LayoutDashboard aria-hidden="true" />
-						<span className="hidden sm:inline">Dashboard</span>
+						<span className="hidden sm:inline">{t('dashboard')}</span>
 					</Button>
 				</div>
 			</div>

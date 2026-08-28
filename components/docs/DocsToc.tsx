@@ -1,10 +1,12 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import type { DocHeading } from '@/lib/docs';
 import { cn } from '@/lib/utils/cn';
 
 export function DocsToc({ headings }: { headings: DocHeading[] }) {
+	const t = useTranslations('docs');
 	const [active, setActive] = useState('');
 
 	useEffect(() => {
@@ -35,8 +37,8 @@ export function DocsToc({ headings }: { headings: DocHeading[] }) {
 	if (headings.length === 0) return null;
 
 	return (
-		<nav aria-label="On this page" className="flex flex-col gap-2">
-			<p className="font-mono text-overline text-text-subtle uppercase">On this page</p>
+		<nav aria-label={t('onThisPage')} className="flex flex-col gap-2">
+			<p className="font-mono text-overline text-text-subtle uppercase">{t('onThisPage')}</p>
 			<ul className="flex flex-col gap-1 border-l border-border">
 				{headings.map((heading) => (
 					<li key={heading.id}>

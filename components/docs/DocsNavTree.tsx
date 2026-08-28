@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import type { DocNavGroup } from '@/lib/docs';
 import { docsHref } from '@/lib/docs/types';
@@ -21,10 +22,11 @@ export function DocsNavTree({
 	groups: DocNavGroup[];
 	onNavigate?: () => void;
 }) {
+	const t = useTranslations('docs');
 	const activeSlug = useActiveSlug();
 
 	return (
-		<nav aria-label="Documentation" className="flex flex-col gap-6">
+		<nav aria-label={t('title')} className="flex flex-col gap-6">
 			{groups.map((group) => (
 				<div key={group.id}>
 					<p className="mb-2 px-3 font-mono text-overline text-text-subtle uppercase">

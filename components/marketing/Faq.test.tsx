@@ -1,46 +1,59 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
+import { BRAND } from '@/lib/brand';
 import { FAQ_ENTRIES } from '@/lib/marketing';
+import messages from '@/messages/en-US.json';
+import { Translated } from '@/tests/i18n';
 import { Faq } from './Faq';
 
-const first = FAQ_ENTRIES[0];
-const second = FAQ_ENTRIES[1];
+const answer = (key: 'free' | 'administrator' | 'slash' | 'export'): string =>
+	messages.marketing.faq[key].answer.replaceAll('{brand}', BRAND.name);
 
-if (!first || !second) throw new Error('FAQ_ENTRIES precisa de pelo menos duas perguntas');
+const copy = messages.marketing.faq;
+
+const [first, second] = FAQ_ENTRIES;
+
+function renderFaq() {
+	render(
+		<Translated>
+			<Faq />
+		</Translated>
+	);
+}
 
 describe('Faq', () => {
 	it('opens the first question so the section is never a wall of closed rows', () => {
-		render(<Faq />);
+		renderFaq();
 
-		expect(screen.getByRole('button', { name: first.question })).toHaveAttribute(
+		expect(screen.getByRole('button', { name: copy[first].question })).toHaveAttribute(
 			'aria-expanded',
 			'true'
 		);
-		expect(screen.getByText(first.answer)).toBeInTheDocument();
-		expect(screen.queryByText(second.answer)).not.toBeInTheDocument();
+		expect(screen.getByText(answer(first))).toBeInTheDocument();
+		expect(screen.queryByText(answer(second))).not.toBeInTheDocument();
 	});
 
 	it('closes the open one when another is opened', async () => {
 		const user = userEvent.setup();
-		render(<Faq />);
+		renderFaq();
 
-		await user.click(screen.getByRole('button', { name: second.question }));
+		await user.click(screen.getByRole('button', { name: copy[second].question }));
 
-		expect(screen.getByText(second.answer)).toBeInTheDocument();
-		expect(screen.queryByText(first.answer)).not.toBeInTheDocument();
+		expect(screen.getByText(answer(second))).toBeInTheDocument();
+		expect(screen.queryByText(answer(first))).not.toBeInTheDocument();
 	});
 
 	it('collapses the open one when it is clicked again', async () => {
 		const user = userEvent.setup();
-		render(<Faq />);
+		renderFaq();
 
-		await user.click(screen.getByRole('button', { name: first.question }));
+		await user.click(screen.getByRole('button', { name: copy[first].question }));
 
-		expect(screen.getByRole('button', { name: first.question })).toHaveAttribute(
+		expect(screen.getByRole('button', { name: copy[first].question })).toHaveAttribute(
 			'aria-expanded',
 			'false'
 		);
-		expect(screen.queryByText(first.answer)).not.toBeInTheDocument();
+		expect(screen.queryByText(answer(first))).not.toBeInTheDocument();
 	});
 });

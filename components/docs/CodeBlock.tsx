@@ -1,6 +1,7 @@
 'use client';
 
 import { Check, Copy } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { cn } from '@/lib/utils/cn';
 
@@ -13,6 +14,7 @@ export function CodeBlock({
 	language: string;
 	filename?: string;
 }) {
+	const t = useTranslations('docs');
 	const [copied, setCopied] = useState(false);
 
 	async function copy() {
@@ -40,7 +42,7 @@ export function CodeBlock({
 					onClick={() => {
 						void copy();
 					}}
-					aria-label={copied ? 'Copied' : 'Copy code'}
+					aria-label={copied ? t('copied') : t('copyCode')}
 					className={cn(
 						'flex size-6 shrink-0 items-center justify-center rounded-sm transition-colors duration-120 ease-out',
 						copied ? 'text-success' : 'text-text-subtle hover:bg-surface-hover hover:text-text'

@@ -1,4 +1,5 @@
 import { ChevronRight } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { adjacentPages, docHeadings, groupOf } from '@/lib/docs';
 import type { DocPage } from '@/lib/docs/types';
@@ -7,6 +8,7 @@ import { DocsPager } from './DocsPager';
 import { DocsToc } from './DocsToc';
 
 export function DocsArticle({ page }: { page: DocPage }) {
+	const t = useTranslations('docs');
 	const headings = docHeadings(page);
 	const neighbours = adjacentPages(page.slug);
 	const group = groupOf(page.slug);
@@ -15,11 +17,11 @@ export function DocsArticle({ page }: { page: DocPage }) {
 		<>
 			<main className="max-w-200 min-w-0 flex-1">
 				<nav
-					aria-label="Breadcrumb"
+					aria-label={t('breadcrumb')}
 					className="mb-4 flex min-w-0 items-center gap-1.5 text-body-sm text-text-muted"
 				>
 					<Link href="/docs" className="no-underline hover:text-text hover:no-underline">
-						Docs
+						{t('root')}
 					</Link>
 					{group ? (
 						<>

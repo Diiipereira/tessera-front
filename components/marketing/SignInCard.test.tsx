@@ -1,11 +1,21 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { loginErrorFor } from '@/lib/auth';
+import { loginErrorFor, type LoginError } from '@/lib/auth';
 import { mockUser } from '@/lib/mock';
+import type { SessionUser } from '@/lib/types/session';
+import { Translated } from '@/tests/i18n';
 import { SignInCard } from './SignInCard';
 
 const assign = vi.fn();
+
+function renderCard(error: LoginError | null, user: SessionUser | null) {
+	render(
+		<Translated>
+			<SignInCard error={error} user={user} />
+		</Translated>
+	);
+}
 
 beforeEach(() => {
 	assign.mockClear();
@@ -17,7 +27,7 @@ beforeEach(() => {
 
 describe('SignInCard', () => {
 	it('offers Discord and nothing else when there is no session', () => {
-		render(<SignInCard error={null} user={null} />);
+		renderCard(null, null);
 
 		expect(screen.getByRole('heading', { name: 'Sign in to the dashboard' })).toBeInTheDocument();
 		expect(screen.getByRole('button', { name: /Continue with Discord/ })).toBeInTheDocument();
@@ -27,7 +37,7 @@ describe('SignInCard', () => {
 	});
 
 	it('surfaces the error the URL asked for, with a retry', () => {
-		render(<SignInCard error={loginErrorFor('access_denied')} user={null} />);
+		renderCard(loginErrorFor('access_denied'), null);
 
 		const alert = screen.getByRole('alert');
 		expect(alert).toHaveTextContent('You declined the Discord prompt');
@@ -35,7 +45,7 @@ describe('SignInCard', () => {
 	});
 
 	it('names the account and drops the scopes note once signed in', () => {
-		render(<SignInCard error={null} user={mockUser} />);
+		renderCard(null, mockUser);
 
 		expect(screen.getByRole('heading', { name: "You're already signed in" })).toBeInTheDocument();
 		expect(screen.getByRole('link', { name: /Use another account/ })).toHaveAttribute(
@@ -46,7 +56,7 @@ describe('SignInCard', () => {
 	});
 
 	it('walks a signed-in visitor to the dashboard instead of back through Discord', () => {
-		render(<SignInCard error={null} user={mockUser} />);
+		renderCard(null, mockUser);
 
 		expect(screen.getByRole('link', { name: `Continue as ${mockUser.handle}` })).toHaveAttribute(
 			'href',
@@ -55,7 +65,7 @@ describe('SignInCard', () => {
 	});
 
 	it('never offers to restart the handshake for a session that is already valid', () => {
-		render(<SignInCard error={null} user={mockUser} />);
+		renderCard(null, mockUser);
 
 		expect(screen.queryByRole('button', { name: /Continue with Discord/ })).not.toBeInTheDocument();
 		expect(
@@ -64,7 +74,7 @@ describe('SignInCard', () => {
 	});
 
 	it('still offers Discord as the only door when there is no session', () => {
-		render(<SignInCard error={null} user={null} />);
+		renderCard(null, null);
 
 		expect(screen.queryByRole('link', { name: /Continue as/ })).not.toBeInTheDocument();
 		expect(screen.getByRole('button', { name: /Continue with Discord/ })).toBeInTheDocument();
@@ -72,7 +82,7 @@ describe('SignInCard', () => {
 
 	it('leaves for the API handshake and locks the button while it goes', async () => {
 		const user = userEvent.setup();
-		render(<SignInCard error={null} user={null} />);
+		renderCard(null, null);
 
 		await user.click(screen.getByRole('button', { name: /Continue with Discord/ }));
 
@@ -82,7 +92,7 @@ describe('SignInCard', () => {
 
 	it('asks the API to send the browser back to the server picker', async () => {
 		const user = userEvent.setup();
-		render(<SignInCard error={null} user={null} />);
+		renderCard(null, null);
 
 		await user.click(screen.getByRole('button', { name: /Continue with Discord/ }));
 
