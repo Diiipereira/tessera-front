@@ -722,6 +722,70 @@
 			"notImage": "Este não é um link direto de imagem — o Discord não vai mostrar nada. Ele precisa terminar em .png, .jpg ou .gif",
 			"expiring": "Link de anexo do Discord expira em menos de um dia e a imagem some. Hospede a figura em algum lugar permanente."
 		},
+		"scheduled": {
+			"title": "Mensagens agendadas",
+			"description": "Publica por horário, sem ninguém precisar lembrar.",
+			"saved": "Agendamentos salvos",
+			"new": "Nova mensagem",
+			"untitled": "Mensagem sem nome",
+			"list": {
+				"title": "Mensagens",
+				"description": "Todo agendamento roda no fuso horário do servidor.",
+				"timezone": "Fuso horário do servidor",
+				"empty": "Nada agendado.",
+				"enable": "Ligar {name}",
+				"edit": "Editar {name}",
+				"delete": "Excluir {name}"
+			},
+			"form": {
+				"title": "Agendamento",
+				"name": "Nome",
+				"nameHint": "Só para uso interno.",
+				"namePlaceholder": "Lembrete semanal de evento",
+				"channel": "Canal",
+				"repeats": "Repetição",
+				"once": "Uma vez",
+				"recurring": "Recorrente",
+				"kind": "Tipo de agendamento",
+				"when": "Quando",
+				"days": "Dias",
+				"time": "Horário",
+				"cron": "Cron",
+				"next": "Próximas {count}",
+				"nothing": "Nada está agendado — escolha ao menos um dia, ou uma data."
+			},
+			"message": { "title": "Mensagem" },
+			"when": {
+				"no-date": "Nenhuma data definida",
+				"once": "Uma vez, em {at}",
+				"no-days": "Nenhum dia escolhido",
+				"daily": "Todo dia às {time}",
+				"days": "{days} às {time}"
+			},
+			"run": {
+				"this": "{day} desta semana às {time}",
+				"next": "{day} da semana que vem às {time}",
+				"later": "daqui a {weeks} semanas, {day} às {time}"
+			},
+			"weekday": {
+				"mon": "segunda-feira",
+				"tue": "terça-feira",
+				"wed": "quarta-feira",
+				"thu": "quinta-feira",
+				"fri": "sexta-feira",
+				"sat": "sábado",
+				"sun": "domingo"
+			},
+			"weekdayShort": {
+				"mon": "S",
+				"tue": "T",
+				"wed": "Q",
+				"thu": "Q",
+				"fri": "S",
+				"sat": "S",
+				"sun": "D"
+			}
+		},
 		"customCommands": {
 			"title": "Comandos personalizados",
 			"description": "Seus próprios comandos de barra, sem código e sem hospedagem.",
@@ -807,7 +871,10 @@
 					"body": "Inclui as permissões sobrescritas."
 				},
 				"role_change": { "name": "Cargo criado ou excluído", "body": "E edições de permissão." },
-				"voice_join": { "name": "Entrada ou saída de voz", "body": "Barulhento em servidor grande." }
+				"voice_join": {
+					"name": "Entrada ou saída de voz",
+					"body": "Barulhento em servidor grande."
+				}
 			}
 		},
 		"moderation": {

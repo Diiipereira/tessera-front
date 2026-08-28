@@ -1,6 +1,7 @@
 'use client';
 
 import { CalendarClock, Pencil, Plus, Trash2 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { ChannelPicker } from '@/components/discord/ChannelPicker';
@@ -16,7 +17,7 @@ import { SegmentedControl } from '@/components/ui/SegmentedControl';
 import { Select } from '@/components/ui/Select';
 import { Switch } from '@/components/ui/Switch';
 import { useConfigDraft } from '@/lib/hooks/useConfigDraft';
-import { describeSchedule, nextRuns, toCron, WEEKDAYS } from '@/lib/schedule';
+import { nextRuns, readSchedule, toCron, WEEKDAYS, type Run } from '@/lib/schedule';
 import type { Channel } from '@/lib/types/discord';
 import type { ScheduledConfig, ScheduledMessage } from '@/lib/types/module-configs';
 import type { MessageVariable } from '@/lib/types/modules';
@@ -66,6 +67,7 @@ type ScheduledScreenProps = {
 };
 
 export function ScheduledScreen({ config, channels, variables }: ScheduledScreenProps) {
+	const t = useTranslations('modules.scheduled');
 	const form = useConfigDraft<ScheduledConfig>(config);
 	const draft = form.draft;
 
@@ -79,12 +81,35 @@ export function ScheduledScreen({ config, channels, variables }: ScheduledScreen
 		);
 	}
 
-	function toggleDay(message: ScheduledMessage, day: (typeof WEEKDAYS)[number]['id']) {
+	function toggleDay(message: ScheduledMessage, day: (typeof WEEKDAYS)[number]) {
 		update(message.id, {
 			days: message.days.includes(day)
 				? message.days.filter((entry) => entry !== day)
 				: [...message.days, day]
 		});
+	}
+
+	function whenLabel(message: ScheduledMessage): string {
+		const schedule = readSchedule(message);
+
+		if (schedule.kind === 'once') return t('when.once', { at: schedule.at.replace('T', ' ') });
+		if (schedule.kind === 'daily') return t('when.daily', { time: schedule.time });
+		if (schedule.kind === 'days') {
+			const names = schedule.days.map((day) => t(`weekday.${day}`)).join(', ');
+			return t('when.days', { days: names, time: schedule.time });
+		}
+
+		return t(`when.${schedule.kind}`);
+	}
+
+	function runLabel(run: Run): string {
+		if ('at' in run) return run.at.replace('T', ' ');
+
+		const day = t(`weekday.${run.day}`);
+		if (run.week === 0) return t('run.this', { day, time: run.time });
+		if (run.week === 1) return t('run.next', { day, time: run.time });
+
+		return t('run.later', { weeks: run.week, day, time: run.time });
 	}
 
 	const runs = selected ? nextRuns(selected) : [];
@@ -93,8 +118,8 @@ export function ScheduledScreen({ config, channels, variables }: ScheduledScreen
 		<ModulePage
 			moduleId="scheduled"
 			icon={CalendarClock}
-			title="Scheduled messages"
-			description="Post on a timer, without anyone having to remember."
+			title={t('title')}
+			description={t('description')}
 			enabled={draft.enabled}
 			onEnabledChange={(next) => {
 				form.set('enabled', next);
@@ -107,7 +132,7 @@ export function ScheduledScreen({ config, channels, variables }: ScheduledScreen
 					onDiscard={form.discard}
 					onSave={() => {
 						void form.save().then(() => {
-							toast.success('Schedules saved');
+							toast.success(t('saved'));
 						});
 					}}
 					onResolveConflict={form.resolveConflict}
@@ -115,8 +140,8 @@ export function ScheduledScreen({ config, channels, variables }: ScheduledScreen
 			}
 		>
 			<SettingsSection
-				title="Messages"
-				description="Every schedule runs in the server timezone."
+				title={t('list.title')}
+				description={t('list.description')}
 				action={
 					<Button
 						variant="outline"
@@ -128,11 +153,11 @@ export function ScheduledScreen({ config, channels, variables }: ScheduledScreen
 						}}
 					>
 						<Plus aria-hidden="true" />
-						New message
+						{t('new')}
 					</Button>
 				}
 			>
-				<Field label="Server timezone" className="max-w-80">
+				<Field label={t('list.timezone')} className="max-w-80">
 					<Select
 						options={TIMEZONES}
 						value={draft.timezone}
@@ -143,7 +168,7 @@ export function ScheduledScreen({ config, channels, variables }: ScheduledScreen
 				</Field>
 
 				{draft.messages.length === 0 ? (
-					<p className="text-body-sm text-text-muted">Nothing scheduled.</p>
+					<p className="text-body-sm text-text-muted">{t('list.empty')}</p>
 				) : (
 					<ul className="flex flex-col">
 						{draft.messages.map((message) => (
@@ -164,16 +189,18 @@ export function ScheduledScreen({ config, channels, variables }: ScheduledScreen
 											message.id === selectedId ? 'text-primary' : 'text-text'
 										)}
 									>
-										{message.name === '' ? 'Untitled message' : message.name}
+										{message.name === '' ? t('untitled') : message.name}
 									</span>
 									<span className="block truncate text-caption font-normal text-text-muted">
-										{describeSchedule(message)}
+										{whenLabel(message)}
 									</span>
 								</button>
 
 								<Switch
 									checked={message.enabled}
-									aria-label={`Enable ${message.name === '' ? 'untitled message' : message.name}`}
+									aria-label={t('list.enable', {
+										name: message.name === '' ? t('untitled') : message.name
+									})}
 									onCheckedChange={(next) => {
 										update(message.id, { enabled: next });
 									}}
@@ -183,7 +210,9 @@ export function ScheduledScreen({ config, channels, variables }: ScheduledScreen
 									variant="ghost"
 									size="sm"
 									iconOnly
-									aria-label={`Edit ${message.name === '' ? 'untitled message' : message.name}`}
+									aria-label={t('list.edit', {
+										name: message.name === '' ? t('untitled') : message.name
+									})}
 									onClick={() => {
 										setSelectedId(message.id);
 									}}
@@ -195,7 +224,9 @@ export function ScheduledScreen({ config, channels, variables }: ScheduledScreen
 									variant="ghost-danger"
 									size="sm"
 									iconOnly
-									aria-label={`Delete ${message.name === '' ? 'untitled message' : message.name}`}
+									aria-label={t('list.delete', {
+										name: message.name === '' ? t('untitled') : message.name
+									})}
 									onClick={() => {
 										const rest = draft.messages.filter((entry) => entry.id !== message.id);
 										form.set('messages', rest);
@@ -212,18 +243,18 @@ export function ScheduledScreen({ config, channels, variables }: ScheduledScreen
 
 			{selected ? (
 				<>
-					<SettingsSection title="Schedule">
-						<Field label="Name" hint="Internal only.">
+					<SettingsSection title={t('form.title')}>
+						<Field label={t('form.name')} hint={t('form.nameHint')}>
 							<Input
 								value={selected.name}
 								onChange={(event) => {
 									update(selected.id, { name: event.target.value });
 								}}
-								placeholder="Weekly event reminder"
+								placeholder={t('form.namePlaceholder')}
 							/>
 						</Field>
 
-						<Field label="Channel">
+						<Field label={t('form.channel')}>
 							<ChannelPicker
 								channels={channels}
 								value={selected.channelId}
@@ -234,23 +265,23 @@ export function ScheduledScreen({ config, channels, variables }: ScheduledScreen
 						</Field>
 
 						<div className="flex flex-col gap-2">
-							<span className="text-body-sm font-medium">Repeats</span>
+							<span className="text-body-sm font-medium">{t('form.repeats')}</span>
 							<SegmentedControl
 								options={[
-									{ value: 'once', label: 'Once' },
-									{ value: 'recurring', label: 'Recurring' }
+									{ value: 'once', label: t('form.once') },
+									{ value: 'recurring', label: t('form.recurring') }
 								]}
 								value={selected.kind}
 								onValueChange={(next) => {
 									update(selected.id, { kind: next });
 								}}
-								label="Schedule kind"
+								label={t('form.kind')}
 								className="w-fit"
 							/>
 						</div>
 
 						{selected.kind === 'once' ? (
-							<Field label="When">
+							<Field label={t('form.when')}>
 								<DateTimeInput
 									type="datetime-local"
 									value={selected.runAt}
@@ -263,18 +294,18 @@ export function ScheduledScreen({ config, channels, variables }: ScheduledScreen
 						) : (
 							<>
 								<div className="flex flex-col gap-2">
-									<span className="text-body-sm font-medium">Days</span>
+									<span className="text-body-sm font-medium">{t('form.days')}</span>
 									<div className="flex flex-wrap gap-1.5">
 										{WEEKDAYS.map((day) => {
-											const active = selected.days.includes(day.id);
+											const active = selected.days.includes(day);
 											return (
 												<button
-													key={day.id}
+													key={day}
 													type="button"
 													aria-pressed={active}
-													aria-label={day.label}
+													aria-label={t(`weekday.${day}`)}
 													onClick={() => {
-														toggleDay(selected, day.id);
+														toggleDay(selected, day);
 													}}
 													className={cn(
 														'grid size-9 place-items-center rounded-md border text-body-sm font-medium transition-colors duration-120 ease-out',
@@ -283,14 +314,14 @@ export function ScheduledScreen({ config, channels, variables }: ScheduledScreen
 															: 'border-border bg-surface text-text-muted hover:border-border-strong hover:text-text'
 													)}
 												>
-													{day.short}
+													{t(`weekdayShort.${day}`)}
 												</button>
 											);
 										})}
 									</div>
 								</div>
 
-								<Field label="Time" className="max-w-40">
+								<Field label={t('form.time')} className="max-w-40">
 									<DateTimeInput
 										type="time"
 										value={selected.timeOfDay}
@@ -301,7 +332,9 @@ export function ScheduledScreen({ config, channels, variables }: ScheduledScreen
 								</Field>
 
 								<div className="rounded-md border border-border bg-surface-sunken p-3">
-									<p className="mb-1 font-mono text-overline text-text-muted uppercase">Cron</p>
+									<p className="mb-1 font-mono text-overline text-text-muted uppercase">
+										{t('form.cron')}
+									</p>
 									<code className="font-mono text-body-sm text-text">
 										{toCron(selected.days, selected.timeOfDay)}
 									</code>
@@ -312,24 +345,22 @@ export function ScheduledScreen({ config, channels, variables }: ScheduledScreen
 						{runs.length > 0 ? (
 							<div>
 								<p className="mb-1.5 font-mono text-overline text-text-muted uppercase">
-									Next {runs.length}
+									{t('form.next', { count: runs.length })}
 								</p>
 								<ul className="flex flex-col gap-1">
 									{runs.map((run) => (
-										<li key={run} className="text-body-sm text-text-muted">
-											{run}
+										<li key={runLabel(run)} className="text-body-sm text-text-muted">
+											{runLabel(run)}
 										</li>
 									))}
 								</ul>
 							</div>
 						) : (
-							<p className="text-caption font-normal text-warning-fg">
-								Nothing is scheduled — pick at least one day, or a date.
-							</p>
+							<p className="text-caption font-normal text-warning-fg">{t('form.nothing')}</p>
 						)}
 					</SettingsSection>
 
-					<SettingsSection title="Message">
+					<SettingsSection title={t('message.title')}>
 						<MessageComposer
 							value={selected.message}
 							onChange={(next) => {

@@ -722,6 +722,70 @@
 			"notImage": "This is not a direct image link — Discord will show nothing. It should end in .png, .jpg or .gif",
 			"expiring": "A Discord attachment link expires within a day and the image will vanish. Host it somewhere permanent instead."
 		},
+		"scheduled": {
+			"title": "Scheduled messages",
+			"description": "Post on a timer, without anyone having to remember.",
+			"saved": "Schedules saved",
+			"new": "New message",
+			"untitled": "Untitled message",
+			"list": {
+				"title": "Messages",
+				"description": "Every schedule runs in the server timezone.",
+				"timezone": "Server timezone",
+				"empty": "Nothing scheduled.",
+				"enable": "Enable {name}",
+				"edit": "Edit {name}",
+				"delete": "Delete {name}"
+			},
+			"form": {
+				"title": "Schedule",
+				"name": "Name",
+				"nameHint": "Internal only.",
+				"namePlaceholder": "Weekly event reminder",
+				"channel": "Channel",
+				"repeats": "Repeats",
+				"once": "Once",
+				"recurring": "Recurring",
+				"kind": "Schedule kind",
+				"when": "When",
+				"days": "Days",
+				"time": "Time",
+				"cron": "Cron",
+				"next": "Next {count}",
+				"nothing": "Nothing is scheduled — pick at least one day, or a date."
+			},
+			"message": { "title": "Message" },
+			"when": {
+				"no-date": "No date set",
+				"once": "Once, on {at}",
+				"no-days": "No days picked",
+				"daily": "Every day at {time}",
+				"days": "{days} at {time}"
+			},
+			"run": {
+				"this": "this {day} at {time}",
+				"next": "next {day} at {time}",
+				"later": "in {weeks} weeks, {day} at {time}"
+			},
+			"weekday": {
+				"mon": "Monday",
+				"tue": "Tuesday",
+				"wed": "Wednesday",
+				"thu": "Thursday",
+				"fri": "Friday",
+				"sat": "Saturday",
+				"sun": "Sunday"
+			},
+			"weekdayShort": {
+				"mon": "M",
+				"tue": "T",
+				"wed": "W",
+				"thu": "T",
+				"fri": "F",
+				"sat": "S",
+				"sun": "S"
+			}
+		},
 		"customCommands": {
 			"title": "Custom commands",
 			"description": "Your own slash commands, with no code and no hosting.",

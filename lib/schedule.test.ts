@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { describeSchedule, nextRuns, toCron } from './schedule';
+import { nextRuns, readSchedule, toCron } from './schedule';
 import type { ScheduledMessage } from './types/module-configs';
 
 function message(overrides: Partial<ScheduledMessage> = {}): ScheduledMessage {
@@ -57,30 +57,43 @@ describe('toCron', () => {
 	});
 });
 
-describe('describeSchedule', () => {
-	it('spells out a weekly schedule in words', () => {
-		expect(describeSchedule(message({ days: ['fri'], timeOfDay: '19:00' }))).toBe(
-			'Friday at 19:00'
-		);
+describe('readSchedule', () => {
+	it('names the days a weekly schedule runs on, in week order', () => {
+		expect(readSchedule(message({ days: ['fri', 'mon'], timeOfDay: '19:00' }))).toEqual({
+			kind: 'days',
+			days: ['mon', 'fri'],
+			time: '19:00'
+		});
 	});
 
-	it('collapses a full week to "every day"', () => {
+	it('collapses a full week rather than listing seven days', () => {
 		const every = message({ days: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] });
-		expect(describeSchedule(every)).toBe('Every day at 09:00');
+		expect(readSchedule(every)).toEqual({ kind: 'daily', time: '09:00' });
 	});
 
-	it('says plainly when no day is picked', () => {
-		expect(describeSchedule(message({ days: [] }))).toBe('No days picked');
+	it('reports no day picked as its own case, not as an empty list', () => {
+		expect(readSchedule(message({ days: [] }))).toEqual({ kind: 'no-days' });
 	});
 
-	it('says plainly when a one-off has no date', () => {
-		expect(describeSchedule(message({ kind: 'once', runAt: '' }))).toBe('No date set');
+	it('reports a one-off with no date as its own case', () => {
+		expect(readSchedule(message({ kind: 'once', runAt: '' }))).toEqual({ kind: 'no-date' });
 	});
 
-	it('reads a one-off date back', () => {
-		expect(describeSchedule(message({ kind: 'once', runAt: '2026-09-02T22:00' }))).toContain(
-			'2026-09-02 at 22:00'
-		);
+	it('hands back the stored one-off date untouched, for the screen to format', () => {
+		expect(readSchedule(message({ kind: 'once', runAt: '2026-09-02T22:00' }))).toEqual({
+			kind: 'once',
+			at: '2026-09-02T22:00'
+		});
+	});
+
+	it('carries no human wording, so a language cannot leak out of here', () => {
+		const shapes = [
+			readSchedule(message({ days: ['fri'] })),
+			readSchedule(message({ days: [] })),
+			readSchedule(message({ kind: 'once', runAt: '2026-09-02T22:00' }))
+		];
+
+		expect(JSON.stringify(shapes)).not.toMatch(/friday|every|no days|once, on/i);
 	});
 });
 
@@ -91,7 +104,7 @@ describe('nextRuns', () => {
 
 	it('wraps into following weeks rather than repeating the same wording', () => {
 		const runs = nextRuns(message({ days: ['mon'] }), 3);
-		expect(new Set(runs).size).toBe(3);
+		expect(new Set(runs.map((run) => JSON.stringify(run))).size).toBe(3);
 	});
 
 	it('returns nothing when there is no day to run on', () => {
