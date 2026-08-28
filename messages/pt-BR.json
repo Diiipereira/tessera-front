@@ -722,6 +722,88 @@
 			"notImage": "Este não é um link direto de imagem — o Discord não vai mostrar nada. Ele precisa terminar em .png, .jpg ou .gif",
 			"expiring": "Link de anexo do Discord expira em menos de um dia e a imagem some. Hospede a figura em algum lugar permanente."
 		},
+		"economy": {
+			"title": "Economia",
+			"description": "Uma moeda que os membros ganham por aparecer, e algo para gastar com ela.",
+			"saved": "Economia salva",
+			"currency": {
+				"title": "Moeda",
+				"name": "Nome",
+				"namePlaceholder": "Moedas",
+				"symbol": "Símbolo",
+				"symbolHelp": "Um caractere só fica melhor.",
+				"starting": "Saldo inicial",
+				"presets": "Símbolos comuns",
+				"usePreset": "Usar {symbol} como símbolo",
+				"starts": "Um membro novo começa com <b>{amount} {name}</b>."
+			},
+			"earning": {
+				"title": "Ganho",
+				"description": "Quanto cada comando entrega, e com que frequência.",
+				"dailyBlurb": "Resgatado uma vez por intervalo. O bônus acumula mais uma vez a cada dia seguido, e zera no instante em que um dia é perdido.",
+				"workBlurb": "Um pagamento menor com um intervalo bem mais curto, para o dia ter o que fazer.",
+				"amount": "Quantia",
+				"cooldownHours": "Intervalo (horas)",
+				"cooldownMinutes": "Intervalo (minutos)",
+				"streak": "Bônus de sequência",
+				"flat": "Todo dia paga <b>{daily}</b>. Uma semana dá <b>{week}</b>.",
+				"stacking": "O dia 1 paga <b>{daily}</b>, o dia 7 paga <b>{seventh}</b>. A semana inteira dá <b>{week}</b>."
+			},
+			"transfers": {
+				"title": "Transferências",
+				"description": "Quanto custa mandar moeda para alguém.",
+				"blurb": "A taxa é queimada, não vai para ninguém. Coloque 0 para deixar a moeda circular livremente.",
+				"free": "Nada é queimado. O valor inteiro chega ao outro membro.",
+				"tax": "Taxa de transferência (%)"
+			},
+			"shop": {
+				"title": "Loja",
+				"description": "O que a moeda de fato compra.",
+				"new": "Novo item",
+				"empty": "Nada à venda. A moeda não tem onde ser gasta.",
+				"untitled": "Item sem nome",
+				"stockLeft": "{count} restantes",
+				"perUser": "no máximo {count} cada",
+				"edit": "Editar",
+				"remove": "Remover {name}"
+			},
+			"item": {
+				"new": "Novo item da loja",
+				"edit": "Editar item",
+				"add": "Adicionar item",
+				"save": "Salvar item",
+				"name": "Nome",
+				"namePlaceholder": "Cor de booster",
+				"description": "Descrição",
+				"role": "Cargo dado na compra",
+				"roleHint": "Opcional — alguns itens são só enfeite.",
+				"rolePlaceholder": "Nenhum cargo…",
+				"limitedStock": "Estoque limitado",
+				"limitedStockHint": "Quando acaba, o item para de vender.",
+				"stock": "Estoque",
+				"perUserLimit": "Limite por membro",
+				"perUserLabel": "Limite por membro"
+			},
+			"transactions": {
+				"title": "Transações",
+				"description": "Somente leitura. Todo movimento de moeda, do mais novo para o mais antigo.",
+				"filter": "Filtrar transações",
+				"empty": "Nada desse tipo ainda.",
+				"all": "Todas",
+				"daily": "Diário",
+				"work": "Trabalho",
+				"transfer": "Transferências",
+				"purchase": "Compras",
+				"admin": "Admin"
+			},
+			"kind": {
+				"daily": "diário",
+				"work": "trabalho",
+				"transfer": "transferência",
+				"purchase": "compra",
+				"admin": "admin"
+			}
+		},
 		"automod": {
 			"title": "AutoMod",
 			"description": "Regras que agem antes de um humano precisar agir. Toda ocorrência vai para o log de casos.",
@@ -742,13 +824,34 @@
 				"delete": "Excluir {name}"
 			},
 			"trigger": {
-				"spam": { "label": "Spam", "blurb": "Mensagens demais rápido demais" },
-				"invites": { "label": "Convites", "blurb": "Links para outros servidores" },
-				"links": { "label": "Links", "blurb": "Qualquer URL" },
-				"caps": { "label": "Maiúsculas", "blurb": "GRITARIA" },
-				"mentions": { "label": "Menções", "blurb": "Marcação em massa" },
-				"words": { "label": "Palavras", "blurb": "Sua própria lista de bloqueio" },
-				"attachments": { "label": "Anexos", "blurb": "Arquivos demais" }
+				"spam": {
+					"label": "Spam",
+					"blurb": "Mensagens demais rápido demais"
+				},
+				"invites": {
+					"label": "Convites",
+					"blurb": "Links para outros servidores"
+				},
+				"links": {
+					"label": "Links",
+					"blurb": "Qualquer URL"
+				},
+				"caps": {
+					"label": "Maiúsculas",
+					"blurb": "GRITARIA"
+				},
+				"mentions": {
+					"label": "Menções",
+					"blurb": "Marcação em massa"
+				},
+				"words": {
+					"label": "Palavras",
+					"blurb": "Sua própria lista de bloqueio"
+				},
+				"attachments": {
+					"label": "Anexos",
+					"blurb": "Arquivos demais"
+				}
 			},
 			"summary": {
 				"spam": "{threshold} mensagens em {window}s",

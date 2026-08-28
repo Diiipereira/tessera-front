@@ -1,6 +1,7 @@
 'use client';
 
 import { Coins, Pencil, Plus, Trash2 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useState, type ReactNode } from 'react';
 import { toast } from 'sonner';
 import { RolePicker } from '@/components/discord/RolePicker';
@@ -41,13 +42,13 @@ const SYMBOL_PRESETS = ['🪙', '💰', '💎', '⭐', '🍪', '$'];
 
 const ASCII_SYMBOL = /^[!-~]+$/;
 
-const FILTERS: { value: TransactionKind | 'all'; label: string }[] = [
-	{ value: 'all', label: 'All' },
-	{ value: 'daily', label: 'Daily' },
-	{ value: 'work', label: 'Work' },
-	{ value: 'transfer', label: 'Transfers' },
-	{ value: 'purchase', label: 'Purchases' },
-	{ value: 'admin', label: 'Admin' }
+const FILTERS: (TransactionKind | 'all')[] = [
+	'all',
+	'daily',
+	'work',
+	'transfer',
+	'purchase',
+	'admin'
 ];
 
 function CommandGroup({
@@ -94,6 +95,7 @@ type EconomyScreenProps = {
 };
 
 export function EconomyScreen({ config, roles, transactions }: EconomyScreenProps) {
+	const t = useTranslations('modules.economy');
 	const form = useConfigDraft<EconomyConfig>(config);
 	const draft = form.draft;
 
@@ -123,8 +125,8 @@ export function EconomyScreen({ config, roles, transactions }: EconomyScreenProp
 		<ModulePage
 			moduleId="economy"
 			icon={Coins}
-			title="Economy"
-			description="A currency members earn by showing up, and something to spend it on."
+			title={t('title')}
+			description={t('description')}
 			enabled={draft.enabled}
 			onEnabledChange={(next) => {
 				form.set('enabled', next);
@@ -137,25 +139,25 @@ export function EconomyScreen({ config, roles, transactions }: EconomyScreenProp
 					onDiscard={form.discard}
 					onSave={() => {
 						void form.save().then(() => {
-							toast.success('Economy saved');
+							toast.success(t('saved'));
 						});
 					}}
 					onResolveConflict={form.resolveConflict}
 				/>
 			}
 		>
-			<SettingsSection title="Currency">
+			<SettingsSection title={t('currency.title')}>
 				<div className="flex flex-wrap items-start gap-4">
-					<Field label="Name" className="w-48">
+					<Field label={t('currency.name')} className="w-48">
 						<Input
 							value={draft.currencyName}
 							onChange={(event) => {
 								form.set('currencyName', event.target.value);
 							}}
-							placeholder="Coins"
+							placeholder={t('currency.namePlaceholder')}
 						/>
 					</Field>
-					<Field label="Symbol" help="One character reads best." className="w-28">
+					<Field label={t('currency.symbol')} help={t('currency.symbolHelp')} className="w-28">
 						<Input
 							value={draft.currencySymbol}
 							onChange={(event) => {
@@ -165,7 +167,7 @@ export function EconomyScreen({ config, roles, transactions }: EconomyScreenProp
 							className="text-center font-mono"
 						/>
 					</Field>
-					<Field label="Starting balance" className="w-40">
+					<Field label={t('currency.starting')} className="w-40">
 						<NumberInput
 							min={0}
 							max={1000000}
@@ -179,7 +181,7 @@ export function EconomyScreen({ config, roles, transactions }: EconomyScreenProp
 				</div>
 
 				<div className="flex flex-wrap items-center gap-2">
-					<span className="text-caption font-normal text-text-muted">Common symbols</span>
+					<span className="text-caption font-normal text-text-muted">{t('currency.presets')}</span>
 					{SYMBOL_PRESETS.map((preset) => {
 						const active = draft.currencySymbol === preset;
 						return (
@@ -187,7 +189,7 @@ export function EconomyScreen({ config, roles, transactions }: EconomyScreenProp
 								key={preset}
 								type="button"
 								aria-pressed={active}
-								aria-label={`Use ${preset} as the symbol`}
+								aria-label={t('currency.usePreset', { symbol: preset })}
 								className={cn(
 									'grid size-8 place-items-center rounded-md border text-body transition-colors duration-120 ease-out',
 									active
@@ -205,44 +207,35 @@ export function EconomyScreen({ config, roles, transactions }: EconomyScreenProp
 				</div>
 
 				<p className="text-body-sm text-text-muted">
-					A new member starts with{' '}
-					<span className="font-medium text-text">
-						{money(draft.startingBalance)} {draft.currencyName}
-					</span>
-					.
+					{t.rich('currency.starts', {
+						amount: money(draft.startingBalance),
+						name: draft.currencyName,
+						b: (chunks) => <span className="font-medium text-text">{chunks}</span>
+					})}
 				</p>
 			</SettingsSection>
 
-			<SettingsSection title="Earning" description="What each command hands out, and how often.">
+			<SettingsSection title={t('earning.title')} description={t('earning.description')}>
 				<div className="grid gap-4 lg:grid-cols-2">
 					<CommandGroup
 						command="/daily"
-						blurb="Claimed once per cooldown. The bonus stacks one more time each consecutive day, and resets the moment one is missed."
+						blurb={t('earning.dailyBlurb')}
 						footer={
-							draft.streakBonus === 0 ? (
-								<>
-									Every day pays{' '}
-									<span className="font-medium text-text">{money(draft.dailyAmount)}</span>. A week
-									is <span className="font-medium text-text">{money(draft.dailyAmount * 7)}</span>.
-								</>
-							) : (
-								<>
-									Day 1 pays{' '}
-									<span className="font-medium text-text">{money(draft.dailyAmount)}</span>, day 7
-									pays{' '}
-									<span className="font-medium text-text">
-										{money(draft.dailyAmount + draft.streakBonus * 6)}
-									</span>
-									. A full week is{' '}
-									<span className="font-medium text-text">
-										{money(draft.dailyAmount * 7 + draft.streakBonus * 21)}
-									</span>
-									.
-								</>
-							)
+							draft.streakBonus === 0
+								? t.rich('earning.flat', {
+										daily: money(draft.dailyAmount),
+										week: money(draft.dailyAmount * 7),
+										b: (chunks) => <span className="font-medium text-text">{chunks}</span>
+									})
+								: t.rich('earning.stacking', {
+										daily: money(draft.dailyAmount),
+										seventh: money(draft.dailyAmount + draft.streakBonus * 6),
+										week: money(draft.dailyAmount * 7 + draft.streakBonus * 21),
+										b: (chunks) => <span className="font-medium text-text">{chunks}</span>
+									})
 						}
 					>
-						<Field label="Amount" className="w-32">
+						<Field label={t('earning.amount')} className="w-32">
 							<NumberInput
 								min={0}
 								max={100000}
@@ -253,7 +246,7 @@ export function EconomyScreen({ config, roles, transactions }: EconomyScreenProp
 								}}
 							/>
 						</Field>
-						<Field label="Cooldown (hours)" className="w-40">
+						<Field label={t('earning.cooldownHours')} className="w-40">
 							<NumberInput
 								min={1}
 								max={168}
@@ -263,7 +256,7 @@ export function EconomyScreen({ config, roles, transactions }: EconomyScreenProp
 								}}
 							/>
 						</Field>
-						<Field label="Streak bonus" className="w-36">
+						<Field label={t('earning.streak')} className="w-36">
 							<NumberInput
 								min={0}
 								max={10000}
@@ -276,11 +269,8 @@ export function EconomyScreen({ config, roles, transactions }: EconomyScreenProp
 						</Field>
 					</CommandGroup>
 
-					<CommandGroup
-						command="/work"
-						blurb="A smaller payout on a much shorter cooldown, so the day has something to do."
-					>
-						<Field label="Amount" className="w-32">
+					<CommandGroup command="/work" blurb={t('earning.workBlurb')}>
+						<Field label={t('earning.amount')} className="w-32">
 							<NumberInput
 								min={0}
 								max={100000}
@@ -291,7 +281,7 @@ export function EconomyScreen({ config, roles, transactions }: EconomyScreenProp
 								}}
 							/>
 						</Field>
-						<Field label="Cooldown (minutes)" className="w-44">
+						<Field label={t('earning.cooldownMinutes')} className="w-44">
 							<NumberInput
 								min={1}
 								max={1440}
@@ -305,13 +295,13 @@ export function EconomyScreen({ config, roles, transactions }: EconomyScreenProp
 				</div>
 			</SettingsSection>
 
-			<SettingsSection title="Transfers" description="What it costs to send currency to someone.">
+			<SettingsSection title={t('transfers.title')} description={t('transfers.description')}>
 				<CommandGroup
 					command="/pay"
-					blurb="The tax is burned, not paid to anyone. Set it to 0 to let currency move freely."
+					blurb={t('transfers.blurb')}
 					footer={
 						draft.transferTaxPercent === 0 ? (
-							<>Nothing is burned. The whole amount reaches the other member.</>
+							t('transfers.free')
 						) : (
 							<>
 								Of every <span className="font-medium text-text">{money(100)}</span> sent,{' '}
@@ -325,7 +315,7 @@ export function EconomyScreen({ config, roles, transactions }: EconomyScreenProp
 						)
 					}
 				>
-					<Field label="Transfer tax (%)" className="w-36">
+					<Field label={t('transfers.tax')} className="w-36">
 						<NumberInput
 							min={0}
 							max={100}
@@ -339,8 +329,8 @@ export function EconomyScreen({ config, roles, transactions }: EconomyScreenProp
 			</SettingsSection>
 
 			<SettingsSection
-				title="Shop"
-				description="What the currency actually buys."
+				title={t('shop.title')}
+				description={t('shop.description')}
 				action={
 					<Button
 						variant="outline"
@@ -356,9 +346,7 @@ export function EconomyScreen({ config, roles, transactions }: EconomyScreenProp
 				}
 			>
 				{draft.shop.length === 0 ? (
-					<p className="text-body-sm text-text-muted">
-						Nothing for sale. The currency has nowhere to go.
-					</p>
+					<p className="text-body-sm text-text-muted">{t('shop.empty')}</p>
 				) : (
 					<div className="grid grid-cols-[repeat(auto-fill,minmax(16rem,1fr))] gap-4">
 						{draft.shop.map((item) => {
@@ -370,7 +358,7 @@ export function EconomyScreen({ config, roles, transactions }: EconomyScreenProp
 								>
 									<div className="flex items-start gap-2">
 										<h3 className="min-w-0 flex-1 truncate text-body font-medium">
-											{item.name === '' ? 'Untitled item' : item.name}
+											{item.name === '' ? t('shop.untitled') : item.name}
 										</h3>
 										<span className="tabular shrink-0 text-body font-semibold text-primary">
 											{money(item.price)}
@@ -394,11 +382,13 @@ export function EconomyScreen({ config, roles, transactions }: EconomyScreenProp
 										) : null}
 										{item.stock === null ? null : (
 											<Badge variant={item.stock === 0 ? 'danger' : 'neutral'}>
-												{item.stock} left
+												{t('shop.stockLeft', { count: item.stock })}
 											</Badge>
 										)}
 										{item.perUserLimit === null ? null : (
-											<Badge variant="neutral">max {item.perUserLimit} each</Badge>
+											<Badge variant="neutral">
+												{t('shop.perUser', { count: item.perUserLimit })}
+											</Badge>
 										)}
 									</div>
 
@@ -412,14 +402,16 @@ export function EconomyScreen({ config, roles, transactions }: EconomyScreenProp
 											}}
 										>
 											<Pencil aria-hidden="true" />
-											Edit
+											{t('shop.edit')}
 										</Button>
 										<div className="flex-1" />
 										<Button
 											variant="ghost-danger"
 											size="sm"
 											iconOnly
-											aria-label={`Remove ${item.name === '' ? 'untitled item' : item.name}`}
+											aria-label={t('shop.remove', {
+												name: item.name === '' ? t('shop.untitled') : item.name
+											})}
 											onClick={() => {
 												form.set(
 													'shop',
@@ -438,20 +430,20 @@ export function EconomyScreen({ config, roles, transactions }: EconomyScreenProp
 			</SettingsSection>
 
 			<SettingsSection
-				title="Transactions"
-				description="Read-only. Every movement of currency, newest first."
+				title={t('transactions.title')}
+				description={t('transactions.description')}
 				action={
 					<SegmentedControl
-						options={FILTERS}
+						options={FILTERS.map((value) => ({ value, label: t(`transactions.${value}`) }))}
 						value={filter}
 						onValueChange={setFilter}
-						label="Filter transactions"
+						label={t('transactions.filter')}
 						size="sm"
 					/>
 				}
 			>
 				{visible.length === 0 ? (
-					<p className="text-body-sm text-text-muted">Nothing of that kind yet.</p>
+					<p className="text-body-sm text-text-muted">{t('transactions.empty')}</p>
 				) : (
 					<ul className="flex flex-col">
 						{visible.map((entry) => (
@@ -472,7 +464,7 @@ export function EconomyScreen({ config, roles, transactions }: EconomyScreenProp
 									<span className="text-caption font-normal text-text-muted">{entry.at}</span>
 								</div>
 								<Badge variant={KIND_VARIANTS[entry.kind]} className="shrink-0">
-									{entry.kind}
+									{t(`kind.${entry.kind}`)}
 								</Badge>
 								<span
 									className={cn(
@@ -515,6 +507,8 @@ type ItemDialogProps = {
 };
 
 function ItemDialog({ item, isNew, roles, symbol, onCancel, onSave }: ItemDialogProps) {
+	const t = useTranslations('modules.economy.item');
+	const shared = useTranslations('common');
 	const [work, setWork] = useState(item);
 	const [limitedStock, setLimitedStock] = useState(item.stock !== null);
 	const [limitedPerUser, setLimitedPerUser] = useState(item.perUserLimit !== null);
@@ -529,12 +523,12 @@ function ItemDialog({ item, isNew, roles, symbol, onCancel, onSave }: ItemDialog
 			onOpenChange={(next) => {
 				if (!next) onCancel();
 			}}
-			title={isNew ? 'New shop item' : 'Edit item'}
+			title={isNew ? t('new') : t('edit')}
 			size="md"
 			footer={
 				<>
 					<Button variant="ghost" onClick={onCancel}>
-						Cancel
+						{shared('cancel')}
 					</Button>
 					<Button
 						disabled={work.name.trim() === ''}
@@ -546,23 +540,23 @@ function ItemDialog({ item, isNew, roles, symbol, onCancel, onSave }: ItemDialog
 							});
 						}}
 					>
-						{isNew ? 'Add item' : 'Save item'}
+						{isNew ? t('add') : t('save')}
 					</Button>
 				</>
 			}
 		>
 			<div className="flex flex-col gap-5">
-				<Field label="Name" required>
+				<Field label={t('name')} required>
 					<Input
 						value={work.name}
 						onChange={(event) => {
 							patch({ name: event.target.value });
 						}}
-						placeholder="Booster colour"
+						placeholder={t('namePlaceholder')}
 					/>
 				</Field>
 
-				<Field label="Description">
+				<Field label={t('description')}>
 					<Textarea
 						value={work.description}
 						onChange={(event) => {
@@ -586,14 +580,14 @@ function ItemDialog({ item, isNew, roles, symbol, onCancel, onSave }: ItemDialog
 					/>
 				</Field>
 
-				<Field label="Role given on purchase" hint="Optional — some items are just flavour.">
+				<Field label={t('role')} hint={t('roleHint')}>
 					<RolePicker
 						roles={roles}
 						value={work.roleId === null ? [] : [work.roleId]}
 						onValueChange={(next) => {
 							patch({ roleId: next.at(-1) ?? null });
 						}}
-						placeholder="No role…"
+						placeholder={t('rolePlaceholder')}
 					/>
 				</Field>
 
@@ -601,8 +595,8 @@ function ItemDialog({ item, isNew, roles, symbol, onCancel, onSave }: ItemDialog
 					<Switch
 						checked={limitedStock}
 						onCheckedChange={setLimitedStock}
-						label="Limited stock"
-						description="Once it runs out the item stops selling."
+						label={t('limitedStock')}
+						description={t('limitedStockHint')}
 					/>
 					{limitedStock ? (
 						<NumberInput
@@ -612,7 +606,7 @@ function ItemDialog({ item, isNew, roles, symbol, onCancel, onSave }: ItemDialog
 							onValueChange={(next) => {
 								patch({ stock: next });
 							}}
-							aria-label="Stock"
+							aria-label={t('stock')}
 							className="w-32"
 						/>
 					) : null}
@@ -620,7 +614,7 @@ function ItemDialog({ item, isNew, roles, symbol, onCancel, onSave }: ItemDialog
 					<Switch
 						checked={limitedPerUser}
 						onCheckedChange={setLimitedPerUser}
-						label="Limit per member"
+						label={t('perUserLimit')}
 					/>
 					{limitedPerUser ? (
 						<NumberInput
@@ -630,7 +624,7 @@ function ItemDialog({ item, isNew, roles, symbol, onCancel, onSave }: ItemDialog
 							onValueChange={(next) => {
 								patch({ perUserLimit: next });
 							}}
-							aria-label="Per-member limit"
+							aria-label={t('perUserLabel')}
 							className="w-32"
 						/>
 					) : null}

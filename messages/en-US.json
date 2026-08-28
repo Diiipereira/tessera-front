@@ -722,6 +722,88 @@
 			"notImage": "This is not a direct image link — Discord will show nothing. It should end in .png, .jpg or .gif",
 			"expiring": "A Discord attachment link expires within a day and the image will vanish. Host it somewhere permanent instead."
 		},
+		"economy": {
+			"title": "Economy",
+			"description": "A currency members earn by showing up, and something to spend it on.",
+			"saved": "Economy saved",
+			"currency": {
+				"title": "Currency",
+				"name": "Name",
+				"namePlaceholder": "Coins",
+				"symbol": "Symbol",
+				"symbolHelp": "One character reads best.",
+				"starting": "Starting balance",
+				"presets": "Common symbols",
+				"usePreset": "Use {symbol} as the symbol",
+				"starts": "A new member starts with <b>{amount} {name}</b>."
+			},
+			"earning": {
+				"title": "Earning",
+				"description": "What each command hands out, and how often.",
+				"dailyBlurb": "Claimed once per cooldown. The bonus stacks one more time each consecutive day, and resets the moment one is missed.",
+				"workBlurb": "A smaller payout on a much shorter cooldown, so the day has something to do.",
+				"amount": "Amount",
+				"cooldownHours": "Cooldown (hours)",
+				"cooldownMinutes": "Cooldown (minutes)",
+				"streak": "Streak bonus",
+				"flat": "Every day pays <b>{daily}</b>. A week is <b>{week}</b>.",
+				"stacking": "Day 1 pays <b>{daily}</b>, day 7 pays <b>{seventh}</b>. A full week is <b>{week}</b>."
+			},
+			"transfers": {
+				"title": "Transfers",
+				"description": "What it costs to send currency to someone.",
+				"blurb": "The tax is burned, not paid to anyone. Set it to 0 to let currency move freely.",
+				"free": "Nothing is burned. The whole amount reaches the other member.",
+				"tax": "Transfer tax (%)"
+			},
+			"shop": {
+				"title": "Shop",
+				"description": "What the currency actually buys.",
+				"new": "New item",
+				"empty": "Nothing for sale. The currency has nowhere to go.",
+				"untitled": "Untitled item",
+				"stockLeft": "{count} left",
+				"perUser": "max {count} each",
+				"edit": "Edit",
+				"remove": "Remove {name}"
+			},
+			"item": {
+				"new": "New shop item",
+				"edit": "Edit item",
+				"add": "Add item",
+				"save": "Save item",
+				"name": "Name",
+				"namePlaceholder": "Booster colour",
+				"description": "Description",
+				"role": "Role given on purchase",
+				"roleHint": "Optional — some items are just flavour.",
+				"rolePlaceholder": "No role…",
+				"limitedStock": "Limited stock",
+				"limitedStockHint": "Once it runs out the item stops selling.",
+				"stock": "Stock",
+				"perUserLimit": "Limit per member",
+				"perUserLabel": "Per-member limit"
+			},
+			"transactions": {
+				"title": "Transactions",
+				"description": "Read-only. Every movement of currency, newest first.",
+				"filter": "Filter transactions",
+				"empty": "Nothing of that kind yet.",
+				"all": "All",
+				"daily": "Daily",
+				"work": "Work",
+				"transfer": "Transfers",
+				"purchase": "Purchases",
+				"admin": "Admin"
+			},
+			"kind": {
+				"daily": "daily",
+				"work": "work",
+				"transfer": "transfer",
+				"purchase": "purchase",
+				"admin": "admin"
+			}
+		},
 		"automod": {
 			"title": "AutoMod",
 			"description": "Rules that act before a human has to. Every hit is written to the case log.",
@@ -742,13 +824,34 @@
 				"delete": "Delete {name}"
 			},
 			"trigger": {
-				"spam": { "label": "Spam", "blurb": "Too many messages too fast" },
-				"invites": { "label": "Invites", "blurb": "Links to other servers" },
-				"links": { "label": "Links", "blurb": "Any URL at all" },
-				"caps": { "label": "Capitals", "blurb": "SHOUTING" },
-				"mentions": { "label": "Mentions", "blurb": "Mass pings" },
-				"words": { "label": "Words", "blurb": "Your own blocklist" },
-				"attachments": { "label": "Attachments", "blurb": "Too many files" }
+				"spam": {
+					"label": "Spam",
+					"blurb": "Too many messages too fast"
+				},
+				"invites": {
+					"label": "Invites",
+					"blurb": "Links to other servers"
+				},
+				"links": {
+					"label": "Links",
+					"blurb": "Any URL at all"
+				},
+				"caps": {
+					"label": "Capitals",
+					"blurb": "SHOUTING"
+				},
+				"mentions": {
+					"label": "Mentions",
+					"blurb": "Mass pings"
+				},
+				"words": {
+					"label": "Words",
+					"blurb": "Your own blocklist"
+				},
+				"attachments": {
+					"label": "Attachments",
+					"blurb": "Too many files"
+				}
 			},
 			"summary": {
 				"spam": "{threshold} messages in {window}s",
