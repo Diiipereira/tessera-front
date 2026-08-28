@@ -1,6 +1,7 @@
 'use client';
 
 import { Plus, Ticket, Trash2 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { ChannelPicker } from '@/components/discord/ChannelPicker';
@@ -36,7 +37,7 @@ const STATUS_VARIANTS: Record<TicketStatus, BadgeVariant> = {
 	closed: 'neutral'
 };
 
-function blankPanel(): TicketPanel {
+function blankPanel(buttonLabel: string, text: string): TicketPanel {
 	return {
 		id: newId('panel'),
 		name: '',
@@ -44,10 +45,10 @@ function blankPanel(): TicketPanel {
 		staffRoleIds: [],
 		namingPattern: 'ticket-{number}',
 		maxOpenPerUser: 1,
-		buttonLabel: 'Open a ticket',
+		buttonLabel,
 		message: {
 			mode: 'text',
-			text: 'Need a hand? Press the button below.',
+			text,
 			embed: {
 				authorName: '',
 				title: '',
@@ -78,6 +79,8 @@ export function TicketsScreen({
 	variables,
 	openTickets
 }: TicketsScreenProps) {
+	const t = useTranslations('modules.tickets');
+	const preview = useTranslations('modules.preview');
 	const form = useConfigDraft<TicketsConfig>(config);
 	const draft = form.draft;
 
@@ -96,23 +99,22 @@ export function TicketsScreen({
 	const aside =
 		tab === 'panels' && selected ? (
 			<section
-				aria-label="Panel preview"
+				aria-label={t('preview.label')}
 				className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-4 shadow-1"
 			>
-				<h2 className="text-h4">Preview</h2>
+				<h2 className="text-h4">{preview('title')}</h2>
 				<DiscordPreview message={selected.message} variables={variables} />
 				<div className="rounded-md border border-border bg-surface-sunken p-3">
-					<p className="mb-2 text-caption font-normal text-text-muted">The button members press</p>
+					<p className="mb-2 text-caption font-normal text-text-muted">{t('preview.buttonHint')}</p>
 					<span className="inline-flex h-8 items-center rounded-sm bg-discord px-4 text-body-sm font-medium text-discord-fg">
-						{selected.buttonLabel === '' ? 'Open a ticket' : selected.buttonLabel}
+						{selected.buttonLabel === '' ? t('preview.defaultButton') : selected.buttonLabel}
 					</span>
 				</div>
 				<p className="text-caption font-normal text-text-muted">
-					A ticket lands as{' '}
-					<span className="font-mono text-text">
-						#{selected.namingPattern.replace('{number}', '185').replace('{user}', 'novato')}
-					</span>
-					.
+					{t.rich('preview.landsAs', {
+						name: selected.namingPattern.replace('{number}', '185').replace('{user}', 'novato'),
+						code: (chunks) => <span className="font-mono text-text">{chunks}</span>
+					})}
 				</p>
 			</section>
 		) : undefined;
@@ -121,8 +123,8 @@ export function TicketsScreen({
 		<ModulePage
 			moduleId="tickets"
 			icon={Ticket}
-			title="Tickets"
-			description="A button members press to open a private channel with your staff."
+			title={t('title')}
+			description={t('description')}
 			enabled={draft.enabled}
 			onEnabledChange={(next) => {
 				form.set('enabled', next);
@@ -130,12 +132,12 @@ export function TicketsScreen({
 			headerAction={
 				<SegmentedControl
 					options={[
-						{ value: 'panels', label: 'Panels', count: draft.panels.length },
-						{ value: 'open', label: 'Open tickets', count: openTickets.length }
+						{ value: 'panels', label: t('tabPanels'), count: draft.panels.length },
+						{ value: 'open', label: t('tabOpen'), count: openTickets.length }
 					]}
 					value={tab}
 					onValueChange={setTab}
-					label="Tickets view"
+					label={t('view')}
 					size="sm"
 				/>
 			}
@@ -148,7 +150,7 @@ export function TicketsScreen({
 					onDiscard={form.discard}
 					onSave={() => {
 						void form.save().then(() => {
-							toast.success('Tickets saved');
+							toast.success(t('saved'));
 						});
 					}}
 					onResolveConflict={form.resolveConflict}
@@ -156,23 +158,20 @@ export function TicketsScreen({
 			}
 		>
 			{tab === 'open' ? (
-				<SettingsSection
-					title="Open tickets"
-					description="Read-only here. Claiming and closing happen in Discord."
-				>
+				<SettingsSection title={t('open.title')} description={t('open.description')}>
 					{openTickets.length === 0 ? (
-						<p className="text-body-sm text-text-muted">Nothing open. Quiet day.</p>
+						<p className="text-body-sm text-text-muted">{t('open.empty')}</p>
 					) : (
 						<div className="overflow-x-auto">
 							<table className="w-full min-w-160 border-collapse">
 								<thead>
 									<tr className="border-b border-border text-left">
-										{['#', 'Subject', 'Opened by', 'Claimed by', 'Age', 'Status'].map((head) => (
+										{['number', 'subject', 'openedBy', 'claimedBy', 'age', 'status'].map((head) => (
 											<th
 												key={head}
 												className="pb-2 font-mono text-overline font-semibold text-text-muted uppercase"
 											>
-												{head}
+												{t(`open.${head}`)}
 											</th>
 										))}
 									</tr>
@@ -201,7 +200,7 @@ export function TicketsScreen({
 											<td className="py-3 pr-3 text-body-sm text-text-muted">{ticket.age}</td>
 											<td className="py-3">
 												<Badge variant={STATUS_VARIANTS[ticket.status]} dot>
-													{ticket.status}
+													{t(`status.${ticket.status}`)}
 												</Badge>
 											</td>
 										</tr>
@@ -214,27 +213,25 @@ export function TicketsScreen({
 			) : (
 				<>
 					<SettingsSection
-						title="Panels"
-						description="Each panel is one message with one button."
+						title={t('panels.title')}
+						description={t('panels.description')}
 						action={
 							<Button
 								variant="outline"
 								size="sm"
 								onClick={() => {
-									const panel = blankPanel();
+									const panel = blankPanel(t('panels.seedButton'), t('panels.seedMessage'));
 									form.set('panels', [...draft.panels, panel]);
 									setSelectedId(panel.id);
 								}}
 							>
 								<Plus aria-hidden="true" />
-								New panel
+								{t('new')}
 							</Button>
 						}
 					>
 						{draft.panels.length === 0 ? (
-							<p className="text-body-sm text-text-muted">
-								No panels yet. Members have no way to open a ticket.
-							</p>
+							<p className="text-body-sm text-text-muted">{t('panels.empty')}</p>
 						) : (
 							<div className="flex flex-wrap gap-2">
 								{draft.panels.map((panel) => (
@@ -251,7 +248,7 @@ export function TicketsScreen({
 												: 'inline-flex h-8 items-center rounded-md border border-border bg-surface px-3 text-body-sm text-text-muted transition-colors duration-120 ease-out hover:border-border-strong hover:text-text'
 										}
 									>
-										{panel.name === '' ? 'Untitled panel' : panel.name}
+										{panel.name === '' ? t('untitled') : panel.name}
 									</button>
 								))}
 							</div>
@@ -261,13 +258,15 @@ export function TicketsScreen({
 					{selected ? (
 						<>
 							<SettingsSection
-								title="Panel settings"
+								title={t('panels.settings')}
 								action={
 									<Button
 										variant="ghost-danger"
 										size="sm"
 										iconOnly
-										aria-label={`Delete ${selected.name === '' ? 'untitled panel' : selected.name}`}
+										aria-label={t('panels.delete', {
+											name: selected.name === '' ? t('untitled') : selected.name
+										})}
 										onClick={() => {
 											const rest = draft.panels.filter((panel) => panel.id !== selected.id);
 											form.set('panels', rest);
@@ -278,17 +277,17 @@ export function TicketsScreen({
 									</Button>
 								}
 							>
-								<Field label="Panel name" hint="Internal only — members never see it.">
+								<Field label={t('panels.name')} hint={t('panels.nameHint')}>
 									<Input
 										value={selected.name}
 										onChange={(event) => {
 											updatePanel(selected.id, { name: event.target.value });
 										}}
-										placeholder="General support"
+										placeholder={t('panels.namePlaceholder')}
 									/>
 								</Field>
 
-								<Field label="Category" hint="New ticket channels are created inside it.">
+								<Field label={t('panels.category')} hint={t('panels.categoryHint')}>
 									<ChannelPicker
 										channels={channels}
 										value={selected.categoryId}
@@ -298,7 +297,7 @@ export function TicketsScreen({
 									/>
 								</Field>
 
-								<Field label="Staff roles" hint="Who can see and claim tickets from this panel.">
+								<Field label={t('panels.staff')} hint={t('panels.staffHint')}>
 									<RolePicker
 										roles={roles}
 										value={selected.staffRoleIds}
@@ -310,8 +309,8 @@ export function TicketsScreen({
 
 								<div className="flex flex-wrap items-end gap-4">
 									<Field
-										label="Channel naming"
-										hint="{number} and {user} are filled in."
+										label={t('panels.naming')}
+										hint={t('panels.namingHint')}
 										className="min-w-56 flex-1"
 									>
 										<Input
@@ -322,7 +321,7 @@ export function TicketsScreen({
 											className="font-mono"
 										/>
 									</Field>
-									<Field label="Max open per member" className="w-44">
+									<Field label={t('panels.maxOpen')} className="w-44">
 										<NumberInput
 											min={1}
 											max={20}
@@ -334,7 +333,7 @@ export function TicketsScreen({
 									</Field>
 								</div>
 
-								<Field label="Button label">
+								<Field label={t('panels.button')}>
 									<Input
 										value={selected.buttonLabel}
 										onChange={(event) => {
@@ -346,8 +345,8 @@ export function TicketsScreen({
 							</SettingsSection>
 
 							<SettingsSection
-								title="Panel message"
-								description="What sits above the button in the channel."
+								title={t('panels.messageTitle')}
+								description={t('panels.messageDescription')}
 							>
 								<MessageComposer
 									value={selected.message}
@@ -360,14 +359,14 @@ export function TicketsScreen({
 						</>
 					) : null}
 
-					<SettingsSection title="Behaviour" description="Applies to every panel.">
+					<SettingsSection title={t('behaviour.title')} description={t('behaviour.description')}>
 						<Switch
 							checked={draft.transcripts}
 							onCheckedChange={(next) => {
 								form.set('transcripts', next);
 							}}
-							label="Save a transcript when a ticket closes"
-							description="Posted in the log channel and sent to the member."
+							label={t('behaviour.transcript')}
+							description={t('behaviour.transcriptHint')}
 						/>
 
 						<Switch
@@ -375,12 +374,12 @@ export function TicketsScreen({
 							onCheckedChange={(next) => {
 								form.set('askForRating', next);
 							}}
-							label="Ask for a rating after closing"
+							label={t('behaviour.rating')}
 						/>
 
 						<Field
-							label="Auto-close after (hours of silence)"
-							hint="Set to 0 to never close automatically."
+							label={t('behaviour.autoClose')}
+							hint={t('behaviour.autoCloseHint')}
 							className="w-56"
 						>
 							<NumberInput

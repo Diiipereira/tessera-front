@@ -722,6 +722,69 @@
 			"notImage": "Este não é um link direto de imagem — o Discord não vai mostrar nada. Ele precisa terminar em .png, .jpg ou .gif",
 			"expiring": "Link de anexo do Discord expira em menos de um dia e a imagem some. Hospede a figura em algum lugar permanente."
 		},
+		"tickets": {
+			"title": "Tickets",
+			"description": "Um botão que os membros apertam para abrir um canal privado com a sua equipe.",
+			"saved": "Tickets salvos",
+			"new": "Novo painel",
+			"untitled": "Painel sem nome",
+			"view": "Visão dos tickets",
+			"tabPanels": "Painéis",
+			"tabOpen": "Tickets abertos",
+			"preview": {
+				"label": "Prévia do painel",
+				"buttonHint": "O botão que os membros apertam",
+				"defaultButton": "Abrir um ticket",
+				"landsAs": "Um ticket aparece como <code>#{name}</code>."
+			},
+			"open": {
+				"title": "Tickets abertos",
+				"description": "Somente leitura aqui. Assumir e fechar acontece no Discord.",
+				"empty": "Nada aberto. Dia tranquilo.",
+				"number": "Nº",
+				"subject": "Assunto",
+				"openedBy": "Aberto por",
+				"claimedBy": "Assumido por",
+				"age": "Idade",
+				"status": "Estado"
+			},
+			"status": {
+				"open": "aberto",
+				"claimed": "assumido",
+				"closed": "fechado"
+			},
+			"panels": {
+				"title": "Painéis",
+				"description": "Cada painel é uma mensagem com um botão.",
+				"settings": "Configurações do painel",
+				"delete": "Excluir {name}",
+				"name": "Nome do painel",
+				"nameHint": "Só uso interno — os membros nunca veem.",
+				"namePlaceholder": "Suporte geral",
+				"category": "Categoria",
+				"categoryHint": "Os canais de ticket são criados dentro dela.",
+				"staff": "Cargos da equipe",
+				"staffHint": "Quem consegue ver e assumir tickets deste painel.",
+				"naming": "Nome dos canais",
+				"namingHint": "'{'number'}' e '{'user'}' são preenchidos.",
+				"maxOpen": "Máximo aberto por membro",
+				"button": "Texto do botão",
+				"messageTitle": "Mensagem do painel",
+				"messageDescription": "O que fica acima do botão no canal.",
+				"empty": "Nenhum painel ainda. Os membros não têm como abrir um ticket.",
+				"seedButton": "Abrir um ticket",
+				"seedMessage": "Precisa de ajuda? Aperte o botão abaixo."
+			},
+			"behaviour": {
+				"title": "Comportamento",
+				"description": "Vale para todo painel.",
+				"transcript": "Guardar uma transcrição quando um ticket fecha",
+				"transcriptHint": "Publicada no canal de log e enviada ao membro.",
+				"rating": "Pedir uma avaliação depois de fechar",
+				"autoClose": "Fechar sozinho depois de (horas de silêncio)",
+				"autoCloseHint": "Coloque 0 para nunca fechar sozinho."
+			}
+		},
 		"giveaways": {
 			"title": "Sorteios",
 			"description": "Sorteios com prazo e requisitos de entrada, e um novo sorteio quando o ganhador some.",

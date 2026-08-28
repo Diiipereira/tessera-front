@@ -722,6 +722,69 @@
 			"notImage": "This is not a direct image link — Discord will show nothing. It should end in .png, .jpg or .gif",
 			"expiring": "A Discord attachment link expires within a day and the image will vanish. Host it somewhere permanent instead."
 		},
+		"tickets": {
+			"title": "Tickets",
+			"description": "A button members press to open a private channel with your staff.",
+			"saved": "Tickets saved",
+			"new": "New panel",
+			"untitled": "Untitled panel",
+			"view": "Tickets view",
+			"tabPanels": "Panels",
+			"tabOpen": "Open tickets",
+			"preview": {
+				"label": "Panel preview",
+				"buttonHint": "The button members press",
+				"defaultButton": "Open a ticket",
+				"landsAs": "A ticket lands as <code>#{name}</code>."
+			},
+			"open": {
+				"title": "Open tickets",
+				"description": "Read-only here. Claiming and closing happen in Discord.",
+				"empty": "Nothing open. Quiet day.",
+				"number": "#",
+				"subject": "Subject",
+				"openedBy": "Opened by",
+				"claimedBy": "Claimed by",
+				"age": "Age",
+				"status": "Status"
+			},
+			"status": {
+				"open": "open",
+				"claimed": "claimed",
+				"closed": "closed"
+			},
+			"panels": {
+				"title": "Panels",
+				"description": "Each panel is one message with one button.",
+				"settings": "Panel settings",
+				"delete": "Delete {name}",
+				"name": "Panel name",
+				"nameHint": "Internal only — members never see it.",
+				"namePlaceholder": "General support",
+				"category": "Category",
+				"categoryHint": "New ticket channels are created inside it.",
+				"staff": "Staff roles",
+				"staffHint": "Who can see and claim tickets from this panel.",
+				"naming": "Channel naming",
+				"namingHint": "'{'number'}' and '{'user'}' are filled in.",
+				"maxOpen": "Max open per member",
+				"button": "Button label",
+				"messageTitle": "Panel message",
+				"messageDescription": "What sits above the button in the channel.",
+				"empty": "No panels yet. Members have no way to open a ticket.",
+				"seedButton": "Open a ticket",
+				"seedMessage": "Need a hand? Press the button below."
+			},
+			"behaviour": {
+				"title": "Behaviour",
+				"description": "Applies to every panel.",
+				"transcript": "Save a transcript when a ticket closes",
+				"transcriptHint": "Posted in the log channel and sent to the member.",
+				"rating": "Ask for a rating after closing",
+				"autoClose": "Auto-close after (hours of silence)",
+				"autoCloseHint": "Set to 0 to never close automatically."
+			}
+		},
 		"giveaways": {
 			"title": "Giveaways",
 			"description": "Timed draws with entry requirements, and a reroll when a winner goes quiet.",
