@@ -33,14 +33,15 @@ export function Combobox({
 	options,
 	value,
 	onValueChange,
-	placeholder = 'Select…',
-	searchPlaceholder = 'Search…',
+	placeholder,
+	searchPlaceholder,
 	emptyLabel,
 	disabled,
 	invalid,
 	className
 }: ComboboxProps) {
 	const t = useTranslations('pickers');
+	const shared = useTranslations('common');
 	const field = useFieldState();
 	const listId = useId();
 	const [open, setOpen] = useState(false);
@@ -136,7 +137,7 @@ export function Combobox({
 					)}
 				>
 					<span className={cn('min-w-0 flex-1 truncate', value === '' && 'text-text-subtle')}>
-						{selected?.label ?? (value === '' ? placeholder : value)}
+						{selected?.label ?? (value === '' ? (placeholder ?? shared('select')) : value)}
 					</span>
 					<ChevronsUpDown className="size-4 shrink-0 text-text-subtle" aria-hidden="true" />
 				</button>
@@ -146,8 +147,8 @@ export function Combobox({
 				value={query}
 				onValueChange={changeQuery}
 				onKeyDown={onKeyDown}
-				placeholder={searchPlaceholder}
-				aria-label={searchPlaceholder}
+				placeholder={searchPlaceholder ?? shared('search')}
+				aria-label={searchPlaceholder ?? shared('search')}
 			/>
 
 			{matches.length === 0 ? (

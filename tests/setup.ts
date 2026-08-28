@@ -15,6 +15,9 @@ class ResizeObserverStub implements ResizeObserver {
 globalThis.ResizeObserver = ResizeObserverStub;
 
 Element.prototype.scrollIntoView = () => undefined;
+Element.prototype.hasPointerCapture = () => false;
+Element.prototype.setPointerCapture = () => undefined;
+Element.prototype.releasePointerCapture = () => undefined;
 
 globalThis.matchMedia = (query: string): MediaQueryList => ({
 	matches: false,

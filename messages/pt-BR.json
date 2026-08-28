@@ -6,7 +6,8 @@
 		"discard": "Descartar",
 		"open": "Abrir",
 		"remove": "Remover",
-		"search": "Buscar…"
+		"search": "Buscar…",
+		"select": "Selecione…"
 	},
 	"locales": {
 		"en-US": "English (US)",

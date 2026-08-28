@@ -6,7 +6,8 @@
 		"discard": "Discard",
 		"open": "Open",
 		"remove": "Remove",
-		"search": "Search…"
+		"search": "Search…",
+		"select": "Select…"
 	},
 	"locales": {
 		"en-US": "English (US)",

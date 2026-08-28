@@ -2,6 +2,7 @@
 
 import * as SelectPrimitive from '@radix-ui/react-select';
 import { Check, ChevronsUpDown } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils/cn';
 import { useFieldState } from './field-context';
 
@@ -28,12 +29,13 @@ export function Select({
 	value,
 	defaultValue,
 	onValueChange,
-	placeholder = 'Selecione…',
+	placeholder,
 	disabled,
 	invalid,
 	name,
 	className
 }: SelectProps) {
+	const t = useTranslations('common');
 	const field = useFieldState();
 
 	const isInvalid = invalid ?? field?.invalid ?? false;
@@ -62,7 +64,7 @@ export function Select({
 				)}
 			>
 				<span className="min-w-0 flex-1 truncate">
-					<SelectPrimitive.Value placeholder={placeholder} />
+					<SelectPrimitive.Value placeholder={placeholder ?? t('select')} />
 				</span>
 				<SelectPrimitive.Icon asChild>
 					<ChevronsUpDown className="size-4 shrink-0 text-text-subtle" aria-hidden="true" />
