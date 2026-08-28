@@ -7,7 +7,7 @@ type Tree = { [key: string]: string | Tree };
 
 const DICTIONARIES: Record<string, Tree> = { 'en-US': enUS, 'pt-BR': ptBR };
 
-const PLACEHOLDER = /\{(\w+)/g;
+const PLACEHOLDER = /\{\s*(\w+)\s*[},]/g;
 
 const RICH_TAG = /<(\w+)>/g;
 

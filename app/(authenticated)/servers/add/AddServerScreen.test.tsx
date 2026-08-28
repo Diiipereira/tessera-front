@@ -51,7 +51,7 @@ describe('AddServerScreen', () => {
 	it('finishes the sentence even when Discord did not say which server', () => {
 		renderAdd(null, true);
 
-		const heading = screen.getByRole('heading').textContent ?? '';
+		const heading = screen.getByRole('heading').textContent;
 
 		expect(heading).toContain(BRAND.name);
 		expect(heading).not.toMatch(DANGLING);
@@ -60,7 +60,7 @@ describe('AddServerScreen', () => {
 	it('finishes the waiting sentence too, with no server to name', () => {
 		renderAdd(null, false);
 
-		const heading = screen.getByRole('heading').textContent ?? '';
+		const heading = screen.getByRole('heading').textContent;
 
 		expect(heading).toContain(BRAND.name);
 		expect(heading).not.toMatch(DANGLING);

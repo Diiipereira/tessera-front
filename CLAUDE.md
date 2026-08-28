@@ -945,6 +945,25 @@ only the component. Same split for `sidebar-context.ts` and `tooltip-provider.ts
 helpers went to `lib/` for the same reason — `commandNameError` to `lib/commands.ts`,
 `formatCountdown` to `lib/time.ts`.
 
+## Token de produto no dicionário precisa de escape ICU
+
+`{user}`, `{server}` e `{date}` são texto que o leitor **deve ver com as chaves**, mas o ICU
+lê chave como argumento. A mensagem tem que escapar: `"Bem-vindo ao '{'server'}'"`, nunca
+`"Bem-vindo ao {server}"`.
+
+O motivo de isso não aparecer no primeiro teste: quando a mensagem **não tem nenhum argumento
+de verdade**, o next-intl nem chama o ICU e devolve o texto cru — o token não escapado passa
+por acidente. Basta a mensagem ganhar **um** argumento real para o parser rodar, e aí falta o
+valor do token: erro `FORMATTING_ERROR` e a tela renderiza **o caminho da chave**
+(`modules.composer.unknown`), que é o pior desfecho possível. Medido, não deduzido.
+
+A forma escapada funciona nos dois casos, então ela é a única forma certa.
+
+Corolário no teste de paridade: `placeholdersOf` extrai argumento ICU, não qualquer `{`.
+A regex é `/\{\s*(\w+)\s*[},]/` — com `/\{(\w+)/` ela casava também o **corpo das ramificações
+do plural** (`{is not a variable` virava `is`), que por definição muda de idioma, e acusava
+divergência onde havia tradução correta.
+
 ## Things that look removable but are not
 
 The inline `PRE_PAINT` script in `app/layout.tsx` sets the `dark` class and the

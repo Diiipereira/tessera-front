@@ -1,23 +1,22 @@
 'use client';
 
 import { GripVertical, Plus, Trash2 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useId, useRef } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Field } from '@/components/ui/Field';
 import { Input } from '@/components/ui/Input';
 import { Switch } from '@/components/ui/Switch';
 import { Textarea } from '@/components/ui/Textarea';
-import { imageUrlHint } from '@/lib/embed-urls';
+import { BRAND } from '@/lib/brand';
+import { imageUrlIssue } from '@/lib/embed-urls';
 import { insertAtCursor, unknownVariables } from '@/lib/message-variables';
 import type { EmbedField, MessageDraft, MessageMode, MessageVariable } from '@/lib/types/modules';
 import { cn } from '@/lib/utils/cn';
 import { newId } from '@/lib/utils/id';
 import { VariableChips } from './VariableChips';
 
-const MODES: { id: MessageMode; label: string }[] = [
-	{ id: 'text', label: 'Plain text' },
-	{ id: 'embed', label: 'Embed' }
-];
+const MODES: MessageMode[] = ['text', 'embed'];
 
 const segment = 'h-7 rounded-sm px-3 text-caption transition-colors duration-120 ease-out';
 
@@ -31,6 +30,8 @@ type MessageComposerProps = {
 };
 
 export function MessageComposer({ value, onChange, variables }: MessageComposerProps) {
+	const t = useTranslations('modules.composer');
+	const urls = useTranslations('modules.url');
 	const uid = useId();
 	const textRef = useRef<HTMLTextAreaElement>(null);
 	const descriptionRef = useRef<HTMLTextAreaElement>(null);
@@ -73,6 +74,12 @@ export function MessageComposer({ value, onChange, variables }: MessageComposerP
 		setEmbed({ fields: value.embed.fields.filter((field) => field.id !== id) });
 	}
 
+	function hintFor(url: string, fallback: 'imageHint' | 'thumbnailHint') {
+		const issue = imageUrlIssue(url);
+
+		return issue === null ? t(fallback) : urls(issue);
+	}
+
 	const unknown = unknownVariables(activeText, variables);
 
 	return (
@@ -80,25 +87,25 @@ export function MessageComposer({ value, onChange, variables }: MessageComposerP
 			<div className="flex flex-wrap items-center gap-3">
 				<div
 					role="group"
-					aria-label="Message format"
+					aria-label={t('format')}
 					className="flex items-center gap-0.5 rounded-md border border-border bg-surface-sunken p-0.5"
 				>
 					{MODES.map((mode) => (
 						<button
-							key={mode.id}
+							key={mode}
 							type="button"
-							aria-pressed={value.mode === mode.id}
+							aria-pressed={value.mode === mode}
 							className={cn(
 								segment,
-								value.mode === mode.id
+								value.mode === mode
 									? 'bg-primary-subtle text-primary'
 									: 'text-text-muted hover:text-text'
 							)}
 							onClick={() => {
-								onChange({ ...value, mode: mode.id });
+								onChange({ ...value, mode });
 							}}
 						>
-							{mode.label}
+							{t(mode)}
 						</button>
 					))}
 				</div>
@@ -116,32 +123,32 @@ export function MessageComposer({ value, onChange, variables }: MessageComposerP
 					}}
 					maxLength={TEXT_LIMIT}
 					showCount
-					aria-label="Message text"
-					placeholder="Say something to the new member…"
+					aria-label={t('messageLabel')}
+					placeholder={t('messagePlaceholder')}
 				/>
 			) : (
 				<div className="flex flex-col gap-5">
-					<Field label="Author" hint="A small line above the title.">
+					<Field label={t('author')} hint={t('authorHint')}>
 						<Input
 							value={value.embed.authorName}
 							onChange={(event) => {
 								setEmbed({ authorName: event.target.value });
 							}}
-							placeholder="Tessera"
+							placeholder={BRAND.name}
 						/>
 					</Field>
 
-					<Field label="Title">
+					<Field label={t('title')}>
 						<Input
 							value={value.embed.title}
 							onChange={(event) => {
 								setEmbed({ title: event.target.value });
 							}}
-							placeholder="Welcome to {server}"
+							placeholder={t('titlePlaceholder')}
 						/>
 					</Field>
 
-					<Field label="Description">
+					<Field label={t('description')}>
 						<Textarea
 							ref={descriptionRef}
 							value={value.embed.description}
@@ -150,11 +157,11 @@ export function MessageComposer({ value, onChange, variables }: MessageComposerP
 							}}
 							maxLength={DESCRIPTION_LIMIT}
 							showCount
-							placeholder="Glad you made it, {user}."
+							placeholder={t('descriptionPlaceholder')}
 						/>
 					</Field>
 
-					<Field label="Accent color" hint="The bar down the left of the embed.">
+					<Field label={t('color')} hint={t('colorHint')}>
 						<div className="flex items-center gap-2">
 							<input
 								type="color"
@@ -162,7 +169,7 @@ export function MessageComposer({ value, onChange, variables }: MessageComposerP
 								onChange={(event) => {
 									setEmbed({ color: event.target.value });
 								}}
-								aria-label="Accent color"
+								aria-label={t('color')}
 								className="size-9 shrink-0 cursor-pointer overflow-hidden rounded-md border border-border bg-surface p-1 transition-colors duration-120 ease-out hover:border-border-strong"
 							/>
 							<Input
@@ -170,7 +177,7 @@ export function MessageComposer({ value, onChange, variables }: MessageComposerP
 								onChange={(event) => {
 									setEmbed({ color: event.target.value });
 								}}
-								aria-label="Accent color hex"
+								aria-label={t('colorHex')}
 								className="max-w-32 font-mono"
 							/>
 						</div>
@@ -178,18 +185,18 @@ export function MessageComposer({ value, onChange, variables }: MessageComposerP
 
 					<div className="flex flex-col gap-3">
 						<div className="flex items-center gap-3">
-							<span className="font-mono text-overline text-text-muted uppercase">Fields</span>
+							<span className="font-mono text-overline text-text-muted uppercase">
+								{t('fields')}
+							</span>
 							<div className="h-px flex-1 bg-border" />
 							<Button variant="outline" size="sm" onClick={addField}>
 								<Plus aria-hidden="true" />
-								Add field
+								{t('addField')}
 							</Button>
 						</div>
 
 						{value.embed.fields.length === 0 ? (
-							<p className="text-body-sm text-text-muted">
-								No fields. An embed works fine without them.
-							</p>
+							<p className="text-body-sm text-text-muted">{t('noFields')}</p>
 						) : (
 							value.embed.fields.map((field) => (
 								<div
@@ -206,16 +213,16 @@ export function MessageComposer({ value, onChange, variables }: MessageComposerP
 											onChange={(event) => {
 												updateField(field.id, { name: event.target.value });
 											}}
-											aria-label="Field name"
-											placeholder="Field name"
+											aria-label={t('fieldName')}
+											placeholder={t('fieldName')}
 										/>
 										<Textarea
 											value={field.value}
 											onChange={(event) => {
 												updateField(field.id, { value: event.target.value });
 											}}
-											aria-label="Field value"
-											placeholder="Field value"
+											aria-label={t('fieldValue')}
+											placeholder={t('fieldValue')}
 											className="min-h-16"
 										/>
 										<Switch
@@ -223,14 +230,16 @@ export function MessageComposer({ value, onChange, variables }: MessageComposerP
 											onCheckedChange={(next) => {
 												updateField(field.id, { inline: next });
 											}}
-											label="Inline"
+											label={t('inline')}
 										/>
 									</div>
 									<Button
 										variant="ghost-danger"
 										size="sm"
 										iconOnly
-										aria-label={`Remove field ${field.name || 'without a name'}`}
+										aria-label={t('removeField', {
+											name: field.name === '' ? t('unnamedField') : field.name
+										})}
 										onClick={() => {
 											removeField(field.id);
 										}}
@@ -242,39 +251,33 @@ export function MessageComposer({ value, onChange, variables }: MessageComposerP
 						)}
 					</div>
 
-					<Field
-						label="Image"
-						hint={imageUrlHint(value.embed.imageUrl) ?? 'A wide picture under the text.'}
-					>
+					<Field label={t('image')} hint={hintFor(value.embed.imageUrl, 'imageHint')}>
 						<Input
 							value={value.embed.imageUrl}
 							onChange={(event) => {
 								setEmbed({ imageUrl: event.target.value });
 							}}
-							placeholder="https://cdn.discordapp.com/…/banner.png"
+							placeholder={t('imagePlaceholder')}
 						/>
 					</Field>
 
-					<Field
-						label="Thumbnail"
-						hint={imageUrlHint(value.embed.thumbnailUrl) ?? 'A small picture in the top right.'}
-					>
+					<Field label={t('thumbnail')} hint={hintFor(value.embed.thumbnailUrl, 'thumbnailHint')}>
 						<Input
 							value={value.embed.thumbnailUrl}
 							onChange={(event) => {
 								setEmbed({ thumbnailUrl: event.target.value });
 							}}
-							placeholder="https://cdn.discordapp.com/…/icon.png"
+							placeholder={t('thumbnailPlaceholder')}
 						/>
 					</Field>
 
-					<Field label="Footer">
+					<Field label={t('footer')}>
 						<Input
 							value={value.embed.footerText}
 							onChange={(event) => {
 								setEmbed({ footerText: event.target.value });
 							}}
-							placeholder="Joined {date}"
+							placeholder={t('footerPlaceholder')}
 						/>
 					</Field>
 
@@ -283,16 +286,15 @@ export function MessageComposer({ value, onChange, variables }: MessageComposerP
 						onCheckedChange={(next) => {
 							setEmbed({ timestamp: next });
 						}}
-						label="Show a timestamp"
-						description="Discord renders it next to the footer."
+						label={t('timestamp')}
+						description={t('timestampHint')}
 					/>
 				</div>
 			)}
 
 			{unknown.length > 0 ? (
 				<p className="text-caption font-normal text-warning-fg">
-					{unknown.join(', ')} {unknown.length === 1 ? 'is not a variable' : 'are not variables'} —{' '}
-					{unknown.length === 1 ? 'it' : 'they'} will post as written.
+					{t('unknown', { list: unknown.join(', '), count: unknown.length })}
 				</p>
 			) : null}
 		</div>

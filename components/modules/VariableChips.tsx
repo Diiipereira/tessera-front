@@ -1,6 +1,7 @@
 'use client';
 
 import { CircleHelp } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { Popover } from '@/components/ui/Popover';
 import type { MessageVariable } from '@/lib/types/modules';
 
@@ -10,9 +11,11 @@ type VariableChipsProps = {
 };
 
 export function VariableChips({ variables, onInsert }: VariableChipsProps) {
+	const t = useTranslations('modules.variables');
+
 	return (
 		<div className="flex flex-wrap items-center gap-1.5">
-			<span className="mr-1 font-mono text-overline text-text-muted uppercase">Insert</span>
+			<span className="mr-1 font-mono text-overline text-text-muted uppercase">{t('insert')}</span>
 
 			{variables.map((variable) => (
 				<button
@@ -35,15 +38,13 @@ export function VariableChips({ variables, onInsert }: VariableChipsProps) {
 				trigger={
 					<>
 						<CircleHelp className="size-4" aria-hidden="true" />
-						<span className="sr-only">What do these mean?</span>
+						<span className="sr-only">{t('help')}</span>
 					</>
 				}
 			>
 				<div className="border-b border-border px-3 py-2">
-					<p className="text-body-sm font-medium">Message variables</p>
-					<p className="text-caption font-normal text-text-muted">
-						Replaced when the message is posted.
-					</p>
+					<p className="text-body-sm font-medium">{t('title')}</p>
+					<p className="text-caption font-normal text-text-muted">{t('body')}</p>
 				</div>
 				<ul className="max-h-70 overflow-y-auto p-1">
 					{variables.map((variable) => (

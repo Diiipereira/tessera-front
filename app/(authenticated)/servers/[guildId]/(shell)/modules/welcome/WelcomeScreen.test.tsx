@@ -1,11 +1,21 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { createTranslator } from 'next-intl';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { TooltipProvider } from '@/components/ui/tooltip-provider';
 import { emptyEmbedDraft, welcomeVariables } from '@/lib/modules/welcome';
 import type { Channel, Role } from '@/lib/types/discord';
 import type { WelcomeConfig } from '@/lib/types/modules';
+import enUS from '@/messages/en-US.json';
+import { Translated } from '@/tests/i18n';
 import { WelcomeScreen } from './WelcomeScreen';
+
+const copy = enUS.modules.welcome;
+
+const changed = (count: number) =>
+	createTranslator({ locale: 'en-US', messages: enUS, namespace: 'modules.save' })('modified', {
+		count
+	});
 
 const patchModule = vi.hoisted(() => vi.fn());
 
@@ -71,13 +81,14 @@ function renderScreen(overrides: Partial<WelcomeConfig> = {}) {
 				roles={roles}
 				variables={variables}
 			/>
-		</TooltipProvider>
+		</TooltipProvider>,
+		{ wrapper: Translated }
 	);
 }
 
-const previewPanel = () => screen.getByRole('region', { name: 'Preview' });
+const previewPanel = () => screen.getByRole('region', { name: enUS.modules.preview.title });
 
-const saveBar = () => screen.queryByRole('region', { name: 'Unsaved changes' });
+const saveBar = () => screen.queryByRole('region', { name: enUS.modules.save.region });
 
 const saveButton = () => screen.getByRole('button', { name: /Save/ });
 
@@ -89,8 +100,8 @@ describe('WelcomeScreen', () => {
 	it('renders the module header with its master switch', () => {
 		renderScreen();
 
-		expect(screen.getByRole('heading', { name: 'Welcome', level: 1 })).toBeInTheDocument();
-		expect(screen.getByLabelText('Enabled')).toBeChecked();
+		expect(screen.getByRole('heading', { name: copy.title, level: 1 })).toBeInTheDocument();
+		expect(screen.getByLabelText(enUS.modules.enabled)).toBeChecked();
 	});
 
 	it('starts with a clean form, so no save bar', () => {
@@ -103,10 +114,10 @@ describe('WelcomeScreen', () => {
 		const user = userEvent.setup();
 		renderScreen();
 
-		await user.click(screen.getByLabelText('Enabled'));
+		await user.click(screen.getByLabelText(enUS.modules.enabled));
 
 		expect(saveBar()).toBeInTheDocument();
-		expect(screen.getByText('1 setting modified')).toBeInTheDocument();
+		expect(screen.getByText(changed(1))).toBeInTheDocument();
 	});
 
 	it('substitutes only the variables the bot actually replaces', () => {
@@ -133,7 +144,7 @@ describe('WelcomeScreen', () => {
 
 		renderScreen();
 
-		await user.click(screen.getByLabelText('Enabled'));
+		await user.click(screen.getByLabelText(enUS.modules.enabled));
 		await user.click(saveButton());
 
 		await waitFor(() => {
@@ -175,13 +186,13 @@ describe('WelcomeScreen', () => {
 
 		renderScreen();
 
-		await user.click(screen.getByLabelText('Enabled'));
+		await user.click(screen.getByLabelText(enUS.modules.enabled));
 		await user.click(saveButton());
 		await waitFor(() => {
-			expect(success).toHaveBeenCalled();
+			expect(success).toHaveBeenCalledWith(copy.saved);
 		});
 
-		await user.click(screen.getByLabelText('Disabled'));
+		await user.click(screen.getByLabelText(enUS.modules.disabled));
 		await user.click(saveButton());
 
 		await waitFor(() => {
@@ -199,11 +210,11 @@ describe('WelcomeScreen', () => {
 
 		renderScreen();
 
-		await user.click(screen.getByLabelText('Enabled'));
+		await user.click(screen.getByLabelText(enUS.modules.enabled));
 		await user.click(saveButton());
 
 		await waitFor(() => {
-			expect(failure).toHaveBeenCalledWith('Could not save', 'message: Too big');
+			expect(failure).toHaveBeenCalledWith(copy.saveFailed, 'message: Too big');
 		});
 		expect(success).not.toHaveBeenCalled();
 	});
@@ -222,7 +233,7 @@ describe('WelcomeScreen', () => {
 
 		renderScreen();
 
-		await user.click(screen.getByLabelText('Enabled'));
+		await user.click(screen.getByLabelText(enUS.modules.enabled));
 		await user.click(saveButton());
 
 		await waitFor(() => {

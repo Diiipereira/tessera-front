@@ -521,5 +521,117 @@
 				"action": "Ligar"
 			}
 		}
+	},
+	"modules": {
+		"docs": "Documentação",
+		"enabled": "Ligado",
+		"disabled": "Desligado",
+		"save": {
+			"region": "Alterações não salvas",
+			"conflictTitle": "Isto foi alterado no Discord",
+			"conflictBody": "Alguém editou estas mesmas configurações por comando enquanto este formulário estava aberto.",
+			"reload": "Recarregar",
+			"keepMine": "Manter as minhas",
+			"unsaved": "Você tem alterações não salvas",
+			"modified": "{count, plural, =1 {1 configuração alterada} other {# configurações alteradas}}",
+			"discard": "Descartar",
+			"saving": "Salvando…",
+			"submit": "Salvar alterações"
+		},
+		"preview": {
+			"title": "Prévia",
+			"bot": "Bot",
+			"timestampSample": "Hoje às 14:32",
+			"nothing": "Nada para publicar ainda.",
+			"embedEmpty": "O embed está vazio — adicione um título ou uma descrição.",
+			"imageUnavailable": "Imagem indisponível"
+		},
+		"variables": {
+			"insert": "Inserir",
+			"help": "O que significam?",
+			"title": "Variáveis da mensagem",
+			"body": "Substituídas quando a mensagem é publicada."
+		},
+		"composer": {
+			"format": "Formato da mensagem",
+			"text": "Texto simples",
+			"embed": "Embed",
+			"messageLabel": "Texto da mensagem",
+			"messagePlaceholder": "Diga algo para quem acabou de chegar…",
+			"author": "Autor",
+			"authorHint": "Uma linha pequena acima do título.",
+			"title": "Título",
+			"titlePlaceholder": "Bem-vindo ao '{'server'}'",
+			"description": "Descrição",
+			"descriptionPlaceholder": "Que bom que você chegou, '{'user'}'.",
+			"color": "Cor de destaque",
+			"colorHint": "A barra à esquerda do embed.",
+			"colorHex": "Cor de destaque em hexadecimal",
+			"fields": "Campos",
+			"addField": "Adicionar campo",
+			"noFields": "Nenhum campo. Um embed funciona bem sem eles.",
+			"fieldName": "Nome do campo",
+			"fieldValue": "Valor do campo",
+			"inline": "Na mesma linha",
+			"removeField": "Remover o campo {name}",
+			"unnamedField": "sem nome",
+			"image": "Imagem",
+			"imageHint": "Uma figura larga abaixo do texto.",
+			"imagePlaceholder": "https://exemplo.com/banner.png",
+			"thumbnail": "Miniatura",
+			"thumbnailHint": "Uma figura pequena no canto superior direito.",
+			"thumbnailPlaceholder": "https://exemplo.com/icone.png",
+			"footer": "Rodapé",
+			"footerPlaceholder": "Entrou em '{'date'}'",
+			"timestamp": "Mostrar o horário",
+			"timestampHint": "O Discord exibe ao lado do rodapé.",
+			"unknown": "{list} {count, plural, =1 {não é uma variável — vai} other {não são variáveis — vão}} aparecer exatamente como está escrito."
+		},
+		"url": {
+			"notHttp": "Use um link que comece com http:// ou https://",
+			"notImage": "Este não é um link direto de imagem — o Discord não vai mostrar nada. Ele precisa terminar em .png, .jpg ou .gif",
+			"expiring": "Link de anexo do Discord expira em menos de um dia e a imagem some. Hospede a figura em algum lugar permanente."
+		},
+		"welcome": {
+			"title": "Boas-vindas",
+			"description": "Receba quem acabou de entrar e dê um cargo na hora.",
+			"saved": "Configurações de boas-vindas salvas",
+			"saveFailed": "Não foi possível salvar",
+			"unknownFailure": "Falha desconhecida",
+			"previewNote": "As variáveis aparecem com dados de exemplo. A mensagem real usa quem entrou.",
+			"message": {
+				"title": "Mensagem de boas-vindas",
+				"description": "Publicada em um canal assim que alguém entra.",
+				"channel": "Canal",
+				"channelHint": "Obrigatório antes de o módulo poder ser ligado."
+			},
+			"mention": {
+				"title": "Menção",
+				"description": "Como o '{'user'}' aparece quando a mensagem é publicada.",
+				"label": "Modo de menção",
+				"none": "Não mencionar",
+				"noneHint": "'{'user'}' mostra o nome de exibição.",
+				"inline": "Mencionar na mensagem",
+				"inlineHint": "'{'user'}' vira uma menção de verdade.",
+				"ghost": "Menção fantasma",
+				"ghostHint": "Uma menção separada é publicada e apagada em seguida."
+			},
+			"autorole": {
+				"title": "Cargo automático",
+				"description": "Dado automaticamente na entrada. Até {max, number} cargos.",
+				"label": "Cargos a atribuir"
+			},
+			"cleanup": {
+				"title": "Limpeza",
+				"description": "Evita que o canal fique lotado de mensagens de entrada.",
+				"label": "Apagar a mensagem",
+				"keep": "Manter",
+				"seconds30": "Depois de 30 segundos",
+				"minutes1": "Depois de 1 minuto",
+				"minutes5": "Depois de 5 minutos",
+				"hours1": "Depois de 1 hora",
+				"days1": "Depois de 1 dia"
+			}
+		}
 	}
 }

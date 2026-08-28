@@ -1,10 +1,12 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { BRAND } from '@/lib/brand';
 import { DISCORD, EMBED_SWATCHES } from '@/lib/discord-colors';
 import { renderVariables } from '@/lib/message-variables';
 import type { MessageDraft, MessageVariable } from '@/lib/types/modules';
+import { cn } from '@/lib/utils/cn';
 
 type DiscordPreviewProps = {
 	message: MessageDraft;
@@ -12,14 +14,21 @@ type DiscordPreviewProps = {
 	timestampLabel?: string;
 };
 
-function PreviewImage({ src, className }: { src: string; className: string }) {
+function PreviewImage({ src, frame, fit }: { src: string; frame: string; fit: string }) {
 	const [failed, setFailed] = useState(false);
+	const t = useTranslations('modules.preview');
 
 	if (failed) {
 		return (
-			<p className="mt-2 text-[12px]" style={{ color: DISCORD.muted }}>
-				Discord will not be able to show this image.
-			</p>
+			<span
+				className={cn(
+					frame,
+					'grid place-items-center overflow-hidden px-2 text-center text-[11px]'
+				)}
+				style={{ backgroundColor: DISCORD.surface, color: DISCORD.muted }}
+			>
+				{t('imageUnavailable')}
+			</span>
 		);
 	}
 
@@ -27,7 +36,7 @@ function PreviewImage({ src, className }: { src: string; className: string }) {
 		<img
 			src={src}
 			alt=""
-			className={className}
+			className={cn(frame, fit)}
 			onError={() => {
 				setFailed(true);
 			}}
@@ -47,13 +56,11 @@ function Line({ text }: { text: string }) {
 	);
 }
 
-export function DiscordPreview({
-	message,
-	variables,
-	timestampLabel = 'Today at 14:32'
-}: DiscordPreviewProps) {
+export function DiscordPreview({ message, variables, timestampLabel }: DiscordPreviewProps) {
+	const t = useTranslations('modules.preview');
 	const resolve = (value: string) => renderVariables(value, variables);
 	const embed = message.embed;
+	const stamp = timestampLabel ?? t('timestampSample');
 
 	const embedIsEmpty =
 		embed.title === '' &&
@@ -84,24 +91,24 @@ export function DiscordPreview({
 							className="rounded-[3px] px-1 text-[10px] font-semibold text-white uppercase"
 							style={{ backgroundColor: EMBED_SWATCHES[0] }}
 						>
-							Bot
+							{t('bot')}
 						</span>
 						<span className="text-[12px]" style={{ color: DISCORD.muted }}>
-							{timestampLabel}
+							{stamp}
 						</span>
 					</div>
 
 					{message.mode === 'text' ? (
 						<div className="mt-0.5 wrap-break-word whitespace-pre-wrap">
 							{message.text === '' ? (
-								<span style={{ color: DISCORD.muted }}>Nothing to post yet.</span>
+								<span style={{ color: DISCORD.muted }}>{t('nothing')}</span>
 							) : (
 								<Line text={resolve(message.text)} />
 							)}
 						</div>
 					) : embedIsEmpty ? (
 						<div className="mt-1 text-[14px]" style={{ color: DISCORD.muted }}>
-							The embed is empty — add a title or a description.
+							{t('embedEmpty')}
 						</div>
 					) : (
 						<div
@@ -157,7 +164,8 @@ export function DiscordPreview({
 										{embed.thumbnailUrl === '' ? null : (
 											<PreviewImage
 												src={embed.thumbnailUrl}
-												className="size-20 shrink-0 rounded-xs object-cover"
+												frame="size-20 shrink-0 rounded-xs"
+												fit="object-cover"
 											/>
 										)}
 									</div>
@@ -165,7 +173,8 @@ export function DiscordPreview({
 									{embed.imageUrl === '' ? null : (
 										<PreviewImage
 											src={embed.imageUrl}
-											className="mt-3 max-h-64 w-full rounded-xs object-cover"
+											frame="mt-3 h-40 w-full rounded-xs"
+											fit="object-cover"
 										/>
 									)}
 
@@ -173,7 +182,7 @@ export function DiscordPreview({
 										<p className="mt-2 text-[12px]" style={{ color: DISCORD.muted }}>
 											{resolve(embed.footerText)}
 											{embed.footerText !== '' && embed.timestamp ? ' • ' : ''}
-											{embed.timestamp ? timestampLabel : ''}
+											{embed.timestamp ? stamp : ''}
 										</p>
 									)}
 								</div>

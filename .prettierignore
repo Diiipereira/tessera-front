@@ -2,5 +2,6 @@
 node_modules
 public
 yarn.lock
+.yarnrc.yml
 docs-markdown
 next-env.d.ts

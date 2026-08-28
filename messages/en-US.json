@@ -521,5 +521,117 @@
 				"action": "Turn on"
 			}
 		}
+	},
+	"modules": {
+		"docs": "Docs",
+		"enabled": "Enabled",
+		"disabled": "Disabled",
+		"save": {
+			"region": "Unsaved changes",
+			"conflictTitle": "This was changed in Discord",
+			"conflictBody": "Someone edited the same settings with a slash command while this form was open.",
+			"reload": "Reload",
+			"keepMine": "Keep mine",
+			"unsaved": "You have unsaved changes",
+			"modified": "{count, plural, =1 {1 setting modified} other {# settings modified}}",
+			"discard": "Discard",
+			"saving": "Saving…",
+			"submit": "Save changes"
+		},
+		"preview": {
+			"title": "Preview",
+			"bot": "Bot",
+			"timestampSample": "Today at 14:32",
+			"nothing": "Nothing to post yet.",
+			"embedEmpty": "The embed is empty — add a title or a description.",
+			"imageUnavailable": "Image unavailable"
+		},
+		"variables": {
+			"insert": "Insert",
+			"help": "What do these mean?",
+			"title": "Message variables",
+			"body": "Replaced when the message is posted."
+		},
+		"composer": {
+			"format": "Message format",
+			"text": "Plain text",
+			"embed": "Embed",
+			"messageLabel": "Message text",
+			"messagePlaceholder": "Say something to the new member…",
+			"author": "Author",
+			"authorHint": "A small line above the title.",
+			"title": "Title",
+			"titlePlaceholder": "Welcome to '{'server'}'",
+			"description": "Description",
+			"descriptionPlaceholder": "Glad you made it, '{'user'}'.",
+			"color": "Accent color",
+			"colorHint": "The bar down the left of the embed.",
+			"colorHex": "Accent color hex",
+			"fields": "Fields",
+			"addField": "Add field",
+			"noFields": "No fields. An embed works fine without them.",
+			"fieldName": "Field name",
+			"fieldValue": "Field value",
+			"inline": "Inline",
+			"removeField": "Remove field {name}",
+			"unnamedField": "without a name",
+			"image": "Image",
+			"imageHint": "A wide picture under the text.",
+			"imagePlaceholder": "https://example.com/banner.png",
+			"thumbnail": "Thumbnail",
+			"thumbnailHint": "A small picture in the top right.",
+			"thumbnailPlaceholder": "https://example.com/icon.png",
+			"footer": "Footer",
+			"footerPlaceholder": "Joined '{'date'}'",
+			"timestamp": "Show a timestamp",
+			"timestampHint": "Discord renders it next to the footer.",
+			"unknown": "{list} {count, plural, =1 {is not a variable — it} other {are not variables — they}} will post as written."
+		},
+		"url": {
+			"notHttp": "Use a link that starts with http:// or https://",
+			"notImage": "This is not a direct image link — Discord will show nothing. It should end in .png, .jpg or .gif",
+			"expiring": "A Discord attachment link expires within a day and the image will vanish. Host it somewhere permanent instead."
+		},
+		"welcome": {
+			"title": "Welcome",
+			"description": "Greet new members and give them a role the moment they join.",
+			"saved": "Welcome settings saved",
+			"saveFailed": "Could not save",
+			"unknownFailure": "Unknown failure",
+			"previewNote": "Variables are shown with sample data. The real post uses the member who joined.",
+			"message": {
+				"title": "Welcome message",
+				"description": "Posted in a channel the moment someone joins.",
+				"channel": "Channel",
+				"channelHint": "Required before the module can be switched on."
+			},
+			"mention": {
+				"title": "Mention",
+				"description": "How '{'user'}' is rendered when the greeting is posted.",
+				"label": "Ping mode",
+				"none": "Do not mention",
+				"noneHint": "'{'user'}' shows the display name.",
+				"inline": "Mention in the message",
+				"inlineHint": "'{'user'}' becomes a real mention.",
+				"ghost": "Ghost ping",
+				"ghostHint": "A separate mention is posted and deleted at once."
+			},
+			"autorole": {
+				"title": "Autorole",
+				"description": "Given automatically on join. Up to {max, number} roles.",
+				"label": "Roles to assign"
+			},
+			"cleanup": {
+				"title": "Cleanup",
+				"description": "Keep the channel from filling up with joins.",
+				"label": "Delete the greeting",
+				"keep": "Keep it",
+				"seconds30": "After 30 seconds",
+				"minutes1": "After 1 minute",
+				"minutes5": "After 5 minutes",
+				"hours1": "After 1 hour",
+				"days1": "After 1 day"
+			}
+		}
 	}
 }

@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { imageUrlHint, isHttpUrl, looksLikeImage } from './embed-urls';
+import { expiresSoon, imageUrlIssue, isHttpUrl, looksLikeImage } from './embed-urls';
+
+const SIGNED =
+	'https://cdn.discordapp.com/attachments/1542349971838472263/1542350805926027274/Joker.jpg?ex=6a90e99f&is=6a8f981f&hm=7b8ea438ead871c7c6cc48dbbeeb8f17f1dc5c5c5f6df58c6205e6474bf987ad&';
 
 describe('isHttpUrl', () => {
 	it('accepts http and https', () => {
@@ -31,21 +34,41 @@ describe('looksLikeImage', () => {
 	});
 });
 
-describe('imageUrlHint', () => {
+describe('expiresSoon', () => {
+	it('recognises a signed Discord attachment link', () => {
+		expect(expiresSoon(SIGNED)).toBe(true);
+	});
+
+	it('leaves a plain link alone', () => {
+		expect(expiresSoon('https://example.com/a.png')).toBe(false);
+		expect(expiresSoon('https://example.com/a.png?v=2')).toBe(false);
+	});
+
+	it('needs the whole signature, not one stray parameter', () => {
+		expect(expiresSoon('https://example.com/a.png?ex=1')).toBe(false);
+		expect(expiresSoon('https://example.com/a.png?ex=1&is=2')).toBe(false);
+	});
+});
+
+describe('imageUrlIssue', () => {
 	it('stays quiet while the box is empty', () => {
-		expect(imageUrlHint('')).toBeNull();
-		expect(imageUrlHint('   ')).toBeNull();
+		expect(imageUrlIssue('')).toBeNull();
+		expect(imageUrlIssue('   ')).toBeNull();
 	});
 
 	it('stays quiet on a direct image link', () => {
-		expect(imageUrlHint('https://example.com/a.png')).toBeNull();
+		expect(imageUrlIssue('https://example.com/a.png')).toBeNull();
 	});
 
 	it('asks for a scheme when there is none', () => {
-		expect(imageUrlHint('example.com/a.png')).toContain('http://');
+		expect(imageUrlIssue('example.com/a.png')).toBe('notHttp');
 	});
 
 	it('warns that Discord will render nothing for a page link', () => {
-		expect(imageUrlHint('https://imgur.com/gallery/abc')).toContain('direct image link');
+		expect(imageUrlIssue('https://imgur.com/gallery/abc')).toBe('notImage');
+	});
+
+	it('warns that a Discord attachment link will die on its own', () => {
+		expect(imageUrlIssue(SIGNED)).toBe('expiring');
 	});
 });

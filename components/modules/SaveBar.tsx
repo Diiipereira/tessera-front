@@ -1,6 +1,7 @@
 'use client';
 
 import { Info, TriangleAlert, Undo2 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/Button';
 import { cn } from '@/lib/utils/cn';
 import type { ConflictChoice, SaveState } from '@/lib/hooks/useConfigDraft';
@@ -24,6 +25,7 @@ export function SaveBar({
 	onResolveConflict,
 	className
 }: SaveBarProps) {
+	const t = useTranslations('modules.save');
 	const conflict = state === 'conflict';
 	if (!dirty && !conflict) return null;
 
@@ -32,7 +34,7 @@ export function SaveBar({
 	return (
 		<div
 			role="region"
-			aria-label="Unsaved changes"
+			aria-label={t('region')}
 			className={cn(
 				'sticky bottom-0 z-30 -mx-6 mt-8 -mb-6 animate-rise border-t border-border-strong bg-surface-raised shadow-3 sm:-mx-8 sm:-mb-8',
 				className
@@ -43,11 +45,9 @@ export function SaveBar({
 					<>
 						<Info className="size-5 shrink-0 text-info" aria-hidden="true" />
 						<div className="min-w-0 flex-1">
-							<p className="truncate text-body font-medium text-info-fg">
-								This was changed in Discord
-							</p>
+							<p className="truncate text-body font-medium text-info-fg">{t('conflictTitle')}</p>
 							<p className="truncate text-caption font-normal text-text-muted">
-								Someone edited the same settings with a slash command while this form was open.
+								{t('conflictBody')}
 							</p>
 						</div>
 						<Button
@@ -56,31 +56,31 @@ export function SaveBar({
 								onResolveConflict('reload');
 							}}
 						>
-							Reload
+							{t('reload')}
 						</Button>
 						<Button
 							onClick={() => {
 								onResolveConflict('keep-mine');
 							}}
 						>
-							Keep mine
+							{t('keepMine')}
 						</Button>
 					</>
 				) : (
 					<>
 						<TriangleAlert className="size-5 shrink-0 text-warning" aria-hidden="true" />
 						<div className="min-w-0 flex-1">
-							<p className="truncate text-body font-medium">You have unsaved changes</p>
+							<p className="truncate text-body font-medium">{t('unsaved')}</p>
 							<p className="tabular truncate text-caption font-normal text-text-muted">
-								{changedCount} {changedCount === 1 ? 'setting' : 'settings'} modified
+								{t('modified', { count: changedCount })}
 							</p>
 						</div>
 						<Button variant="ghost" disabled={saving} onClick={onDiscard}>
 							<Undo2 aria-hidden="true" />
-							Discard
+							{t('discard')}
 						</Button>
 						<Button loading={saving} onClick={onSave}>
-							{saving ? 'Saving…' : 'Save changes'}
+							{saving ? t('saving') : t('submit')}
 						</Button>
 					</>
 				)}

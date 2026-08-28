@@ -1,6 +1,7 @@
 'use client';
 
 import { ArrowUpRight, type LucideIcon } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { Switch } from '@/components/ui/Switch';
@@ -33,6 +34,8 @@ export function ModulePage({
 	saveBar,
 	children
 }: ModulePageProps) {
+	const t = useTranslations('modules');
+
 	return (
 		<div className="w-full p-6 sm:p-8">
 			<header className="flex flex-wrap items-start gap-4">
@@ -51,13 +54,13 @@ export function ModulePage({
 						href={docsHref(`modules/${moduleId}`)}
 						className="relative flex items-center gap-1 text-body-sm text-link no-underline before:absolute before:inset-x-0 before:-inset-y-0.5 before:content-[''] hover:text-link-hover"
 					>
-						Docs
+						{t('docs')}
 						<ArrowUpRight className="size-3.5" aria-hidden="true" />
 					</Link>
 					<Switch
 						checked={enabled}
 						onCheckedChange={onEnabledChange}
-						label={enabled ? 'Enabled' : 'Disabled'}
+						label={enabled ? t('enabled') : t('disabled')}
 					/>
 				</div>
 			</header>

@@ -2,6 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { GuildSettings } from '@/lib/types/management';
+import { Translated } from '@/tests/i18n';
 import { SettingsScreen } from './SettingsScreen';
 
 const push = vi.fn();
@@ -41,7 +42,9 @@ const SETTINGS: GuildSettings = {
 const UNBUILT = ['Export', 'Import', 'Reset'];
 
 function setup() {
-	render(<SettingsScreen guildId={GUILD_ID} settings={SETTINGS} guildName={GUILD_NAME} />);
+	render(<SettingsScreen guildId={GUILD_ID} settings={SETTINGS} guildName={GUILD_NAME} />, {
+		wrapper: Translated
+	});
 }
 
 async function confirmRemoval() {

@@ -20,14 +20,28 @@ export function looksLikeImage(value: string): boolean {
 	}
 }
 
-export function imageUrlHint(value: string): string | null {
+export const SIGNED_PARAMS = ['ex', 'is', 'hm'] as const;
+
+export function expiresSoon(value: string): boolean {
+	try {
+		const url = new URL(value.trim());
+
+		return SIGNED_PARAMS.every((param) => url.searchParams.has(param));
+	} catch {
+		return false;
+	}
+}
+
+export type ImageUrlIssue = 'notHttp' | 'notImage' | 'expiring';
+
+export function imageUrlIssue(value: string): ImageUrlIssue | null {
 	if (value.trim() === '') return null;
 
-	if (!isHttpUrl(value)) return 'Use a link that starts with http:// or https://';
+	if (!isHttpUrl(value)) return 'notHttp';
 
-	if (!looksLikeImage(value)) {
-		return 'This is not a direct image link — Discord will show nothing. It should end in .png, .jpg or .gif';
-	}
+	if (!looksLikeImage(value)) return 'notImage';
+
+	if (expiresSoon(value)) return 'expiring';
 
 	return null;
 }

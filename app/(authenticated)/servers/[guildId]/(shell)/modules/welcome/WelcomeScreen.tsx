@@ -1,6 +1,7 @@
 'use client';
 
 import { DoorOpen } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useCallback, useRef } from 'react';
 import { DiscordPreview } from '@/components/modules/DiscordPreview';
 import { MessageComposer } from '@/components/modules/MessageComposer';
@@ -23,23 +24,15 @@ import type { Channel, Role } from '@/lib/types/discord';
 import type { MessageVariable, WelcomeConfig, WelcomePingMode } from '@/lib/types/modules';
 import { toast } from 'sonner';
 
-const PING_MODES: { value: WelcomePingMode; label: string; hint: string }[] = [
-	{ value: 'none', label: 'Do not mention', hint: '{user} shows the display name.' },
-	{ value: 'inline', label: 'Mention in the message', hint: '{user} becomes a real mention.' },
-	{
-		value: 'ghost',
-		label: 'Ghost ping',
-		hint: 'A separate mention is posted and deleted at once.'
-	}
-];
+const PING_MODES: WelcomePingMode[] = ['none', 'inline', 'ghost'];
 
-const DELETE_AFTER: { value: string; label: string }[] = [
-	{ value: '0', label: 'Keep it' },
-	{ value: '30', label: 'After 30 seconds' },
-	{ value: '60', label: 'After 1 minute' },
-	{ value: '300', label: 'After 5 minutes' },
-	{ value: '3600', label: 'After 1 hour' },
-	{ value: String(WELCOME_DELETE_AFTER_MAX), label: 'After 1 day' }
+const DELETE_AFTER: { value: string; key: string }[] = [
+	{ value: '0', key: 'keep' },
+	{ value: '30', key: 'seconds30' },
+	{ value: '60', key: 'minutes1' },
+	{ value: '300', key: 'minutes5' },
+	{ value: '3600', key: 'hours1' },
+	{ value: String(WELCOME_DELETE_AFTER_MAX), key: 'days1' }
 ];
 
 type WelcomeScreenProps = {
@@ -59,6 +52,8 @@ export function WelcomeScreen({
 	roles,
 	variables
 }: WelcomeScreenProps) {
+	const t = useTranslations('modules.welcome');
+	const previewText = useTranslations('modules.preview');
 	const versionRef = useRef(version);
 
 	const save = useCallback(
@@ -85,16 +80,14 @@ export function WelcomeScreen({
 
 	const preview = (
 		<section
-			aria-label="Preview"
+			aria-label={previewText('title')}
 			className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-4 shadow-1"
 		>
-			<h2 className="min-w-0 truncate text-h4">Preview</h2>
+			<h2 className="min-w-0 truncate text-h4">{previewText('title')}</h2>
 
 			<DiscordPreview message={draft.message} variables={variables} />
 
-			<p className="text-caption font-normal text-text-muted">
-				Variables are shown with sample data. The real post uses the member who joined.
-			</p>
+			<p className="text-caption font-normal text-text-muted">{t('previewNote')}</p>
 		</section>
 	);
 
@@ -102,8 +95,8 @@ export function WelcomeScreen({
 		<ModulePage
 			moduleId="welcome"
 			icon={DoorOpen}
-			title="Welcome"
-			description="Greet new members and give them a role the moment they join."
+			title={t('title')}
+			description={t('description')}
 			enabled={draft.enabled}
 			onEnabledChange={(next) => {
 				form.set('enabled', next);
@@ -118,11 +111,11 @@ export function WelcomeScreen({
 					onSave={() => {
 						void form.save().then(
 							(state) => {
-								if (state === 'idle') toast.success('Welcome settings saved');
+								if (state === 'idle') toast.success(t('saved'));
 							},
 							(error: unknown) => {
-								toast.error('Could not save', {
-									description: error instanceof Error ? error.message : 'Unknown failure'
+								toast.error(t('saveFailed'), {
+									description: error instanceof Error ? error.message : t('unknownFailure')
 								});
 							}
 						);
@@ -131,11 +124,8 @@ export function WelcomeScreen({
 				/>
 			}
 		>
-			<SettingsSection
-				title="Welcome message"
-				description="Posted in a channel the moment someone joins."
-			>
-				<Field label="Channel" hint="Required before the module can be switched on.">
+			<SettingsSection title={t('message.title')} description={t('message.description')}>
+				<Field label={t('message.channel')} hint={t('message.channelHint')}>
 					<ChannelPicker
 						channels={channels}
 						value={draft.channelId}
@@ -154,26 +144,23 @@ export function WelcomeScreen({
 				/>
 			</SettingsSection>
 
-			<SettingsSection
-				title="Mention"
-				description="How {user} is rendered when the greeting is posted."
-			>
-				<Field label="Ping mode" hint={PING_MODES.find((m) => m.value === draft.pingMode)?.hint}>
+			<SettingsSection title={t('mention.title')} description={t('mention.description')}>
+				<Field label={t('mention.label')} hint={t(`mention.${draft.pingMode}Hint`)}>
 					<Select
 						value={draft.pingMode}
 						onValueChange={(next) => {
 							form.set('pingMode', next as WelcomePingMode);
 						}}
-						options={PING_MODES.map((mode) => ({ value: mode.value, label: mode.label }))}
+						options={PING_MODES.map((mode) => ({ value: mode, label: t(`mention.${mode}`) }))}
 					/>
 				</Field>
 			</SettingsSection>
 
 			<SettingsSection
-				title="Autorole"
-				description={`Given automatically on join. Up to ${String(WELCOME_AUTO_ROLES_MAX)} roles.`}
+				title={t('autorole.title')}
+				description={t('autorole.description', { max: WELCOME_AUTO_ROLES_MAX })}
 			>
-				<Field label="Roles to assign">
+				<Field label={t('autorole.label')}>
 					<RolePicker
 						roles={roles}
 						value={draft.autoRoleIds}
@@ -184,14 +171,17 @@ export function WelcomeScreen({
 				</Field>
 			</SettingsSection>
 
-			<SettingsSection title="Cleanup" description="Keep the channel from filling up with joins.">
-				<Field label="Delete the greeting">
+			<SettingsSection title={t('cleanup.title')} description={t('cleanup.description')}>
+				<Field label={t('cleanup.label')}>
 					<Select
 						value={String(draft.deleteAfter ?? 0)}
 						onValueChange={(next) => {
 							form.set('deleteAfter', Number(next) === 0 ? null : Number(next));
 						}}
-						options={DELETE_AFTER}
+						options={DELETE_AFTER.map((option) => ({
+							value: option.value,
+							label: t(`cleanup.${option.key}`)
+						}))}
 					/>
 				</Field>
 			</SettingsSection>
