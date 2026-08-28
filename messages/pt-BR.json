@@ -722,6 +722,94 @@
 			"notImage": "Este não é um link direto de imagem — o Discord não vai mostrar nada. Ele precisa terminar em .png, .jpg ou .gif",
 			"expiring": "Link de anexo do Discord expira em menos de um dia e a imagem some. Hospede a figura em algum lugar permanente."
 		},
+		"customCommands": {
+			"title": "Comandos personalizados",
+			"description": "Seus próprios comandos de barra, sem código e sem hospedagem.",
+			"saved": "Comandos salvos",
+			"new": "Novo comando",
+			"previewLabel": "Prévia da resposta",
+			"untitled": "sem-nome",
+			"namePlaceholder": "nome",
+			"ephemeralNote": "Só quem rodou o comando vai ver isto.",
+			"list": {
+				"title": "Comandos",
+				"description": "Registrados no Discord ao salvar. Nomes novos podem levar um minuto para aparecer.",
+				"empty": "Nenhum comando ainda.",
+				"command": "Comando",
+				"commandDescription": "Descrição",
+				"uses": "Usos",
+				"on": "Ligado",
+				"actions": "Ações",
+				"enable": "Ligar {name}",
+				"edit": "Editar /{name}",
+				"delete": "Excluir /{name}"
+			},
+			"settings": {
+				"title": "Configurações do comando",
+				"name": "Nome",
+				"nameHint": "O que os membros digitam depois da barra.",
+				"namePlaceholder": "regras",
+				"description": "Descrição",
+				"descriptionHint": "Aparece na lista de comandos do Discord.",
+				"descriptionPlaceholder": "Publica as regras do servidor",
+				"who": "Quem pode usar",
+				"whoHint": "Deixe vazio para liberar para todos.",
+				"whoPlaceholder": "Todos…",
+				"ephemeral": "Só quem chamou vê a resposta",
+				"ephemeralHint": "Bom para qualquer coisa barulhenta ou pessoal."
+			},
+			"response": { "title": "Resposta" },
+			"nameIssue": {
+				"empty": "Um comando precisa de nome.",
+				"shape": "Só letras minúsculas, números, hífens e sublinhados, até 32 caracteres.",
+				"taken": "Outro comando já usa esse nome."
+			}
+		},
+		"logging": {
+			"title": "Registros",
+			"description": "Escreve os eventos do servidor em um canal. Ligue só o que você vai ler de verdade.",
+			"saved": "Registros salvos",
+			"events": {
+				"title": "Eventos",
+				"description": "{enabled} de {total} eventos estão sendo registrados.",
+				"missing": "{count, plural, =1 {1 evento está ligado sem canal definido — ele não vai ser registrado em lugar nenhum.} other {# eventos estão ligados sem canal definido — eles não vão ser registrados em lugar nenhum.}}",
+				"noChannel": "Nenhum canal…",
+				"log": "Registrar {name}",
+				"setAll": "Apontar todos para um canal",
+				"setAllHint": "Vale para todo evento de {group}, ligado ou não."
+			},
+			"groups": {
+				"Messages": "Mensagens",
+				"Members": "Membros",
+				"Moderation": "Moderação",
+				"Server": "Servidor",
+				"Voice": "Voz"
+			},
+			"ignore": {
+				"title": "Listas de exceção",
+				"description": "Nada que venha daqui é registrado, independentemente dos eventos.",
+				"channels": "Canais ignorados",
+				"channelsPlaceholder": "Nada ignorado…",
+				"roles": "Cargos ignorados",
+				"rolesPlaceholder": "Ninguém ignorado…"
+			},
+			"event": {
+				"message_delete": { "name": "Mensagem apagada", "body": "Conteúdo, autor e canal." },
+				"message_edit": { "name": "Mensagem editada", "body": "Antes e depois." },
+				"bulk_delete": { "name": "Exclusão em massa", "body": "Uma limpeza, com a contagem." },
+				"member_join": { "name": "Membro entrou", "body": "Com a idade da conta." },
+				"member_leave": { "name": "Membro saiu", "body": "E que cargos tinha." },
+				"nickname": { "name": "Apelido alterado", "body": "Antigo e novo." },
+				"ban": { "name": "Membro banido", "body": "Moderador e motivo." },
+				"timeout": { "name": "Membro em timeout", "body": "Duração e motivo." },
+				"channel_change": {
+					"name": "Canal criado ou excluído",
+					"body": "Inclui as permissões sobrescritas."
+				},
+				"role_change": { "name": "Cargo criado ou excluído", "body": "E edições de permissão." },
+				"voice_join": { "name": "Entrada ou saída de voz", "body": "Barulhento em servidor grande." }
+			}
+		},
 		"moderation": {
 			"title": "Moderação",
 			"description": "Advertências, timeouts, silenciamentos e banimentos — todos registrados no log de casos.",

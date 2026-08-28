@@ -722,6 +722,94 @@
 			"notImage": "This is not a direct image link — Discord will show nothing. It should end in .png, .jpg or .gif",
 			"expiring": "A Discord attachment link expires within a day and the image will vanish. Host it somewhere permanent instead."
 		},
+		"customCommands": {
+			"title": "Custom commands",
+			"description": "Your own slash commands, with no code and no hosting.",
+			"saved": "Commands saved",
+			"new": "New command",
+			"previewLabel": "Response preview",
+			"untitled": "untitled",
+			"namePlaceholder": "name",
+			"ephemeralNote": "Only the person who ran it will see this.",
+			"list": {
+				"title": "Commands",
+				"description": "Registered with Discord on save. New names can take a minute to appear.",
+				"empty": "No commands yet.",
+				"command": "Command",
+				"commandDescription": "Description",
+				"uses": "Uses",
+				"on": "On",
+				"actions": "Actions",
+				"enable": "Enable {name}",
+				"edit": "Edit /{name}",
+				"delete": "Delete /{name}"
+			},
+			"settings": {
+				"title": "Command settings",
+				"name": "Name",
+				"nameHint": "What members type after the slash.",
+				"namePlaceholder": "rules",
+				"description": "Description",
+				"descriptionHint": "Shown in the Discord command list.",
+				"descriptionPlaceholder": "Post the server rules",
+				"who": "Who can use it",
+				"whoHint": "Leave empty to allow everyone.",
+				"whoPlaceholder": "Everyone…",
+				"ephemeral": "Only the caller sees the reply",
+				"ephemeralHint": "Good for anything noisy or personal."
+			},
+			"response": { "title": "Response" },
+			"nameIssue": {
+				"empty": "A command needs a name.",
+				"shape": "Lowercase letters, numbers, dashes and underscores only, up to 32 characters.",
+				"taken": "Another command already uses that name."
+			}
+		},
+		"logging": {
+			"title": "Logging",
+			"description": "Write server events to a channel. Turn on only what you will actually read.",
+			"saved": "Logging saved",
+			"events": {
+				"title": "Events",
+				"description": "{enabled} of {total} events are being written.",
+				"missing": "{count, plural, =1 {1 event is on with no channel set — it will not be written anywhere.} other {# events are on with no channel set — they will not be written anywhere.}}",
+				"noChannel": "No channel…",
+				"log": "Log {name}",
+				"setAll": "Set all to one channel",
+				"setAllHint": "Applies to every {group} event, on or off."
+			},
+			"groups": {
+				"Messages": "Messages",
+				"Members": "Members",
+				"Moderation": "Moderation",
+				"Server": "Server",
+				"Voice": "Voice"
+			},
+			"ignore": {
+				"title": "Ignore lists",
+				"description": "Nothing from these is ever logged, whatever the events say.",
+				"channels": "Ignored channels",
+				"channelsPlaceholder": "Nothing ignored…",
+				"roles": "Ignored roles",
+				"rolesPlaceholder": "Nobody ignored…"
+			},
+			"event": {
+				"message_delete": { "name": "Message deleted", "body": "Content, author and channel." },
+				"message_edit": { "name": "Message edited", "body": "Before and after." },
+				"bulk_delete": { "name": "Bulk delete", "body": "A purge, with the count." },
+				"member_join": { "name": "Member joined", "body": "With account age." },
+				"member_leave": { "name": "Member left", "body": "And what roles they had." },
+				"nickname": { "name": "Nickname changed", "body": "Old and new." },
+				"ban": { "name": "Member banned", "body": "Moderator and reason." },
+				"timeout": { "name": "Member timed out", "body": "Duration and reason." },
+				"channel_change": {
+					"name": "Channel created or deleted",
+					"body": "Includes permission overwrites."
+				},
+				"role_change": { "name": "Role created or deleted", "body": "And permission edits." },
+				"voice_join": { "name": "Voice join or leave", "body": "Noisy on big servers." }
+			}
+		},
 		"moderation": {
 			"title": "Moderation",
 			"description": "Warns, timeouts, mutes and bans — every one of them written to the case log.",

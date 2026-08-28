@@ -1,6 +1,7 @@
 'use client';
 
 import { ScrollText } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { ChannelPicker } from '@/components/discord/ChannelPicker';
@@ -25,6 +26,7 @@ type LoggingScreenProps = {
 };
 
 export function LoggingScreen({ config, channels, roles }: LoggingScreenProps) {
+	const t = useTranslations('modules.logging');
 	const form = useConfigDraft<LoggingConfig>(config);
 	const draft = form.draft;
 
@@ -49,8 +51,8 @@ export function LoggingScreen({ config, channels, roles }: LoggingScreenProps) {
 		<ModulePage
 			moduleId="logging"
 			icon={ScrollText}
-			title="Logging"
-			description="Write server events to a channel. Turn on only what you will actually read."
+			title={t('title')}
+			description={t('description')}
 			enabled={draft.enabled}
 			onEnabledChange={(next) => {
 				form.set('enabled', next);
@@ -63,7 +65,7 @@ export function LoggingScreen({ config, channels, roles }: LoggingScreenProps) {
 					onDiscard={form.discard}
 					onSave={() => {
 						void form.save().then(() => {
-							toast.success('Logging saved');
+							toast.success(t('saved'));
 						});
 					}}
 					onResolveConflict={form.resolveConflict}
@@ -71,14 +73,15 @@ export function LoggingScreen({ config, channels, roles }: LoggingScreenProps) {
 			}
 		>
 			<SettingsSection
-				title="Events"
-				description={`${String(enabledCount)} of ${String(draft.events.length)} events are being written.`}
+				title={t('events.title')}
+				description={t('events.description', {
+					enabled: enabledCount,
+					total: draft.events.length
+				})}
 			>
 				{missingChannel.length > 0 ? (
 					<p className="rounded-md border border-warning bg-warning-subtle px-3 py-2 text-body-sm text-warning-fg">
-						{missingChannel.length} {missingChannel.length === 1 ? 'event is' : 'events are'} on
-						with no channel set &mdash; {missingChannel.length === 1 ? 'it' : 'they'} will not be
-						written anywhere.
+						{t('events.missing', { count: missingChannel.length })}
 					</p>
 				) : null}
 
@@ -90,7 +93,9 @@ export function LoggingScreen({ config, channels, roles }: LoggingScreenProps) {
 						return (
 							<div key={group} className="flex flex-col gap-2">
 								<div className="flex items-center gap-3">
-									<span className="font-mono text-overline text-text-muted uppercase">{group}</span>
+									<span className="font-mono text-overline text-text-muted uppercase">
+										{t(`groups.${group}`)}
+									</span>
 									<div className="h-px flex-1 bg-border" />
 									<GroupChannelButton
 										group={group}
@@ -107,9 +112,9 @@ export function LoggingScreen({ config, channels, roles }: LoggingScreenProps) {
 											{events.map((event) => (
 												<tr key={event.id} className="border-b border-border last:border-0">
 													<td className="w-2/5 py-3 pr-4 align-top">
-														<p className="text-body">{event.name}</p>
+														<p className="text-body">{t(`event.${event.id}.name`)}</p>
 														<p className="text-caption font-normal text-text-muted">
-															{event.description}
+															{t(`event.${event.id}.body`)}
 														</p>
 													</td>
 													<td className="py-3 pr-4 align-top">
@@ -119,13 +124,15 @@ export function LoggingScreen({ config, channels, roles }: LoggingScreenProps) {
 															onValueChange={(next) => {
 																updateEvent(event.id, { channelId: next });
 															}}
-															placeholder="No channel…"
+															placeholder={t('events.noChannel')}
 														/>
 													</td>
 													<td className="w-16 py-3 align-top">
 														<Switch
 															checked={event.enabled}
-															aria-label={`Log ${event.name}`}
+															aria-label={t('events.log', {
+																name: t(`event.${event.id}.name`)
+															})}
 															onCheckedChange={(next) => {
 																updateEvent(event.id, { enabled: next });
 															}}
@@ -142,29 +149,26 @@ export function LoggingScreen({ config, channels, roles }: LoggingScreenProps) {
 				</div>
 			</SettingsSection>
 
-			<SettingsSection
-				title="Ignore lists"
-				description="Nothing from these is ever logged, whatever the events say."
-			>
-				<Field label="Ignored channels">
+			<SettingsSection title={t('ignore.title')} description={t('ignore.description')}>
+				<Field label={t('ignore.channels')}>
 					<ChannelPicker
 						channels={channels}
 						value={draft.ignoredChannelIds[0] ?? null}
 						onValueChange={(next) => {
 							form.set('ignoredChannelIds', [next]);
 						}}
-						placeholder="Nothing ignored…"
+						placeholder={t('ignore.channelsPlaceholder')}
 					/>
 				</Field>
 
-				<Field label="Ignored roles">
+				<Field label={t('ignore.roles')}>
 					<RolePicker
 						roles={roles}
 						value={draft.ignoredRoleIds}
 						onValueChange={(next) => {
 							form.set('ignoredRoleIds', next);
 						}}
-						placeholder="Nobody ignored…"
+						placeholder={t('ignore.rolesPlaceholder')}
 					/>
 				</Field>
 			</SettingsSection>
@@ -179,6 +183,7 @@ type GroupChannelButtonProps = {
 };
 
 function GroupChannelButton({ group, channels, onPick }: GroupChannelButtonProps) {
+	const t = useTranslations('modules.logging');
 	const [open, setOpen] = useState(false);
 
 	return (
@@ -190,12 +195,12 @@ function GroupChannelButton({ group, channels, onPick }: GroupChannelButtonProps
 			triggerAsChild
 			trigger={
 				<Button variant="ghost" size="sm">
-					Set all to one channel
+					{t('events.setAll')}
 				</Button>
 			}
 		>
 			<p className="mb-2 text-caption font-normal text-text-muted">
-				Applies to every {group.toLowerCase()} event, on or off.
+				{t('events.setAllHint', { group: t(`groups.${group}`).toLowerCase() })}
 			</p>
 			<ChannelPicker
 				channels={channels}
@@ -204,7 +209,6 @@ function GroupChannelButton({ group, channels, onPick }: GroupChannelButtonProps
 					onPick(next);
 					setOpen(false);
 				}}
-				placeholder="Pick a channel…"
 			/>
 		</Popover>
 	);

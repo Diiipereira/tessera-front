@@ -28,8 +28,6 @@ export type LogGroup = 'Messages' | 'Members' | 'Moderation' | 'Server' | 'Voice
 export type LogEvent = {
 	id: string;
 	group: LogGroup;
-	name: string;
-	description: string;
 	channelId: string | null;
 	enabled: boolean;
 };

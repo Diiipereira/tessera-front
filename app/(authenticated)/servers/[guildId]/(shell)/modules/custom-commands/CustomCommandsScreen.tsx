@@ -1,6 +1,7 @@
 'use client';
 
 import { Pencil, Plus, Terminal, Trash2 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { RolePicker } from '@/components/discord/RolePicker';
@@ -13,7 +14,7 @@ import { Button } from '@/components/ui/Button';
 import { Field } from '@/components/ui/Field';
 import { Input } from '@/components/ui/Input';
 import { Switch } from '@/components/ui/Switch';
-import { commandNameError } from '@/lib/commands';
+import { commandNameIssue } from '@/lib/commands';
 import { useConfigDraft } from '@/lib/hooks/useConfigDraft';
 import type { Role } from '@/lib/types/discord';
 import type { CustomCommand, CustomCommandsConfig } from '@/lib/types/module-configs';
@@ -57,6 +58,8 @@ type CustomCommandsScreenProps = {
 };
 
 export function CustomCommandsScreen({ config, roles, variables }: CustomCommandsScreenProps) {
+	const t = useTranslations('modules.customCommands');
+	const preview = useTranslations('modules.preview');
 	const form = useConfigDraft<CustomCommandsConfig>(config);
 	const draft = form.draft;
 
@@ -70,29 +73,29 @@ export function CustomCommandsScreen({ config, roles, variables }: CustomCommand
 		);
 	}
 
-	const nameError = selected
-		? commandNameError(
+	const nameIssue = selected
+		? commandNameIssue(
 				selected.name,
 				draft.commands.filter((entry) => entry.id !== selected.id).map((entry) => entry.name)
 			)
 		: undefined;
 
+	const nameError = nameIssue === undefined ? undefined : t(`nameIssue.${nameIssue}`);
+
 	const aside = selected ? (
 		<section
-			aria-label="Response preview"
+			aria-label={t('previewLabel')}
 			className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-4 shadow-1"
 		>
-			<h2 className="text-h4">Preview</h2>
+			<h2 className="text-h4">{preview('title')}</h2>
 			<div className="rounded-md border border-border bg-surface-sunken px-3 py-2">
 				<code className="font-mono text-body-sm text-primary">
-					/{selected.name === '' ? 'name' : selected.name}
+					/{selected.name === '' ? t('namePlaceholder') : selected.name}
 				</code>
 			</div>
 			<DiscordPreview message={selected.response} variables={variables} />
 			{selected.ephemeral ? (
-				<p className="text-caption font-normal text-text-muted">
-					Only the person who ran it will see this.
-				</p>
+				<p className="text-caption font-normal text-text-muted">{t('ephemeralNote')}</p>
 			) : null}
 		</section>
 	) : undefined;
@@ -101,8 +104,8 @@ export function CustomCommandsScreen({ config, roles, variables }: CustomCommand
 		<ModulePage
 			moduleId="custom-commands"
 			icon={Terminal}
-			title="Custom commands"
-			description="Your own slash commands, with no code and no hosting."
+			title={t('title')}
+			description={t('description')}
 			enabled={draft.enabled}
 			onEnabledChange={(next) => {
 				form.set('enabled', next);
@@ -118,7 +121,7 @@ export function CustomCommandsScreen({ config, roles, variables }: CustomCommand
 					}}
 				>
 					<Plus aria-hidden="true" />
-					New command
+					{t('new')}
 				</Button>
 			}
 			aside={aside}
@@ -130,30 +133,31 @@ export function CustomCommandsScreen({ config, roles, variables }: CustomCommand
 					onDiscard={form.discard}
 					onSave={() => {
 						void form.save().then(() => {
-							toast.success('Commands saved');
+							toast.success(t('saved'));
 						});
 					}}
 					onResolveConflict={form.resolveConflict}
 				/>
 			}
 		>
-			<SettingsSection
-				title="Commands"
-				description="Registered with Discord on save. New names can take a minute to appear."
-			>
+			<SettingsSection title={t('list.title')} description={t('list.description')}>
 				{draft.commands.length === 0 ? (
-					<p className="text-body-sm text-text-muted">No commands yet.</p>
+					<p className="text-body-sm text-text-muted">{t('list.empty')}</p>
 				) : (
 					<div className="overflow-x-auto">
 						<table className="w-full min-w-160 border-collapse">
 							<thead>
 								<tr className="border-b border-border text-left">
-									{['Command', 'Description', 'Uses', 'On', ''].map((head, index) => (
+									{['command', 'commandDescription', 'uses', 'on', ''].map((head, index) => (
 										<th
 											key={head + String(index)}
 											className="pb-2 font-mono text-overline font-semibold text-text-muted uppercase"
 										>
-											{head === '' ? <span className="sr-only">Actions</span> : head}
+											{head === '' ? (
+												<span className="sr-only">{t('list.actions')}</span>
+											) : (
+												t(`list.${head}`)
+											)}
 										</th>
 									))}
 								</tr>
@@ -172,7 +176,7 @@ export function CustomCommandsScreen({ config, roles, variables }: CustomCommand
 													command.id === selectedId ? 'text-primary' : 'text-link'
 												)}
 											>
-												/{command.name === '' ? 'untitled' : command.name}
+												/{command.name === '' ? t('untitled') : command.name}
 											</button>
 										</td>
 										<td className="py-3 pr-3 text-body-sm text-text-muted">
@@ -184,7 +188,7 @@ export function CustomCommandsScreen({ config, roles, variables }: CustomCommand
 										<td className="py-3 pr-3">
 											<Switch
 												checked={command.enabled}
-												aria-label={`Enable ${command.name}`}
+												aria-label={t('list.enable', { name: command.name })}
 												onCheckedChange={(next) => {
 													update(command.id, { enabled: next });
 												}}
@@ -196,7 +200,9 @@ export function CustomCommandsScreen({ config, roles, variables }: CustomCommand
 													variant="ghost"
 													size="sm"
 													iconOnly
-													aria-label={`Edit /${command.name === '' ? 'untitled' : command.name}`}
+													aria-label={t('list.edit', {
+														name: command.name === '' ? t('untitled') : command.name
+													})}
 													onClick={() => {
 														setSelectedId(command.id);
 													}}
@@ -207,7 +213,9 @@ export function CustomCommandsScreen({ config, roles, variables }: CustomCommand
 													variant="ghost-danger"
 													size="sm"
 													iconOnly
-													aria-label={`Delete /${command.name === '' ? 'untitled' : command.name}`}
+													aria-label={t('list.delete', {
+														name: command.name === '' ? t('untitled') : command.name
+													})}
 													onClick={() => {
 														form.set(
 															'commands',
@@ -230,10 +238,10 @@ export function CustomCommandsScreen({ config, roles, variables }: CustomCommand
 
 			{selected ? (
 				<>
-					<SettingsSection title="Command settings">
+					<SettingsSection title={t('settings.title')}>
 						<Field
-							label="Name"
-							hint="What members type after the slash."
+							label={t('settings.name')}
+							hint={t('settings.nameHint')}
 							error={nameError}
 							required
 						>
@@ -244,29 +252,29 @@ export function CustomCommandsScreen({ config, roles, variables }: CustomCommand
 								}}
 								maxLength={32}
 								className="font-mono"
-								placeholder="rules"
+								placeholder={t('settings.namePlaceholder')}
 							/>
 						</Field>
 
-						<Field label="Description" hint="Shown in the Discord command list.">
+						<Field label={t('settings.description')} hint={t('settings.descriptionHint')}>
 							<Input
 								value={selected.description}
 								onChange={(event) => {
 									update(selected.id, { description: event.target.value });
 								}}
 								maxLength={100}
-								placeholder="Post the server rules"
+								placeholder={t('settings.descriptionPlaceholder')}
 							/>
 						</Field>
 
-						<Field label="Who can use it" hint="Leave empty to allow everyone.">
+						<Field label={t('settings.who')} hint={t('settings.whoHint')}>
 							<RolePicker
 								roles={roles}
 								value={selected.requiredRoleIds}
 								onValueChange={(next) => {
 									update(selected.id, { requiredRoleIds: next });
 								}}
-								placeholder="Everyone…"
+								placeholder={t('settings.whoPlaceholder')}
 							/>
 						</Field>
 
@@ -275,12 +283,12 @@ export function CustomCommandsScreen({ config, roles, variables }: CustomCommand
 							onCheckedChange={(next) => {
 								update(selected.id, { ephemeral: next });
 							}}
-							label="Only the caller sees the reply"
-							description="Good for anything noisy or personal."
+							label={t('settings.ephemeral')}
+							description={t('settings.ephemeralHint')}
 						/>
 					</SettingsSection>
 
-					<SettingsSection title="Response">
+					<SettingsSection title={t('response.title')}>
 						<MessageComposer
 							value={selected.response}
 							onChange={(next) => {

@@ -81,11 +81,11 @@ export function categoryCounts(commands: BotCommand[]): Record<CommandCategory, 
 
 const NAME_PATTERN = /^[a-z0-9_-]{1,32}$/;
 
-export function commandNameError(name: string, taken: string[]): string | undefined {
-	if (name === '') return 'A command needs a name.';
-	if (!NAME_PATTERN.test(name)) {
-		return 'Lowercase letters, numbers, dashes and underscores only, up to 32 characters.';
-	}
-	if (taken.includes(name)) return 'Another command already uses that name.';
+export type CommandNameIssue = 'empty' | 'shape' | 'taken';
+
+export function commandNameIssue(name: string, taken: string[]): CommandNameIssue | undefined {
+	if (name === '') return 'empty';
+	if (!NAME_PATTERN.test(name)) return 'shape';
+	if (taken.includes(name)) return 'taken';
 	return undefined;
 }

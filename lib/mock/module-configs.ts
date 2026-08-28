@@ -94,88 +94,66 @@ export const mockLoggingConfig: LoggingConfig = {
 		{
 			id: 'message_delete',
 			group: 'Messages',
-			name: 'Message deleted',
-			description: 'Content, author and channel.',
 			channelId: '901234567890123008',
 			enabled: true
 		},
 		{
 			id: 'message_edit',
 			group: 'Messages',
-			name: 'Message edited',
-			description: 'Before and after.',
 			channelId: '901234567890123008',
 			enabled: true
 		},
 		{
 			id: 'bulk_delete',
 			group: 'Messages',
-			name: 'Bulk delete',
-			description: 'A purge, with the count.',
 			channelId: '901234567890123008',
 			enabled: false
 		},
 		{
 			id: 'member_join',
 			group: 'Members',
-			name: 'Member joined',
-			description: 'With account age.',
 			channelId: '901234567890123009',
 			enabled: true
 		},
 		{
 			id: 'member_leave',
 			group: 'Members',
-			name: 'Member left',
-			description: 'And what roles they had.',
 			channelId: '901234567890123009',
 			enabled: true
 		},
 		{
 			id: 'nickname',
 			group: 'Members',
-			name: 'Nickname changed',
-			description: 'Old and new.',
 			channelId: null,
 			enabled: false
 		},
 		{
 			id: 'ban',
 			group: 'Moderation',
-			name: 'Member banned',
-			description: 'Moderator and reason.',
 			channelId: '901234567890123008',
 			enabled: true
 		},
 		{
 			id: 'timeout',
 			group: 'Moderation',
-			name: 'Member timed out',
-			description: 'Duration and reason.',
 			channelId: '901234567890123008',
 			enabled: true
 		},
 		{
 			id: 'channel_change',
 			group: 'Server',
-			name: 'Channel created or deleted',
-			description: 'Includes permission overwrites.',
 			channelId: null,
 			enabled: false
 		},
 		{
 			id: 'role_change',
 			group: 'Server',
-			name: 'Role created or deleted',
-			description: 'And permission edits.',
 			channelId: null,
 			enabled: false
 		},
 		{
 			id: 'voice_join',
 			group: 'Voice',
-			name: 'Voice join or leave',
-			description: 'Noisy on big servers.',
 			channelId: null,
 			enabled: false
 		}
