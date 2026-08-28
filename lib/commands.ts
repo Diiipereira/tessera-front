@@ -21,11 +21,14 @@ export function cooldownLabel(seconds: number): string {
 	return Number.isInteger(hours) ? `${String(hours)}h` : `${hours.toFixed(1)}h`;
 }
 
-export function restrictionSummary(
+export type Restriction =
+	{ kind: 'open' } | { kind: 'scoped'; role: string | null; roles: number; channels: number };
+
+export function readRestriction(
 	command: BotCommand,
 	roles: Role[],
 	channels: Channel[]
-): string {
+): Restriction {
 	const allowed = command.allowedRoleIds
 		.map((id) => roles.find((role) => role.id === id)?.name)
 		.filter((name): name is string => name !== undefined);
@@ -34,16 +37,14 @@ export function restrictionSummary(
 		.map((id) => channels.find((channel) => channel.id === id)?.name)
 		.filter((name): name is string => name !== undefined);
 
-	if (allowed.length === 0 && denied.length === 0) return 'Everyone, everywhere';
+	if (allowed.length === 0 && denied.length === 0) return { kind: 'open' };
 
-	const parts: string[] = [];
-	if (allowed.length > 0)
-		parts.push(allowed.length === 1 ? (allowed[0] ?? '') : `${String(allowed.length)} roles`);
-	else parts.push('Everyone');
-	if (denied.length > 0)
-		parts.push(`except ${String(denied.length)} channel${denied.length === 1 ? '' : 's'}`);
-
-	return parts.join(', ');
+	return {
+		kind: 'scoped',
+		role: allowed.length === 1 ? (allowed[0] ?? null) : null,
+		roles: allowed.length,
+		channels: denied.length
+	};
 }
 
 export type CommandFilters = {

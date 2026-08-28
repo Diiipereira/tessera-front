@@ -1,6 +1,7 @@
 'use client';
 
 import { RefreshCw, SlidersHorizontal, SquareSlash } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { ChannelPicker } from '@/components/discord/ChannelPicker';
@@ -20,7 +21,7 @@ import {
 	COMMAND_CATEGORIES,
 	cooldownLabel,
 	filterCommands,
-	restrictionSummary
+	readRestriction
 } from '@/lib/commands';
 import { relativeTime } from '@/lib/time';
 import type { Channel, Role } from '@/lib/types/discord';
@@ -36,6 +37,7 @@ type CommandsScreenProps = {
 };
 
 export function CommandsScreen({ commands, roles, channels, lastSyncedAt }: CommandsScreenProps) {
+	const t = useTranslations('commands');
 	const [items, setItems] = useState(commands);
 	const [query, setQuery] = useState('');
 	const [category, setCategory] = useState<CommandCategory | 'all'>('all');
@@ -61,7 +63,10 @@ export function CommandsScreen({ commands, roles, channels, lastSyncedAt }: Comm
 			current.map((command) => (selected.includes(command.id) ? { ...command, enabled } : command))
 		);
 		toast.success(
-			`${String(selected.length)} command${selected.length === 1 ? '' : 's'} ${enabled ? 'enabled' : 'disabled'}`
+			t('bulk', {
+				count: selected.length,
+				state: enabled ? t('stateEnabled') : t('stateDisabled')
+			})
 		);
 		setSelected([]);
 	}
@@ -69,34 +74,36 @@ export function CommandsScreen({ commands, roles, channels, lastSyncedAt }: Comm
 	return (
 		<div className="w-full p-6 sm:p-8">
 			<PageHeader
-				title="Commands"
-				description={`${String(enabledCount)} of ${String(items.length)} commands are registered with Discord. Turning one off unregisters it.`}
+				title={t('title')}
+				description={t('description', { enabled: enabledCount, total: items.length })}
 				action={
 					<Button
 						variant="outline"
 						onClick={() => {
-							toast.success('Sync queued', {
-								description: 'Discord takes up to an hour to show global command changes.'
+							toast.success(t('syncQueued'), {
+								description: t('syncHint')
 							});
 						}}
 					>
 						<RefreshCw aria-hidden="true" />
-						Sync with Discord
+						{t('sync')}
 					</Button>
 				}
 			/>
 
 			<p className="mt-1 text-caption font-normal text-text-muted">
-				Last synced {relativeTime(lastSyncedAt)}.
+				{t('lastSynced', { when: relativeTime(lastSyncedAt) })}
 			</p>
 
 			<div className="mt-6 grid gap-6 lg:grid-cols-[200px_minmax(0,1fr)]">
 				<aside className="lg:sticky lg:top-6 lg:self-start">
-					<p className="mb-2 font-mono text-overline text-text-muted uppercase">Categories</p>
+					<p className="mb-2 font-mono text-overline text-text-muted uppercase">
+						{t('categories')}
+					</p>
 					<ul className="flex flex-wrap gap-1 lg:flex-col">
 						<li>
 							<CategoryButton
-								label="All commands"
+								label={t('allCommands')}
 								count={items.length}
 								active={category === 'all'}
 								onClick={() => {
@@ -124,8 +131,8 @@ export function CommandsScreen({ commands, roles, channels, lastSyncedAt }: Comm
 						<SearchInput
 							value={query}
 							onValueChange={setQuery}
-							placeholder="Search commands…"
-							aria-label="Search commands"
+							placeholder={t('search')}
+							aria-label={t('searchLabel')}
 							className="max-w-64"
 						/>
 
@@ -134,12 +141,14 @@ export function CommandsScreen({ commands, roles, channels, lastSyncedAt }: Comm
 							onCheckedChange={(next) => {
 								setOnlyDisabled(next === true);
 							}}
-							label="Only disabled"
+							label={t('onlyDisabled')}
 						/>
 
 						{selected.length > 0 ? (
 							<div className="ml-auto flex items-center gap-2">
-								<span className="text-body-sm text-text-muted">{selected.length} selected</span>
+								<span className="text-body-sm text-text-muted">
+									{t('selected', { count: selected.length })}
+								</span>
 								<Button
 									variant="outline"
 									size="sm"
@@ -147,7 +156,7 @@ export function CommandsScreen({ commands, roles, channels, lastSyncedAt }: Comm
 										bulkSet(true);
 									}}
 								>
-									Enable
+									{t('enable')}
 								</Button>
 								<Button
 									variant="outline"
@@ -156,7 +165,7 @@ export function CommandsScreen({ commands, roles, channels, lastSyncedAt }: Comm
 										bulkSet(false);
 									}}
 								>
-									Disable
+									{t('disable')}
 								</Button>
 							</div>
 						) : null}
@@ -164,11 +173,7 @@ export function CommandsScreen({ commands, roles, channels, lastSyncedAt }: Comm
 
 					<div className="mt-4 overflow-hidden rounded-lg border border-border bg-surface shadow-1">
 						{visible.length === 0 ? (
-							<EmptyState
-								icon={SquareSlash}
-								title="No commands match"
-								description="Nothing in this category answers to that. Clear the search or pick another category."
-							/>
+							<EmptyState icon={SquareSlash} title={t('emptyTitle')} description={t('emptyBody')} />
 						) : (
 							<div className="overflow-x-auto">
 								<table className="w-full min-w-220 border-collapse text-left">
@@ -183,15 +188,17 @@ export function CommandsScreen({ commands, roles, channels, lastSyncedAt }: Comm
 													id="select-all-commands"
 												/>
 												<label htmlFor="select-all-commands" className="sr-only">
-													Select every visible command
+													{t('selectAll')}
 												</label>
 											</th>
-											<th className="px-4 py-3 font-mono font-semibold">Command</th>
-											<th className="px-4 py-3 font-mono font-semibold">Category</th>
-											<th className="px-4 py-3 text-right font-mono font-semibold">Uses 7d</th>
-											<th className="px-4 py-3 font-mono font-semibold">Cooldown</th>
-											<th className="px-4 py-3 font-mono font-semibold">Access</th>
-											<th className="w-16 px-4 py-3 font-mono font-semibold">On</th>
+											<th className="px-4 py-3 font-mono font-semibold">{t('columns.command')}</th>
+											<th className="px-4 py-3 font-mono font-semibold">{t('columns.category')}</th>
+											<th className="px-4 py-3 text-right font-mono font-semibold">
+												{t('columns.uses')}
+											</th>
+											<th className="px-4 py-3 font-mono font-semibold">{t('columns.cooldown')}</th>
+											<th className="px-4 py-3 font-mono font-semibold">{t('columns.access')}</th>
+											<th className="w-16 px-4 py-3 font-mono font-semibold">{t('columns.on')}</th>
 										</tr>
 									</thead>
 									<tbody>
@@ -210,7 +217,7 @@ export function CommandsScreen({ commands, roles, channels, lastSyncedAt }: Comm
 														id={`select-${command.id}`}
 													/>
 													<label htmlFor={`select-${command.id}`} className="sr-only">
-														Select /{command.name}
+														{t('selectOne', { name: command.name })}
 													</label>
 												</td>
 												<td className="px-4 py-3 align-top">
@@ -252,7 +259,7 @@ export function CommandsScreen({ commands, roles, channels, lastSyncedAt }: Comm
 														id={`toggle-${command.id}`}
 													/>
 													<label htmlFor={`toggle-${command.id}`} className="sr-only">
-														Enable /{command.name}
+														{t('enableOne', { name: command.name })}
 													</label>
 												</td>
 											</tr>
@@ -304,6 +311,7 @@ function CooldownCell({
 	command: BotCommand;
 	onChange: (seconds: number) => void;
 }) {
+	const t = useTranslations('commands');
 	const [open, setOpen] = useState(false);
 
 	return (
@@ -318,7 +326,7 @@ function CooldownCell({
 				</Button>
 			}
 		>
-			<Field label="Cooldown" hint="Per member, in seconds. Zero means no cooldown.">
+			<Field label={t('drawer.cooldown')} hint={t('drawer.cooldownHint')}>
 				<NumberInput
 					value={command.cooldownSeconds}
 					onValueChange={onChange}
@@ -342,7 +350,24 @@ function RestrictCell({
 	channels: Channel[];
 	onChange: (patch: Partial<BotCommand>) => void;
 }) {
+	const t = useTranslations('commands');
 	const [open, setOpen] = useState(false);
+
+	function accessLabel(): string {
+		const restriction = readRestriction(command, roles, channels);
+		if (restriction.kind === 'open') return t('access.open');
+
+		const who =
+			restriction.role ??
+			(restriction.roles > 0
+				? t('access.roles', { count: restriction.roles })
+				: t('access.everyone'));
+
+		return restriction.channels === 0
+			? who
+			: who + t('access.except', { count: restriction.channels });
+	}
+
 	const restricted = command.allowedRoleIds.length > 0 || command.deniedChannelIds.length > 0;
 
 	return (
@@ -355,30 +380,30 @@ function RestrictCell({
 			trigger={
 				<Button variant="ghost" size="sm" className="max-w-52">
 					<SlidersHorizontal aria-hidden="true" />
-					<span className="min-w-0 truncate">{restrictionSummary(command, roles, channels)}</span>
+					<span className="min-w-0 truncate">{accessLabel()}</span>
 				</Button>
 			}
 		>
 			<div className="flex flex-col gap-3">
-				<Field label="Allowed roles" hint="Empty means everyone can run it.">
+				<Field label={t('drawer.roles')} hint={t('drawer.rolesHint')}>
 					<RolePicker
 						roles={roles}
 						value={command.allowedRoleIds}
 						onValueChange={(next) => {
 							onChange({ allowedRoleIds: next });
 						}}
-						placeholder="Everyone…"
+						placeholder={t('drawer.rolesPlaceholder')}
 					/>
 				</Field>
 
-				<Field label="Blocked channel" hint="The command is refused here.">
+				<Field label={t('drawer.channel')} hint={t('drawer.channelHint')}>
 					<ChannelPicker
 						channels={channels}
 						value={command.deniedChannelIds[0] ?? null}
 						onValueChange={(next) => {
 							onChange({ deniedChannelIds: [next] });
 						}}
-						placeholder="Nowhere blocked…"
+						placeholder={t('drawer.channelPlaceholder')}
 					/>
 				</Field>
 

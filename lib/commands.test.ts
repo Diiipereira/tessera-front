@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { categoryCounts, cooldownLabel, filterCommands, restrictionSummary } from '@/lib/commands';
+import { categoryCounts, cooldownLabel, filterCommands, readRestriction } from '@/lib/commands';
 import type { Channel, Role } from '@/lib/types/discord';
 import type { BotCommand } from '@/lib/types/management';
 
@@ -48,33 +48,50 @@ describe('cooldownLabel', () => {
 	});
 });
 
-describe('restrictionSummary', () => {
-	it('says everyone when nothing is set', () => {
-		expect(restrictionSummary(command({}), roles, channels)).toBe('Everyone, everywhere');
+describe('readRestriction', () => {
+	it('reports an unrestricted command as its own case', () => {
+		expect(readRestriction(command({}), roles, channels)).toEqual({ kind: 'open' });
 	});
 
-	it('names a single allowed role', () => {
-		const summary = restrictionSummary(command({ allowedRoleIds: ['r1'] }), roles, channels);
-		expect(summary).toBe('Staff');
+	it('names a single allowed role, so the screen can print it as it is', () => {
+		expect(readRestriction(command({ allowedRoleIds: ['r1'] }), roles, channels)).toEqual({
+			kind: 'scoped',
+			role: 'Staff',
+			roles: 1,
+			channels: 0
+		});
 	});
 
-	it('counts rather than lists once there is more than one role', () => {
-		const summary = restrictionSummary(command({ allowedRoleIds: ['r1', 'r2'] }), roles, channels);
-		expect(summary).toBe('2 roles');
+	it('gives the count rather than a name once there is more than one role', () => {
+		const restriction = readRestriction(command({ allowedRoleIds: ['r1', 'r2'] }), roles, channels);
+
+		expect(restriction).toEqual({ kind: 'scoped', role: null, roles: 2, channels: 0 });
 	});
 
-	it('mentions blocked channels alongside the role rule', () => {
-		const summary = restrictionSummary(
+	it('counts blocked channels alongside the role rule', () => {
+		const restriction = readRestriction(
 			command({ allowedRoleIds: ['r1'], deniedChannelIds: ['c1'] }),
 			roles,
 			channels
 		);
-		expect(summary).toBe('Staff, except 1 channel');
+
+		expect(restriction).toEqual({ kind: 'scoped', role: 'Staff', roles: 1, channels: 1 });
 	});
 
 	it('ignores a role that no longer exists in the server', () => {
-		const summary = restrictionSummary(command({ allowedRoleIds: ['gone'] }), roles, channels);
-		expect(summary).toBe('Everyone, everywhere');
+		expect(readRestriction(command({ allowedRoleIds: ['gone'] }), roles, channels)).toEqual({
+			kind: 'open'
+		});
+	});
+
+	it('carries no human wording, so a language cannot leak out of here', () => {
+		const restriction = readRestriction(
+			command({ allowedRoleIds: ['r1', 'r2'], deniedChannelIds: ['c1'] }),
+			roles,
+			channels
+		);
+
+		expect(JSON.stringify(Object.values(restriction))).not.toMatch(/everyone|except|channel/i);
 	});
 });
 

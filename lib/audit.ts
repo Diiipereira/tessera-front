@@ -15,18 +15,27 @@ export const SOURCE_LABELS: Record<AuditSource, string> = {
 	api: 'API'
 };
 
-export function formatValue(value: unknown): string {
-	if (value === null || value === undefined) return 'none';
-	if (typeof value === 'boolean') return value ? 'on' : 'off';
-	if (typeof value === 'string') return value === '' ? '(empty)' : value;
+export type ValueWords = {
+	none: string;
+	on: string;
+	off: string;
+	empty: string;
+	emptyList: string;
+	unreadable: string;
+};
+
+export function formatValue(value: unknown, words: ValueWords): string {
+	if (value === null || value === undefined) return words.none;
+	if (typeof value === 'boolean') return value ? words.on : words.off;
+	if (typeof value === 'string') return value === '' ? words.empty : value;
 	if (Array.isArray(value)) {
 		return value.length === 0
-			? '(empty list)'
-			: value.map((entry) => formatValue(entry)).join(', ');
+			? words.emptyList
+			: value.map((entry) => formatValue(entry, words)).join(', ');
 	}
 	if (typeof value === 'number') return String(value);
 	if (typeof value === 'object') return JSON.stringify(value);
-	return 'unreadable';
+	return words.unreadable;
 }
 
 export function fieldLabel(field: string): string {
@@ -38,14 +47,16 @@ export function fieldLabel(field: string): string {
 	return spaced.charAt(0).toUpperCase() + spaced.slice(1);
 }
 
-export function diffEntry(entry: AuditEntry): DiffRow[] {
-	const fields = [...new Set([...Object.keys(entry.before), ...Object.keys(entry.after)])].sort();
+export function changedFields(entry: AuditEntry): string[] {
+	return [...new Set([...Object.keys(entry.before), ...Object.keys(entry.after)])].sort();
+}
 
-	return fields.flatMap<DiffRow>((field) => {
+export function diffEntry(entry: AuditEntry, words: ValueWords): DiffRow[] {
+	return changedFields(entry).flatMap<DiffRow>((field) => {
 		const had = Object.hasOwn(entry.before, field);
 		const has = Object.hasOwn(entry.after, field);
-		const before = formatValue(entry.before[field]);
-		const after = formatValue(entry.after[field]);
+		const before = formatValue(entry.before[field], words);
+		const after = formatValue(entry.after[field], words);
 
 		if (had && has) {
 			if (before === after) return [];
@@ -75,12 +86,12 @@ export function filterAudit(entries: AuditEntry[], filters: AuditFilters): Audit
 			entry.action.toLowerCase().includes(term) ||
 			entry.actorName.toLowerCase().includes(term) ||
 			entry.module.toLowerCase().includes(term) ||
-			diffEntry(entry).some((row) => fieldLabel(row.field).toLowerCase().includes(term))
+			changedFields(entry).some((field) => fieldLabel(field).toLowerCase().includes(term))
 		);
 	});
 }
 
-export function toCsv(entries: AuditEntry[]): string {
+export function toCsv(entries: AuditEntry[], words: ValueWords): string {
 	const escape = (value: string) => `"${value.replace(/"/g, '""')}"`;
 	const header = ['at', 'actor', 'action', 'module', 'source', 'changes'];
 
@@ -91,8 +102,11 @@ export function toCsv(entries: AuditEntry[]): string {
 			entry.action,
 			entry.module,
 			SOURCE_LABELS[entry.source],
-			diffEntry(entry)
-				.map((row) => `${fieldLabel(row.field)}: ${row.before ?? 'none'} -> ${row.after ?? 'none'}`)
+			diffEntry(entry, words)
+				.map(
+					(row) =>
+						`${fieldLabel(row.field)}: ${row.before ?? words.none} -> ${row.after ?? words.none}`
+				)
 				.join('; ')
 		]
 			.map(escape)

@@ -1,6 +1,7 @@
 'use client';
 
 import { ChevronRight, Download, FileClock } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { PageHeader } from '@/components/management/PageHeader';
@@ -32,6 +33,18 @@ const KIND_STYLES = {
 } as const;
 
 export function AuditScreen({ entries }: { entries: AuditEntry[] }) {
+	const t = useTranslations('audit');
+	const words = useMemo(
+		() => ({
+			none: t('value.none'),
+			on: t('value.on'),
+			off: t('value.off'),
+			empty: t('value.empty'),
+			emptyList: t('value.emptyList'),
+			unreadable: t('value.unreadable')
+		}),
+		[t]
+	);
 	const [query, setQuery] = useState('');
 	const [actor, setActor] = useState('all');
 	const [module, setModule] = useState('all');
@@ -52,19 +65,19 @@ export function AuditScreen({ entries }: { entries: AuditEntry[] }) {
 	return (
 		<div className="w-full p-6 sm:p-8">
 			<PageHeader
-				title="Audit log"
-				description="Every change to this server, whoever made it and wherever they made it from."
+				title={t('title')}
+				description={t('description')}
 				action={
 					<Button
 						variant="outline"
 						onClick={() => {
-							toast.success(`Exported ${String(visible.length)} entries`, {
-								description: `${String(toCsv(visible).length)} bytes of CSV, once the API can stream it.`
+							toast.success(t('exported', { count: visible.length }), {
+								description: t('exportedHint', { bytes: toCsv(visible, words).length })
 							});
 						}}
 					>
 						<Download aria-hidden="true" />
-						Export
+						{t('export')}
 					</Button>
 				}
 			/>
@@ -73,14 +86,14 @@ export function AuditScreen({ entries }: { entries: AuditEntry[] }) {
 				<SearchInput
 					value={query}
 					onValueChange={setQuery}
-					placeholder="Search actions and fields…"
-					aria-label="Search the audit log"
+					placeholder={t('search')}
+					aria-label={t('searchLabel')}
 					className="max-w-72"
 				/>
 
 				<Select
 					options={[
-						{ value: 'all', label: 'Every actor' },
+						{ value: 'all', label: t('everyActor') },
 						...actors.map((name) => ({ value: name, label: name }))
 					]}
 					value={actor}
@@ -90,7 +103,7 @@ export function AuditScreen({ entries }: { entries: AuditEntry[] }) {
 
 				<Select
 					options={[
-						{ value: 'all', label: 'Every module' },
+						{ value: 'all', label: t('everyModule') },
 						...modules.map((name) => ({ value: name, label: name }))
 					]}
 					value={module}
@@ -100,29 +113,25 @@ export function AuditScreen({ entries }: { entries: AuditEntry[] }) {
 
 				<SegmentedControl
 					options={[
-						{ value: 'all', label: 'All' },
+						{ value: 'all', label: t('allSources') },
 						{ value: 'web', label: 'Web' },
 						{ value: 'slash', label: 'Slash' },
 						{ value: 'api', label: 'API' }
 					]}
 					value={source}
 					onValueChange={setSource}
-					label="Filter by source"
+					label={t('source')}
 					size="sm"
 				/>
 			</div>
 
 			<div className="mt-6 overflow-hidden rounded-lg border border-border bg-surface shadow-1">
 				{visible.length === 0 ? (
-					<EmptyState
-						icon={FileClock}
-						title="Nothing matches"
-						description="No change in the retained window fits those filters. The free plan keeps 30 days."
-					/>
+					<EmptyState icon={FileClock} title={t('emptyTitle')} description={t('emptyBody')} />
 				) : (
 					<ul>
 						{visible.map((entry) => {
-							const rows = diffEntry(entry);
+							const rows = diffEntry(entry, words);
 							const open = expanded === entry.id;
 
 							return (
@@ -155,8 +164,7 @@ export function AuditScreen({ entries }: { entries: AuditEntry[] }) {
 												<span className="text-text-muted">{entry.action}</span>
 											</span>
 											<span className="block truncate text-caption font-normal text-text-muted">
-												{entry.module} · {rows.length} {rows.length === 1 ? 'field' : 'fields'}{' '}
-												changed
+												{entry.module} · {t('fields', { count: rows.length })} changed
 											</span>
 										</span>
 
@@ -183,9 +191,9 @@ export function AuditScreen({ entries }: { entries: AuditEntry[] }) {
 													<table className="w-full min-w-140 border-collapse text-left">
 														<thead>
 															<tr className="text-overline text-text-muted uppercase">
-																<th className="w-1/4 pb-2 font-mono font-semibold">Field</th>
-																<th className="pb-2 font-mono font-semibold">Before</th>
-																<th className="pb-2 font-mono font-semibold">After</th>
+																<th className="w-1/4 pb-2 font-mono font-semibold">{t('field')}</th>
+																<th className="pb-2 font-mono font-semibold">{t('before')}</th>
+																<th className="pb-2 font-mono font-semibold">{t('after')}</th>
 															</tr>
 														</thead>
 														<tbody>
@@ -242,7 +250,7 @@ export function AuditScreen({ entries }: { entries: AuditEntry[] }) {
 			</div>
 
 			<p className="mt-3 text-caption font-normal text-text-muted">
-				Showing {visible.length} of {entries.length} retained entries.
+				{t('showing', { shown: visible.length, total: entries.length })}
 			</p>
 		</div>
 	);

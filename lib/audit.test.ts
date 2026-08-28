@@ -2,6 +2,15 @@ import { describe, expect, it } from 'vitest';
 import { diffEntry, fieldLabel, filterAudit, formatValue, toCsv } from '@/lib/audit';
 import type { AuditEntry } from '@/lib/types/management';
 
+const WORDS = {
+	none: 'none',
+	on: 'on',
+	off: 'off',
+	empty: '(empty)',
+	emptyList: '(empty list)',
+	unreadable: 'unreadable'
+};
+
 function entry(partial: Partial<AuditEntry>): AuditEntry {
 	return {
 		id: 'a',
@@ -20,18 +29,25 @@ function entry(partial: Partial<AuditEntry>): AuditEntry {
 
 describe('formatValue', () => {
 	it('reads booleans as on and off, not true and false', () => {
-		expect(formatValue(true)).toBe('on');
-		expect(formatValue(false)).toBe('off');
+		expect(formatValue(true, WORDS)).toBe(WORDS.on);
+		expect(formatValue(false, WORDS)).toBe(WORDS.off);
 	});
 
 	it('marks an empty string apart from a missing one', () => {
-		expect(formatValue('')).toBe('(empty)');
-		expect(formatValue(null)).toBe('none');
+		expect(formatValue('', WORDS)).toBe(WORDS.empty);
+		expect(formatValue(null, WORDS)).toBe(WORDS.none);
 	});
 
 	it('joins a list and names the empty case', () => {
-		expect(formatValue(['Staff', 'Admin'])).toBe('Staff, Admin');
-		expect(formatValue([])).toBe('(empty list)');
+		expect(formatValue(['Staff', 'Admin'], WORDS)).toBe('Staff, Admin');
+		expect(formatValue([], WORDS)).toBe(WORDS.emptyList);
+	});
+
+	it('says every word it prints, so none is hardcoded in the formatter', () => {
+		const other = { ...WORDS, none: 'nada', on: 'ligado' };
+
+		expect(formatValue(null, other)).toBe('nada');
+		expect(formatValue(true, other)).toBe('ligado');
 	});
 });
 
@@ -47,28 +63,34 @@ describe('fieldLabel', () => {
 
 describe('diffEntry', () => {
 	it('drops fields whose value did not move', () => {
-		const rows = diffEntry(entry({ before: { threshold: 1 }, after: { threshold: 1 } }));
+		const rows = diffEntry(entry({ before: { threshold: 1 }, after: { threshold: 1 } }), WORDS);
 		expect(rows).toEqual([]);
 	});
 
 	it('marks a field only in `after` as added', () => {
-		const rows = diffEntry(entry({ before: {}, after: { winners: 2 } }));
+		const rows = diffEntry(entry({ before: {}, after: { winners: 2 } }), WORDS);
 		expect(rows).toEqual([{ field: 'winners', kind: 'added', before: null, after: '2' }]);
 	});
 
 	it('marks a field only in `before` as removed', () => {
-		const rows = diffEntry(entry({ before: { name: 'coinflip' }, after: {} }));
+		const rows = diffEntry(entry({ before: { name: 'coinflip' }, after: {} }), WORDS);
 		expect(rows).toEqual([{ field: 'name', kind: 'removed', before: 'coinflip', after: null }]);
 	});
 
 	it('keeps a field explicitly set to null as a change, not a removal', () => {
-		const rows = diffEntry(entry({ before: { channel: 'general' }, after: { channel: null } }));
+		const rows = diffEntry(
+			entry({ before: { channel: 'general' }, after: { channel: null } }),
+			WORDS
+		);
 		expect(rows[0]?.kind).toBe('changed');
 		expect(rows[0]?.after).toBe('none');
 	});
 
 	it('sorts rows by field name so the diff does not jump around', () => {
-		const rows = diffEntry(entry({ before: { zeta: 1, alpha: 1 }, after: { zeta: 2, alpha: 2 } }));
+		const rows = diffEntry(
+			entry({ before: { zeta: 1, alpha: 1 }, after: { zeta: 2, alpha: 2 } }),
+			WORDS
+		);
 		expect(rows.map((row) => row.field)).toEqual(['alpha', 'zeta']);
 	});
 });
@@ -104,7 +126,7 @@ describe('filterAudit', () => {
 
 describe('toCsv', () => {
 	it('writes a header and one row per entry', () => {
-		const csv = toCsv([entry({ before: { a: 1 }, after: { a: 2 } })]);
+		const csv = toCsv([entry({ before: { a: 1 }, after: { a: 2 } })], WORDS);
 		const lines = csv.split('\n');
 		expect(lines).toHaveLength(2);
 		expect(lines[0]).toContain('"actor"');
@@ -112,7 +134,7 @@ describe('toCsv', () => {
 	});
 
 	it('escapes a quote inside a reason rather than breaking the row', () => {
-		const csv = toCsv([entry({ action: 'Said "hello"' })]);
+		const csv = toCsv([entry({ action: 'Said "hello"' })], WORDS);
 		expect(csv).toContain('"Said ""hello"""');
 		expect(csv.split('\n')).toHaveLength(2);
 	});

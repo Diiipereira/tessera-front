@@ -1555,5 +1555,81 @@
 				"days1": "Depois de 1 dia"
 			}
 		}
+	},
+	"audit": {
+		"title": "Registro de auditoria",
+		"description": "Toda mudança neste servidor, quem fez e de onde fez.",
+		"export": "Exportar",
+		"exported": "{count} entradas exportadas",
+		"exportedHint": "{bytes} bytes de CSV, quando a API conseguir transmitir.",
+		"search": "Buscar ações e campos…",
+		"searchLabel": "Buscar no registro de auditoria",
+		"everyActor": "Todos os autores",
+		"everyModule": "Todos os módulos",
+		"allSources": "Todas",
+		"source": "Filtrar por origem",
+		"emptyTitle": "Nada corresponde",
+		"emptyBody": "Nenhuma mudança na janela retida se encaixa nesses filtros. O plano gratuito guarda 30 dias.",
+		"fields": "{count, plural, =1 {1 campo} other {# campos}}",
+		"field": "Campo",
+		"before": "Antes",
+		"after": "Depois",
+		"showing": "Mostrando {shown} de {total} entradas retidas.",
+		"value": {
+			"none": "nenhum",
+			"on": "ligado",
+			"off": "desligado",
+			"empty": "(vazio)",
+			"emptyList": "(lista vazia)",
+			"unreadable": "ilegível"
+		}
+	},
+	"commands": {
+		"title": "Comandos",
+		"description": "{enabled} de {total} comandos estão registrados no Discord. Desligar um cancela o registro dele.",
+		"sync": "Sincronizar com o Discord",
+		"syncQueued": "Sincronização na fila",
+		"syncHint": "O Discord leva até uma hora para mostrar mudanças em comandos globais.",
+		"categories": "Categorias",
+		"allCommands": "Todos os comandos",
+		"search": "Buscar comandos…",
+		"searchLabel": "Buscar comandos",
+		"onlyDisabled": "Só os desligados",
+		"selected": "{count} selecionados",
+		"enable": "Ligar",
+		"disable": "Desligar",
+		"bulk": "{count, plural, =1 {1 comando} other {# comandos}} {state}",
+		"stateEnabled": "ligado(s)",
+		"stateDisabled": "desligado(s)",
+		"enableOne": "Ligar /{name}",
+		"emptyTitle": "Nenhum comando corresponde",
+		"emptyBody": "Nada nesta categoria atende a isso. Limpe a busca ou escolha outra categoria.",
+		"columns": {
+			"command": "Comando",
+			"category": "Categoria",
+			"uses": "Usos 7d",
+			"cooldown": "Intervalo",
+			"access": "Acesso",
+			"on": "Ligado"
+		},
+		"drawer": {
+			"cooldown": "Intervalo",
+			"cooldownHint": "Por membro, em segundos. Zero significa sem intervalo.",
+			"roles": "Cargos permitidos",
+			"rolesHint": "Vazio significa que todos podem rodar.",
+			"rolesPlaceholder": "Todos…",
+			"channel": "Canal bloqueado",
+			"channelHint": "O comando é recusado aqui.",
+			"channelPlaceholder": "Nenhum bloqueado…"
+		},
+		"lastSynced": "Sincronizado {when}.",
+		"access": {
+			"open": "Todos, em todo lugar",
+			"everyone": "Todos",
+			"roles": "{count} cargos",
+			"except": ", exceto {count, plural, =1 {1 canal} other {# canais}}"
+		},
+		"selectAll": "Selecionar todos os comandos visíveis",
+		"selectOne": "Selecionar /{name}"
 	}
 }

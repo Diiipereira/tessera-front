@@ -1555,5 +1555,81 @@
 				"days1": "After 1 day"
 			}
 		}
+	},
+	"audit": {
+		"title": "Audit log",
+		"description": "Every change to this server, whoever made it and wherever they made it from.",
+		"export": "Export",
+		"exported": "Exported {count} entries",
+		"exportedHint": "{bytes} bytes of CSV, once the API can stream it.",
+		"search": "Search actions and fields…",
+		"searchLabel": "Search the audit log",
+		"everyActor": "Every actor",
+		"everyModule": "Every module",
+		"allSources": "All",
+		"source": "Filter by source",
+		"emptyTitle": "Nothing matches",
+		"emptyBody": "No change in the retained window fits those filters. The free plan keeps 30 days.",
+		"fields": "{count, plural, =1 {1 field} other {# fields}}",
+		"field": "Field",
+		"before": "Before",
+		"after": "After",
+		"showing": "Showing {shown} of {total} retained entries.",
+		"value": {
+			"none": "none",
+			"on": "on",
+			"off": "off",
+			"empty": "(empty)",
+			"emptyList": "(empty list)",
+			"unreadable": "unreadable"
+		}
+	},
+	"commands": {
+		"title": "Commands",
+		"description": "{enabled} of {total} commands are registered with Discord. Turning one off unregisters it.",
+		"sync": "Sync with Discord",
+		"syncQueued": "Sync queued",
+		"syncHint": "Discord takes up to an hour to show global command changes.",
+		"categories": "Categories",
+		"allCommands": "All commands",
+		"search": "Search commands…",
+		"searchLabel": "Search commands",
+		"onlyDisabled": "Only disabled",
+		"selected": "{count} selected",
+		"enable": "Enable",
+		"disable": "Disable",
+		"bulk": "{count, plural, =1 {1 command} other {# commands}} {state}",
+		"stateEnabled": "enabled",
+		"stateDisabled": "disabled",
+		"enableOne": "Enable /{name}",
+		"emptyTitle": "No commands match",
+		"emptyBody": "Nothing in this category answers to that. Clear the search or pick another category.",
+		"columns": {
+			"command": "Command",
+			"category": "Category",
+			"uses": "Uses 7d",
+			"cooldown": "Cooldown",
+			"access": "Access",
+			"on": "On"
+		},
+		"drawer": {
+			"cooldown": "Cooldown",
+			"cooldownHint": "Per member, in seconds. Zero means no cooldown.",
+			"roles": "Allowed roles",
+			"rolesHint": "Empty means everyone can run it.",
+			"rolesPlaceholder": "Everyone…",
+			"channel": "Blocked channel",
+			"channelHint": "The command is refused here.",
+			"channelPlaceholder": "Nowhere blocked…"
+		},
+		"lastSynced": "Last synced {when}.",
+		"access": {
+			"open": "Everyone, everywhere",
+			"everyone": "Everyone",
+			"roles": "{count} roles",
+			"except": ", except {count, plural, =1 {1 channel} other {# channels}}"
+		},
+		"selectAll": "Select every visible command",
+		"selectOne": "Select /{name}"
 	}
 }
