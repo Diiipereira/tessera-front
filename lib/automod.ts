@@ -1,8 +1,15 @@
-import type { AutoModRule, AutoModTrigger } from '@/lib/types/module-configs';
+import type { AutoModRule } from '@/lib/types/module-configs';
+
+export type HitReason =
+	| { kind: 'invites'; count: number }
+	| { kind: 'links'; count: number }
+	| { kind: 'mentions'; count: number; limit: number }
+	| { kind: 'caps'; ratio: number; limit: number }
+	| { kind: 'words'; found: string[] };
 
 export type RuleHit = {
 	rule: AutoModRule;
-	reason: string;
+	reason: HitReason;
 };
 
 const INVITE = /(discord\.(gg|com\/invite)|discordapp\.com\/invite)\/\S+/gi;
@@ -20,25 +27,6 @@ function capsRatio(text: string): number {
 	return (upper / letters.length) * 100;
 }
 
-export function describeTrigger(trigger: AutoModTrigger, rule: AutoModRule): string {
-	switch (trigger) {
-		case 'spam':
-			return `${String(rule.threshold)} messages in ${String(rule.windowSeconds)}s`;
-		case 'invites':
-			return 'any Discord invite';
-		case 'links':
-			return 'any link';
-		case 'caps':
-			return `over ${String(rule.threshold)}% capitals`;
-		case 'mentions':
-			return `${String(rule.threshold)} mentions in one message`;
-		case 'words':
-			return `${String(rule.words.length)} blocked words`;
-		case 'attachments':
-			return `${String(rule.threshold)} attachments`;
-	}
-}
-
 export function evaluateMessage(text: string, rules: AutoModRule[]): RuleHit[] {
 	const hits: RuleHit[] = [];
 
@@ -48,7 +36,7 @@ export function evaluateMessage(text: string, rules: AutoModRule[]): RuleHit[] {
 		if (rule.trigger === 'invites') {
 			const count = countMatches(text, INVITE);
 			if (count >= Math.max(1, rule.threshold)) {
-				hits.push({ rule, reason: `found ${String(count)} invite link(s)` });
+				hits.push({ rule, reason: { kind: 'invites', count } });
 			}
 			continue;
 		}
@@ -56,7 +44,7 @@ export function evaluateMessage(text: string, rules: AutoModRule[]): RuleHit[] {
 		if (rule.trigger === 'links') {
 			const count = countMatches(text, LINK);
 			if (count >= Math.max(1, rule.threshold)) {
-				hits.push({ rule, reason: `found ${String(count)} link(s)` });
+				hits.push({ rule, reason: { kind: 'links', count } });
 			}
 			continue;
 		}
@@ -64,10 +52,7 @@ export function evaluateMessage(text: string, rules: AutoModRule[]): RuleHit[] {
 		if (rule.trigger === 'mentions') {
 			const count = countMatches(text, MENTION);
 			if (count >= rule.threshold) {
-				hits.push({
-					rule,
-					reason: `${String(count)} mentions, limit is ${String(rule.threshold)}`
-				});
+				hits.push({ rule, reason: { kind: 'mentions', count, limit: rule.threshold } });
 			}
 			continue;
 		}
@@ -75,10 +60,7 @@ export function evaluateMessage(text: string, rules: AutoModRule[]): RuleHit[] {
 		if (rule.trigger === 'caps') {
 			const ratio = Math.round(capsRatio(text));
 			if (text.length >= 8 && ratio > rule.threshold) {
-				hits.push({
-					rule,
-					reason: `${String(ratio)}% capitals, limit is ${String(rule.threshold)}%`
-				});
+				hits.push({ rule, reason: { kind: 'caps', ratio, limit: rule.threshold } });
 			}
 			continue;
 		}
@@ -89,7 +71,7 @@ export function evaluateMessage(text: string, rules: AutoModRule[]): RuleHit[] {
 				(word) => word !== '' && lowered.includes(word.toLowerCase())
 			);
 			if (found.length > 0) {
-				hits.push({ rule, reason: `matched ${found.join(', ')}` });
+				hits.push({ rule, reason: { kind: 'words', found } });
 			}
 			continue;
 		}

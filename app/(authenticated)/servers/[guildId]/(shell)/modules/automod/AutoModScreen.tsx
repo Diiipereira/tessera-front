@@ -15,6 +15,7 @@ import {
 	Type,
 	type LucideIcon
 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useId, useState } from 'react';
 import { toast } from 'sonner';
 import { ChannelPicker } from '@/components/discord/ChannelPicker';
@@ -30,7 +31,7 @@ import { Input } from '@/components/ui/Input';
 import { NumberInput } from '@/components/ui/NumberInput';
 import { Switch } from '@/components/ui/Switch';
 import { Textarea } from '@/components/ui/Textarea';
-import { describeTrigger, evaluateMessage, untestableTriggers } from '@/lib/automod';
+import { evaluateMessage, untestableTriggers, type HitReason } from '@/lib/automod';
 import type {
 	AutoModAction,
 	AutoModConfig,
@@ -42,24 +43,17 @@ import { useConfigDraft } from '@/lib/hooks/useConfigDraft';
 import { cn } from '@/lib/utils/cn';
 import { newId } from '@/lib/utils/id';
 
-const TRIGGERS: { id: AutoModTrigger; label: string; blurb: string; icon: LucideIcon }[] = [
-	{ id: 'spam', label: 'Spam', blurb: 'Too many messages too fast', icon: MessageSquareWarning },
-	{ id: 'invites', label: 'Invites', blurb: 'Links to other servers', icon: Ticket },
-	{ id: 'links', label: 'Links', blurb: 'Any URL at all', icon: Link2 },
-	{ id: 'caps', label: 'Capitals', blurb: 'SHOUTING', icon: CaseUpper },
-	{ id: 'mentions', label: 'Mentions', blurb: 'Mass pings', icon: AtSign },
-	{ id: 'words', label: 'Words', blurb: 'Your own blocklist', icon: Type },
-	{ id: 'attachments', label: 'Attachments', blurb: 'Too many files', icon: Paperclip }
+const TRIGGERS: { id: AutoModTrigger; icon: LucideIcon }[] = [
+	{ id: 'spam', icon: MessageSquareWarning },
+	{ id: 'invites', icon: Ticket },
+	{ id: 'links', icon: Link2 },
+	{ id: 'caps', icon: CaseUpper },
+	{ id: 'mentions', icon: AtSign },
+	{ id: 'words', icon: Type },
+	{ id: 'attachments', icon: Paperclip }
 ];
 
-const ACTIONS: { id: AutoModAction; label: string }[] = [
-	{ id: 'delete', label: 'Delete' },
-	{ id: 'warn', label: 'Warn' },
-	{ id: 'timeout', label: 'Timeout' },
-	{ id: 'kick', label: 'Kick' },
-	{ id: 'ban', label: 'Ban' },
-	{ id: 'log', label: 'Log only' }
-];
+const ACTIONS: AutoModAction[] = ['delete', 'warn', 'timeout', 'kick', 'ban', 'log'];
 
 const ACTION_VARIANTS: Record<AutoModAction, BadgeVariant> = {
 	delete: 'neutral',
@@ -69,10 +63,6 @@ const ACTION_VARIANTS: Record<AutoModAction, BadgeVariant> = {
 	ban: 'danger',
 	log: 'info'
 };
-
-const TRIGGER_LABEL: Record<AutoModTrigger, string> = Object.fromEntries(
-	TRIGGERS.map((entry) => [entry.id, entry.label])
-) as Record<AutoModTrigger, string>;
 
 function newRule(): AutoModRule {
 	return {
@@ -96,6 +86,7 @@ type AutoModScreenProps = {
 };
 
 export function AutoModScreen({ config, channels, roles }: AutoModScreenProps) {
+	const t = useTranslations('modules.automod');
 	const form = useConfigDraft<AutoModConfig>(config);
 	const draft = form.draft;
 
@@ -105,6 +96,26 @@ export function AutoModScreen({ config, channels, roles }: AutoModScreenProps) {
 
 	const hits = evaluateMessage(sample, draft.rules);
 	const untestable = untestableTriggers(draft.rules);
+
+	function summaryFor(rule: AutoModRule): string {
+		return t(`summary.${rule.trigger}`, {
+			threshold: rule.threshold,
+			window: rule.windowSeconds,
+			count: rule.words.length
+		});
+	}
+
+	function reasonFor(reason: HitReason): string {
+		if (reason.kind === 'words') return t('reason.words', { found: reason.found.join(', ') });
+		if (reason.kind === 'caps') {
+			return t('reason.caps', { ratio: reason.ratio, limit: reason.limit });
+		}
+		if (reason.kind === 'mentions') {
+			return t('reason.mentions', { count: reason.count, limit: reason.limit });
+		}
+
+		return t(`reason.${reason.kind}`, { count: reason.count });
+	}
 
 	function commitRule(rule: AutoModRule) {
 		const exists = draft.rules.some((entry) => entry.id === rule.id);
@@ -121,8 +132,8 @@ export function AutoModScreen({ config, channels, roles }: AutoModScreenProps) {
 		<ModulePage
 			moduleId="automod"
 			icon={ShieldAlert}
-			title="AutoMod"
-			description="Rules that act before a human has to. Every hit is written to the case log."
+			title={t('title')}
+			description={t('description')}
 			enabled={draft.enabled}
 			onEnabledChange={(next) => {
 				form.set('enabled', next);
@@ -148,19 +159,16 @@ export function AutoModScreen({ config, channels, roles }: AutoModScreenProps) {
 					onDiscard={form.discard}
 					onSave={() => {
 						void form.save().then(() => {
-							toast.success('AutoMod rules saved');
+							toast.success(t('saved'));
 						});
 					}}
 					onResolveConflict={form.resolveConflict}
 				/>
 			}
 		>
-			<SettingsSection
-				title="Rules"
-				description="Checked top to bottom. The first rule that fires wins."
-			>
+			<SettingsSection title={t('rules.title')} description={t('rules.description')}>
 				{draft.rules.length === 0 ? (
-					<p className="text-body-sm text-text-muted">No rules yet. Nothing is being filtered.</p>
+					<p className="text-body-sm text-text-muted">{t('rules.empty')}</p>
 				) : (
 					<div className="overflow-x-auto">
 						<table className="w-full min-w-160 border-collapse">
@@ -168,13 +176,13 @@ export function AutoModScreen({ config, channels, roles }: AutoModScreenProps) {
 								<tr className="border-b border-border text-left">
 									{RULE_COLUMNS.map((column) => (
 										<th
-											key={column.label}
+											key={column.key}
 											className="pb-2 font-mono text-overline font-semibold text-text-muted uppercase"
 										>
 											{column.hidden ? (
-												<span className="sr-only">{column.label}</span>
+												<span className="sr-only">{t(`rules.${column.key}`)}</span>
 											) : (
-												column.label
+												t(`rules.${column.key}`)
 											)}
 										</th>
 									))}
@@ -182,7 +190,7 @@ export function AutoModScreen({ config, channels, roles }: AutoModScreenProps) {
 							</thead>
 							<tbody>
 								{draft.rules.map((rule) => {
-									const label = rule.name === '' ? 'Untitled rule' : rule.name;
+									const label = rule.name === '' ? t('untitled') : rule.name;
 									return (
 										<tr key={rule.id} className="border-b border-border last:border-0">
 											<td className="py-3 pr-3">
@@ -197,17 +205,15 @@ export function AutoModScreen({ config, channels, roles }: AutoModScreenProps) {
 													{label}
 												</button>
 												<p className="text-caption font-normal text-text-muted">
-													{TRIGGER_LABEL[rule.trigger]}
+													{t(`trigger.${rule.trigger}.label`)}
 												</p>
 											</td>
-											<td className="py-3 pr-3 text-body-sm text-text-muted">
-												{describeTrigger(rule.trigger, rule)}
-											</td>
+											<td className="py-3 pr-3 text-body-sm text-text-muted">{summaryFor(rule)}</td>
 											<td className="py-3 pr-3">
 												<div className="flex flex-wrap gap-1">
 													{rule.actions.map((action) => (
 														<Badge key={action} variant={ACTION_VARIANTS[action]}>
-															{ACTIONS.find((entry) => entry.id === action)?.label ?? action}
+															{t(`action.${action}`)}
 														</Badge>
 													))}
 												</div>
@@ -215,7 +221,7 @@ export function AutoModScreen({ config, channels, roles }: AutoModScreenProps) {
 											<td className="py-3 pr-3">
 												<Switch
 													checked={rule.enabled}
-													aria-label={`Enable ${label}`}
+													aria-label={t('rules.enable', { name: label })}
 													onCheckedChange={(next) => {
 														form.set(
 															'rules',
@@ -232,7 +238,7 @@ export function AutoModScreen({ config, channels, roles }: AutoModScreenProps) {
 														variant="ghost"
 														size="sm"
 														iconOnly
-														aria-label={`Edit ${label}`}
+														aria-label={t('rules.edit', { name: label })}
 														onClick={() => {
 															setEditing(rule);
 															setIsNew(false);
@@ -244,7 +250,7 @@ export function AutoModScreen({ config, channels, roles }: AutoModScreenProps) {
 														variant="ghost-danger"
 														size="sm"
 														iconOnly
-														aria-label={`Delete ${label}`}
+														aria-label={t('rules.delete', { name: label })}
 														onClick={() => {
 															form.set(
 																'rules',
@@ -265,11 +271,8 @@ export function AutoModScreen({ config, channels, roles }: AutoModScreenProps) {
 				)}
 			</SettingsSection>
 
-			<SettingsSection
-				title="Test playground"
-				description="Paste something a member might send and see which rules would catch it."
-			>
-				<Field label="Sample message">
+			<SettingsSection title={t('playground.title')} description={t('playground.description')}>
+				<Field label={t('playground.sample')}>
 					<Textarea
 						value={sample}
 						onChange={(event) => {
@@ -287,9 +290,7 @@ export function AutoModScreen({ config, channels, roles }: AutoModScreenProps) {
 					)}
 				>
 					{hits.length === 0 ? (
-						<p className="text-body-sm text-text-muted">
-							Nothing fires. This message would go through.
-						</p>
+						<p className="text-body-sm text-text-muted">{t('playground.clear')}</p>
 					) : (
 						<ul className="flex flex-col gap-2">
 							{hits.map((hit) => (
@@ -299,8 +300,8 @@ export function AutoModScreen({ config, channels, roles }: AutoModScreenProps) {
 										aria-hidden="true"
 									/>
 									<span className="text-body-sm text-warning-fg">
-										<span className="font-medium">{hit.rule.name}</span> would fire &mdash;{' '}
-										{hit.reason}
+										<span className="font-medium">{hit.rule.name}</span> {t('playground.fires')}{' '}
+										&mdash; {reasonFor(hit.reason)}
 									</span>
 								</li>
 							))}
@@ -310,8 +311,10 @@ export function AutoModScreen({ config, channels, roles }: AutoModScreenProps) {
 
 				{untestable.length > 0 ? (
 					<p className="text-caption font-normal text-text-muted">
-						{untestable.map((rule) => rule.name).join(', ')} cannot be tested here &mdash;{' '}
-						{untestable.length === 1 ? 'it needs' : 'they need'} message history or attachments.
+						{t('playground.untestable', {
+							names: untestable.map((rule) => rule.name).join(', '),
+							count: untestable.length
+						})}
 					</p>
 				) : null}
 			</SettingsSection>
@@ -332,12 +335,12 @@ export function AutoModScreen({ config, channels, roles }: AutoModScreenProps) {
 	);
 }
 
-const RULE_COLUMNS: { label: string; hidden?: boolean }[] = [
-	{ label: 'Rule' },
-	{ label: 'Fires on' },
-	{ label: 'Then' },
-	{ label: 'Enabled', hidden: true },
-	{ label: 'Actions', hidden: true }
+const RULE_COLUMNS: { key: string; hidden?: boolean }[] = [
+	{ key: 'rule' },
+	{ key: 'firesOn' },
+	{ key: 'then' },
+	{ key: 'enabled', hidden: true },
+	{ key: 'actions', hidden: true }
 ];
 
 type RuleDialogProps = {
@@ -350,6 +353,8 @@ type RuleDialogProps = {
 };
 
 function RuleDialog({ rule, isNew, channels, roles, onCancel, onSave }: RuleDialogProps) {
+	const t = useTranslations('modules.automod');
+	const shared = useTranslations('common');
 	const [work, setWork] = useState(rule);
 	const triggerLabelId = useId();
 	const actionsLabelId = useId();
@@ -376,13 +381,13 @@ function RuleDialog({ rule, isNew, channels, roles, onCancel, onSave }: RuleDial
 			onOpenChange={(next) => {
 				if (!next) onCancel();
 			}}
-			title={isNew ? 'New rule' : 'Edit rule'}
-			description="Pick what it watches for, then what happens when it fires."
+			title={isNew ? t('dialog.new') : t('dialog.edit')}
+			description={t('dialog.description')}
 			size="lg"
 			footer={
 				<>
 					<Button variant="ghost" onClick={onCancel}>
-						Cancel
+						{shared('cancel')}
 					</Button>
 					<Button
 						disabled={work.actions.length === 0}
@@ -390,25 +395,25 @@ function RuleDialog({ rule, isNew, channels, roles, onCancel, onSave }: RuleDial
 							onSave(work);
 						}}
 					>
-						{isNew ? 'Create rule' : 'Save rule'}
+						{isNew ? t('dialog.create') : t('dialog.save')}
 					</Button>
 				</>
 			}
 		>
 			<div className="flex flex-col gap-5">
-				<Field label="Name">
+				<Field label={t('dialog.name')}>
 					<Input
 						value={work.name}
 						onChange={(event) => {
 							patch({ name: event.target.value });
 						}}
-						placeholder="Mass mentions"
+						placeholder={t('dialog.namePlaceholder')}
 					/>
 				</Field>
 
 				<div className="flex flex-col gap-2" role="group" aria-labelledby={triggerLabelId}>
 					<span id={triggerLabelId} className="text-body-sm font-medium">
-						Fires on
+						{t('rules.firesOn')}
 					</span>
 					<div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
 						{TRIGGERS.map((trigger) => {
@@ -438,11 +443,11 @@ function RuleDialog({ rule, isNew, channels, roles, onCancel, onSave }: RuleDial
 											aria-hidden="true"
 										/>
 										<span className="min-w-0 truncate text-body-sm font-medium">
-											{trigger.label}
+											{t(`trigger.${trigger.id}.label`)}
 										</span>
 									</span>
 									<span className="text-caption font-normal text-pretty text-text-muted">
-										{trigger.blurb}
+										{t(`trigger.${trigger.id}.blurb`)}
 									</span>
 								</button>
 							);
@@ -451,7 +456,7 @@ function RuleDialog({ rule, isNew, channels, roles, onCancel, onSave }: RuleDial
 				</div>
 
 				{needsWords ? (
-					<Field label="Blocked words" hint="One per line. Matching is case-insensitive.">
+					<Field label={t('dialog.words')} hint={t('dialog.wordsHint')}>
 						<Textarea
 							value={work.words.join('\n')}
 							onChange={(event) => {
@@ -468,7 +473,7 @@ function RuleDialog({ rule, isNew, channels, roles, onCancel, onSave }: RuleDial
 					<div className="grid gap-5 sm:grid-cols-2">
 						{needsThreshold ? (
 							<Field
-								label={work.trigger === 'caps' ? 'Percent of capitals' : 'Threshold'}
+								label={work.trigger === 'caps' ? t('dialog.percent') : t('dialog.threshold')}
 								hint={work.trigger === 'caps' ? 'Above this share of letters.' : undefined}
 							>
 								<NumberInput
@@ -483,7 +488,7 @@ function RuleDialog({ rule, isNew, channels, roles, onCancel, onSave }: RuleDial
 						) : null}
 
 						{needsWindow ? (
-							<Field label="Within (seconds)">
+							<Field label={t('dialog.window')}>
 								<NumberInput
 									min={1}
 									max={120}
@@ -503,18 +508,18 @@ function RuleDialog({ rule, isNew, channels, roles, onCancel, onSave }: RuleDial
 					aria-labelledby={actionsLabelId}
 				>
 					<span id={actionsLabelId} className="text-body-sm font-medium">
-						Then
+						{t('rules.then')}
 					</span>
 					<div className="flex flex-wrap gap-1.5">
 						{ACTIONS.map((action) => {
-							const active = work.actions.includes(action.id);
+							const active = work.actions.includes(action);
 							return (
 								<button
-									key={action.id}
+									key={action}
 									type="button"
 									aria-pressed={active}
 									onClick={() => {
-										toggleAction(action.id);
+										toggleAction(action);
 									}}
 									className={cn(
 										'inline-flex h-7 items-center rounded-sm border px-2.5 text-body-sm transition-colors duration-120 ease-out',
@@ -523,7 +528,7 @@ function RuleDialog({ rule, isNew, channels, roles, onCancel, onSave }: RuleDial
 											: 'border-border bg-surface text-text-muted hover:border-border-strong hover:text-text'
 									)}
 								>
-									{action.label}
+									{t(`action.${action}`)}
 								</button>
 							);
 						})}
@@ -536,25 +541,25 @@ function RuleDialog({ rule, isNew, channels, roles, onCancel, onSave }: RuleDial
 				</div>
 
 				<div className="grid gap-5 border-t border-border pt-5 sm:grid-cols-2">
-					<Field label="Never applies to these roles">
+					<Field label={t('dialog.exemptRoles')}>
 						<RolePicker
 							roles={roles}
 							value={work.exemptRoleIds}
 							onValueChange={(next) => {
 								patch({ exemptRoleIds: next });
 							}}
-							placeholder="No exemptions…"
+							placeholder={t('dialog.exemptRolesPlaceholder')}
 						/>
 					</Field>
 
-					<Field label="Never applies in this channel">
+					<Field label={t('dialog.exemptChannel')}>
 						<ChannelPicker
 							channels={channels}
 							value={work.exemptChannelIds[0] ?? null}
 							onValueChange={(next) => {
 								patch({ exemptChannelIds: [next] });
 							}}
-							placeholder="Applies everywhere…"
+							placeholder={t('dialog.exemptChannelPlaceholder')}
 						/>
 					</Field>
 				</div>

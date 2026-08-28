@@ -722,6 +722,85 @@
 			"notImage": "Este não é um link direto de imagem — o Discord não vai mostrar nada. Ele precisa terminar em .png, .jpg ou .gif",
 			"expiring": "Link de anexo do Discord expira em menos de um dia e a imagem some. Hospede a figura em algum lugar permanente."
 		},
+		"automod": {
+			"title": "AutoMod",
+			"description": "Regras que agem antes de um humano precisar agir. Toda ocorrência vai para o log de casos.",
+			"saved": "Regras do AutoMod salvas",
+			"new": "Nova regra",
+			"untitled": "Regra sem nome",
+			"rules": {
+				"title": "Regras",
+				"description": "Conferidas de cima para baixo. A primeira regra que dispara vence.",
+				"empty": "Nenhuma regra ainda. Nada está sendo filtrado.",
+				"rule": "Regra",
+				"firesOn": "Dispara em",
+				"then": "Então",
+				"enabled": "Ligada",
+				"actions": "Ações",
+				"enable": "Ligar {name}",
+				"edit": "Editar {name}",
+				"delete": "Excluir {name}"
+			},
+			"trigger": {
+				"spam": { "label": "Spam", "blurb": "Mensagens demais rápido demais" },
+				"invites": { "label": "Convites", "blurb": "Links para outros servidores" },
+				"links": { "label": "Links", "blurb": "Qualquer URL" },
+				"caps": { "label": "Maiúsculas", "blurb": "GRITARIA" },
+				"mentions": { "label": "Menções", "blurb": "Marcação em massa" },
+				"words": { "label": "Palavras", "blurb": "Sua própria lista de bloqueio" },
+				"attachments": { "label": "Anexos", "blurb": "Arquivos demais" }
+			},
+			"summary": {
+				"spam": "{threshold} mensagens em {window}s",
+				"invites": "qualquer convite do Discord",
+				"links": "qualquer link",
+				"caps": "acima de {threshold}% de maiúsculas",
+				"mentions": "{threshold} menções em uma mensagem",
+				"words": "{count} palavras bloqueadas",
+				"attachments": "{threshold} anexos"
+			},
+			"action": {
+				"delete": "Apagar",
+				"warn": "Advertir",
+				"timeout": "Timeout",
+				"kick": "Expulsar",
+				"ban": "Banir",
+				"log": "Só registrar"
+			},
+			"playground": {
+				"title": "Playground de teste",
+				"description": "Cole algo que um membro poderia mandar e veja quais regras pegariam.",
+				"sample": "Mensagem de exemplo",
+				"clear": "Nada dispara. Esta mensagem passaria.",
+				"fires": "dispararia",
+				"untestable": "{names} não dá para testar aqui — {count, plural, =1 {ela precisa} other {elas precisam}} de histórico de mensagens ou de anexos."
+			},
+			"reason": {
+				"invites": "encontrou {count} link(s) de convite",
+				"links": "encontrou {count} link(s)",
+				"mentions": "{count} menções, o limite é {limit}",
+				"caps": "{ratio}% de maiúsculas, o limite é {limit}%",
+				"words": "casou com {found}"
+			},
+			"dialog": {
+				"new": "Nova regra",
+				"edit": "Editar regra",
+				"description": "Escolha o que ela vigia, e depois o que acontece quando dispara.",
+				"create": "Criar regra",
+				"save": "Salvar regra",
+				"name": "Nome",
+				"namePlaceholder": "Menções em massa",
+				"words": "Palavras bloqueadas",
+				"wordsHint": "Uma por linha. A comparação ignora maiúsculas.",
+				"percent": "Porcentagem de maiúsculas",
+				"threshold": "Limite",
+				"window": "Dentro de (segundos)",
+				"exemptRoles": "Nunca vale para estes cargos",
+				"exemptRolesPlaceholder": "Nenhuma exceção…",
+				"exemptChannel": "Nunca vale neste canal",
+				"exemptChannelPlaceholder": "Vale em todo lugar…"
+			}
+		},
 		"tickets": {
 			"title": "Tickets",
 			"description": "Um botão que os membros apertam para abrir um canal privado com a sua equipe.",

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { describeTrigger, evaluateMessage, untestableTriggers } from './automod';
+import { evaluateMessage, untestableTriggers } from './automod';
 import type { AutoModRule, AutoModTrigger } from './types/module-configs';
 
 function rule(trigger: AutoModTrigger, overrides: Partial<AutoModRule> = {}): AutoModRule {
@@ -22,7 +22,7 @@ describe('evaluateMessage', () => {
 	it('catches a Discord invite', () => {
 		const hits = evaluateMessage('join discord.gg/abc123', [rule('invites')]);
 		expect(hits).toHaveLength(1);
-		expect(hits[0]?.reason).toContain('invite');
+		expect(hits[0]?.reason.kind).toBe('invites');
 	});
 
 	it('catches the discord.com/invite spelling too', () => {
@@ -56,7 +56,7 @@ describe('evaluateMessage', () => {
 	it('matches blocked words regardless of case', () => {
 		const hits = evaluateMessage('free NITRO here', [rule('words', { words: ['nitro'] })]);
 		expect(hits).toHaveLength(1);
-		expect(hits[0]?.reason).toContain('nitro');
+		expect(hits[0]?.reason).toEqual({ kind: 'words', found: ['nitro'] });
 	});
 
 	it('ignores empty entries in the blocklist', () => {
@@ -100,29 +100,36 @@ describe('untestableTriggers', () => {
 	});
 });
 
-describe('describeTrigger', () => {
-	it('spells out the spam window', () => {
-		expect(describeTrigger('spam', rule('spam', { threshold: 5, windowSeconds: 10 }))).toBe(
-			'5 messages in 10s'
+describe('hit reasons', () => {
+	it('reports the counted evidence, not a sentence about it', () => {
+		const [hit] = evaluateMessage('discord.gg/a discord.gg/b', [rule('invites')]);
+
+		expect(hit?.reason).toEqual({ kind: 'invites', count: 2 });
+	});
+
+	it('carries the limit alongside the count, so either can be shown', () => {
+		const [hit] = evaluateMessage('@everyone @here', [rule('mentions', { threshold: 2 })]);
+
+		expect(hit?.reason).toEqual({ kind: 'mentions', count: 2, limit: 2 });
+	});
+
+	it('names the words that matched', () => {
+		const [hit] = evaluateMessage('this is Spam and junk', [
+			rule('words', { words: ['spam', 'junk'] })
+		]);
+
+		expect(hit?.reason).toEqual({ kind: 'words', found: ['spam', 'junk'] });
+	});
+
+	it('carries no human wording, so a language cannot leak out of here', () => {
+		const hits = evaluateMessage('LOOK AT THIS discord.gg/x @everyone', [
+			rule('invites'),
+			rule('mentions', { threshold: 1 }),
+			rule('caps', { threshold: 40 })
+		]);
+
+		expect(JSON.stringify(hits.map((hit) => hit.reason))).not.toMatch(
+			/found|limit is|capitals|matched/i
 		);
-	});
-
-	it('counts the blocklist', () => {
-		expect(describeTrigger('words', rule('words', { words: ['a', 'b'] }))).toBe('2 blocked words');
-	});
-
-	it('has wording for every trigger', () => {
-		const triggers: AutoModTrigger[] = [
-			'spam',
-			'invites',
-			'links',
-			'caps',
-			'mentions',
-			'words',
-			'attachments'
-		];
-		for (const trigger of triggers) {
-			expect(describeTrigger(trigger, rule(trigger))).not.toBe('');
-		}
 	});
 });

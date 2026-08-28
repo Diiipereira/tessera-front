@@ -722,6 +722,85 @@
 			"notImage": "This is not a direct image link — Discord will show nothing. It should end in .png, .jpg or .gif",
 			"expiring": "A Discord attachment link expires within a day and the image will vanish. Host it somewhere permanent instead."
 		},
+		"automod": {
+			"title": "AutoMod",
+			"description": "Rules that act before a human has to. Every hit is written to the case log.",
+			"saved": "AutoMod rules saved",
+			"new": "New rule",
+			"untitled": "Untitled rule",
+			"rules": {
+				"title": "Rules",
+				"description": "Checked top to bottom. The first rule that fires wins.",
+				"empty": "No rules yet. Nothing is being filtered.",
+				"rule": "Rule",
+				"firesOn": "Fires on",
+				"then": "Then",
+				"enabled": "Enabled",
+				"actions": "Actions",
+				"enable": "Enable {name}",
+				"edit": "Edit {name}",
+				"delete": "Delete {name}"
+			},
+			"trigger": {
+				"spam": { "label": "Spam", "blurb": "Too many messages too fast" },
+				"invites": { "label": "Invites", "blurb": "Links to other servers" },
+				"links": { "label": "Links", "blurb": "Any URL at all" },
+				"caps": { "label": "Capitals", "blurb": "SHOUTING" },
+				"mentions": { "label": "Mentions", "blurb": "Mass pings" },
+				"words": { "label": "Words", "blurb": "Your own blocklist" },
+				"attachments": { "label": "Attachments", "blurb": "Too many files" }
+			},
+			"summary": {
+				"spam": "{threshold} messages in {window}s",
+				"invites": "any Discord invite",
+				"links": "any link",
+				"caps": "over {threshold}% capitals",
+				"mentions": "{threshold} mentions in one message",
+				"words": "{count} blocked words",
+				"attachments": "{threshold} attachments"
+			},
+			"action": {
+				"delete": "Delete",
+				"warn": "Warn",
+				"timeout": "Timeout",
+				"kick": "Kick",
+				"ban": "Ban",
+				"log": "Log only"
+			},
+			"playground": {
+				"title": "Test playground",
+				"description": "Paste something a member might send and see which rules would catch it.",
+				"sample": "Sample message",
+				"clear": "Nothing fires. This message would go through.",
+				"fires": "would fire",
+				"untestable": "{names} cannot be tested here — {count, plural, =1 {it needs} other {they need}} message history or attachments."
+			},
+			"reason": {
+				"invites": "found {count} invite link(s)",
+				"links": "found {count} link(s)",
+				"mentions": "{count} mentions, limit is {limit}",
+				"caps": "{ratio}% capitals, limit is {limit}%",
+				"words": "matched {found}"
+			},
+			"dialog": {
+				"new": "New rule",
+				"edit": "Edit rule",
+				"description": "Pick what it watches for, then what happens when it fires.",
+				"create": "Create rule",
+				"save": "Save rule",
+				"name": "Name",
+				"namePlaceholder": "Mass mentions",
+				"words": "Blocked words",
+				"wordsHint": "One per line. Matching is case-insensitive.",
+				"percent": "Percent of capitals",
+				"threshold": "Threshold",
+				"window": "Within (seconds)",
+				"exemptRoles": "Never applies to these roles",
+				"exemptRolesPlaceholder": "No exemptions…",
+				"exemptChannel": "Never applies in this channel",
+				"exemptChannelPlaceholder": "Applies everywhere…"
+			}
+		},
 		"tickets": {
 			"title": "Tickets",
 			"description": "A button members press to open a private channel with your staff.",
