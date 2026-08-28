@@ -34,6 +34,30 @@ describe('toWelcomeConfig', () => {
 		});
 	});
 
+	it('starts a fresh embed on the colour the server settings chose', () => {
+		const config = toWelcomeConfig({ enabled: false, config: {} }, '#eb459e');
+
+		expect(config.message.embed.color).toBe('#eb459e');
+	});
+
+	it('lets the colour on the embed win over the one from settings', () => {
+		const config = toWelcomeConfig(
+			{ enabled: true, config: { embed: { color: '#2ce28d' } } },
+			'#eb459e'
+		);
+
+		expect(config.message.embed.color).toBe('#2ce28d');
+	});
+
+	it('falls back to the settings colour when the stored embed never picked one', () => {
+		const config = toWelcomeConfig(
+			{ enabled: true, config: { embed: { title: 'Bem-vindo' } } },
+			'#eb459e'
+		);
+
+		expect(config.message.embed.color).toBe('#eb459e');
+	});
+
 	it('refuses a ping mode the registry never declared', () => {
 		expect(toWelcomeConfig({ enabled: true, config: { pingMode: 'shout' } }).pingMode).toBe('none');
 	});

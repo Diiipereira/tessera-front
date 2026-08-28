@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
-import type { Channel } from '@/lib/types/discord';
+import type { Channel, ChannelKind } from '@/lib/types/discord';
 import { Translated } from '@/tests/i18n';
 import { ChannelPicker } from './ChannelPicker';
 
@@ -12,12 +12,12 @@ const channel = (over: Partial<Channel> & { id: string; name: string }): Channel
 	...over
 });
 
-async function open(channels: Channel[]) {
+async function open(channels: Channel[], kinds?: readonly ChannelKind[]) {
 	const user = userEvent.setup();
 
 	render(
 		<Translated>
-			<ChannelPicker channels={channels} onValueChange={vi.fn()} />
+			<ChannelPicker channels={channels} kinds={kinds} onValueChange={vi.fn()} />
 		</Translated>
 	);
 
@@ -49,6 +49,32 @@ describe('ChannelPicker', () => {
 		expect(headings()).toEqual(['Informações', 'Informações']);
 		expect(screen.getByRole('button', { name: 'regras' })).toBeDefined();
 		expect(screen.getByRole('button', { name: 'avisos' })).toBeDefined();
+	});
+
+	it('offers only the kinds the caller can post to', async () => {
+		await open(
+			[
+				channel({ id: '1', name: 'geral', kind: 'text' }),
+				channel({ id: '2', name: 'anuncios', kind: 'announcement' }),
+				channel({ id: '3', name: 'teste', kind: 'voice' }),
+				channel({ id: '4', name: 'ajuda', kind: 'forum' })
+			],
+			['text', 'announcement']
+		);
+
+		expect(screen.getByRole('button', { name: 'geral' })).toBeDefined();
+		expect(screen.getByRole('button', { name: 'anuncios' })).toBeDefined();
+		expect(screen.queryByRole('button', { name: 'teste' })).toBeNull();
+		expect(screen.queryByRole('button', { name: 'ajuda' })).toBeNull();
+	});
+
+	it('offers every channel when the caller names no kinds', async () => {
+		await open([
+			channel({ id: '1', name: 'geral', kind: 'text' }),
+			channel({ id: '2', name: 'teste', kind: 'voice' })
+		]);
+
+		expect(screen.getByRole('button', { name: 'teste' })).toBeDefined();
 	});
 
 	it('groups every uncategorised channel together', async () => {

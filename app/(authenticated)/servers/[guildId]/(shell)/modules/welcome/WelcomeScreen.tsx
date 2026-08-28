@@ -16,6 +16,7 @@ import { useConfigDraft, type SaveOutcome } from '@/lib/hooks/useConfigDraft';
 import { patchModule } from '@/lib/module-client';
 import {
 	WELCOME_AUTO_ROLES_MAX,
+	WELCOME_CHANNEL_KINDS,
 	WELCOME_DELETE_AFTER_MAX,
 	toWelcomeConfig,
 	toWelcomePatch
@@ -38,6 +39,7 @@ const DELETE_AFTER: { value: string; key: string }[] = [
 type WelcomeScreenProps = {
 	guildId: string;
 	config: WelcomeConfig;
+	defaultColor: string;
 	version: number;
 	channels: Channel[];
 	roles: Role[];
@@ -47,6 +49,7 @@ type WelcomeScreenProps = {
 export function WelcomeScreen({
 	guildId,
 	config,
+	defaultColor,
 	version,
 	channels,
 	roles,
@@ -69,10 +72,10 @@ export function WelcomeScreen({
 			versionRef.current = result.state.version;
 
 			return result.status === 'saved'
-				? { status: 'saved', saved: toWelcomeConfig(result.state) }
-				: { status: 'conflict', current: toWelcomeConfig(result.state) };
+				? { status: 'saved', saved: toWelcomeConfig(result.state, defaultColor) }
+				: { status: 'conflict', current: toWelcomeConfig(result.state, defaultColor) };
 		},
-		[guildId]
+		[guildId, defaultColor]
 	);
 
 	const form = useConfigDraft<WelcomeConfig>(config, { save });
@@ -128,6 +131,7 @@ export function WelcomeScreen({
 				<Field label={t('message.channel')} hint={t('message.channelHint')}>
 					<ChannelPicker
 						channels={channels}
+						kinds={WELCOME_CHANNEL_KINDS}
 						value={draft.channelId}
 						onValueChange={(next) => {
 							form.set('channelId', next);

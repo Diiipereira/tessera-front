@@ -1,3 +1,4 @@
+import type { ChannelKind } from '@/lib/types/discord';
 import type {
 	EmbedDraft,
 	MessageDraft,
@@ -13,6 +14,8 @@ export function welcomeVariables(guildName: string): MessageVariable[] {
 	];
 }
 
+export const WELCOME_CHANNEL_KINDS: readonly ChannelKind[] = ['text', 'announcement'];
+
 export const WELCOME_MESSAGE_MAX = 2000;
 
 export const WELCOME_AUTO_ROLES_MAX = 5;
@@ -21,12 +24,14 @@ export const WELCOME_DELETE_AFTER_MAX = 86_400;
 
 const PING_MODES: readonly WelcomePingMode[] = ['none', 'inline', 'ghost'];
 
-export function emptyEmbedDraft(): EmbedDraft {
+export const FALLBACK_EMBED_COLOR = '#5865f2';
+
+export function emptyEmbedDraft(defaultColor: string = FALLBACK_EMBED_COLOR): EmbedDraft {
 	return {
 		authorName: '',
 		title: '',
 		description: '',
-		color: '#5865f2',
+		color: defaultColor,
 		fields: [],
 		imageUrl: '',
 		thumbnailUrl: '',
@@ -54,27 +59,31 @@ const asPingMode = (value: unknown): WelcomePingMode =>
 const asDeleteAfter = (value: unknown): number | null =>
 	typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : null;
 
-export function toEmbedDraft(value: unknown): EmbedDraft {
+export function toEmbedDraft(value: unknown, defaultColor?: string): EmbedDraft {
 	const raw = asRecord(value);
-	const base = emptyEmbedDraft();
+	const base = emptyEmbedDraft(defaultColor);
 
 	return {
 		...base,
 		...raw,
+		color: asString(raw.color, base.color),
 		fields: Array.isArray(raw.fields) ? (raw.fields as EmbedDraft['fields']) : base.fields
 	};
 }
 
-export function toWelcomeConfig(state: {
-	enabled: boolean;
-	config: Record<string, unknown>;
-}): WelcomeConfig {
+export function toWelcomeConfig(
+	state: {
+		enabled: boolean;
+		config: Record<string, unknown>;
+	},
+	defaultColor?: string
+): WelcomeConfig {
 	const { config } = state;
 
 	const message: MessageDraft = {
 		mode: asBoolean(config.useEmbed) ? 'embed' : 'text',
 		text: asString(config.message, ''),
-		embed: toEmbedDraft(config.embed)
+		embed: toEmbedDraft(config.embed, defaultColor)
 	};
 
 	return {

@@ -76,6 +76,7 @@ function renderScreen(overrides: Partial<WelcomeConfig> = {}) {
 			<WelcomeScreen
 				guildId={GUILD_ID}
 				config={{ ...config, ...overrides }}
+				defaultColor="#eb459e"
 				version={4}
 				channels={channels}
 				roles={roles}

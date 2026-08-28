@@ -33,6 +33,7 @@ const UNCATEGORISED_GROUP = 'uncategorised';
 
 type ChannelPickerProps = {
 	channels: Channel[];
+	kinds?: readonly ChannelKind[];
 	value?: string | null;
 	onValueChange?: (value: string) => void;
 	placeholder?: string;
@@ -41,6 +42,7 @@ type ChannelPickerProps = {
 
 export function ChannelPicker({
 	channels,
+	kinds,
 	value = null,
 	onValueChange,
 	placeholder,
@@ -51,9 +53,12 @@ export function ChannelPicker({
 	const [open, setOpen] = useState(false);
 	const [query, setQuery] = useState('');
 
-	const selected = channels.find((channel) => channel.id === value);
+	const offered =
+		kinds === undefined ? channels : channels.filter((channel) => kinds.includes(channel.kind));
 
-	const matches = channels.filter((channel) => channel.name.includes(query.trim().toLowerCase()));
+	const selected = offered.find((channel) => channel.id === value);
+
+	const matches = offered.filter((channel) => channel.name.includes(query.trim().toLowerCase()));
 
 	const groups = matches.reduce<{ id: string; category: string; items: Channel[] }[]>(
 		(acc, channel) => {
