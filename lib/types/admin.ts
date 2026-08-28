@@ -1,3 +1,4 @@
+import type { ModuleId } from './modules';
 import type { PlanTier } from './billing';
 
 export type DashboardRole = 'owner' | 'admin' | 'moderator' | 'viewer';
@@ -22,8 +23,7 @@ export type TenantSummary = {
 };
 
 export type TenantModuleState = {
-	key: string;
-	label: string;
+	key: ModuleId;
 	enabled: boolean;
 	version: number;
 	updatedAt: string | null;

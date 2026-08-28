@@ -8,6 +8,7 @@ import type {
 } from '@/lib/types/admin';
 import type { ModuleId } from '@/lib/types/modules';
 import { MOCK_NOW } from '@/lib/time';
+import { mockModules } from './modules';
 
 export const mockTenants: TenantSummary[] = [
 	{
@@ -138,21 +139,7 @@ export const mockTenants: TenantSummary[] = [
 	}
 ];
 
-const MODULE_LABELS: Record<ModuleId, string> = {
-	welcome: 'Welcome',
-	moderation: 'Moderation',
-	automod: 'AutoMod',
-	logging: 'Logging',
-	levels: 'Levels',
-	economy: 'Economy',
-	tickets: 'Tickets',
-	'reaction-roles': 'Reaction roles',
-	giveaways: 'Giveaways',
-	'custom-commands': 'Custom commands',
-	scheduled: 'Scheduled messages'
-};
-
-const MODULE_KEYS = Object.keys(MODULE_LABELS) as ModuleId[];
+const MODULE_KEYS: ModuleId[] = mockModules.map((module) => module.id);
 
 function seedOf(id: string): number {
 	let seed = 0;
@@ -175,7 +162,6 @@ function buildModules(tenant: TenantSummary): TenantModuleState[] {
 
 		return {
 			key,
-			label: MODULE_LABELS[key],
 			enabled,
 			version,
 			updatedAt: enabled ? new Date(MOCK_NOW.getTime() - daysAgo * 86_400_000).toISOString() : null,

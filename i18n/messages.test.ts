@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import enUS from '@/messages/en-US.json';
 import ptBR from '@/messages/pt-BR.json';
 import { SUPPORTED_LOCALES } from '@/lib/locale';
+import { DOC_GROUPS } from '@/lib/docs';
+import { mockModules } from '@/lib/mock';
 
 type Tree = { [key: string]: string | Tree };
 
@@ -75,6 +77,26 @@ describe('message dictionaries', () => {
 			.map(([key]) => key);
 
 		expect(mismatched).toEqual([]);
+	});
+
+	it('names every documentation group, which the nav resolves by id', () => {
+		const missing = DOC_GROUPS.flatMap((group) =>
+			[...Object.entries(DICTIONARIES)]
+				.filter(([, tree]) => flatten(tree).get(`docs.groups.${group.id}`) === undefined)
+				.map(([locale]) => `${locale}: docs.groups.${group.id}`)
+		);
+
+		expect(missing).toEqual([]);
+	});
+
+	it('names every module, which every screen resolves by id', () => {
+		const missing = mockModules.flatMap((module) =>
+			[...Object.entries(DICTIONARIES)]
+				.filter(([, tree]) => flatten(tree).get(`nav.${module.id}`) === undefined)
+				.map(([locale]) => `${locale}: nav.${module.id}`)
+		);
+
+		expect(missing).toEqual([]);
 	});
 
 	it('keeps the same rich tags on both sides, which t.rich throws without', () => {

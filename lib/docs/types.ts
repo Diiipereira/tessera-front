@@ -32,9 +32,10 @@ export type DocPage = {
 	blocks: DocBlock[];
 };
 
+export type DocGroupId = 'start' | 'concepts' | 'modules' | 'reference';
+
 export type DocGroup = {
-	id: string;
-	label: string;
+	id: DocGroupId;
 	pages: DocPage[];
 };
 

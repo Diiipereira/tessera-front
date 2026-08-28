@@ -1,7 +1,7 @@
 import { COMMANDS_PAGE } from './pages/commands';
 import { GUIDE_PAGES, INTRO_PAGE } from './pages/guides';
 import { MODULE_PAGES } from './pages/modules';
-import type { DocBlock, DocGroup, DocPage } from './types';
+import type { DocBlock, DocGroup, DocGroupId, DocPage } from './types';
 
 function pick(pages: DocPage[], slugs: string[]): DocPage[] {
 	return slugs.flatMap((slug) => pages.filter((page) => page.slug === slug));
@@ -10,7 +10,6 @@ function pick(pages: DocPage[], slugs: string[]): DocPage[] {
 export const DOC_GROUPS: DocGroup[] = [
 	{
 		id: 'start',
-		label: 'Getting started',
 		pages: [
 			INTRO_PAGE,
 			...pick(GUIDE_PAGES, [
@@ -22,13 +21,11 @@ export const DOC_GROUPS: DocGroup[] = [
 	},
 	{
 		id: 'concepts',
-		label: 'Concepts',
 		pages: pick(GUIDE_PAGES, ['concepts/config', 'concepts/plans'])
 	},
-	{ id: 'modules', label: 'Modules', pages: MODULE_PAGES },
+	{ id: 'modules', pages: MODULE_PAGES },
 	{
 		id: 'reference',
-		label: 'Reference',
 		pages: [COMMANDS_PAGE, ...pick(GUIDE_PAGES, ['troubleshooting'])]
 	}
 ];
@@ -44,12 +41,11 @@ export function groupOf(slug: string): DocGroup | null {
 }
 
 export type DocNavPage = { slug: string; title: string };
-export type DocNavGroup = { id: string; label: string; pages: DocNavPage[] };
+export type DocNavGroup = { id: DocGroupId; pages: DocNavPage[] };
 
 export function docNav(): DocNavGroup[] {
 	return DOC_GROUPS.map((group) => ({
 		id: group.id,
-		label: group.label,
 		pages: group.pages.map((page) => ({ slug: page.slug, title: page.title }))
 	}));
 }
@@ -107,7 +103,7 @@ function plain(text: string): string {
 export type DocSearchEntry = {
 	slug: string;
 	title: string;
-	group: string;
+	group: DocGroupId;
 	summary: string;
 	keywords: string;
 };
@@ -117,7 +113,7 @@ export function docSearchIndex(): DocSearchEntry[] {
 		group.pages.map((page) => ({
 			slug: page.slug,
 			title: page.title,
-			group: group.label,
+			group: group.id,
 			summary: page.summary,
 			keywords: plain([page.title, page.summary, ...page.blocks.map(blockText)].join(' ')).slice(
 				0,

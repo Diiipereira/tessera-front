@@ -12,7 +12,8 @@ import {
 	toTargetFilter,
 	toTenantSort
 } from './admin';
-import { mockBlacklist, mockTenants } from './mock/admin';
+import { findTenant, mockBlacklist, mockTenants } from './mock/admin';
+import enUS from '@/messages/en-US.json';
 import type { TenantFilters } from './admin';
 
 const base: TenantFilters = { query: '', status: 'all', plan: 'all', sort: 'recent' };
@@ -195,5 +196,21 @@ describe('select guards', () => {
 	it('falls back to all for an unknown target type', () => {
 		expect(toTargetFilter('channel')).toBe('all');
 		expect(toTargetFilter('user')).toBe('user');
+	});
+});
+
+describe('tenant modules', () => {
+	const detail = findTenant(mockTenants[0]?.id ?? '');
+	const names = enUS.nav as Record<string, unknown>;
+
+	it('names every module through the dictionary rather than carrying the name', () => {
+		expect(detail).not.toBeNull();
+
+		for (const state of detail?.modules ?? []) {
+			const name = names[state.key];
+
+			expect(typeof name).toBe('string');
+			expect(Object.values(state).filter((value) => value === name)).toEqual([]);
+		}
 	});
 });

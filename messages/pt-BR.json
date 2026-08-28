@@ -348,6 +348,12 @@
 		"title": "Documentação",
 		"badge": "Docs",
 		"root": "Documentação",
+		"groups": {
+			"start": "Primeiros passos",
+			"concepts": "Conceitos",
+			"modules": "Módulos",
+			"reference": "Referência"
+		},
 		"breadcrumb": "Trilha",
 		"dashboard": "Painel",
 		"menu": "Menu da documentação",

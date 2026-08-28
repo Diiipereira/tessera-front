@@ -348,6 +348,12 @@
 		"title": "Documentation",
 		"badge": "Docs",
 		"root": "Docs",
+		"groups": {
+			"start": "Getting started",
+			"concepts": "Concepts",
+			"modules": "Modules",
+			"reference": "Reference"
+		},
 		"breadcrumb": "Breadcrumb",
 		"dashboard": "Dashboard",
 		"menu": "Documentation menu",

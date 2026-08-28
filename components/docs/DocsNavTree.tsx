@@ -30,7 +30,7 @@ export function DocsNavTree({
 			{groups.map((group) => (
 				<div key={group.id}>
 					<p className="mb-2 px-3 font-mono text-overline text-text-subtle uppercase">
-						{group.label}
+						{t(`groups.${group.id}`)}
 					</p>
 					<ul className="flex flex-col gap-0.5">
 						{group.pages.map((page) => {

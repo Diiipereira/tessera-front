@@ -51,9 +51,10 @@ function Fact({ label, value }: { label: string; value: string }) {
 
 function ModuleRow({ module }: { module: TenantModuleState }) {
 	const t = useTranslations('admin.tenant');
+	const names = useTranslations('nav');
 	return (
 		<li className="flex items-center gap-3 border-b border-border px-5 py-2.5 last:border-0">
-			<span className="min-w-0 flex-1 truncate text-body-sm">{module.label}</span>
+			<span className="min-w-0 flex-1 truncate text-body-sm">{names(module.key)}</span>
 
 			<span className="tabular hidden w-14 shrink-0 text-right font-mono text-caption text-text-muted sm:block">
 				v{module.version}

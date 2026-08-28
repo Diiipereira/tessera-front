@@ -26,7 +26,7 @@ export function DocsArticle({ page }: { page: DocPage }) {
 					{group ? (
 						<>
 							<ChevronRight className="size-3.5 shrink-0 text-text-subtle" aria-hidden="true" />
-							<span>{group.label}</span>
+							<span>{t(`groups.${group.id}`)}</span>
 						</>
 					) : null}
 					<ChevronRight className="size-3.5 shrink-0 text-text-subtle" aria-hidden="true" />

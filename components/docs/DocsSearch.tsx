@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils/cn';
 
 export function DocsSearch({ entries }: { entries: DocSearchEntry[] }) {
 	const t = useTranslations('docs.search');
+	const groups = useTranslations('docs.groups');
 	const router = useRouter();
 	const [open, setOpen] = useState(false);
 	const [query, setQuery] = useState('');
@@ -144,7 +145,7 @@ export function DocsSearch({ entries }: { entries: DocSearchEntry[] }) {
 													{entry.title}
 												</span>
 												<span className="shrink-0 font-mono text-caption font-normal text-text-subtle">
-													{entry.group}
+													{groups(entry.group)}
 												</span>
 											</span>
 											<span className="line-clamp-1 text-body-sm text-text-muted">
