@@ -1661,27 +1661,49 @@
 		"selectAll": "Select every visible command",
 		"selectOne": "Select /{name}"
 	},
+	"invitePage": {
+		"title": "You have been invited to {guild}",
+		"body": "Sign in with Discord to take the {role} seat on the dashboard.",
+		"accept": "Accept the invite",
+		"signIn": "Sign in with Discord",
+		"dead": {
+			"used": {
+				"title": "This link was already used",
+				"body": "Invite links work once. Ask for a new one."
+			},
+			"revoked": {
+				"title": "This link was revoked",
+				"body": "Someone with access took it back. Ask for a new one."
+			},
+			"expired": {
+				"title": "This link has expired",
+				"body": "Invite links last seven days. Ask for a new one."
+			},
+			"open": {
+				"title": "This link is still open",
+				"body": "Reload the page to use it."
+			}
+		}
+	},
 	"team": {
 		"title": "Team",
 		"description": "Who can open this dashboard, and how far each of them can reach.",
-		"invite": "Invite",
+		"add": "Invite",
 		"discordTitle": "Discord permissions grant access too",
-		"discordBody": "Anyone with <b>Manage Server</b> in Discord can open this dashboard as a {role}, whether or not they are listed here.",
+		"discordBody": "Anyone with <b>Manage Server</b> in Discord can open this dashboard with the {role} seat, whether or not they are listed here.",
 		"access": {
 			"title": "Dashboard access",
+			"description": "{count, plural, one {# person can open this dashboard.} other {# people can open this dashboard.}}",
 			"person": "Person",
 			"seat": "Seat",
 			"grantedBy": "Granted by",
 			"lastSeen": "Last seen",
 			"changed": "{name} is now a {role}",
 			"removed": "{name} no longer has access",
-			"remove": "Remove {name}"
-		},
-		"pending": {
-			"title": "Pending invites",
-			"description": "They take the seat the moment they sign in.",
-			"revoked": "Invite to {handle} revoked",
-			"invitedBy": "invited by {who}"
+			"remove": "Remove {name}",
+			"you": "(you)",
+			"fromDiscord": "Discord",
+			"never": "never"
 		},
 		"matrix": {
 			"title": "What each seat can do",
@@ -1694,20 +1716,30 @@
 			"moderator": "Moderator",
 			"viewer": "Viewer"
 		},
+		"links": {
+			"title": "Invite links",
+			"description": "Each one seats a single person, and only until it is used.",
+			"mintedBy": "created by {who}",
+			"expires": "expires {when}",
+			"copy": "Copy",
+			"revoke": "Revoke",
+			"revoked": "Link revoked",
+			"unavailableTitle": "Invite links could not be loaded",
+			"unavailableBody": "The rest of this page is fine. Try again in a moment — if it keeps failing, check the API log."
+		},
 		"dialog": {
 			"title": "Invite to the dashboard",
-			"description": "They get an invite link. Access starts when they sign in with Discord.",
-			"submit": "Send invite",
-			"invited": "Invited {handle}",
-			"handle": "Discord handle",
-			"handleHint": "The @name, not the display name.",
+			"description": "Pick the seat. The link carries no name — whoever opens it signs in with Discord and takes that seat.",
+			"ready": "Send this link to one person. It works once, and expires in seven days.",
+			"submit": "Generate link",
+			"copy": "Copy",
+			"copied": "Link copied",
+			"copyRefused": "The browser refused to copy",
+			"terms": "Whoever signs in through it becomes a {role}. It expires {when}.",
 			"seat": "Seat",
-			"grants": "A {role} gets {granted} of {total} permissions.",
-			"joinAs": "They join as a {role}."
+			"grants": "A {role} gets {granted} of {total} permissions."
 		},
 		"discordTail": "Remove the Discord permission to remove that access — {brand} cannot override it.",
-		"viaDiscord": " · Discord",
-		"revoke": "Revoke",
 		"granted": "granted",
 		"notGranted": "not granted"
 	},

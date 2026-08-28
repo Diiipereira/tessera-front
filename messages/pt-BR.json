@@ -1661,27 +1661,49 @@
 		"selectAll": "Selecionar todos os comandos visíveis",
 		"selectOne": "Selecionar /{name}"
 	},
+	"invitePage": {
+		"title": "Você foi convidado para {guild}",
+		"body": "Entre com o Discord para assumir o posto de {role} no painel.",
+		"accept": "Aceitar o convite",
+		"signIn": "Entrar com o Discord",
+		"dead": {
+			"used": {
+				"title": "Este link já foi usado",
+				"body": "Link de convite vale uma vez só. Peça um novo."
+			},
+			"revoked": {
+				"title": "Este link foi revogado",
+				"body": "Alguém com acesso o cancelou. Peça um novo."
+			},
+			"expired": {
+				"title": "Este link expirou",
+				"body": "Link de convite dura sete dias. Peça um novo."
+			},
+			"open": {
+				"title": "Este link ainda está válido",
+				"body": "Recarregue a página para usá-lo."
+			}
+		}
+	},
 	"team": {
 		"title": "Equipe",
 		"description": "Quem pode abrir este painel, e até onde cada um alcança.",
-		"invite": "Convidar",
+		"add": "Convidar",
 		"discordTitle": "Permissões do Discord também dão acesso",
-		"discordBody": "Qualquer um com <b>Gerenciar Servidor</b> no Discord consegue abrir este painel como {role}, esteja ou não listado aqui.",
+		"discordBody": "Qualquer um com <b>Gerenciar Servidor</b> no Discord consegue abrir este painel com o posto de {role}, esteja ou não listado aqui.",
 		"access": {
 			"title": "Acesso ao painel",
+			"description": "{count, plural, one {# pessoa pode abrir este painel.} other {# pessoas podem abrir este painel.}}",
 			"person": "Pessoa",
 			"seat": "Posto",
 			"grantedBy": "Concedido por",
 			"lastSeen": "Visto por último",
 			"changed": "{name} agora é {role}",
 			"removed": "{name} não tem mais acesso",
-			"remove": "Remover {name}"
-		},
-		"pending": {
-			"title": "Convites pendentes",
-			"description": "Eles assumem o posto no instante em que entram.",
-			"revoked": "Convite para {handle} revogado",
-			"invitedBy": "convidado por {who}"
+			"remove": "Remover {name}",
+			"you": "(você)",
+			"fromDiscord": "Discord",
+			"never": "nunca"
 		},
 		"matrix": {
 			"title": "O que cada posto pode fazer",
@@ -1694,20 +1716,30 @@
 			"moderator": "Moderador",
 			"viewer": "Observador"
 		},
+		"links": {
+			"title": "Links de convite",
+			"description": "Cada um dá posto a uma pessoa só, e só até ser usado.",
+			"mintedBy": "criado por {who}",
+			"expires": "expira {when}",
+			"copy": "Copiar",
+			"revoke": "Revogar",
+			"revoked": "Link revogado",
+			"unavailableTitle": "Não foi possível carregar os links de convite",
+			"unavailableBody": "O resto da página está de pé. Tente de novo em instantes — se continuar falhando, veja o log da API."
+		},
 		"dialog": {
 			"title": "Convidar para o painel",
-			"description": "A pessoa recebe um link de convite. O acesso começa quando ela entra com o Discord.",
-			"submit": "Enviar convite",
-			"invited": "{handle} convidado",
-			"handle": "Usuário do Discord",
-			"handleHint": "O @nome, não o nome de exibição.",
+			"description": "Escolha o posto. O link não carrega nome — quem abrir entra com o Discord e assume esse posto.",
+			"ready": "Mande este link para uma pessoa. Ele funciona uma vez e expira em sete dias.",
+			"submit": "Gerar link",
+			"copy": "Copiar",
+			"copied": "Link copiado",
+			"copyRefused": "O navegador recusou a cópia",
+			"terms": "Quem entrar por ele vira {role}. Expira {when}.",
 			"seat": "Posto",
-			"grants": "Um {role} recebe {granted} de {total} permissões.",
-			"joinAs": "A pessoa entra como {role}."
+			"grants": "Um {role} recebe {granted} de {total} permissões."
 		},
 		"discordTail": "Tire a permissão no Discord para tirar esse acesso — a {brand} não consegue passar por cima dela.",
-		"viaDiscord": " · Discord",
-		"revoke": "Revogar",
 		"granted": "concedida",
 		"notGranted": "não concedida"
 	},

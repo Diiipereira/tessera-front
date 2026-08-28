@@ -1,21 +1,44 @@
 import { redirect } from 'next/navigation';
-import { apiGet } from '@/lib/api';
-import type { CapabilityCatalogDto } from '@/lib/api-url';
+import { apiGet, type ApiResult } from '@/lib/api';
+import type { CapabilityCatalogDto, InviteListDto, TeamListDto } from '@/lib/api-url';
 import { ApiUnreachableError } from '@/lib/guild-access';
-import { mockInvites, mockTeam } from '@/lib/mock';
+import { can, MANAGE_TEAM } from '@/lib/team';
+import type { GuildPageProps } from '@/lib/types/page';
 import { TeamScreen } from './TeamScreen';
 
 export const metadata = { title: 'Team' };
 
-export default async function Page() {
-	const catalog = await apiGet<CapabilityCatalogDto>('/capabilities');
-
-	if (catalog.status === 'unauthenticated') redirect('/login');
-	if (catalog.status === 'unreachable') {
-		throw new ApiUnreachableError(catalog.reason, catalog.answered);
+function unwrap<T>(result: ApiResult<T>): T {
+	if (result.status === 'unauthenticated') redirect('/login');
+	if (result.status === 'unreachable') {
+		throw new ApiUnreachableError(result.reason, result.answered);
 	}
 
+	return result.data;
+}
+
+export default async function Page({ params }: GuildPageProps) {
+	const { guildId } = await params;
+	const [catalogResult, teamResult] = await Promise.all([
+		apiGet<CapabilityCatalogDto>('/capabilities'),
+		apiGet<TeamListDto>(`/guilds/${guildId}/team`)
+	]);
+
+	const catalog = unwrap(catalogResult);
+	const team = unwrap(teamResult);
+
+	const links = can(catalog, team.viewerRole, MANAGE_TEAM)
+		? await apiGet<InviteListDto>(`/guilds/${guildId}/invites`)
+		: null;
+
 	return (
-		<TeamScreen team={mockTeam} invites={mockInvites} viewerRole="owner" catalog={catalog.data} />
+		<TeamScreen
+			guildId={guildId}
+			catalog={catalog}
+			team={team}
+			invites={links?.status === 'ok' ? links.data.invites : []}
+			invitesFailed={links !== null && links.status !== 'ok'}
+			now={new Date().toISOString()}
+		/>
 	);
 }

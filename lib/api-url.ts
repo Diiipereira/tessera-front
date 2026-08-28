@@ -78,3 +78,51 @@ export type CapabilityCatalogDto = {
 	roles: TeamRole[];
 	presets: Partial<Record<TeamRole, string[]>>;
 };
+
+export type TeamSeatSource = 'guild-owner' | 'guild-staff';
+
+export type TeamSeatDto = {
+	userId: string;
+	username: string;
+	globalName: string | null;
+	avatarHash: string | null;
+	role: TeamRole;
+	source: TeamSeatSource;
+	grantedBy: string | null;
+	grantedAt: string | null;
+	lastSeenAt: string | null;
+};
+
+export type TeamListDto = {
+	seats: TeamSeatDto[];
+	viewerId: string;
+	viewerRole: TeamRole;
+};
+
+export type InviteDto = {
+	id: string;
+	url: string;
+	role: TeamRole;
+	createdBy: string | null;
+	createdAt: string;
+	expiresAt: string;
+};
+
+export type InviteListDto = {
+	invites: InviteDto[];
+};
+
+export type InviteState = 'open' | 'used' | 'revoked' | 'expired';
+
+export type InvitePreviewDto = {
+	guildId: string;
+	guildName: string;
+	role: TeamRole;
+	state: InviteState;
+};
+
+export type InviteAcceptedDto = {
+	guildId: string;
+	role: TeamRole;
+	alreadyHadAccess: boolean;
+};

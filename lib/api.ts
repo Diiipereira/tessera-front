@@ -4,7 +4,7 @@ import { apiBaseUrl, SESSION_COOKIE } from './api-url';
 export type ApiResult<T> =
 	| { status: 'ok'; data: T }
 	| { status: 'unauthenticated' }
-	| { status: 'unreachable'; answered: boolean; reason: string };
+	| { status: 'unreachable'; answered: boolean; reason: string; httpStatus?: number };
 
 async function failureReason(response: Response): Promise<string> {
 	const status = `The API answered ${String(response.status)}`;
@@ -17,6 +17,31 @@ async function failureReason(response: Response): Promise<string> {
 	} catch {
 		return status;
 	}
+}
+
+export async function apiGetPublic<T>(path: string): Promise<ApiResult<T>> {
+	let response: Response;
+
+	try {
+		response = await fetch(`${apiBaseUrl()}${path}`, { cache: 'no-store' });
+	} catch (error) {
+		return {
+			status: 'unreachable',
+			answered: false,
+			reason: error instanceof Error ? error.message : 'Unknown transport failure'
+		};
+	}
+
+	if (!response.ok) {
+		return {
+			status: 'unreachable',
+			answered: true,
+			reason: await failureReason(response),
+			httpStatus: response.status
+		};
+	}
+
+	return { status: 'ok', data: (await response.json()) as T };
 }
 
 export async function apiGet<T>(path: string): Promise<ApiResult<T>> {
@@ -46,7 +71,8 @@ export async function apiGet<T>(path: string): Promise<ApiResult<T>> {
 		return {
 			status: 'unreachable',
 			answered: true,
-			reason: await failureReason(response)
+			reason: await failureReason(response),
+			httpStatus: response.status
 		};
 	}
 

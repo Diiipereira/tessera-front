@@ -1,8 +1,9 @@
 'use client';
 
-import { Check, Minus, Trash2, UserPlus } from 'lucide-react';
+import { Check, Copy, Link2, Minus, Trash2, UserPlus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { PageHeader } from '@/components/management/PageHeader';
 import { Avatar } from '@/components/layout/Avatar';
@@ -12,34 +13,129 @@ import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Dialog } from '@/components/ui/Dialog';
 import { Field } from '@/components/ui/Field';
-import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { BRAND } from '@/lib/brand';
-import type { CapabilityCatalogDto } from '@/lib/api-url';
-import { assignableRoles, can, grantedCount } from '@/lib/team';
+import type { CapabilityCatalogDto, InviteDto, TeamListDto } from '@/lib/api-url';
+import { assignableRoles, can, grantedCount, isFixedSeat, toTeamMember } from '@/lib/team';
+import { deleteSeat, putSeat } from '@/lib/team-client';
+import { mintInvite, revokeInvite } from '@/lib/invite-client';
 import { relativeTime } from '@/lib/time';
-import type { TeamInvite, TeamMember, TeamRole } from '@/lib/types/management';
+import type { TeamRole } from '@/lib/types/management';
 import { cn } from '@/lib/utils/cn';
-import { newId } from '@/lib/utils/id';
 
 type TeamScreenProps = {
-	team: TeamMember[];
-	invites: TeamInvite[];
-	viewerRole: TeamRole;
+	guildId: string;
 	catalog: CapabilityCatalogDto;
+	team: TeamListDto;
+	invites: InviteDto[];
+	invitesFailed?: boolean;
+	now?: string;
 };
 
-export function TeamScreen({ team, invites, viewerRole, catalog }: TeamScreenProps) {
+export function TeamScreen({
+	guildId,
+	catalog,
+	team,
+	invites,
+	invitesFailed = false,
+	now
+}: TeamScreenProps) {
 	const t = useTranslations('team');
+	const common = useTranslations('common');
 	const names = useTranslations('capabilities');
-	const [members, setMembers] = useState(team);
-	const [pending, setPending] = useState(invites);
-	const [inviting, setInviting] = useState(false);
-	const [handle, setHandle] = useState('');
-	const [inviteRole, setInviteRole] = useState<TeamRole>('viewer');
+	const router = useRouter();
+	const [, startTransition] = useTransition();
+	const [busy, setBusy] = useState<string | null>(null);
+	const [minting, setMinting] = useState(false);
+	const [minted, setMinted] = useState<InviteDto | null>(null);
+	const [targetRole, setTargetRole] = useState<TeamRole>('viewer');
 
-	const options = assignableRoles(catalog, viewerRole);
-	const canManage = options.length > 0;
+	const at = now === undefined ? new Date() : new Date(now);
+	const members = team.seats.map(toTeamMember);
+	const options = assignableRoles(catalog, team.viewerRole);
+	const canManage = can(catalog, team.viewerRole, 'team.manage');
+
+	const refresh = (): void => {
+		startTransition(() => {
+			router.refresh();
+		});
+	};
+
+	const changeRole = async (userId: string, name: string, role: TeamRole): Promise<void> => {
+		setBusy(userId);
+		const result = await putSeat(guildId, userId, role);
+		setBusy(null);
+
+		if (result.status === 'error') {
+			toast.error(result.message);
+			return;
+		}
+
+		toast.success(t('access.changed', { name, role: t(`role.${role}`) }));
+		refresh();
+	};
+
+	const remove = async (userId: string, name: string): Promise<void> => {
+		setBusy(userId);
+		const result = await deleteSeat(guildId, userId);
+		setBusy(null);
+
+		if (result.status === 'error') {
+			toast.error(result.message);
+			return;
+		}
+
+		toast.success(t('access.removed', { name }));
+		refresh();
+	};
+
+	const mint = async (): Promise<void> => {
+		setBusy('mint');
+		const result = await mintInvite(guildId, targetRole);
+		setBusy(null);
+
+		if (result.status === 'error') {
+			toast.error(result.message);
+			return;
+		}
+
+		setMinted(result.invite);
+		refresh();
+	};
+
+	const copyLink = (url: string): void => {
+		void navigator.clipboard.writeText(url).then(
+			() => {
+				toast.success(t('dialog.copied'));
+			},
+			() => {
+				toast.error(t('dialog.copyRefused'));
+			}
+		);
+	};
+
+	const revoke = async (inviteId: string): Promise<void> => {
+		setBusy(inviteId);
+		const result = await revokeInvite(guildId, inviteId);
+		setBusy(null);
+
+		if (result.status === 'error') {
+			toast.error(result.message);
+			return;
+		}
+
+		toast.success(t('links.revoked'));
+		refresh();
+	};
+
+	const closeDialog = (open: boolean): void => {
+		setMinting(open);
+
+		if (!open) {
+			setMinted(null);
+			setTargetRole('viewer');
+		}
+	};
 
 	return (
 		<div className="w-full p-6 sm:p-8">
@@ -50,11 +146,11 @@ export function TeamScreen({ team, invites, viewerRole, catalog }: TeamScreenPro
 					<Button
 						disabled={!canManage}
 						onClick={() => {
-							setInviting(true);
+							closeDialog(true);
 						}}
 					>
 						<UserPlus aria-hidden="true" />
-						{t('invite')}
+						{t('add')}
 					</Button>
 				}
 			/>
@@ -62,7 +158,7 @@ export function TeamScreen({ team, invites, viewerRole, catalog }: TeamScreenPro
 			<div className="mt-6 flex flex-col gap-6">
 				<Alert variant="info" title={t('discordTitle')}>
 					{t.rich('discordBody', {
-						role: t('role.moderator'),
+						role: t('role.admin'),
 						b: (chunks) => <strong>{chunks}</strong>
 					})}{' '}
 					{t('discordTail', { brand: BRAND.name })}
@@ -70,7 +166,7 @@ export function TeamScreen({ team, invites, viewerRole, catalog }: TeamScreenPro
 
 				<SettingsSection
 					title={t('access.title')}
-					description={`${String(members.length)} people, ${String(members.filter((member) => member.viaDiscord).length)} of them through Discord.`}
+					description={t('access.description', { count: members.length })}
 				>
 					<div className="overflow-x-auto">
 						<table className="w-full min-w-180 border-collapse text-left">
@@ -84,114 +180,134 @@ export function TeamScreen({ team, invites, viewerRole, catalog }: TeamScreenPro
 								</tr>
 							</thead>
 							<tbody>
-								{members.map((member) => (
-									<tr key={member.id} className="border-b border-border last:border-0">
-										<td className="py-3 pr-4">
-											<div className="flex items-center gap-2.5">
-												<Avatar
-													initials={member.initials}
-													color={member.color}
-													shape="circle"
-													size="sm"
-												/>
-												<div className="min-w-0">
-													<p className="truncate text-body">{member.name}</p>
-													<p className="truncate font-mono text-caption font-normal text-text-muted">
-														{member.handle}
-													</p>
+								{members.map((member) => {
+									const fixed = isFixedSeat(member, team.viewerId);
+
+									return (
+										<tr key={member.id} className="border-b border-border last:border-0">
+											<td className="py-3 pr-4">
+												<div className="flex items-center gap-2.5">
+													<Avatar
+														initials={member.initials}
+														color={member.color}
+														src={member.avatarUrl}
+														shape="circle"
+														size="sm"
+													/>
+													<div className="min-w-0">
+														<p className="truncate text-body">
+															{member.name}
+															{member.id === team.viewerId ? (
+																<span className="text-text-muted"> {t('access.you')}</span>
+															) : null}
+														</p>
+														<p className="truncate font-mono text-caption font-normal text-text-muted">
+															{member.handle}
+														</p>
+													</div>
 												</div>
-											</div>
-										</td>
-										<td className="py-3 pr-4">
-											{member.role === 'owner' || member.viaDiscord ? (
-												<Badge variant={member.role === 'owner' ? 'primary' : 'outline'}>
-													{t(`role.${member.role}`)}
-													{member.viaDiscord && member.role !== 'owner' ? t('viaDiscord') : ''}
-												</Badge>
-											) : (
-												<Select
-													options={options.map((role) => ({
-														value: role,
-														label: t(`role.${role}`)
-													}))}
-													value={member.role}
-													onValueChange={(next) => {
-														const role = options.find((entry) => entry === next);
-														if (!role) return;
-														setMembers((current) =>
-															current.map((entry) =>
-																entry.id === member.id ? { ...entry, role } : entry
-															)
-														);
-														toast.success(
-															t('access.changed', { name: member.name, role: t(`role.${role}`) })
-														);
-													}}
-													disabled={!canManage}
-													className="w-36"
-												/>
-											)}
-										</td>
-										<td className="py-3 pr-4 text-body-sm text-text-muted">
-											{member.grantedBy}
-											<span className="block text-caption font-normal text-text-muted">
-												{relativeTime(member.grantedAt)}
-											</span>
-										</td>
-										<td className="py-3 pr-4 text-body-sm whitespace-nowrap text-text-muted">
-											{relativeTime(member.lastSeenAt)}
-										</td>
-										<td className="py-3">
-											{member.role === 'owner' || member.viaDiscord ? null : (
-												<Button
-													variant="ghost-danger"
-													size="sm"
-													iconOnly
-													disabled={!canManage}
-													aria-label={t('access.remove', { name: member.name })}
-													onClick={() => {
-														setMembers((current) =>
-															current.filter((entry) => entry.id !== member.id)
-														);
-														toast.success(t('access.removed', { name: member.name }));
-													}}
-												>
-													<Trash2 aria-hidden="true" />
-												</Button>
-											)}
-										</td>
-									</tr>
-								))}
+											</td>
+											<td className="py-3 pr-4">
+												{fixed || !canManage ? (
+													<Badge variant={member.role === 'owner' ? 'primary' : 'outline'}>
+														{t(`role.${member.role}`)}
+													</Badge>
+												) : (
+													<Select
+														options={options.map((role) => ({
+															value: role,
+															label: t(`role.${role}`)
+														}))}
+														value={member.role}
+														onValueChange={(next) => {
+															const role = options.find((entry) => entry === next);
+															if (!role || role === member.role) return;
+															void changeRole(member.id, member.name, role);
+														}}
+														disabled={busy !== null}
+														className="w-36"
+													/>
+												)}
+											</td>
+											<td className="py-3 pr-4 text-body-sm text-text-muted">
+												{member.grantedBy ?? t('access.fromDiscord')}
+												{member.grantedAt === null ? null : (
+													<span className="block text-caption font-normal text-text-muted">
+														{relativeTime(member.grantedAt, at)}
+													</span>
+												)}
+											</td>
+											<td className="py-3 pr-4 text-body-sm whitespace-nowrap text-text-muted">
+												{member.lastSeenAt === null
+													? t('access.never')
+													: relativeTime(member.lastSeenAt, at)}
+											</td>
+											<td className="py-3">
+												{fixed || !canManage ? null : (
+													<Button
+														variant="ghost-danger"
+														size="sm"
+														iconOnly
+														disabled={busy !== null}
+														aria-label={t('access.remove', { name: member.name })}
+														onClick={() => {
+															void remove(member.id, member.name);
+														}}
+													>
+														<Trash2 aria-hidden="true" />
+													</Button>
+												)}
+											</td>
+										</tr>
+									);
+								})}
 							</tbody>
 						</table>
 					</div>
 				</SettingsSection>
 
-				{pending.length > 0 ? (
-					<SettingsSection title={t('pending.title')} description={t('pending.description')}>
+				{canManage && invitesFailed ? (
+					<Alert variant="warning" title={t('links.unavailableTitle')}>
+						{t('links.unavailableBody')}
+					</Alert>
+				) : null}
+
+				{canManage && !invitesFailed && invites.length > 0 ? (
+					<SettingsSection title={t('links.title')} description={t('links.description')}>
 						<ul className="flex flex-col">
-							{pending.map((invite) => (
+							{invites.map((invite) => (
 								<li
 									key={invite.id}
 									className="flex flex-wrap items-center gap-3 border-b border-border py-3 last:border-0"
 								>
-									<span className="font-mono text-body">{invite.handle}</span>
+									<Link2 className="size-4 shrink-0 text-text-muted" aria-hidden="true" />
 									<Badge variant="outline">{t(`role.${invite.role}`)}</Badge>
 									<span className="text-caption font-normal text-text-muted">
-										{t('pending.invitedBy', { who: invite.invitedBy })} ·{' '}
-										{relativeTime(invite.invitedAt)}
+										{t('links.mintedBy', { who: invite.createdBy ?? t('access.fromDiscord') })} ·{' '}
+										{t('links.expires', { when: relativeTime(invite.expiresAt, at) })}
 									</span>
-									<Button
-										variant="ghost-danger"
-										size="sm"
-										className="ml-auto"
-										onClick={() => {
-											setPending((current) => current.filter((entry) => entry.id !== invite.id));
-											toast.success(t('pending.revoked', { handle: invite.handle }));
-										}}
-									>
-										{t('revoke')}
-									</Button>
+									<div className="ml-auto flex items-center gap-1">
+										<Button
+											variant="ghost"
+											size="sm"
+											onClick={() => {
+												copyLink(invite.url);
+											}}
+										>
+											<Copy aria-hidden="true" />
+											{t('links.copy')}
+										</Button>
+										<Button
+											variant="ghost-danger"
+											size="sm"
+											disabled={busy !== null}
+											onClick={() => {
+												void revoke(invite.id);
+											}}
+										>
+											{t('links.revoke')}
+										</Button>
+									</div>
 								</li>
 							))}
 						</ul>
@@ -225,6 +341,7 @@ export function TeamScreen({ team, invites, viewerRole, catalog }: TeamScreenPro
 										</td>
 										{catalog.roles.map((role) => {
 											const granted = can(catalog, role, capability.key);
+
 											return (
 												<td key={role} className="py-3 text-center">
 													<span
@@ -254,76 +371,92 @@ export function TeamScreen({ team, invites, viewerRole, catalog }: TeamScreenPro
 			</div>
 
 			<Dialog
-				open={inviting}
-				onOpenChange={setInviting}
+				open={minting}
+				onOpenChange={closeDialog}
 				title={t('dialog.title')}
-				description={t('dialog.description')}
+				description={minted === null ? t('dialog.description') : t('dialog.ready')}
 				footer={
-					<>
+					minted === null ? (
+						<>
+							<Button
+								variant="ghost"
+								onClick={() => {
+									closeDialog(false);
+								}}
+							>
+								{common('cancel')}
+							</Button>
+							<Button
+								disabled={busy !== null}
+								onClick={() => {
+									void mint();
+								}}
+							>
+								<Link2 aria-hidden="true" />
+								{t('dialog.submit')}
+							</Button>
+						</>
+					) : (
 						<Button
-							variant="ghost"
 							onClick={() => {
-								setInviting(false);
+								closeDialog(false);
 							}}
 						>
-							Cancel
+							{common('close')}
 						</Button>
-						<Button
-							disabled={handle.trim() === ''}
-							onClick={() => {
-								setPending((current) => [
-									...current,
-									{
-										id: newId('inv'),
-										handle: handle.trim(),
-										role: inviteRole,
-										invitedBy: 'you',
-										invitedAt: new Date().toISOString()
-									}
-								]);
-								toast.success(t('dialog.invited', { handle: handle.trim() }), {
-									description: t('dialog.joinAs', { role: t(`role.${inviteRole}`) })
-								});
-								setHandle('');
-								setInviteRole('viewer');
-								setInviting(false);
-							}}
-						>
-							{t('dialog.submit')}
-						</Button>
-					</>
+					)
 				}
 			>
-				<div className="flex flex-col gap-4">
-					<Field label={t('dialog.handle')} hint={t('dialog.handleHint')}>
-						<Input
-							value={handle}
-							onChange={(event) => {
-								setHandle(event.target.value);
-							}}
-							placeholder="@someone"
-						/>
-					</Field>
+				{minted === null ? (
+					<div className="flex flex-col gap-4">
+						<Field label={t('dialog.seat')}>
+							<Select
+								options={options.map((role) => ({ value: role, label: t(`role.${role}`) }))}
+								value={targetRole}
+								onValueChange={(next) => {
+									const role = options.find((entry) => entry === next);
+									if (role) setTargetRole(role);
+								}}
+							/>
+						</Field>
 
-					<Field label={t('dialog.seat')}>
-						<Select
-							options={options.map((role) => ({ value: role, label: t(`role.${role}`) }))}
-							value={inviteRole}
-							onValueChange={(next) => {
-								const role = options.find((entry) => entry === next);
-								if (role) setInviteRole(role);
-							}}
-						/>
-					</Field>
+						<p className="text-body-sm text-text-muted">
+							{t('dialog.grants', {
+								role: t(`role.${targetRole}`),
+								granted: grantedCount(catalog, targetRole),
+								total: catalog.capabilities.length
+							})}
+						</p>
+					</div>
+				) : (
+					<div className="flex flex-col gap-3">
+						<div className="flex items-center gap-2">
+							<code
+								data-testid="invite-link"
+								className="min-w-0 flex-1 truncate rounded-md border border-border bg-surface-sunken px-2 py-1.5 font-mono text-caption text-text-muted"
+							>
+								{minted.url}
+							</code>
+							<Button
+								variant="ghost"
+								size="sm"
+								onClick={() => {
+									copyLink(minted.url);
+								}}
+							>
+								<Copy aria-hidden="true" />
+								{t('dialog.copy')}
+							</Button>
+						</div>
 
-					<p className="text-body-sm text-text-muted">
-						{t('dialog.grants', {
-							role: t(`role.${inviteRole}`),
-							granted: grantedCount(catalog, inviteRole),
-							total: catalog.capabilities.length
-						})}
-					</p>
-				</div>
+						<p className="text-body-sm text-text-muted">
+							{t('dialog.terms', {
+								role: t(`role.${minted.role}`),
+								when: relativeTime(minted.expiresAt, at)
+							})}
+						</p>
+					</div>
+				)}
 			</Dialog>
 		</div>
 	);

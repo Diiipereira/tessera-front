@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import type { CapabilityCatalogDto } from '@/lib/api-url';
-import { assignableRoles, can, grantedCount, MANAGE_TEAM } from '@/lib/team';
+import type { CapabilityCatalogDto, TeamSeatDto } from '@/lib/api-url';
+import {
+	assignableRoles,
+	can,
+	grantedCount,
+	isFixedSeat,
+	MANAGE_TEAM,
+	toTeamMember
+} from '@/lib/team';
 
 const catalog: CapabilityCatalogDto = {
 	capabilities: [
@@ -67,5 +74,56 @@ describe('assignableRoles', () => {
 		const narrowed: CapabilityCatalogDto = { ...catalog, roles: ['owner', 'viewer'] };
 
 		expect(assignableRoles(narrowed, 'admin')).toEqual(['viewer']);
+	});
+});
+
+const SEAT: TeamSeatDto = {
+	userId: '304918273645102938',
+	username: 'lia.exe',
+	globalName: 'lia',
+	avatarHash: null,
+	role: 'admin',
+	source: 'guild-staff',
+	grantedBy: 'okra',
+	grantedAt: '2026-08-20T10:00:00.000Z',
+	lastSeenAt: '2026-08-27T10:00:00.000Z'
+};
+
+describe('toTeamMember', () => {
+	it('prefers the display name Discord shows over the account name', () => {
+		expect(toTeamMember(SEAT).name).toBe('lia');
+	});
+
+	it('falls back to the account name when there is no display name', () => {
+		expect(toTeamMember({ ...SEAT, globalName: null }).name).toBe('lia.exe');
+	});
+
+	it('builds the avatar url only when Discord sent a hash', () => {
+		expect(toTeamMember(SEAT).avatarUrl).toBeNull();
+		expect(toTeamMember({ ...SEAT, avatarHash: 'abc' }).avatarUrl).toContain(
+			'/avatars/304918273645102938/abc.png'
+		);
+	});
+
+	it('does not prefix an at sign to an owner the dashboard only knows by id', () => {
+		const unknown = { ...SEAT, username: SEAT.userId, globalName: null };
+
+		expect(toTeamMember(unknown).handle).toBe(SEAT.userId);
+	});
+});
+
+describe('isFixedSeat', () => {
+	it('fixes the owner seat, which comes from Discord', () => {
+		expect(isFixedSeat(toTeamMember({ ...SEAT, source: 'guild-owner' }), 'someone-else')).toBe(
+			true
+		);
+	});
+
+	it('fixes your own seat, because the API refuses to let you change it', () => {
+		expect(isFixedSeat(toTeamMember(SEAT), SEAT.userId)).toBe(true);
+	});
+
+	it('leaves everybody else editable', () => {
+		expect(isFixedSeat(toTeamMember(SEAT), 'someone-else')).toBe(false);
 	});
 });

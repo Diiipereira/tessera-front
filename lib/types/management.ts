@@ -98,27 +98,6 @@ export type AuditEntry = {
 
 export type TeamRole = 'owner' | 'admin' | 'moderator' | 'viewer';
 
-export type TeamMember = {
-	id: string;
-	name: string;
-	handle: string;
-	initials: string;
-	color: string;
-	role: TeamRole;
-	grantedBy: string;
-	grantedAt: string;
-	lastSeenAt: string;
-	viaDiscord: boolean;
-};
-
-export type TeamInvite = {
-	id: string;
-	handle: string;
-	role: TeamRole;
-	invitedBy: string;
-	invitedAt: string;
-};
-
 export type BillingCycle = 'monthly' | 'yearly';
 
 export type InvoiceStatus = 'paid' | 'open' | 'refunded';

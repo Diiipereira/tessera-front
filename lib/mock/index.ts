@@ -14,7 +14,7 @@ export { mockCommands } from './commands';
 export { mockGuilds } from './guilds';
 export { mockMembers } from './members';
 export { mockBotOnline, mockPlan, mockUser } from './session';
-export { mockBilling, mockGuildSettings, mockInvites, mockTeam } from './server';
+export { mockBilling, mockGuildSettings } from './server';
 export { mockModerationConfig, mockModules, mockVariables, mockWelcomeConfig } from './modules';
 export {
 	mockAutoModConfig,
