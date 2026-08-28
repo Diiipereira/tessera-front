@@ -8,7 +8,8 @@ const dto: GuildCardDto = {
 	iconHash: null,
 	owner: true,
 	memberCount: 12431,
-	planKey: 'pro'
+	planKey: 'pro',
+	botPermissions: null
 };
 
 describe('initialsOf', () => {

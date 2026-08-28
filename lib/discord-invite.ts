@@ -1,5 +1,10 @@
 import { apiBaseUrl } from '@/lib/api-url';
-import { permissionMask, permissionsExcept, type PermissionName } from '@/lib/discord-permissions';
+import {
+	grants,
+	permissionMask,
+	permissionsExcept,
+	type PermissionName
+} from '@/lib/discord-permissions';
 
 const AUTHORIZE_URL = 'https://discord.com/oauth2/authorize';
 
@@ -14,6 +19,20 @@ export const REQUESTED_PERMISSIONS = permissionsExcept(REFUSED_PERMISSIONS);
 export const INVITE_PERMISSIONS = permissionMask(REQUESTED_PERMISSIONS).toString();
 
 export const INSTALL_RETURN_PATH = '/auth/discord/install';
+
+export function missingFrom(granted: string | null): readonly PermissionName[] {
+	if (granted === null) return [];
+
+	let held: bigint;
+
+	try {
+		held = BigInt(granted);
+	} catch {
+		return [];
+	}
+
+	return REQUESTED_PERMISSIONS.filter((name) => !grants(held, name));
+}
 
 export function installReturnUri(): string {
 	return `${apiBaseUrl()}${INSTALL_RETURN_PATH}`;

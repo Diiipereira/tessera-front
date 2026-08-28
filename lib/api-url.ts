@@ -18,6 +18,7 @@ export type GuildCardDto = {
 	owner: boolean;
 	memberCount: number | null;
 	planKey: string | null;
+	botPermissions: string | null;
 };
 
 export type GuildListDto = {

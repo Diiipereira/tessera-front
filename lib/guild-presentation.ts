@@ -1,5 +1,6 @@
 import type { AuthenticatedUserDto, GuildCardDto } from '@/lib/api-url';
 import { guildIconUrl, userAvatarUrl } from '@/lib/discord-cdn';
+import { missingFrom } from '@/lib/discord-invite';
 import type { Guild } from '@/lib/types/guild';
 import type { PlanTier } from '@/lib/types/billing';
 import type { SessionUser } from '@/lib/types/session';
@@ -47,7 +48,8 @@ export function toGuild(dto: GuildCardDto, hasBot: boolean): Guild {
 		iconUrl: guildIconUrl(dto.id, dto.iconHash),
 		memberCount: dto.memberCount ?? 0,
 		hasBot,
-		tier: tierOf(dto.planKey)
+		tier: tierOf(dto.planKey),
+		missingPermissions: hasBot ? missingFrom(dto.botPermissions) : []
 	};
 }
 

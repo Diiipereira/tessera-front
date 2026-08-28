@@ -9,7 +9,8 @@ export const mockGuilds: Guild[] = [
 		memberCount: 12431,
 		iconUrl: null,
 		hasBot: true,
-		tier: 'pro'
+		tier: 'pro',
+		missingPermissions: []
 	},
 	{
 		id: '731204885219930112',
@@ -19,7 +20,8 @@ export const mockGuilds: Guild[] = [
 		memberCount: 3908,
 		iconUrl: null,
 		hasBot: true,
-		tier: 'free'
+		tier: 'free',
+		missingPermissions: []
 	},
 	{
 		id: '918273645510293847',
@@ -29,7 +31,8 @@ export const mockGuilds: Guild[] = [
 		memberCount: 27650,
 		iconUrl: null,
 		hasBot: true,
-		tier: 'ultimate'
+		tier: 'ultimate',
+		missingPermissions: []
 	},
 	{
 		id: '556677889900112233',
@@ -39,6 +42,7 @@ export const mockGuilds: Guild[] = [
 		memberCount: 812,
 		iconUrl: null,
 		hasBot: false,
-		tier: 'free'
+		tier: 'free',
+		missingPermissions: []
 	}
 ];

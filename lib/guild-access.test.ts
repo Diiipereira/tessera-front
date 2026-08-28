@@ -28,7 +28,8 @@ const card = (id: string, name: string) => ({
 	iconHash: null,
 	owner: true,
 	memberCount: 3,
-	planKey: 'free'
+	planKey: 'free',
+	botPermissions: null
 });
 
 const MANAGED = '931562055025168435';

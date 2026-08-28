@@ -9,4 +9,5 @@ export type Guild = {
 	memberCount: number;
 	hasBot: boolean;
 	tier: PlanTier;
+	missingPermissions: readonly string[];
 };

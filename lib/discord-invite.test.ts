@@ -6,9 +6,10 @@ import {
 	REFUSED_PERMISSIONS,
 	REQUESTED_PERMISSIONS,
 	installReturnUri,
-	inviteUrl
+	inviteUrl,
+	missingFrom
 } from './discord-invite';
-import { PERMISSION_NAMES, grants } from './discord-permissions';
+import { PERMISSION_BITS, PERMISSION_NAMES, grants, permissionMask } from './discord-permissions';
 
 const CLIENT_ID = '1542230629700079630';
 const GUILD_ID = '842315097461823104';
@@ -71,6 +72,34 @@ describe('inviteUrl', () => {
 	it('never asks for Administrator, which hierarchy would not honour anyway', () => {
 		expect(REFUSED_PERMISSIONS).toEqual(['ADMINISTRATOR']);
 		expect(grants(BigInt(INVITE_PERMISSIONS), 'ADMINISTRATOR')).toBe(false);
+	});
+
+	it('reports nothing missing when the bot holds everything we ask for', () => {
+		expect(missingFrom(INVITE_PERMISSIONS)).toEqual([]);
+	});
+
+	it('counts Administrator as no loss, because we never asked for it', () => {
+		const withoutAdmin = BigInt(INVITE_PERMISSIONS) & ~(1n << PERMISSION_BITS.ADMINISTRATOR);
+
+		expect(missingFrom(withoutAdmin.toString())).toEqual([]);
+	});
+
+	it('names the permissions a server is short of', () => {
+		const stripped = BigInt(INVITE_PERMISSIONS) & ~permissionMask(['BAN_MEMBERS', 'KICK_MEMBERS']);
+
+		expect([...missingFrom(stripped.toString())].sort()).toEqual(['BAN_MEMBERS', 'KICK_MEMBERS']);
+	});
+
+	it('reports every requested permission when the bot holds none', () => {
+		expect(missingFrom('0')).toHaveLength(REQUESTED_PERMISSIONS.length);
+	});
+
+	it('claims nothing is missing when the API could not tell us', () => {
+		expect(missingFrom(null)).toEqual([]);
+	});
+
+	it('refuses to guess from a bitfield it cannot parse', () => {
+		expect(missingFrom('not-a-number')).toEqual([]);
 	});
 
 	it('asks for every other permission Discord defines', () => {

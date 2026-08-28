@@ -1,4 +1,4 @@
-import { Crown, Plus } from 'lucide-react';
+import { Crown, Plus, RefreshCw } from 'lucide-react';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -16,7 +16,8 @@ const TIER_LABELS: Record<string, string> = {
 
 export function GuildCard({ guild }: { guild: Guild }) {
 	const tierLabel = TIER_LABELS[guild.tier];
-	const addHref = botInviteUrl(guild.id);
+	const inviteHref = botInviteUrl(guild.id);
+	const behind = guild.missingPermissions.length;
 
 	return (
 		<div className="flex items-center gap-4 rounded-lg border border-border bg-surface p-5 shadow-1 transition-[border-color,box-shadow] duration-120 ease-out hover:border-border-strong hover:shadow-2">
@@ -55,24 +56,41 @@ export function GuildCard({ guild }: { guild: Guild }) {
 							{tierLabel}
 						</Badge>
 					) : null}
+					{behind > 0 ? (
+						<Badge variant="warning" className="shrink-0">
+							{behind === 1 ? '1 permission behind' : `${String(behind)} permissions behind`}
+						</Badge>
+					) : null}
 				</div>
 
 				<p className="tabular text-caption font-normal text-text-muted">
 					{guild.hasBot ? `${formatCount(guild.memberCount)} members` : 'Not installed yet'}
 				</p>
 
-				<div className="mt-3">
+				<div className="mt-3 flex flex-wrap items-center gap-2">
 					{guild.hasBot ? (
-						<Button size="sm" href={guildHref(guild.id, '')}>
-							Manage
-						</Button>
+						<>
+							<Button size="sm" href={guildHref(guild.id, '')}>
+								Manage
+							</Button>
+							<Button
+								size="sm"
+								variant="outline"
+								href={inviteHref ?? '/docs'}
+								rel="external"
+								disabled={inviteHref === null}
+							>
+								<RefreshCw aria-hidden="true" />
+								Sync permissions
+							</Button>
+						</>
 					) : (
 						<Button
 							size="sm"
 							variant="outline"
-							href={addHref ?? '/docs'}
+							href={inviteHref ?? '/docs'}
 							rel="external"
-							disabled={addHref === null}
+							disabled={inviteHref === null}
 						>
 							<Plus aria-hidden="true" />
 							Add to server
