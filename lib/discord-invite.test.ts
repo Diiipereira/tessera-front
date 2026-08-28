@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
 	INSTALL_RETURN_PATH,
+	ADMINISTRATOR_BIT,
 	INVITE_PERMISSIONS,
 	INVITE_SCOPES,
 	installReturnUri,
@@ -62,7 +63,28 @@ describe('inviteUrl', () => {
 	});
 
 	it('keeps the permission integer exact, not rounded through a float', () => {
-		expect(INVITE_PERMISSIONS).toBe('1391972445398');
+		expect(INVITE_PERMISSIONS).toBe('8866461766385655');
 		expect(BigInt(INVITE_PERMISSIONS) & (1n << 40n)).toBe(1n << 40n);
+	});
+
+	it('never asks for Administrator, which hierarchy would not honour anyway', () => {
+		expect(BigInt(INVITE_PERMISSIONS) & (1n << ADMINISTRATOR_BIT)).toBe(0n);
+	});
+
+	it('asks for every other permission Discord defines', () => {
+		const DEFINED = [
+			...Array.from({ length: 47 }, (_, bit) => BigInt(bit)),
+			48n,
+			49n,
+			50n,
+			51n,
+			52n
+		];
+		const granted = BigInt(INVITE_PERMISSIONS);
+		const missing = DEFINED.filter(
+			(bit) => bit !== ADMINISTRATOR_BIT && (granted & (1n << bit)) === 0n
+		);
+
+		expect(missing).toEqual([]);
 	});
 });

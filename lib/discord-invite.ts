@@ -6,7 +6,9 @@ export type ExternalHref = `${typeof AUTHORIZE_URL}?${string}`;
 
 export const INVITE_SCOPES = ['bot', 'applications.commands', 'identify'] as const;
 
-export const INVITE_PERMISSIONS = '1391972445398';
+export const INVITE_PERMISSIONS = '8866461766385655';
+
+export const ADMINISTRATOR_BIT = 3n;
 
 export const INSTALL_RETURN_PATH = '/auth/discord/install';
 
