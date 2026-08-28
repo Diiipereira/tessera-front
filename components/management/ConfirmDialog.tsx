@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useState, type ReactNode } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Dialog } from '@/components/ui/Dialog';
@@ -27,6 +28,8 @@ export function ConfirmDialog({
 	onConfirm,
 	children
 }: ConfirmDialogProps) {
+	const t = useTranslations('confirm');
+	const shared = useTranslations('common');
 	const [typed, setTyped] = useState('');
 	const matches = typed.trim() === confirmPhrase;
 
@@ -48,7 +51,7 @@ export function ConfirmDialog({
 			footer={
 				<>
 					<Button variant="ghost" onClick={close}>
-						Cancel
+						{shared('cancel')}
 					</Button>
 					<Button
 						variant="danger"
@@ -66,8 +69,8 @@ export function ConfirmDialog({
 			<div className="flex flex-col gap-4">
 				{children}
 				<Field
-					label={`Type ${confirmPhrase} to confirm`}
-					help={matches ? undefined : 'It has to match exactly, capitals included.'}
+					label={t('type', { phrase: confirmPhrase })}
+					help={matches ? undefined : t('mustMatch')}
 				>
 					<Input
 						value={typed}

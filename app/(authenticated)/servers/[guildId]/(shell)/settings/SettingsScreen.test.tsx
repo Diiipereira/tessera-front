@@ -1,7 +1,10 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { createTranslator } from 'next-intl';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { GuildSettings } from '@/lib/types/management';
+import enUS from '@/messages/en-US.json';
+import ptBR from '@/messages/pt-BR.json';
 import { Translated } from '@/tests/i18n';
 import { SettingsScreen } from './SettingsScreen';
 
@@ -39,7 +42,11 @@ const SETTINGS: GuildSettings = {
 	botNickname: 'Tessera'
 };
 
-const UNBUILT = ['Export', 'Import', 'Reset'];
+const copy = enUS.settings;
+
+const t = createTranslator({ locale: 'en-US', messages: enUS });
+
+const UNBUILT = [copy.backup.export, copy.backup.import, copy.danger.reset];
 
 function setup() {
 	render(<SettingsScreen guildId={GUILD_ID} settings={SETTINGS} guildName={GUILD_NAME} />, {
@@ -50,9 +57,9 @@ function setup() {
 async function confirmRemoval() {
 	const user = userEvent.setup();
 
-	await user.click(screen.getByRole('button', { name: 'Remove bot' }));
-	await user.type(screen.getByLabelText(`Type ${GUILD_NAME} to confirm`), GUILD_NAME);
-	await user.click(screen.getByRole('button', { name: 'Remove the bot' }));
+	await user.click(screen.getByRole('button', { name: copy.danger.remove }));
+	await user.type(screen.getByLabelText(t('confirm.type', { phrase: GUILD_NAME })), GUILD_NAME);
+	await user.click(screen.getByRole('button', { name: copy.danger.confirmLabel }));
 }
 
 describe('SettingsScreen', () => {
@@ -73,7 +80,7 @@ describe('SettingsScreen', () => {
 	it('says which actions are missing instead of pretending they ran', () => {
 		setup();
 
-		expect(screen.getAllByText('Not available yet')).toHaveLength(UNBUILT.length);
+		expect(screen.getAllByText(copy.notAvailable)).toHaveLength(UNBUILT.length);
 	});
 
 	it('leaves the settings that do save alone', () => {
@@ -81,14 +88,16 @@ describe('SettingsScreen', () => {
 
 		expect(screen.getByDisplayValue('Tessera')).toBeEnabled();
 		expect(screen.getByDisplayValue('#5865f2')).toBeEnabled();
-		expect(screen.getByRole('button', { name: 'Use #5865f2' })).toBeEnabled();
+		expect(
+			screen.getByRole('button', { name: t('settings.appearance.useColor', { color: '#5865f2' }) })
+		).toBeEnabled();
 	});
 
 	describe('removing the bot', () => {
 		it('offers the removal, because the API can carry this one out', () => {
 			setup();
 
-			expect(screen.getByRole('button', { name: 'Remove bot' })).toBeEnabled();
+			expect(screen.getByRole('button', { name: copy.danger.remove })).toBeEnabled();
 		});
 
 		it('asks the API to remove the bot from this guild, and only this guild', async () => {
@@ -117,7 +126,7 @@ describe('SettingsScreen', () => {
 			await confirmRemoval();
 
 			await waitFor(() => {
-				expect(toastError).toHaveBeenCalledWith('Could not remove the bot', {
+				expect(toastError).toHaveBeenCalledWith(copy.danger.removeFailed, {
 					description: 'Only the owner can do that'
 				});
 			});
@@ -131,11 +140,30 @@ describe('SettingsScreen', () => {
 
 			await waitFor(() => {
 				expect(toastSuccess).toHaveBeenCalledWith(
-					`Tessera left ${GUILD_NAME}`,
-					expect.objectContaining({ description: expect.any(String) as unknown })
+					t('settings.danger.left', { brand: 'Tessera', guild: GUILD_NAME }),
+					{ description: copy.danger.leftHint }
 				);
 			});
 			expect(toastError).not.toHaveBeenCalled();
 		});
+	});
+
+	it('shows the stored server language, which is what the bot writes in', () => {
+		setup();
+
+		expect(screen.getByRole('combobox', { name: copy.language.serverLanguage })).toHaveTextContent(
+			enUS.locales['pt-BR']
+		);
+	});
+
+	it('reads in the language the reader picked, not in English by default', () => {
+		render(<SettingsScreen guildId={GUILD_ID} settings={SETTINGS} guildName={GUILD_NAME} />, {
+			wrapper: ({ children }) => <Translated locale="pt-BR">{children}</Translated>
+		});
+
+		expect(
+			screen.getByRole('heading', { name: ptBR.settings.title, level: 1 })
+		).toBeInTheDocument();
+		expect(screen.getByText(ptBR.settings.danger.title)).toBeInTheDocument();
 	});
 });

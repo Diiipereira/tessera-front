@@ -522,6 +522,65 @@
 			}
 		}
 	},
+	"confirm": {
+		"type": "Digite {phrase} para confirmar",
+		"mustMatch": "Precisa ser igual, maiúsculas incluídas."
+	},
+	"settings": {
+		"title": "Configurações",
+		"description": "Como a {brand} se comporta em {guild}, e as coisas que só dá para fazer uma vez.",
+		"saved": "Configurações salvas",
+		"saveFailed": "Não foi possível salvar",
+		"unknownFailure": "Falha desconhecida",
+		"notAvailable": "Ainda não disponível",
+		"language": {
+			"title": "Idioma e horário",
+			"description": "Tudo o que o bot escreve, e todo agendamento, segue estas escolhas.",
+			"serverLanguage": "Idioma do servidor",
+			"serverLanguageHint": "O que o bot escreve no Discord. O idioma do seu painel fica na sua conta.",
+			"timezone": "Fuso horário",
+			"timezoneHint": "Mensagens agendadas e reinícios diários seguem este relógio.",
+			"timezonePlaceholder": "Escolha um fuso horário",
+			"timezoneSearch": "Buscar fusos horários",
+			"timezoneEmpty": "Nenhum fuso horário corresponde a isso."
+		},
+		"appearance": {
+			"title": "Aparência",
+			"description": "Como o bot aparece na lista de membros e nos embeds dele.",
+			"embedColor": "Cor padrão dos embeds",
+			"useColor": "Usar {color}",
+			"embedColorHex": "Cor dos embeds em hexadecimal",
+			"nickname": "Apelido do bot",
+			"nicknameHint": "Vazio mantém {brand}. Os membros veem este nome na barra lateral."
+		},
+		"backup": {
+			"title": "Backup e restauração",
+			"description": "Uma cópia de todas as configurações de módulo deste servidor, e um jeito de repor.",
+			"exportTitle": "Exportar configuração",
+			"exportBody": "Um arquivo JSON com todas as configurações de módulo deste servidor. Seguro de guardar, seguro de mandar para o suporte.",
+			"export": "Exportar",
+			"importTitle": "Importar configuração",
+			"importBody": "Substitui todas as configurações de módulo pelo conteúdo do arquivo. Você vê a diferença antes de qualquer coisa ser gravada.",
+			"import": "Importar"
+		},
+		"danger": {
+			"title": "Zona de perigo",
+			"description": "Estas ações não passam pela barra de salvar — valem no instante em que você confirma.",
+			"resetTitle": "Restaurar todas as configurações",
+			"resetBody": "Todo módulo volta ao padrão. Casos, histórico de auditoria e dados dos membros ficam.",
+			"reset": "Restaurar",
+			"removeTitle": "Remover a {brand} de {guild}",
+			"removeBody": "O bot sai do servidor. Sua configuração fica guardada por 30 dias, caso você o convide de volta.",
+			"remove": "Remover o bot",
+			"confirmTitle": "Remover a {brand} de {guild}?",
+			"confirmDescription": "O bot sai na hora. Nada do que ele estava executando continua.",
+			"confirmLabel": "Remover o bot",
+			"confirmBody": "Tickets abertos continuam como canais, mas deixam de ser gerenciados. Sorteios ativos nunca sorteiam. Mensagens agendadas param.",
+			"left": "A {brand} saiu de {guild}",
+			"leftHint": "Sua configuração fica guardada por 30 dias.",
+			"removeFailed": "Não foi possível remover o bot"
+		}
+	},
 	"modules": {
 		"docs": "Documentação",
 		"enabled": "Ligado",

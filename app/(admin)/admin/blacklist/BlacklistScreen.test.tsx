@@ -2,11 +2,12 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { mockBlacklist } from '@/lib/mock/admin';
+import { Translated } from '@/tests/i18n';
 import { BlacklistScreen } from './BlacklistScreen';
 
 describe('BlacklistScreen', () => {
 	it('hides expired blocks, which are history rather than policy', () => {
-		render(<BlacklistScreen entries={mockBlacklist} />);
+		render(<BlacklistScreen entries={mockBlacklist} />, { wrapper: Translated });
 
 		expect(screen.queryByText('api-hammer')).not.toBeInTheDocument();
 		expect(screen.getByText('raid-account-01')).toBeInTheDocument();
@@ -14,7 +15,7 @@ describe('BlacklistScreen', () => {
 
 	it('shows the expired ones when asked, marked as expired', async () => {
 		const user = userEvent.setup();
-		render(<BlacklistScreen entries={mockBlacklist} />);
+		render(<BlacklistScreen entries={mockBlacklist} />, { wrapper: Translated });
 
 		await user.click(screen.getByRole('checkbox', { name: /Show expired/ }));
 
@@ -24,7 +25,7 @@ describe('BlacklistScreen', () => {
 
 	it('narrows to servers when the target filter is switched', async () => {
 		const user = userEvent.setup();
-		render(<BlacklistScreen entries={mockBlacklist} />);
+		render(<BlacklistScreen entries={mockBlacklist} />, { wrapper: Translated });
 
 		await user.click(screen.getByRole('button', { name: 'Servers' }));
 
@@ -34,7 +35,7 @@ describe('BlacklistScreen', () => {
 
 	it('searches the reason, not only the name', async () => {
 		const user = userEvent.setup();
-		render(<BlacklistScreen entries={mockBlacklist} />);
+		render(<BlacklistScreen entries={mockBlacklist} />, { wrapper: Translated });
 
 		await user.type(screen.getByLabelText('Search the blacklist'), 'phishing');
 
@@ -44,7 +45,7 @@ describe('BlacklistScreen', () => {
 
 	it('keeps the block button out of reach until the id is a real snowflake', async () => {
 		const user = userEvent.setup();
-		render(<BlacklistScreen entries={mockBlacklist} />);
+		render(<BlacklistScreen entries={mockBlacklist} />, { wrapper: Translated });
 
 		await user.click(screen.getByRole('button', { name: /Add entry/ }));
 
@@ -58,7 +59,7 @@ describe('BlacklistScreen', () => {
 
 	it('unlocks once the id has the right shape', async () => {
 		const user = userEvent.setup();
-		render(<BlacklistScreen entries={mockBlacklist} />);
+		render(<BlacklistScreen entries={mockBlacklist} />, { wrapper: Translated });
 
 		await user.click(screen.getByRole('button', { name: /Add entry/ }));
 		await user.type(screen.getByLabelText('Target id'), '123456789012345678');

@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
+import { Translated } from '@/tests/i18n';
 import { ConfirmDialog } from './ConfirmDialog';
 
 function renderDialog(onConfirm = vi.fn(), onOpenChange = vi.fn()) {
@@ -13,7 +14,8 @@ function renderDialog(onConfirm = vi.fn(), onOpenChange = vi.fn()) {
 			confirmPhrase="Pixel Foundry"
 			confirmLabel="Remove the bot"
 			onConfirm={onConfirm}
-		/>
+		/>,
+		{ wrapper: Translated }
 	);
 	return { onConfirm, onOpenChange };
 }

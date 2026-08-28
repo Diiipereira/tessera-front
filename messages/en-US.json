@@ -522,6 +522,65 @@
 			}
 		}
 	},
+	"confirm": {
+		"type": "Type {phrase} to confirm",
+		"mustMatch": "It has to match exactly, capitals included."
+	},
+	"settings": {
+		"title": "Settings",
+		"description": "How {brand} behaves in {guild}, and the things you can only do once.",
+		"saved": "Settings saved",
+		"saveFailed": "Could not save",
+		"unknownFailure": "Unknown failure",
+		"notAvailable": "Not available yet",
+		"language": {
+			"title": "Language and time",
+			"description": "Everything the bot writes, and every schedule, follows these.",
+			"serverLanguage": "Server language",
+			"serverLanguageHint": "What the bot writes in Discord. Your dashboard language lives in your account.",
+			"timezone": "Timezone",
+			"timezoneHint": "Scheduled messages and daily resets run against this clock.",
+			"timezonePlaceholder": "Pick a timezone",
+			"timezoneSearch": "Search timezones",
+			"timezoneEmpty": "No timezone matches that."
+		},
+		"appearance": {
+			"title": "Appearance",
+			"description": "How the bot shows up in the member list and in its own embeds.",
+			"embedColor": "Default embed colour",
+			"useColor": "Use {color}",
+			"embedColorHex": "Embed colour hex",
+			"nickname": "Bot nickname",
+			"nicknameHint": "Empty keeps {brand}. Members see this name in the sidebar."
+		},
+		"backup": {
+			"title": "Backup and restore",
+			"description": "A copy of every module setting in this server, and a way to put one back.",
+			"exportTitle": "Export configuration",
+			"exportBody": "A JSON file with every module setting in this server. Safe to keep, safe to share with support.",
+			"export": "Export",
+			"importTitle": "Import configuration",
+			"importBody": "Replaces every module setting with the file contents. You see a diff before anything is written.",
+			"import": "Import"
+		},
+		"danger": {
+			"title": "Danger zone",
+			"description": "These are not covered by the save bar — they apply the moment you confirm.",
+			"resetTitle": "Reset all settings",
+			"resetBody": "Every module goes back to its defaults. Cases, audit history and member data are kept.",
+			"reset": "Reset",
+			"removeTitle": "Remove {brand} from {guild}",
+			"removeBody": "The bot leaves the server. Your configuration is kept for 30 days in case you invite it back.",
+			"remove": "Remove bot",
+			"confirmTitle": "Remove {brand} from {guild}?",
+			"confirmDescription": "The bot leaves immediately. Nothing it was running keeps running.",
+			"confirmLabel": "Remove the bot",
+			"confirmBody": "Open tickets stay as channels but stop being managed. Active giveaways never draw a winner. Scheduled messages stop.",
+			"left": "{brand} left {guild}",
+			"leftHint": "Your configuration is kept for 30 days.",
+			"removeFailed": "Could not remove the bot"
+		}
+	},
 	"modules": {
 		"docs": "Docs",
 		"enabled": "Enabled",

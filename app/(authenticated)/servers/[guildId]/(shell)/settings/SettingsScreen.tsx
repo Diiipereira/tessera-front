@@ -1,6 +1,7 @@
 'use client';
 
 import { Download, RotateCcw, Trash2, Upload } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useCallback, useMemo, useState, type ReactNode } from 'react';
 import { toast } from 'sonner';
@@ -18,14 +19,10 @@ import { BRAND } from '@/lib/brand';
 import { EMBED_SWATCHES } from '@/lib/discord-colors';
 import { removeBot } from '@/lib/guild-bot-client';
 import { useConfigDraft, type SaveOutcome } from '@/lib/hooks/useConfigDraft';
+import { SUPPORTED_LOCALES } from '@/lib/locale';
 import { patchSettings } from '@/lib/settings-client';
 import { timezoneOptions } from '@/lib/timezones';
 import type { GuildSettings } from '@/lib/types/management';
-
-const LOCALES = [
-	{ value: 'en-US', label: 'English (US)' },
-	{ value: 'pt-BR', label: 'Português (Brasil)' }
-];
 
 type SettingsScreenProps = {
 	guildId: string;
@@ -34,6 +31,8 @@ type SettingsScreenProps = {
 };
 
 export function SettingsScreen({ guildId, settings, guildName }: SettingsScreenProps) {
+	const t = useTranslations('settings');
+	const localeNames = useTranslations('locales');
 	const save = useCallback(
 		async (next: GuildSettings): Promise<SaveOutcome<GuildSettings>> => {
 			const result = await patchSettings(guildId, next);
@@ -59,44 +58,41 @@ export function SettingsScreen({ guildId, settings, guildName }: SettingsScreenP
 			(result) => {
 				if (result.status === 'error') {
 					setRemoving(false);
-					toast.error('Could not remove the bot', { description: result.message });
+					toast.error(t('danger.removeFailed'), { description: result.message });
 
 					return;
 				}
 
-				toast.success(`${BRAND.name} left ${guildName}`, {
-					description: 'Your configuration is kept for 30 days.'
+				toast.success(t('danger.left', { brand: BRAND.name, guild: guildName }), {
+					description: t('danger.leftHint')
 				});
 				router.push('/servers');
 			},
 			(error: unknown) => {
 				setRemoving(false);
-				toast.error('Could not remove the bot', {
-					description: error instanceof Error ? error.message : 'Unknown failure'
+				toast.error(t('danger.removeFailed'), {
+					description: error instanceof Error ? error.message : t('unknownFailure')
 				});
 			}
 		);
-	}, [guildId, guildName, router]);
+	}, [guildId, guildName, router, t]);
 
 	return (
 		<div className="w-full p-6 sm:p-8">
 			<PageHeader
-				title="Settings"
-				description={`How ${BRAND.name} behaves in ${guildName}, and the things you can only do once.`}
+				title={t('title')}
+				description={t('description', { brand: BRAND.name, guild: guildName })}
 			/>
 
 			<div className="mt-6 flex flex-col gap-6">
-				<SettingsSection
-					title="Language and time"
-					description="Everything the bot writes, and every schedule, follows these."
-				>
+				<SettingsSection title={t('language.title')} description={t('language.description')}>
 					<div className="grid gap-4 sm:grid-cols-2">
-						<Field
-							label="Server language"
-							hint="What the bot writes in Discord. Your dashboard language lives in your account."
-						>
+						<Field label={t('language.serverLanguage')} hint={t('language.serverLanguageHint')}>
 							<Select
-								options={LOCALES}
+								options={SUPPORTED_LOCALES.map((value) => ({
+									value,
+									label: localeNames(value)
+								}))}
 								value={draft.locale}
 								onValueChange={(next) => {
 									form.set('locale', next);
@@ -104,36 +100,30 @@ export function SettingsScreen({ guildId, settings, guildName }: SettingsScreenP
 							/>
 						</Field>
 
-						<Field
-							label="Timezone"
-							hint="Scheduled messages and daily resets run against this clock."
-						>
+						<Field label={t('language.timezone')} hint={t('language.timezoneHint')}>
 							<Combobox
 								options={timezones}
 								value={draft.timezone}
 								onValueChange={(next) => {
 									form.set('timezone', next);
 								}}
-								placeholder="Pick a timezone"
-								searchPlaceholder="Search timezones"
-								emptyLabel="No timezone matches that."
+								placeholder={t('language.timezonePlaceholder')}
+								searchPlaceholder={t('language.timezoneSearch')}
+								emptyLabel={t('language.timezoneEmpty')}
 							/>
 						</Field>
 					</div>
 				</SettingsSection>
 
-				<SettingsSection
-					title="Appearance"
-					description="How the bot shows up in the member list and in its own embeds."
-				>
+				<SettingsSection title={t('appearance.title')} description={t('appearance.description')}>
 					<div className="flex flex-col gap-2">
-						<span className="text-body-sm font-medium">Default embed colour</span>
+						<span className="text-body-sm font-medium">{t('appearance.embedColor')}</span>
 						<div className="flex flex-wrap items-center gap-2">
 							{EMBED_SWATCHES.map((color) => (
 								<button
 									key={color}
 									type="button"
-									aria-label={`Use ${color}`}
+									aria-label={t('appearance.useColor', { color })}
 									aria-pressed={draft.embedColor.toLowerCase() === color}
 									onClick={() => {
 										form.set('embedColor', color);
@@ -151,7 +141,7 @@ export function SettingsScreen({ guildId, settings, guildName }: SettingsScreenP
 								onChange={(event) => {
 									form.set('embedColor', event.target.value);
 								}}
-								aria-label="Embed colour hex"
+								aria-label={t('appearance.embedColorHex')}
 								className="w-28 font-mono"
 								maxLength={7}
 							/>
@@ -159,8 +149,8 @@ export function SettingsScreen({ guildId, settings, guildName }: SettingsScreenP
 					</div>
 
 					<Field
-						label="Bot nickname"
-						hint={`Empty keeps ${BRAND.name}. Members see this name in the sidebar.`}
+						label={t('appearance.nickname')}
+						hint={t('appearance.nicknameHint', { brand: BRAND.name })}
 					>
 						<Input
 							value={draft.botNickname}
@@ -173,55 +163,51 @@ export function SettingsScreen({ guildId, settings, guildName }: SettingsScreenP
 					</Field>
 				</SettingsSection>
 
-				<SettingsSection
-					title="Backup and restore"
-					description="A copy of every module setting in this server, and a way to put one back."
-				>
+				<SettingsSection title={t('backup.title')} description={t('backup.description')}>
 					<ActionRow
 						pending
-						title="Export configuration"
-						body="A JSON file with every module setting in this server. Safe to keep, safe to share with support."
+						title={t('backup.exportTitle')}
+						body={t('backup.exportBody')}
+						pendingLabel={t('notAvailable')}
 						action={
 							<Button variant="outline" size="sm" disabled>
 								<Download aria-hidden="true" />
-								Export
+								{t('backup.export')}
 							</Button>
 						}
 					/>
 
 					<ActionRow
 						pending
-						title="Import configuration"
-						body="Replaces every module setting with the file contents. You see a diff before anything is written."
+						title={t('backup.importTitle')}
+						body={t('backup.importBody')}
+						pendingLabel={t('notAvailable')}
 						action={
 							<Button variant="outline" size="sm" disabled>
 								<Upload aria-hidden="true" />
-								Import
+								{t('backup.import')}
 							</Button>
 						}
 					/>
 				</SettingsSection>
 
-				<SettingsSection
-					title="Danger zone"
-					description="These are not covered by the save bar — they apply the moment you confirm."
-					danger
-				>
+				<SettingsSection title={t('danger.title')} description={t('danger.description')} danger>
 					<ActionRow
 						pending
-						title="Reset all settings"
-						body="Every module goes back to its defaults. Cases, audit history and member data are kept."
+						title={t('danger.resetTitle')}
+						body={t('danger.resetBody')}
+						pendingLabel={t('notAvailable')}
 						action={
 							<Button variant="danger" size="sm" disabled>
 								<RotateCcw aria-hidden="true" />
-								Reset
+								{t('danger.reset')}
 							</Button>
 						}
 					/>
 
 					<ActionRow
-						title={`Remove ${BRAND.name} from ${guildName}`}
-						body="The bot leaves the server. Your configuration is kept for 30 days in case you invite it back."
+						title={t('danger.removeTitle', { brand: BRAND.name, guild: guildName })}
+						body={t('danger.removeBody')}
 						action={
 							<Button
 								variant="danger"
@@ -232,7 +218,7 @@ export function SettingsScreen({ guildId, settings, guildName }: SettingsScreenP
 								}}
 							>
 								<Trash2 aria-hidden="true" />
-								Remove bot
+								{t('danger.remove')}
 							</Button>
 						}
 					/>
@@ -242,16 +228,13 @@ export function SettingsScreen({ guildId, settings, guildName }: SettingsScreenP
 			<ConfirmDialog
 				open={confirmingRemoval}
 				onOpenChange={setConfirmingRemoval}
-				title={`Remove ${BRAND.name} from ${guildName}?`}
-				description="The bot leaves immediately. Nothing it was running keeps running."
+				title={t('danger.confirmTitle', { brand: BRAND.name, guild: guildName })}
+				description={t('danger.confirmDescription')}
 				confirmPhrase={guildName}
-				confirmLabel="Remove the bot"
+				confirmLabel={t('danger.confirmLabel')}
 				onConfirm={leave}
 			>
-				<p className="text-body-sm text-text-muted">
-					Open tickets stay as channels but stop being managed. Active giveaways never draw a
-					winner. Scheduled messages stop.
-				</p>
+				<p className="text-body-sm text-text-muted">{t('danger.confirmBody')}</p>
 			</ConfirmDialog>
 
 			<SaveBar
@@ -262,11 +245,11 @@ export function SettingsScreen({ guildId, settings, guildName }: SettingsScreenP
 				onSave={() => {
 					void form.save().then(
 						(state) => {
-							if (state === 'idle') toast.success('Settings saved');
+							if (state === 'idle') toast.success(t('saved'));
 						},
 						(error: unknown) => {
-							toast.error('Could not save', {
-								description: error instanceof Error ? error.message : 'Unknown failure'
+							toast.error(t('saveFailed'), {
+								description: error instanceof Error ? error.message : t('unknownFailure')
 							});
 						}
 					);
@@ -281,19 +264,21 @@ function ActionRow({
 	title,
 	body,
 	action,
-	pending = false
+	pending = false,
+	pendingLabel
 }: {
 	title: string;
 	body: string;
 	action: ReactNode;
 	pending?: boolean;
+	pendingLabel?: string;
 }) {
 	return (
 		<div className="flex flex-wrap items-start gap-3 border-b border-border pb-4 last:border-0 last:pb-0">
 			<div className="min-w-60 flex-1">
 				<div className="flex flex-wrap items-center gap-2">
 					<p className="text-body font-medium">{title}</p>
-					{pending ? <Badge variant="neutral">Not available yet</Badge> : null}
+					{pending ? <Badge variant="neutral">{pendingLabel}</Badge> : null}
 				</div>
 				<p className="text-body-sm text-pretty text-text-muted">{body}</p>
 			</div>
