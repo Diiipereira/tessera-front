@@ -3,10 +3,12 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { mockMembers, mockRoles } from '@/lib/mock';
 import { MembersScreen } from './MembersScreen';
+import { Translated } from '@/tests/i18n';
 
 function renderScreen() {
 	return render(
-		<MembersScreen members={mockMembers} roles={mockRoles} memberCount={12431} currency="Shards" />
+		<MembersScreen members={mockMembers} roles={mockRoles} memberCount={12431} currency="Shards" />,
+		{ wrapper: Translated }
 	);
 }
 

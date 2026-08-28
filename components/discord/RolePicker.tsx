@@ -1,6 +1,7 @@
 'use client';
 
 import { Check, ChevronsUpDown, Lock } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useState, type ReactElement } from 'react';
 import { Popover } from '@/components/ui/Popover';
 import { Tooltip } from '@/components/ui/Tooltip';
@@ -20,13 +21,8 @@ type RolePickerProps = {
 	id?: string;
 };
 
-export function RolePicker({
-	roles,
-	value = [],
-	onValueChange,
-	placeholder = 'Pick roles…',
-	id
-}: RolePickerProps) {
+export function RolePicker({ roles, value = [], onValueChange, placeholder, id }: RolePickerProps) {
+	const t = useTranslations('pickers');
 	const field = useFieldState();
 	const [open, setOpen] = useState(false);
 
@@ -43,7 +39,7 @@ export function RolePicker({
 		<>
 			{selected.length === 0 ? (
 				<span id={id ?? field?.controlId} className="min-w-0 flex-1 text-left text-text-muted">
-					{placeholder}
+					{placeholder ?? t('roles')}
 				</span>
 			) : (
 				<>

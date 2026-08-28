@@ -21,7 +21,7 @@ export function VariableChips({ variables, onInsert }: VariableChipsProps) {
 				<button
 					key={variable.token}
 					type="button"
-					title={variable.description}
+					title={t(`tokens.${variable.key}`)}
 					onClick={() => {
 						onInsert(variable.token);
 					}}
@@ -53,7 +53,7 @@ export function VariableChips({ variables, onInsert }: VariableChipsProps) {
 								{variable.token}
 							</span>
 							<span className="text-caption font-normal text-text-muted">
-								{variable.description} &mdash;{' '}
+								{t(`tokens.${variable.key}`)} &mdash;{' '}
 								<span className="font-mono text-text">{variable.sample}</span>
 							</span>
 						</li>

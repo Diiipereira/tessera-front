@@ -10,88 +10,66 @@ import type {
 export const mockModules: ModuleSummary[] = [
 	{
 		id: 'welcome',
-		name: 'Welcome',
-		description: 'Greet new members and hand out roles.',
 		category: 'Engagement',
 		status: 'active',
 		premium: false
 	},
 	{
 		id: 'moderation',
-		name: 'Moderation',
-		description: 'Warns, timeouts, bans and a case log.',
 		category: 'Safety',
 		status: 'active',
 		premium: false
 	},
 	{
 		id: 'automod',
-		name: 'AutoMod',
-		description: 'Rules that act before a human has to.',
 		category: 'Safety',
 		status: 'active',
 		premium: false
 	},
 	{
 		id: 'logging',
-		name: 'Logging',
-		description: 'Write server events to a channel.',
 		category: 'Safety',
 		status: 'active',
 		premium: false
 	},
 	{
 		id: 'levels',
-		name: 'Levels',
-		description: 'XP, ranks and role rewards.',
 		category: 'Engagement',
 		status: 'active',
 		premium: false
 	},
 	{
 		id: 'economy',
-		name: 'Economy',
-		description: 'Currency, shop and transfers.',
 		category: 'Engagement',
 		status: 'active',
 		premium: true
 	},
 	{
 		id: 'tickets',
-		name: 'Tickets',
-		description: 'Private support channels on demand.',
 		category: 'Community',
 		status: 'active',
 		premium: false
 	},
 	{
 		id: 'reaction-roles',
-		name: 'Reaction roles',
-		description: 'Members pick their own roles.',
 		category: 'Community',
 		status: 'active',
 		premium: false
 	},
 	{
 		id: 'giveaways',
-		name: 'Giveaways',
-		description: 'Timed draws with entry requirements.',
 		category: 'Community',
 		status: 'active',
 		premium: false
 	},
 	{
 		id: 'custom-commands',
-		name: 'Custom commands',
-		description: 'Your own slash commands, no code.',
 		category: 'Utility',
 		status: 'active',
 		premium: false
 	},
 	{
 		id: 'scheduled',
-		name: 'Scheduled messages',
-		description: 'Post on a timer or a cron.',
 		category: 'Utility',
 		status: 'active',
 		premium: true
@@ -99,16 +77,16 @@ export const mockModules: ModuleSummary[] = [
 ];
 
 export const mockVariables: MessageVariable[] = [
-	{ token: '{user}', description: 'The member, as plain text', sample: 'novato' },
-	{ token: '{user.mention}', description: 'Pings the member', sample: '@novato' },
-	{ token: '{user.tag}', description: 'Username with discriminator', sample: 'novato#4821' },
-	{ token: '{server}', description: 'The server, as plain text', sample: 'Pixel Foundry' },
-	{ token: '{server.name}', description: 'Same as {server}', sample: 'Pixel Foundry' },
-	{ token: '{memberCount}', description: 'How many members after joining', sample: '12,432' },
-	{ token: '{channel}', description: 'The channel the message lands in', sample: '#welcome' },
-	{ token: '{date}', description: "Today's date in the server timezone", sample: '25/08/2026' },
-	{ token: '{level}', description: 'The member level', sample: '7' },
-	{ token: '{balance}', description: 'The member balance', sample: '1,240' }
+	{ token: '{user}', key: 'user', sample: 'novato' },
+	{ token: '{user.mention}', key: 'userMention', sample: '@novato' },
+	{ token: '{user.tag}', key: 'userTag', sample: 'novato#4821' },
+	{ token: '{server}', key: 'server', sample: 'Pixel Foundry' },
+	{ token: '{server.name}', key: 'serverName', sample: 'Pixel Foundry' },
+	{ token: '{memberCount}', key: 'memberCount', sample: '12,432' },
+	{ token: '{channel}', key: 'channel', sample: '#welcome' },
+	{ token: '{date}', key: 'date', sample: '25/08/2026' },
+	{ token: '{level}', key: 'level', sample: '7' },
+	{ token: '{balance}', key: 'balance', sample: '1,240' }
 ];
 
 function emptyEmbed(): EmbedDraft {

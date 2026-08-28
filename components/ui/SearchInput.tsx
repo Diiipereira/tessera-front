@@ -1,6 +1,7 @@
 'use client';
 
 import { Search, X } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useRef, type ComponentPropsWithRef } from 'react';
 import { cn } from '@/lib/utils/cn';
 import { fieldIconButton } from './field-icon-button';
@@ -15,6 +16,7 @@ type SearchInputProps = Omit<
 };
 
 export function SearchInput({ value, onValueChange, ...rest }: SearchInputProps) {
+	const t = useTranslations('pickers');
 	const ref = useRef<HTMLInputElement>(null);
 
 	function clear() {
@@ -42,7 +44,7 @@ export function SearchInput({ value, onValueChange, ...rest }: SearchInputProps)
 			trailing={
 				<button
 					type="button"
-					aria-label="Clear search"
+					aria-label={t('clearSearch')}
 					onClick={clear}
 					className={cn(fieldIconButton, value === '' && 'invisible')}
 				>

@@ -1,6 +1,7 @@
 'use client';
 
 import { PackageSearch } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { ModuleCard } from '@/components/modules/ModuleCard';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -26,6 +27,9 @@ type ModulesScreenProps = {
 };
 
 export function ModulesScreen({ modules, guildId, planIsPaid }: ModulesScreenProps) {
+	const t = useTranslations('modulesList');
+	const catalog = useTranslations('catalog');
+	const names = useTranslations('nav');
 	const [items, setItems] = useState(modules);
 	const [query, setQuery] = useState('');
 	const [category, setCategory] = useState<ModuleCategory | 'All'>('All');
@@ -35,8 +39,8 @@ export function ModulesScreen({ modules, guildId, planIsPaid }: ModulesScreenPro
 		const inCategory = category === 'All' || module.category === category;
 		const inSearch =
 			term === '' ||
-			module.name.toLowerCase().includes(term) ||
-			module.description.toLowerCase().includes(term);
+			names(module.id).toLowerCase().includes(term) ||
+			catalog(`blurb.${module.id}`).toLowerCase().includes(term);
 		return inCategory && inSearch;
 	});
 
@@ -54,10 +58,9 @@ export function ModulesScreen({ modules, guildId, planIsPaid }: ModulesScreenPro
 		<div className="w-full p-6 sm:p-8">
 			<div className="flex flex-col gap-4">
 				<div>
-					<h1 className="text-h1">Modules</h1>
+					<h1 className="text-h1">{t('title')}</h1>
 					<p className="text-body text-text-muted">
-						{activeCount} of {items.length} running in this server. Turn one on here, then open it
-						to configure.
+						{t('running', { active: activeCount, total: items.length })}
 					</p>
 				</div>
 
@@ -65,14 +68,14 @@ export function ModulesScreen({ modules, guildId, planIsPaid }: ModulesScreenPro
 					<SearchInput
 						value={query}
 						onValueChange={setQuery}
-						placeholder="Search modules…"
-						aria-label="Search modules"
+						placeholder={t('search')}
+						aria-label={t('searchLabel')}
 						className="max-w-80"
 					/>
 
 					<div
 						role="group"
-						aria-label="Filter by category"
+						aria-label={t('filter')}
 						className="flex flex-wrap items-center gap-0.5 rounded-md border border-border bg-surface-sunken p-0.5"
 					>
 						{CATEGORIES.map((option) => (
@@ -90,7 +93,7 @@ export function ModulesScreen({ modules, guildId, planIsPaid }: ModulesScreenPro
 									setCategory(option);
 								}}
 							>
-								{option}
+								{catalog(`categories.${option}`)}
 							</button>
 						))}
 					</div>
@@ -101,8 +104,8 @@ export function ModulesScreen({ modules, guildId, planIsPaid }: ModulesScreenPro
 				{matches.length === 0 ? (
 					<EmptyState
 						icon={PackageSearch}
-						title="No modules match"
-						description={`Nothing in ${BRAND.name} answers to that. Try another word, or clear the category filter.`}
+						title={t('emptyTitle')}
+						description={t('emptyBody', { brand: BRAND.name })}
 					/>
 				) : (
 					<div className="grid grid-cols-[repeat(auto-fill,minmax(20rem,1fr))] gap-5">

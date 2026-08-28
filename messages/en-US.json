@@ -522,6 +522,57 @@
 			}
 		}
 	},
+	"pickers": {
+		"channel": "Pick a channel…",
+		"searchChannels": "Search channels…",
+		"searchChannelsLabel": "Search channels",
+		"roles": "Pick roles…",
+		"noRoles": "No roles",
+		"clearSearch": "Clear search",
+		"nothingMatches": "Nothing matches that.",
+		"openTime": "Open the time picker",
+		"openDate": "Open the date picker",
+		"openDatetime": "Open the date and time picker"
+	},
+	"catalog": {
+		"enable": "Enable {name}",
+		"upgrade": "Upgrade",
+		"configure": "Configure",
+		"categories": {
+			"All": "All",
+			"Engagement": "Engagement",
+			"Safety": "Safety",
+			"Community": "Community",
+			"Utility": "Utility"
+		},
+		"status": {
+			"active": "Active",
+			"off": "Off",
+			"needs-setup": "Needs setup"
+		},
+		"blurb": {
+			"welcome": "Greet new members and hand out roles.",
+			"moderation": "Warns, timeouts, bans and a case log.",
+			"automod": "Rules that act before a human has to.",
+			"logging": "Write server events to a channel.",
+			"levels": "XP, ranks and role rewards.",
+			"economy": "Currency, shop and transfers.",
+			"tickets": "Private support channels on demand.",
+			"reaction-roles": "Members pick their own roles.",
+			"giveaways": "Timed draws with entry requirements.",
+			"custom-commands": "Your own slash commands, no code.",
+			"scheduled": "Post on a timer or a cron."
+		}
+	},
+	"modulesList": {
+		"title": "Modules",
+		"running": "{active} of {total} running in this server. Turn one on here, then open it to configure.",
+		"search": "Search modules…",
+		"searchLabel": "Search modules",
+		"filter": "Filter by category",
+		"emptyTitle": "No modules match",
+		"emptyBody": "Nothing in {brand} answers to that. Try another word, or clear the category filter."
+	},
 	"durations": {
 		"60s": "60 seconds",
 		"5m": "5 minutes",
@@ -617,7 +668,19 @@
 			"insert": "Insert",
 			"help": "What do these mean?",
 			"title": "Message variables",
-			"body": "Replaced when the message is posted."
+			"body": "Replaced when the message is posted.",
+			"tokens": {
+				"user": "The member who joined",
+				"userMention": "Pings the member",
+				"userTag": "Username with discriminator",
+				"server": "This server",
+				"serverName": "Same as the server token",
+				"memberCount": "How many members after joining",
+				"channel": "The channel the message lands in",
+				"date": "Today's date in the server timezone",
+				"level": "The member level",
+				"balance": "The member balance"
+			}
 		},
 		"composer": {
 			"format": "Message format",

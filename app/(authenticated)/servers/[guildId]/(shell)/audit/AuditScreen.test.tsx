@@ -3,9 +3,10 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { mockAudit } from '@/lib/mock';
 import { AuditScreen } from './AuditScreen';
+import { Translated } from '@/tests/i18n';
 
 function renderScreen() {
-	return render(<AuditScreen entries={mockAudit} />);
+	return render(<AuditScreen entries={mockAudit} />, { wrapper: Translated });
 }
 
 function rowFor(name: string | RegExp) {

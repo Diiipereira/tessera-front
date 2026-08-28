@@ -8,8 +8,8 @@ import type {
 
 export function welcomeVariables(guildName: string): MessageVariable[] {
 	return [
-		{ token: '{user}', description: 'The member who joined', sample: 'novato' },
-		{ token: '{server}', description: 'This server', sample: guildName }
+		{ token: '{user}', key: 'user', sample: 'novato' },
+		{ token: '{server}', key: 'server', sample: guildName }
 	];
 }
 

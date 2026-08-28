@@ -8,10 +8,10 @@ import {
 import type { MessageVariable } from './types/modules';
 
 const variables: MessageVariable[] = [
-	{ token: '{user}', description: 'member', sample: 'novato' },
-	{ token: '{user.mention}', description: 'ping', sample: '@novato' },
-	{ token: '{server}', description: 'server', sample: 'Pixel Foundry' },
-	{ token: '{memberCount}', description: 'count', sample: '12,432' }
+	{ token: '{user}', key: 'user', sample: 'novato' },
+	{ token: '{user.mention}', key: 'userMention', sample: '@novato' },
+	{ token: '{server}', key: 'server', sample: 'Pixel Foundry' },
+	{ token: '{memberCount}', key: 'memberCount', sample: '12,432' }
 ];
 
 describe('renderVariables', () => {

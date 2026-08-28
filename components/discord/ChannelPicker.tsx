@@ -11,6 +11,7 @@ import {
 	Volume2,
 	type LucideIcon
 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useState, type ReactElement } from 'react';
 import { Popover } from '@/components/ui/Popover';
 import { Tooltip } from '@/components/ui/Tooltip';
@@ -40,9 +41,10 @@ export function ChannelPicker({
 	channels,
 	value = null,
 	onValueChange,
-	placeholder = 'Pick a channel…',
+	placeholder,
 	id
 }: ChannelPickerProps) {
+	const t = useTranslations('pickers');
 	const field = useFieldState();
 	const [open, setOpen] = useState(false);
 	const [query, setQuery] = useState('');
@@ -72,7 +74,7 @@ export function ChannelPicker({
 				id={id ?? field?.controlId}
 				className={cn('min-w-0 flex-1 truncate text-left', !selected && 'text-text-muted')}
 			>
-				{selected ? `#${selected.name}` : placeholder}
+				{selected ? `#${selected.name}` : (placeholder ?? t('channel'))}
 			</span>
 			<ChevronsUpDown className="size-4 shrink-0 text-text-subtle" aria-hidden="true" />
 		</>
@@ -125,8 +127,8 @@ export function ChannelPicker({
 						setQuery(event.target.value);
 					}}
 					type="text"
-					placeholder="Search channels…"
-					aria-label="Search channels"
+					placeholder={t('searchChannels')}
+					aria-label={t('searchChannelsLabel')}
 					className="min-w-0 flex-1 bg-transparent text-body text-text outline-none"
 				/>
 			</div>

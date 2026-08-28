@@ -522,6 +522,57 @@
 			}
 		}
 	},
+	"pickers": {
+		"channel": "Escolha um canal…",
+		"searchChannels": "Buscar canais…",
+		"searchChannelsLabel": "Buscar canais",
+		"roles": "Escolha os cargos…",
+		"noRoles": "Nenhum cargo",
+		"clearSearch": "Limpar a busca",
+		"nothingMatches": "Nada corresponde a isso.",
+		"openTime": "Abrir o seletor de horário",
+		"openDate": "Abrir o seletor de data",
+		"openDatetime": "Abrir o seletor de data e horário"
+	},
+	"catalog": {
+		"enable": "Ligar {name}",
+		"upgrade": "Fazer upgrade",
+		"configure": "Configurar",
+		"categories": {
+			"All": "Todos",
+			"Engagement": "Engajamento",
+			"Safety": "Segurança",
+			"Community": "Comunidade",
+			"Utility": "Utilidades"
+		},
+		"status": {
+			"active": "Ativo",
+			"off": "Desligado",
+			"needs-setup": "Falta configurar"
+		},
+		"blurb": {
+			"welcome": "Receba quem entra e distribua cargos.",
+			"moderation": "Advertências, timeouts, banimentos e um log de casos.",
+			"automod": "Regras que agem antes de um humano precisar agir.",
+			"logging": "Registra os eventos do servidor em um canal.",
+			"levels": "XP, ranques e cargos de recompensa.",
+			"economy": "Moeda, loja e transferências.",
+			"tickets": "Canais de suporte privados sob demanda.",
+			"reaction-roles": "Os membros escolhem os próprios cargos.",
+			"giveaways": "Sorteios com prazo e requisitos de entrada.",
+			"custom-commands": "Seus próprios comandos de barra, sem código.",
+			"scheduled": "Publica por horário ou por cron."
+		}
+	},
+	"modulesList": {
+		"title": "Módulos",
+		"running": "{active} de {total} rodando neste servidor. Ligue um aqui e depois abra para configurar.",
+		"search": "Buscar módulos…",
+		"searchLabel": "Buscar módulos",
+		"filter": "Filtrar por categoria",
+		"emptyTitle": "Nenhum módulo corresponde",
+		"emptyBody": "Nada na {brand} atende a isso. Tente outra palavra, ou limpe o filtro de categoria."
+	},
 	"durations": {
 		"60s": "60 segundos",
 		"5m": "5 minutos",
@@ -617,7 +668,19 @@
 			"insert": "Inserir",
 			"help": "O que significam?",
 			"title": "Variáveis da mensagem",
-			"body": "Substituídas quando a mensagem é publicada."
+			"body": "Substituídas quando a mensagem é publicada.",
+			"tokens": {
+				"user": "Quem acabou de entrar",
+				"userMention": "Menciona o membro",
+				"userTag": "Nome de usuário com discriminador",
+				"server": "Este servidor",
+				"serverName": "O mesmo que o token do servidor",
+				"memberCount": "Quantos membros depois da entrada",
+				"channel": "O canal em que a mensagem cai",
+				"date": "A data de hoje no fuso do servidor",
+				"level": "O nível do membro",
+				"balance": "O saldo do membro"
+			}
 		},
 		"composer": {
 			"format": "Formato da mensagem",

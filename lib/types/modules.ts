@@ -17,8 +17,6 @@ export type ModuleCategory = 'Engagement' | 'Safety' | 'Community' | 'Utility';
 
 export type ModuleSummary = {
 	id: ModuleId;
-	name: string;
-	description: string;
 	category: ModuleCategory;
 	status: ModuleStatus;
 	premium: boolean;
@@ -88,6 +86,6 @@ export type ModerationConfig = {
 
 export type MessageVariable = {
 	token: string;
-	description: string;
+	key: string;
 	sample: string;
 };

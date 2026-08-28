@@ -1,8 +1,13 @@
-import { render, screen } from '@testing-library/react';
+import { render as rtlRender, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { describe, expect, it } from 'vitest';
 import { SearchInput } from './SearchInput';
+
+import type { ReactElement } from 'react';
+import { Translated } from '@/tests/i18n';
+
+const render = (ui: ReactElement) => rtlRender(ui, { wrapper: Translated });
 
 function Harness({ start = '' }: { start?: string }) {
 	const [value, setValue] = useState(start);

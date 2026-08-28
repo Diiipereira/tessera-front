@@ -4,11 +4,17 @@ import { describe, expect, it } from 'vitest';
 import { mockModules } from '@/lib/mock';
 import { guildHref } from '@/lib/navigation';
 import { ModulesScreen } from './ModulesScreen';
+import { Translated } from '@/tests/i18n';
 
 const GUILD_ID = '842315097461823104';
 
 function renderScreen(planIsPaid = true) {
-	return render(<ModulesScreen modules={mockModules} guildId={GUILD_ID} planIsPaid={planIsPaid} />);
+	return render(
+		<ModulesScreen modules={mockModules} guildId={GUILD_ID} planIsPaid={planIsPaid} />,
+		{
+			wrapper: Translated
+		}
+	);
 }
 
 function cardFor(name: string) {

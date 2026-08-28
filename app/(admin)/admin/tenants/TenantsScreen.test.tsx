@@ -1,8 +1,13 @@
-import { render, screen } from '@testing-library/react';
+import { render as rtlRender, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { mockTenants } from '@/lib/mock/admin';
 import { TenantsScreen } from './TenantsScreen';
+
+import type { ReactElement } from 'react';
+import { Translated } from '@/tests/i18n';
+
+const render = (ui: ReactElement) => rtlRender(ui, { wrapper: Translated });
 
 function rows() {
 	return screen.getAllByRole('link', { name: /·/ });

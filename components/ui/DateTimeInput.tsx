@@ -1,6 +1,7 @@
 'use client';
 
 import { Calendar, CalendarClock, Clock } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useRef, type ComponentPropsWithRef } from 'react';
 import { cn } from '@/lib/utils/cn';
 import { fieldIconButton } from './field-icon-button';
@@ -20,11 +21,7 @@ type DateTimeInputProps = Omit<
 
 const ICONS = { time: Clock, date: Calendar, 'datetime-local': CalendarClock };
 
-const LABELS = {
-	time: 'Open the time picker',
-	date: 'Open the date picker',
-	'datetime-local': 'Open the date and time picker'
-};
+const LABELS = { time: 'openTime', date: 'openDate', 'datetime-local': 'openDatetime' } as const;
 
 export function DateTimeInput({
 	type,
@@ -33,6 +30,7 @@ export function DateTimeInput({
 	disabled,
 	...rest
 }: DateTimeInputProps) {
+	const t = useTranslations('pickers');
 	const ref = useRef<HTMLInputElement>(null);
 	const field = useFieldState();
 	const isDisabled = disabled ?? field?.disabled ?? false;
@@ -51,7 +49,7 @@ export function DateTimeInput({
 			trailing={
 				<button
 					type="button"
-					aria-label={LABELS[type]}
+					aria-label={t(LABELS[type])}
 					onClick={() => {
 						ref.current?.showPicker();
 					}}

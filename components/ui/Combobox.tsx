@@ -1,6 +1,7 @@
 'use client';
 
 import { Check, ChevronsUpDown } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { cn } from '@/lib/utils/cn';
 import { useFieldState } from './field-context';
@@ -34,11 +35,12 @@ export function Combobox({
 	onValueChange,
 	placeholder = 'Select…',
 	searchPlaceholder = 'Search…',
-	emptyLabel = 'Nothing matches that.',
+	emptyLabel,
 	disabled,
 	invalid,
 	className
 }: ComboboxProps) {
+	const t = useTranslations('pickers');
 	const field = useFieldState();
 	const listId = useId();
 	const [open, setOpen] = useState(false);
@@ -149,7 +151,9 @@ export function Combobox({
 			/>
 
 			{matches.length === 0 ? (
-				<p className="px-2 py-6 text-center text-body-sm text-text-muted">{emptyLabel}</p>
+				<p className="px-2 py-6 text-center text-body-sm text-text-muted">
+					{emptyLabel ?? t('nothingMatches')}
+				</p>
 			) : (
 				<div
 					ref={listRef}

@@ -1,8 +1,13 @@
-import { render, screen } from '@testing-library/react';
+import { render as rtlRender, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { describe, expect, it } from 'vitest';
 import { Combobox, type ComboboxOption } from './Combobox';
+
+import type { ReactElement } from 'react';
+import { Translated } from '@/tests/i18n';
+
+const render = (ui: ReactElement) => rtlRender(ui, { wrapper: Translated });
 
 const OPTIONS: ComboboxOption[] = [
 	{ value: 'America/Sao_Paulo', label: 'America/Sao Paulo (GMT-3)', search: 'america/sao_paulo' },
