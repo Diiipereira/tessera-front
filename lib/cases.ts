@@ -2,14 +2,6 @@ import { hasPassed, MOCK_NOW } from '@/lib/time';
 import type { CaseStatus, ModerationCase } from '@/lib/types/management';
 import type { ModerationAction } from '@/lib/types/modules';
 
-export const ACTION_LABELS: Record<ModerationAction, string> = {
-	warn: 'Warn',
-	timeout: 'Timeout',
-	mute: 'Mute',
-	kick: 'Kick',
-	ban: 'Ban'
-};
-
 export function caseStatus(entry: ModerationCase, now: Date = MOCK_NOW): CaseStatus {
 	if (entry.revoked) return 'revoked';
 	if (entry.expiresAt === null) return 'active';

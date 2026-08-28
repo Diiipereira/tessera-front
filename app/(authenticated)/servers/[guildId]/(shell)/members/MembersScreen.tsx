@@ -1,6 +1,7 @@
 'use client';
 
 import { Users } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { RoleChips } from '@/components/management/RoleChips';
 import { PageHeader } from '@/components/management/PageHeader';
@@ -9,13 +10,7 @@ import { Badge, type BadgeVariant } from '@/components/ui/Badge';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { SearchInput } from '@/components/ui/SearchInput';
 import { Select } from '@/components/ui/Select';
-import {
-	filterMembers,
-	sortMembers,
-	STANDING_LABELS,
-	warningCount,
-	type MemberSort
-} from '@/lib/members';
+import { filterMembers, sortMembers, warningCount, type MemberSort } from '@/lib/members';
 import { BRAND } from '@/lib/brand';
 import { relativeTime } from '@/lib/time';
 import type { Role } from '@/lib/types/discord';
@@ -30,13 +25,9 @@ const STANDING_VARIANTS: Record<MemberStanding, BadgeVariant> = {
 	banned: 'danger'
 };
 
-const SORTS: { value: MemberSort; label: string }[] = [
-	{ value: 'joined', label: 'Newest first' },
-	{ value: 'level', label: 'Highest level' },
-	{ value: 'balance', label: 'Richest' },
-	{ value: 'warnings', label: 'Most warnings' },
-	{ value: 'name', label: 'Name A–Z' }
-];
+const SORTS: MemberSort[] = ['joined', 'level', 'balance', 'warnings', 'name'];
+
+const STANDINGS: MemberStanding[] = ['clean', 'warned', 'timed-out', 'banned'];
 
 type MembersScreenProps = {
 	members: Member[];
@@ -46,6 +37,7 @@ type MembersScreenProps = {
 };
 
 export function MembersScreen({ members, roles, memberCount, currency }: MembersScreenProps) {
+	const t = useTranslations('members');
 	const [query, setQuery] = useState('');
 	const [roleId, setRoleId] = useState<string>('all');
 	const [standing, setStanding] = useState<MemberStanding | 'all'>('all');
@@ -58,22 +50,26 @@ export function MembersScreen({ members, roles, memberCount, currency }: Members
 	return (
 		<div className="w-full p-6 sm:p-8">
 			<PageHeader
-				title="Members"
-				description={`${formatCount(memberCount)} people in this server. The ${String(members.length)} listed here are the ones ${BRAND.name} has seen speak.`}
+				title={t('title')}
+				description={t('description', {
+					count: formatCount(memberCount),
+					listed: members.length,
+					brand: BRAND.name
+				})}
 			/>
 
 			<div className="mt-6 flex flex-wrap items-center gap-3">
 				<SearchInput
 					value={query}
 					onValueChange={setQuery}
-					placeholder="Search name, handle or ID…"
-					aria-label="Search members"
+					placeholder={t('search')}
+					aria-label={t('searchLabel')}
 					className="max-w-72"
 				/>
 
 				<Select
 					options={[
-						{ value: 'all', label: 'Every role' },
+						{ value: 'all', label: t('everyRole') },
 						...roles.map((role) => ({ value: role.id, label: role.name }))
 					]}
 					value={roleId}
@@ -83,11 +79,8 @@ export function MembersScreen({ members, roles, memberCount, currency }: Members
 
 				<Select
 					options={[
-						{ value: 'all', label: 'Any standing' },
-						{ value: 'clean', label: STANDING_LABELS.clean },
-						{ value: 'warned', label: STANDING_LABELS.warned },
-						{ value: 'timed-out', label: STANDING_LABELS['timed-out'] },
-						{ value: 'banned', label: STANDING_LABELS.banned }
+						{ value: 'all', label: t('anyStanding') },
+						...STANDINGS.map((value) => ({ value, label: t(`standing.${value}`) }))
 					]}
 					value={standing}
 					onValueChange={(next) => {
@@ -97,7 +90,7 @@ export function MembersScreen({ members, roles, memberCount, currency }: Members
 				/>
 
 				<Select
-					options={SORTS.map((entry) => ({ value: entry.value, label: entry.label }))}
+					options={SORTS.map((value) => ({ value, label: t(`sort.${value}`) }))}
 					value={sort}
 					onValueChange={(next) => {
 						setSort(next as MemberSort);
@@ -108,23 +101,23 @@ export function MembersScreen({ members, roles, memberCount, currency }: Members
 
 			<div className="mt-6 overflow-hidden rounded-lg border border-border bg-surface shadow-1">
 				{visible.length === 0 ? (
-					<EmptyState
-						icon={Users}
-						title="Nobody matches"
-						description="Try a shorter search, or clear the role and standing filters."
-					/>
+					<EmptyState icon={Users} title={t('emptyTitle')} description={t('emptyBody')} />
 				) : (
 					<div className="overflow-x-auto">
 						<table className="w-full min-w-200 border-collapse text-left">
 							<thead>
 								<tr className="border-b border-border text-overline text-text-muted uppercase">
-									<th className="px-4 py-3 font-mono font-semibold">Member</th>
-									<th className="px-4 py-3 font-mono font-semibold">Roles</th>
-									<th className="px-4 py-3 font-mono font-semibold">Joined</th>
-									<th className="px-4 py-3 text-right font-mono font-semibold">Level</th>
+									<th className="px-4 py-3 font-mono font-semibold">{t('columns.member')}</th>
+									<th className="px-4 py-3 font-mono font-semibold">{t('columns.roles')}</th>
+									<th className="px-4 py-3 font-mono font-semibold">{t('columns.joined')}</th>
+									<th className="px-4 py-3 text-right font-mono font-semibold">
+										{t('columns.level')}
+									</th>
 									<th className="px-4 py-3 text-right font-mono font-semibold">{currency}</th>
-									<th className="px-4 py-3 text-right font-mono font-semibold">Warns</th>
-									<th className="px-4 py-3 font-mono font-semibold">Standing</th>
+									<th className="px-4 py-3 text-right font-mono font-semibold">
+										{t('columns.warns')}
+									</th>
+									<th className="px-4 py-3 font-mono font-semibold">{t('columns.standing')}</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -136,7 +129,7 @@ export function MembersScreen({ members, roles, memberCount, currency }: Members
 											key={member.id}
 											tabIndex={0}
 											role="button"
-											aria-label={`Open ${member.name}`}
+											aria-label={t('open', { name: member.name })}
 											onClick={() => {
 												setSelectedId(member.id);
 											}}
@@ -182,7 +175,7 @@ export function MembersScreen({ members, roles, memberCount, currency }: Members
 											</td>
 											<td className="px-4 py-3">
 												<Badge variant={STANDING_VARIANTS[member.standing]} dot>
-													{STANDING_LABELS[member.standing]}
+													{t(`standing.${member.standing}`)}
 												</Badge>
 											</td>
 										</tr>
@@ -195,7 +188,7 @@ export function MembersScreen({ members, roles, memberCount, currency }: Members
 			</div>
 
 			<p className="mt-3 text-caption font-normal text-text-muted">
-				Showing {visible.length} of {members.length} loaded members.
+				{t('showing', { shown: visible.length, total: members.length })}
 			</p>
 
 			<MemberDrawer

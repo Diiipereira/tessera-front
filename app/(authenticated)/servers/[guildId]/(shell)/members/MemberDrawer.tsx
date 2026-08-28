@@ -1,6 +1,7 @@
 'use client';
 
 import { Ban, Copy, Gavel, ShieldAlert, Timer } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { RoleChips } from '@/components/management/RoleChips';
@@ -9,8 +10,7 @@ import { Badge, type BadgeVariant } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Drawer } from '@/components/ui/Drawer';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
-import { ACTION_LABELS } from '@/lib/cases';
-import { STANDING_LABELS, warningCount } from '@/lib/members';
+import { warningCount } from '@/lib/members';
 import { absoluteTime, relativeTime } from '@/lib/time';
 import type { Role } from '@/lib/types/discord';
 import type { Member, MemberStanding } from '@/lib/types/management';
@@ -42,6 +42,9 @@ type MemberDrawerProps = {
 };
 
 export function MemberDrawer({ member, roles, currency, onClose }: MemberDrawerProps) {
+	const t = useTranslations('members.drawer');
+	const caseActions = useTranslations('cases.action');
+	const standings = useTranslations('members.standing');
 	const [tab, setTab] = useState<Tab>('overview');
 
 	if (!member) return null;
@@ -71,7 +74,7 @@ export function MemberDrawer({ member, roles, currency, onClose }: MemberDrawerP
 						</p>
 					</div>
 					<Badge variant={STANDING_VARIANTS[member.standing]} dot>
-						{STANDING_LABELS[member.standing]}
+						{standings(member.standing)}
 					</Badge>
 				</div>
 			}
@@ -81,41 +84,41 @@ export function MemberDrawer({ member, roles, currency, onClose }: MemberDrawerP
 						variant="outline"
 						size="sm"
 						onClick={() => {
-							toast.success(`Warned ${member.name}`, { description: 'A case is opened for it.' });
+							toast.success(t('didWarn', { name: member.name }), { description: t('didWarnHint') });
 						}}
 					>
 						<ShieldAlert aria-hidden="true" />
-						Warn
+						{t('warn')}
 					</Button>
 					<Button
 						variant="outline"
 						size="sm"
 						onClick={() => {
-							toast.success(`Timed out ${member.name} for 1h`);
+							toast.success(t('didTimeout', { name: member.name }));
 						}}
 					>
 						<Timer aria-hidden="true" />
-						Timeout
+						{t('timeout')}
 					</Button>
 					<Button
 						variant="outline"
 						size="sm"
 						onClick={() => {
-							toast.success(`Kicked ${member.name}`);
+							toast.success(t('didKick', { name: member.name }));
 						}}
 					>
 						<Gavel aria-hidden="true" />
-						Kick
+						{t('kick')}
 					</Button>
 					<Button
 						variant="danger"
 						size="sm"
 						onClick={() => {
-							toast.success(`Banned ${member.name}`);
+							toast.success(t('didBan', { name: member.name }));
 						}}
 					>
 						<Ban aria-hidden="true" />
-						Ban
+						{t('ban')}
 					</Button>
 				</div>
 			}
@@ -131,50 +134,54 @@ export function MemberDrawer({ member, roles, currency, onClose }: MemberDrawerP
 						onClick={() => {
 							void navigator.clipboard.writeText(member.id).then(
 								() => {
-									toast.success('ID copied');
+									toast.success(t('copied'));
 								},
 								() => {
-									toast.error('The browser refused the clipboard');
+									toast.error(t('copyRefused'));
 								}
 							);
 						}}
 					>
 						<Copy aria-hidden="true" />
-						Copy ID
+						{t('copyId')}
 					</Button>
 				</div>
 
 				<dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-					<Stat label="Level" value={String(member.level)} />
-					<Stat label="Messages" value={formatCount(member.messages)} />
+					<Stat label={t('level')} value={String(member.level)} />
+					<Stat label={t('messages')} value={formatCount(member.messages)} />
 					<Stat label={currency} value={formatCount(member.balance)} />
-					<Stat label="Warnings" value={String(warnings)} tone={warnings > 0 ? 'warn' : 'flat'} />
+					<Stat
+						label={t('warnings')}
+						value={String(warnings)}
+						tone={warnings > 0 ? 'warn' : 'flat'}
+					/>
 				</dl>
 
 				<SegmentedControl
 					options={[
-						{ value: 'overview', label: 'Overview' },
-						{ value: 'infractions', label: 'Infractions', count: member.infractions.length },
-						{ value: 'economy', label: 'Economy' },
-						{ value: 'roles', label: 'Roles', count: member.roleIds.length }
+						{ value: 'overview', label: t('overview') },
+						{ value: 'infractions', label: t('infractions'), count: member.infractions.length },
+						{ value: 'economy', label: t('economy') },
+						{ value: 'roles', label: t('roles'), count: member.roleIds.length }
 					]}
 					value={tab}
 					onValueChange={setTab}
-					label="Member detail section"
+					label={t('section')}
 					size="sm"
 				/>
 
 				{tab === 'overview' ? (
 					<div className="flex flex-col gap-4">
 						<Row
-							label="Joined"
+							label={t('joined')}
 							value={`${relativeTime(member.joinedAt)} · ${absoluteTime(member.joinedAt)}`}
 						/>
-						<Row label="Last seen" value={relativeTime(member.lastSeenAt)} />
-						<Row label="XP" value={`${formatCount(member.xp)} total`} />
+						<Row label={t('lastSeen')} value={relativeTime(member.lastSeenAt)} />
+						<Row label={t('xp')} value={t('xpTotal', { amount: formatCount(member.xp) })} />
 
 						<div>
-							<p className="mb-2 font-mono text-overline text-text-muted uppercase">Staff notes</p>
+							<p className="mb-2 font-mono text-overline text-text-muted uppercase">{t('notes')}</p>
 							{member.notes.length === 0 ? (
 								<p className="text-body-sm text-text-muted">
 									No notes. Notes are staff-only and never shown to the member.
@@ -212,7 +219,7 @@ export function MemberDrawer({ member, roles, currency, onClose }: MemberDrawerP
 								>
 									<div className="flex items-center gap-2">
 										<Badge variant={ACTION_VARIANTS[infraction.action]}>
-											{ACTION_LABELS[infraction.action]}
+											{caseActions(infraction.action)}
 										</Badge>
 										<span className="font-mono text-caption text-text-muted">
 											#{infraction.caseNumber}
@@ -233,8 +240,11 @@ export function MemberDrawer({ member, roles, currency, onClose }: MemberDrawerP
 
 				{tab === 'economy' ? (
 					<div className="flex flex-col gap-4">
-						<Row label="Balance" value={`${formatCount(member.balance)} ${currency}`} />
-						<Row label="Rank by balance" value="Computed once the API exists" />
+						<Row
+							label={t('balance')}
+							value={t('balanceValue', { amount: formatCount(member.balance), currency })}
+						/>
+						<Row label={t('rank')} value={t('rankPending')} />
 						<p className="text-body-sm text-text-muted">
 							The transaction history for one member lives in the Economy module, filtered by this
 							ID.

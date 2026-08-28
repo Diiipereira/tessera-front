@@ -2,13 +2,6 @@ import type { Member, MemberStanding } from '@/lib/types/management';
 
 export type MemberSort = 'joined' | 'level' | 'balance' | 'warnings' | 'name';
 
-export const STANDING_LABELS: Record<MemberStanding, string> = {
-	clean: 'Clean',
-	warned: 'Warned',
-	'timed-out': 'Timed out',
-	banned: 'Banned'
-};
-
 export function warningCount(member: Member): number {
 	return member.infractions.filter((entry) => entry.action === 'warn').length;
 }

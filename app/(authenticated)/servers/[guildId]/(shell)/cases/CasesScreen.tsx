@@ -1,6 +1,7 @@
 'use client';
 
 import { Gavel } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
 import { PageHeader } from '@/components/management/PageHeader';
 import { Avatar } from '@/components/layout/Avatar';
@@ -9,7 +10,7 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { SearchInput } from '@/components/ui/SearchInput';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
 import { Select } from '@/components/ui/Select';
-import { ACTION_LABELS, caseStatus, filterCases } from '@/lib/cases';
+import { caseStatus, filterCases } from '@/lib/cases';
 import { relativeTime } from '@/lib/time';
 import type { CaseStatus, ModerationCase } from '@/lib/types/management';
 import type { ModerationAction } from '@/lib/types/modules';
@@ -29,13 +30,12 @@ const STATUS_VARIANTS: Record<CaseStatus, BadgeVariant> = {
 	revoked: 'outline'
 };
 
-const STATUS_LABELS: Record<CaseStatus, string> = {
-	active: 'Active',
-	expired: 'Expired',
-	revoked: 'Revoked'
-};
+const ACTIONS: ModerationAction[] = ['warn', 'timeout', 'mute', 'kick', 'ban'];
+
+const STATUSES: CaseStatus[] = ['active', 'expired', 'revoked'];
 
 export function CasesScreen({ cases }: { cases: ModerationCase[] }) {
+	const t = useTranslations('cases');
 	const [items, setItems] = useState(cases);
 	const [query, setQuery] = useState('');
 	const [action, setAction] = useState<ModerationAction | 'all'>('all');
@@ -56,27 +56,23 @@ export function CasesScreen({ cases }: { cases: ModerationCase[] }) {
 	return (
 		<div className="w-full p-6 sm:p-8">
 			<PageHeader
-				title="Cases"
-				description={`${String(items.length)} cases on record, ${String(activeCount)} still in force. Every punishment opens one, wherever it came from.`}
+				title={t('title')}
+				description={t('description', { count: items.length, active: activeCount })}
 			/>
 
 			<div className="mt-6 flex flex-wrap items-center gap-3">
 				<SearchInput
 					value={query}
 					onValueChange={setQuery}
-					placeholder="Search member, reason or #number…"
-					aria-label="Search cases"
+					placeholder={t('search')}
+					aria-label={t('searchLabel')}
 					className="max-w-72"
 				/>
 
 				<Select
 					options={[
-						{ value: 'all', label: 'Every action' },
-						{ value: 'warn', label: ACTION_LABELS.warn },
-						{ value: 'timeout', label: ACTION_LABELS.timeout },
-						{ value: 'mute', label: ACTION_LABELS.mute },
-						{ value: 'kick', label: ACTION_LABELS.kick },
-						{ value: 'ban', label: ACTION_LABELS.ban }
+						{ value: 'all', label: t('everyAction') },
+						...ACTIONS.map((value) => ({ value, label: t(`action.`) }))
 					]}
 					value={action}
 					onValueChange={(next) => {
@@ -87,7 +83,7 @@ export function CasesScreen({ cases }: { cases: ModerationCase[] }) {
 
 				<Select
 					options={[
-						{ value: 'all', label: 'Every moderator' },
+						{ value: 'all', label: t('everyModerator') },
 						...moderators.map((name) => ({ value: name, label: name }))
 					]}
 					value={moderator}
@@ -97,37 +93,31 @@ export function CasesScreen({ cases }: { cases: ModerationCase[] }) {
 
 				<SegmentedControl
 					options={[
-						{ value: 'all', label: 'All' },
-						{ value: 'active', label: 'Active' },
-						{ value: 'expired', label: 'Expired' },
-						{ value: 'revoked', label: 'Revoked' }
+						{ value: 'all', label: t('all') },
+						...STATUSES.map((value) => ({ value, label: t(value) }))
 					]}
 					value={status}
 					onValueChange={setStatus}
-					label="Filter by status"
+					label={t('status')}
 					size="sm"
 				/>
 			</div>
 
 			<div className="mt-6 overflow-hidden rounded-lg border border-border bg-surface shadow-1">
 				{visible.length === 0 ? (
-					<EmptyState
-						icon={Gavel}
-						title="No cases match"
-						description="Either nobody has been actioned under those filters, or the search is too narrow."
-					/>
+					<EmptyState icon={Gavel} title={t('emptyTitle')} description={t('emptyBody')} />
 				) : (
 					<div className="overflow-x-auto">
 						<table className="w-full min-w-200 border-collapse text-left">
 							<thead>
 								<tr className="border-b border-border text-overline text-text-muted uppercase">
-									<th className="px-4 py-3 font-mono font-semibold">Case</th>
-									<th className="px-4 py-3 font-mono font-semibold">Action</th>
-									<th className="px-4 py-3 font-mono font-semibold">Member</th>
-									<th className="px-4 py-3 font-mono font-semibold">Moderator</th>
-									<th className="px-4 py-3 font-mono font-semibold">Reason</th>
-									<th className="px-4 py-3 font-mono font-semibold">Opened</th>
-									<th className="px-4 py-3 font-mono font-semibold">Status</th>
+									<th className="px-4 py-3 font-mono font-semibold">{t('columns.case')}</th>
+									<th className="px-4 py-3 font-mono font-semibold">{t('columns.action')}</th>
+									<th className="px-4 py-3 font-mono font-semibold">{t('columns.member')}</th>
+									<th className="px-4 py-3 font-mono font-semibold">{t('columns.moderator')}</th>
+									<th className="px-4 py-3 font-mono font-semibold">{t('columns.reason')}</th>
+									<th className="px-4 py-3 font-mono font-semibold">{t('columns.opened')}</th>
+									<th className="px-4 py-3 font-mono font-semibold">{t('columns.status')}</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -139,7 +129,7 @@ export function CasesScreen({ cases }: { cases: ModerationCase[] }) {
 											key={entry.id}
 											tabIndex={0}
 											role="button"
-											aria-label={`Open case ${String(entry.number)}`}
+											aria-label={t('open', { number: entry.number })}
 											onClick={() => {
 												setSelectedId(entry.id);
 											}}
@@ -155,7 +145,7 @@ export function CasesScreen({ cases }: { cases: ModerationCase[] }) {
 											</td>
 											<td className="px-4 py-3">
 												<Badge variant={ACTION_VARIANTS[entry.action]}>
-													{ACTION_LABELS[entry.action]}
+													{t(`action.${entry.action}`)}
 												</Badge>
 											</td>
 											<td className="px-4 py-3">
@@ -182,7 +172,7 @@ export function CasesScreen({ cases }: { cases: ModerationCase[] }) {
 											</td>
 											<td className="px-4 py-3">
 												<Badge variant={STATUS_VARIANTS[entryStatus]} dot>
-													{STATUS_LABELS[entryStatus]}
+													{t(entryStatus)}
 												</Badge>
 											</td>
 										</tr>
@@ -195,7 +185,7 @@ export function CasesScreen({ cases }: { cases: ModerationCase[] }) {
 			</div>
 
 			<p className="mt-3 text-caption font-normal text-text-muted">
-				Showing {visible.length} of {items.length} cases.
+				{t('showing', { shown: visible.length, total: items.length })}
 			</p>
 
 			<CaseDrawer

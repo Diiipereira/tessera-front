@@ -1,6 +1,7 @@
 'use client';
 
 import { Paperclip, Undo2 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { Avatar } from '@/components/layout/Avatar';
@@ -9,7 +10,7 @@ import { Button } from '@/components/ui/Button';
 import { Drawer } from '@/components/ui/Drawer';
 import { Field } from '@/components/ui/Field';
 import { Textarea } from '@/components/ui/Textarea';
-import { ACTION_LABELS, caseStatus, relatedCases } from '@/lib/cases';
+import { caseStatus, relatedCases } from '@/lib/cases';
 import { absoluteTime, relativeTime, remaining } from '@/lib/time';
 import type { CaseStatus, ModerationCase } from '@/lib/types/management';
 import type { ModerationAction } from '@/lib/types/modules';
@@ -51,6 +52,8 @@ export function CaseDrawer({
 	onEditReason,
 	onOpenCase
 }: CaseDrawerProps) {
+	const t = useTranslations('cases');
+	const shared = useTranslations('common');
 	const [editing, setEditing] = useState(false);
 	const [reason, setReason] = useState(entry?.reason ?? '');
 
@@ -70,7 +73,7 @@ export function CaseDrawer({
 			header={
 				<div className="flex items-center gap-2">
 					<span className="font-mono text-h3">#{entry.number}</span>
-					<Badge variant={ACTION_VARIANTS[entry.action]}>{ACTION_LABELS[entry.action]}</Badge>
+					<Badge variant={ACTION_VARIANTS[entry.action]}>{t(`action.${entry.action}`)}</Badge>
 					<Badge variant={STATUS_VARIANTS[status]} dot>
 						{STATUS_LABELS[status]}
 					</Badge>
@@ -95,13 +98,13 @@ export function CaseDrawer({
 						disabled={status === 'revoked'}
 						onClick={() => {
 							onRevoke(entry.id);
-							toast.success(`Case #${String(entry.number)} revoked`, {
-								description: 'The member is told, and the punishment is lifted.'
+							toast.success(t('drawer.revoked', { number: entry.number }), {
+								description: t('drawer.revokedHint')
 							});
 						}}
 					>
 						<Undo2 aria-hidden="true" />
-						{status === 'revoked' ? 'Already revoked' : 'Revoke'}
+						{status === 'revoked' ? t('drawer.alreadyRevoked') : t('drawer.revoke')}
 					</Button>
 				</div>
 			}
@@ -109,13 +112,13 @@ export function CaseDrawer({
 			<div className="flex flex-col gap-5">
 				<div className="grid gap-3 sm:grid-cols-2">
 					<Party
-						label="Target"
+						label={t('drawer.target')}
 						name={entry.targetName}
 						initials={entry.targetInitials}
 						color={entry.targetColor}
 					/>
 					<Party
-						label="Moderator"
+						label={t('drawer.moderator')}
 						name={entry.moderatorName}
 						initials={entry.moderatorInitials}
 						color={entry.moderatorColor}
@@ -123,10 +126,12 @@ export function CaseDrawer({
 				</div>
 
 				<div>
-					<p className="mb-1.5 font-mono text-overline text-text-muted uppercase">Reason</p>
+					<p className="mb-1.5 font-mono text-overline text-text-muted uppercase">
+						{t('drawer.reason')}
+					</p>
 					{editing ? (
 						<div className="flex flex-col gap-2">
-							<Field help="The member sees this text if DM on punishment is on.">
+							<Field help={t('drawer.reasonHelp')}>
 								<Textarea
 									value={reason}
 									onChange={(event) => {
@@ -142,12 +147,12 @@ export function CaseDrawer({
 									onClick={() => {
 										onEditReason(entry.id, reason);
 										setEditing(false);
-										toast.success('Reason updated', {
-											description: 'The change is kept in the case history.'
+										toast.success(t('drawer.reasonSaved'), {
+											description: t('drawer.reasonSavedHint')
 										});
 									}}
 								>
-									Save reason
+									{t('drawer.saveReason')}
 								</Button>
 								<Button
 									variant="ghost"
@@ -156,7 +161,7 @@ export function CaseDrawer({
 										setEditing(false);
 									}}
 								>
-									Cancel
+									{shared('cancel')}
 								</Button>
 							</div>
 						</div>
@@ -167,14 +172,14 @@ export function CaseDrawer({
 
 				<dl className="flex flex-col gap-2">
 					<Row
-						label="Opened"
+						label={t('drawer.opened')}
 						value={`${relativeTime(entry.createdAt)} · ${absoluteTime(entry.createdAt)}`}
 					/>
 					<Row
-						label="Duration"
-						value={entry.expiresAt === null ? 'Permanent' : absoluteTime(entry.expiresAt)}
+						label={t('drawer.duration')}
+						value={entry.expiresAt === null ? t('drawer.permanent') : absoluteTime(entry.expiresAt)}
 					/>
-					{expiresIn === null ? null : <Row label="Lifts in" value={expiresIn} />}
+					{expiresIn === null ? null : <Row label={t('drawer.liftsIn')} value={expiresIn} />}
 				</dl>
 
 				<div>
@@ -219,7 +224,7 @@ export function CaseDrawer({
 									>
 										<span className="font-mono text-caption text-text-muted">#{other.number}</span>
 										<Badge variant={ACTION_VARIANTS[other.action]}>
-											{ACTION_LABELS[other.action]}
+											{t(`action.${other.action}`)}
 										</Badge>
 										<span className="min-w-0 flex-1 truncate text-body-sm">{other.reason}</span>
 										<span className="shrink-0 text-caption font-normal text-text-muted">
