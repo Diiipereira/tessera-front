@@ -1,12 +1,12 @@
 'use client';
 
 import { Download, RotateCcw, Trash2, Upload } from 'lucide-react';
-import { useCallback, useMemo, useState, type ReactNode } from 'react';
+import { useCallback, useMemo, type ReactNode } from 'react';
 import { toast } from 'sonner';
-import { ConfirmDialog } from '@/components/management/ConfirmDialog';
 import { PageHeader } from '@/components/management/PageHeader';
 import { SaveBar } from '@/components/modules/SaveBar';
 import { SettingsSection } from '@/components/modules/SettingsSection';
+import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Combobox } from '@/components/ui/Combobox';
 import { Field } from '@/components/ui/Field';
@@ -23,8 +23,6 @@ const LOCALES = [
 	{ value: 'en-US', label: 'English (US)' },
 	{ value: 'pt-BR', label: 'Português (Brasil)' }
 ];
-
-type Danger = 'reset' | 'remove' | null;
 
 type SettingsScreenProps = {
 	guildId: string;
@@ -46,7 +44,6 @@ export function SettingsScreen({ guildId, settings, guildName }: SettingsScreenP
 
 	const form = useConfigDraft<GuildSettings>(settings, { save });
 	const draft = form.draft;
-	const [danger, setDanger] = useState<Danger>(null);
 	const timezones = useMemo(() => timezoneOptions(), []);
 
 	return (
@@ -149,18 +146,11 @@ export function SettingsScreen({ guildId, settings, guildName }: SettingsScreenP
 					description="A copy of every module setting in this server, and a way to put one back."
 				>
 					<ActionRow
+						pending
 						title="Export configuration"
 						body="A JSON file with every module setting in this server. Safe to keep, safe to share with support."
 						action={
-							<Button
-								variant="outline"
-								size="sm"
-								onClick={() => {
-									toast.success('Export ready', {
-										description: 'The download starts once the API can produce the file.'
-									});
-								}}
-							>
+							<Button variant="outline" size="sm" disabled>
 								<Download aria-hidden="true" />
 								Export
 							</Button>
@@ -168,18 +158,11 @@ export function SettingsScreen({ guildId, settings, guildName }: SettingsScreenP
 					/>
 
 					<ActionRow
+						pending
 						title="Import configuration"
 						body="Replaces every module setting with the file contents. You see a diff before anything is written."
 						action={
-							<Button
-								variant="outline"
-								size="sm"
-								onClick={() => {
-									toast.info('Pick a file to see the diff', {
-										description: 'Nothing is written until you approve the changes.'
-									});
-								}}
-							>
+							<Button variant="outline" size="sm" disabled>
 								<Upload aria-hidden="true" />
 								Import
 							</Button>
@@ -193,16 +176,11 @@ export function SettingsScreen({ guildId, settings, guildName }: SettingsScreenP
 					danger
 				>
 					<ActionRow
+						pending
 						title="Reset all settings"
 						body="Every module goes back to its defaults. Cases, audit history and member data are kept."
 						action={
-							<Button
-								variant="danger"
-								size="sm"
-								onClick={() => {
-									setDanger('reset');
-								}}
-							>
+							<Button variant="danger" size="sm" disabled>
 								<RotateCcw aria-hidden="true" />
 								Reset
 							</Button>
@@ -210,16 +188,11 @@ export function SettingsScreen({ guildId, settings, guildName }: SettingsScreenP
 					/>
 
 					<ActionRow
+						pending
 						title={`Remove ${BRAND.name} from ${guildName}`}
 						body="The bot leaves the server. Your configuration is kept for 30 days in case you invite it back."
 						action={
-							<Button
-								variant="danger"
-								size="sm"
-								onClick={() => {
-									setDanger('remove');
-								}}
-							>
+							<Button variant="danger" size="sm" disabled>
 								<Trash2 aria-hidden="true" />
 								Remove bot
 							</Button>
@@ -247,55 +220,28 @@ export function SettingsScreen({ guildId, settings, guildName }: SettingsScreenP
 				}}
 				onResolveConflict={form.resolveConflict}
 			/>
-
-			<ConfirmDialog
-				open={danger === 'reset'}
-				onOpenChange={(open) => {
-					if (!open) setDanger(null);
-				}}
-				title="Reset every module?"
-				description="Eleven modules go back to their defaults. This cannot be undone from here."
-				confirmPhrase="RESET"
-				confirmLabel="Reset everything"
-				onConfirm={() => {
-					toast.success('Settings reset', { description: 'Every module is back to its default.' });
-				}}
-			>
-				<p className="text-body-sm text-text-muted">
-					Your welcome message, AutoMod rules, ticket panels, shop items and scheduled messages are
-					all deleted. Cases and the audit log survive.
-				</p>
-			</ConfirmDialog>
-
-			<ConfirmDialog
-				open={danger === 'remove'}
-				onOpenChange={(open) => {
-					if (!open) setDanger(null);
-				}}
-				title={`Remove ${BRAND.name} from ${guildName}?`}
-				description="The bot leaves immediately. Nothing it was running keeps running."
-				confirmPhrase={guildName}
-				confirmLabel="Remove the bot"
-				onConfirm={() => {
-					toast.success(`${BRAND.name} left ${guildName}`, {
-						description: 'Your configuration is kept for 30 days.'
-					});
-				}}
-			>
-				<p className="text-body-sm text-text-muted">
-					Open tickets stay as channels but stop being managed. Active giveaways never draw a
-					winner. Scheduled messages stop.
-				</p>
-			</ConfirmDialog>
 		</div>
 	);
 }
 
-function ActionRow({ title, body, action }: { title: string; body: string; action: ReactNode }) {
+function ActionRow({
+	title,
+	body,
+	action,
+	pending = false
+}: {
+	title: string;
+	body: string;
+	action: ReactNode;
+	pending?: boolean;
+}) {
 	return (
 		<div className="flex flex-wrap items-start gap-3 border-b border-border pb-4 last:border-0 last:pb-0">
 			<div className="min-w-60 flex-1">
-				<p className="text-body font-medium">{title}</p>
+				<div className="flex flex-wrap items-center gap-2">
+					<p className="text-body font-medium">{title}</p>
+					{pending ? <Badge variant="neutral">Not available yet</Badge> : null}
+				</div>
 				<p className="text-body-sm text-pretty text-text-muted">{body}</p>
 			</div>
 			<div className="shrink-0">{action}</div>
