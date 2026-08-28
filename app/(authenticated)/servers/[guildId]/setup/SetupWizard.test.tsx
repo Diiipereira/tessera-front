@@ -20,7 +20,9 @@ const GUILD: Guild = {
 	missingPermissions: []
 };
 
-const CHANNELS: Channel[] = [{ id: '1', name: 'general', category: 'Text', kind: 'text' }];
+const CHANNELS: Channel[] = [
+	{ id: '1', name: 'general', categoryId: 'cat-1', category: 'Text', kind: 'text' }
+];
 
 const ROLES: Role[] = [{ id: '2', name: 'Moderator', color: '#5865f2' }];
 

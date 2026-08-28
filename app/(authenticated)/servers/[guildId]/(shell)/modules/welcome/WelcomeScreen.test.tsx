@@ -39,7 +39,7 @@ const GUILD_ID = '931562055025168435';
 const CHANNEL_ID = '901234567890123001';
 
 const channels: Channel[] = [
-	{ id: CHANNEL_ID, name: 'teste', category: 'Text channels', kind: 'text' }
+	{ id: CHANNEL_ID, name: 'teste', categoryId: 'cat-1', category: 'Text channels', kind: 'text' }
 ];
 
 const roles: Role[] = [

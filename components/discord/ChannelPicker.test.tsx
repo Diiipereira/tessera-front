@@ -1,0 +1,63 @@
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { describe, expect, it, vi } from 'vitest';
+import type { Channel } from '@/lib/types/discord';
+import { Translated } from '@/tests/i18n';
+import { ChannelPicker } from './ChannelPicker';
+
+const channel = (over: Partial<Channel> & { id: string; name: string }): Channel => ({
+	categoryId: null,
+	category: 'No category',
+	kind: 'text',
+	...over
+});
+
+async function open(channels: Channel[]) {
+	const user = userEvent.setup();
+
+	render(
+		<Translated>
+			<ChannelPicker channels={channels} onValueChange={vi.fn()} />
+		</Translated>
+	);
+
+	await user.click(screen.getByRole('button'));
+
+	return user;
+}
+
+const headings = (): string[] =>
+	[...document.querySelectorAll('.font-mono.uppercase')].map((node) => node.textContent);
+
+describe('ChannelPicker', () => {
+	it('gathers a category into one section even when its channels arrive apart', async () => {
+		await open([
+			channel({ id: '1', name: 'regras', categoryId: 'a', category: 'Informações' }),
+			channel({ id: '2', name: 'geral', categoryId: 'b', category: 'Comunidade' }),
+			channel({ id: '3', name: 'avisos', categoryId: 'a', category: 'Informações' })
+		]);
+
+		expect(headings()).toEqual(['Informações', 'Comunidade']);
+	});
+
+	it('keeps two categories apart when Discord let them share a name', async () => {
+		await open([
+			channel({ id: '1', name: 'regras', categoryId: 'a', category: 'Informações' }),
+			channel({ id: '2', name: 'avisos', categoryId: 'b', category: 'Informações' })
+		]);
+
+		expect(headings()).toEqual(['Informações', 'Informações']);
+		expect(screen.getByRole('button', { name: 'regras' })).toBeDefined();
+		expect(screen.getByRole('button', { name: 'avisos' })).toBeDefined();
+	});
+
+	it('groups every uncategorised channel together', async () => {
+		await open([
+			channel({ id: '1', name: 'solto-um' }),
+			channel({ id: '2', name: 'dentro', categoryId: 'a', category: 'Informações' }),
+			channel({ id: '3', name: 'solto-dois' })
+		]);
+
+		expect(headings()).toEqual(['No category', 'Informações']);
+	});
+});

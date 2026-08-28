@@ -29,6 +29,8 @@ const ICONS: Record<ChannelKind, LucideIcon> = {
 const row =
 	'flex h-8 w-full items-center gap-2 rounded-sm px-2 text-body transition-colors duration-120 ease-out';
 
+const UNCATEGORISED_GROUP = 'uncategorised';
+
 type ChannelPickerProps = {
 	channels: Channel[];
 	value?: string | null;
@@ -53,12 +55,18 @@ export function ChannelPicker({
 
 	const matches = channels.filter((channel) => channel.name.includes(query.trim().toLowerCase()));
 
-	const groups = matches.reduce<{ category: string; items: Channel[] }[]>((acc, channel) => {
-		const last = acc.at(-1);
-		if (last?.category === channel.category) last.items.push(channel);
-		else acc.push({ category: channel.category, items: [channel] });
-		return acc;
-	}, []);
+	const groups = matches.reduce<{ id: string; category: string; items: Channel[] }[]>(
+		(acc, channel) => {
+			const id = channel.categoryId ?? UNCATEGORISED_GROUP;
+			const group = acc.find((entry) => entry.id === id);
+
+			if (group) group.items.push(channel);
+			else acc.push({ id, category: channel.category, items: [channel] });
+
+			return acc;
+		},
+		[]
+	);
 
 	function pick(channel: Channel) {
 		if (channel.lockedReason) return;
@@ -138,7 +146,7 @@ export function ChannelPicker({
 					<p className="px-2 py-3 text-body-sm text-text-muted">{t('noChannelMatch', { query })}</p>
 				) : (
 					groups.map((group) => (
-						<div key={group.category} className="contents">
+						<div key={group.id} className="contents">
 							<div className="px-2 pt-3 pb-1 first:pt-1">
 								<span className="font-mono text-overline text-text-muted uppercase">
 									{group.category}

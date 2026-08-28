@@ -1,28 +1,76 @@
 import { BRAND } from '@/lib/brand';
 import type { Channel, Role } from '@/lib/types/discord';
 
+const WELCOME = '901234567890120001';
+const COMMUNITY = '901234567890120002';
+const STAFF = '901234567890120003';
+
 export const mockChannels: Channel[] = [
-	{ id: '901234567890123001', name: 'welcome', category: 'Welcome', kind: 'text' },
+	{
+		id: '901234567890123001',
+		name: 'welcome',
+		categoryId: WELCOME,
+		category: 'Welcome',
+		kind: 'text'
+	},
 	{
 		id: '901234567890123002',
 		name: 'rules',
+		categoryId: WELCOME,
 		category: 'Welcome',
 		kind: 'text',
 		lockedReason: `${BRAND.name} needs Send Messages in #rules`
 	},
-	{ id: '901234567890123003', name: 'announcements', category: 'Welcome', kind: 'announcement' },
-	{ id: '901234567890123004', name: 'general', category: 'Community', kind: 'text' },
-	{ id: '901234567890123005', name: 'screenshots', category: 'Community', kind: 'text' },
-	{ id: '901234567890123006', name: 'help-forum', category: 'Community', kind: 'forum' },
+	{
+		id: '901234567890123003',
+		name: 'announcements',
+		categoryId: WELCOME,
+		category: 'Welcome',
+		kind: 'announcement'
+	},
+	{
+		id: '901234567890123004',
+		name: 'general',
+		categoryId: COMMUNITY,
+		category: 'Community',
+		kind: 'text'
+	},
+	{
+		id: '901234567890123005',
+		name: 'screenshots',
+		categoryId: COMMUNITY,
+		category: 'Community',
+		kind: 'text'
+	},
+	{
+		id: '901234567890123006',
+		name: 'help-forum',
+		categoryId: COMMUNITY,
+		category: 'Community',
+		kind: 'forum'
+	},
 	{
 		id: '901234567890123007',
 		name: 'lounge',
+		categoryId: COMMUNITY,
 		category: 'Community',
 		kind: 'voice',
 		lockedReason: `${BRAND.name} can't post in voice channels`
 	},
-	{ id: '901234567890123008', name: 'mod-log', category: 'Staff', kind: 'text' },
-	{ id: '901234567890123009', name: 'staff-chat', category: 'Staff', kind: 'text' }
+	{
+		id: '901234567890123008',
+		name: 'mod-log',
+		categoryId: STAFF,
+		category: 'Staff',
+		kind: 'text'
+	},
+	{
+		id: '901234567890123009',
+		name: 'staff-chat',
+		categoryId: STAFF,
+		category: 'Staff',
+		kind: 'text'
+	}
 ];
 
 export const mockRoles: Role[] = [

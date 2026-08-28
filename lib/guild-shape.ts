@@ -35,10 +35,10 @@ export function toChannels(dtos: readonly GuildChannelDto[]): Channel[] {
 
 		if (kind === null) return [];
 
-		const category =
-			dto.parentId === null ? UNCATEGORISED : (categories.get(dto.parentId) ?? UNCATEGORISED);
+		const named = dto.parentId === null ? undefined : categories.get(dto.parentId);
+		const categoryId = named === undefined ? null : dto.parentId;
 
-		return [{ id: dto.id, name: dto.name, category, kind }];
+		return [{ id: dto.id, name: dto.name, categoryId, category: named ?? UNCATEGORISED, kind }];
 	});
 }
 

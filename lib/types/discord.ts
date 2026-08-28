@@ -3,6 +3,7 @@ export type ChannelKind = 'text' | 'voice' | 'announcement' | 'forum';
 export type Channel = {
 	id: string;
 	name: string;
+	categoryId: string | null;
 	category: string;
 	kind: ChannelKind;
 	lockedReason?: string;

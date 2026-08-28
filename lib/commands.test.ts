@@ -9,8 +9,14 @@ const roles: Role[] = [
 ];
 
 const channels: Channel[] = [
-	{ id: 'c1', name: 'general', category: 'Community', kind: 'text' },
-	{ id: 'c2', name: 'announcements', category: 'Community', kind: 'announcement' }
+	{ id: 'c1', name: 'general', categoryId: 'cat-1', category: 'Community', kind: 'text' },
+	{
+		id: 'c2',
+		name: 'announcements',
+		categoryId: 'cat-1',
+		category: 'Community',
+		kind: 'announcement'
+	}
 ];
 
 function command(partial: Partial<BotCommand>): BotCommand {

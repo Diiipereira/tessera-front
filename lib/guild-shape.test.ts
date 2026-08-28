@@ -15,11 +15,28 @@ describe('toChannels', () => {
 			dto({ id: '2', type: 0, name: 'teste', parentId: '1' })
 		]);
 
-		expect(channels).toEqual([{ id: '2', name: 'teste', category: 'Text channels', kind: 'text' }]);
+		expect(channels).toEqual([
+			{ id: '2', name: 'teste', categoryId: '1', category: 'Text channels', kind: 'text' }
+		]);
+	});
+
+	it('carries the category id, which is what stays unique when two share a name', () => {
+		const channels = toChannels([
+			dto({ id: '1', type: 4, name: 'Informações' }),
+			dto({ id: '2', type: 4, name: 'Informações' }),
+			dto({ id: '3', type: 0, name: 'regras', parentId: '1' }),
+			dto({ id: '4', type: 0, name: 'avisos', parentId: '2' })
+		]);
+
+		expect(channels.map((channel) => channel.category)).toEqual(['Informações', 'Informações']);
+		expect(channels.map((channel) => channel.categoryId)).toEqual(['1', '2']);
 	});
 
 	it('keeps a channel that sits outside any category', () => {
-		expect(toChannels([dto({ id: '2', type: 0, name: 'geral' })])[0]?.category).toBe(UNCATEGORISED);
+		const [channel] = toChannels([dto({ id: '2', type: 0, name: 'geral' })]);
+
+		expect(channel?.category).toBe(UNCATEGORISED);
+		expect(channel?.categoryId).toBeNull();
 	});
 
 	it('does not offer the category itself as somewhere to post', () => {
