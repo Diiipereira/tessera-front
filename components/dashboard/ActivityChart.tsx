@@ -4,6 +4,7 @@ import { LineChart } from 'echarts/charts';
 import { GridComponent, TooltipComponent } from 'echarts/components';
 import * as echarts from 'echarts/core';
 import { SVGRenderer } from 'echarts/renderers';
+import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState } from 'react';
 import { useTheme } from '@/components/providers/theme-context';
 import { readChartToken } from '@/lib/chart-tokens';
@@ -13,8 +14,8 @@ import {
 	buildActivityOption,
 	SERIES_DOTS,
 	SERIES_KEYS,
-	SERIES_LABELS,
-	type ChartPalette
+	type ChartPalette,
+	type SeriesLabels
 } from './activity-option';
 
 echarts.use([LineChart, GridComponent, TooltipComponent, SVGRenderer]);
@@ -45,6 +46,7 @@ type ActivityChartProps = {
 };
 
 export function ActivityChart({ data }: ActivityChartProps) {
+	const t = useTranslations('overview.activity');
 	const { resolved } = useTheme();
 	const [range, setRange] = useState<ActivityRange>('7d');
 	const containerRef = useRef<HTMLDivElement>(null);
@@ -72,20 +74,25 @@ export function ActivityChart({ data }: ActivityChartProps) {
 	useEffect(() => {
 		const chart = chartRef.current;
 		if (!chart) return;
-		chart.setOption(buildActivityOption(data[range], readPalette()), true);
-	}, [data, range, resolved]);
+		const labels: SeriesLabels = {
+			messages: t('messages'),
+			commands: t('commands'),
+			joins: t('joins')
+		};
+		chart.setOption(buildActivityOption(data[range], readPalette(), labels), true);
+	}, [data, range, resolved, t]);
 
 	return (
 		<div className="flex flex-col rounded-lg border border-border bg-surface shadow-1">
 			<div className="flex flex-wrap items-center gap-3 border-b border-border p-5">
 				<div className="min-w-40 flex-1">
-					<h2 className="text-h4">Activity</h2>
-					<p className="text-body-sm text-text-muted">Messages, commands and joins over time.</p>
+					<h2 className="text-h4">{t('title')}</h2>
+					<p className="text-body-sm text-text-muted">{t('description')}</p>
 				</div>
 
 				<div
 					role="group"
-					aria-label="Range"
+					aria-label={t('rangeLabel')}
 					className="flex items-center gap-0.5 rounded-md border border-border bg-surface-sunken p-0.5"
 				>
 					{RANGES.map((option) => (
@@ -113,7 +120,7 @@ export function ActivityChart({ data }: ActivityChartProps) {
 				{SERIES_KEYS.map((key) => (
 					<span key={key} className="flex items-center gap-2 text-caption text-text-muted">
 						<span aria-hidden="true" className={cn('size-2 rounded-full', SERIES_DOTS[key])} />
-						{SERIES_LABELS[key]}
+						{t(key)}
 					</span>
 				))}
 			</div>
@@ -123,7 +130,7 @@ export function ActivityChart({ data }: ActivityChartProps) {
 					ref={containerRef}
 					data-testid="activity-chart"
 					role="img"
-					aria-label="Activity over time: messages, commands and joins"
+					aria-label={t('chartLabel')}
 					className="h-64 w-full"
 				/>
 			</div>

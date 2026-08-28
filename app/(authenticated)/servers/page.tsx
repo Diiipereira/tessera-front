@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import { redirect } from 'next/navigation';
 import { AccountBar } from '@/components/layout/AccountBar';
 import { Alert } from '@/components/ui/Alert';
@@ -8,7 +9,13 @@ import { toGuild, toSessionUser } from '@/lib/guild-presentation';
 import { mockUser } from '@/lib/mock';
 import { ServerPicker } from './ServerPicker';
 
-export const metadata: Metadata = { title: 'Your servers' };
+const START_COMMAND = 'npm run dev:api';
+
+export async function generateMetadata(): Promise<Metadata> {
+	const t = await getTranslations('servers');
+
+	return { title: t('title') };
+}
 
 export default async function Page({
 	searchParams
@@ -37,13 +44,18 @@ export default async function Page({
 	const user = meResult.status === 'ok' ? toSessionUser(meResult.data) : null;
 
 	if (guildsResult.status === 'unreachable') {
+		const t = await getTranslations('servers');
+
 		return (
 			<div className="flex min-h-svh flex-col">
 				<AccountBar user={user} />
 				<div className="mx-auto w-full max-w-4xl p-6 sm:p-10">
-					<Alert variant="danger" title="The API did not answer">
-						{guildsResult.reason}. Start it with <code className="font-mono">npm run dev:api</code>{' '}
-						in the bot-api repository, then reload this page.
+					<Alert variant="danger" title={t('unreachableTitle')}>
+						{t.rich('unreachableBody', {
+							reason: guildsResult.reason,
+							command: START_COMMAND,
+							code: (chunks) => <code className="font-mono">{chunks}</code>
+						})}
 					</Alert>
 				</div>
 			</div>

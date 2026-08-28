@@ -1,3 +1,4 @@
+import { getTranslations } from 'next-intl/server';
 import { Suspense } from 'react';
 import { OverviewSkeleton } from '@/components/skeletons/OverviewSkeleton';
 import { lookupGuild, resolveGuild } from '@/lib/guild-access';
@@ -14,9 +15,9 @@ import { OverviewScreen } from './OverviewScreen';
 
 export async function generateMetadata({ params }: Pick<GuildPageProps, 'params'>) {
 	const { guildId } = await params;
-	const guild = await lookupGuild(guildId);
+	const [guild, t] = await Promise.all([lookupGuild(guildId), getTranslations('overview')]);
 
-	return { title: `Overview · ${guild?.name ?? 'Server'}` };
+	return { title: t('metaTitle', { guild: guild?.name ?? t('fallbackGuild') }) };
 }
 
 export default function Page({ params, searchParams }: GuildPageProps) {

@@ -74,7 +74,7 @@
 		"noServers": "Nenhum servidor corresponde a “{query}”.",
 		"currentServer": "Servidor atual",
 		"addServer": "Adicionar um servidor",
-		"members": "{count} membros"
+		"members": "{count, number} membros"
 	},
 	"stub": {
 		"fallback": "Tela",
@@ -180,8 +180,8 @@
 		"hero": {
 			"eyebrow": "11 módulos · um painel",
 			"title": "Cuide do seu servidor do Discord sem deixar uma tela de configuração aberta.",
-			"lead": "O {brand} cuida de moderação, boas-vindas, níveis, tickets e sorteios em todos os servidores que você gerencia. Mude uma configuração aqui ou por comando de barra — os dois sempre mostram o mesmo estado.",
-			"invite": "Adicionar o {brand} ao Discord",
+			"lead": "A {brand} cuida de moderação, boas-vindas, níveis, tickets e sorteios em todos os servidores que você gerencia. Mude uma configuração aqui ou por comando de barra — os dois sempre mostram o mesmo estado.",
+			"invite": "Adicionar a {brand} ao Discord",
 			"dashboard": "Abrir o painel"
 		},
 		"trust": {
@@ -192,7 +192,7 @@
 		"modules": {
 			"overline": "Módulos",
 			"title": "Ligue o que você precisa, ignore o resto",
-			"lead": "Cada módulo nasce desligado, e cada um tem a sua própria tela com uma prévia ao vivo do que o {brand} vai publicar.",
+			"lead": "Cada módulo nasce desligado, e cada um tem a sua própria tela com uma prévia ao vivo do que a {brand} vai publicar.",
 			"moderation": {
 				"title": "Moderação",
 				"body": "Advertir, silenciar, expulsar e banir com motivo anexado. O escalonamento de advertências percorre a escada de punições por você."
@@ -221,7 +221,7 @@
 		"mirror": {
 			"overline": "Configure de onde quiser",
 			"title": "O painel e os comandos de barra são a mesma coisa",
-			"lead": "Seus moderadores vivem no Discord e nunca abrem um navegador. Você quer uma tela de configuração de verdade. Os dois escrevem no mesmo estado, então nenhuma das visões fica desatualizada — e se alguém mudar uma configuração com o seu formulário aberto, o {brand} avisa em vez de sobrescrever.",
+			"lead": "Seus moderadores vivem no Discord e nunca abrem um navegador. Você quer uma tela de configuração de verdade. Os dois escrevem no mesmo estado, então nenhuma das visões fica desatualizada — e se alguém mudar uma configuração com o seu formulário aberto, a {brand} avisa em vez de sobrescrever.",
 			"saveBar": "Nada salva sozinho. Uma barra de salvamento diz quantas configurações mudaram antes de qualquer coisa chegar ao seu servidor.",
 			"conflict": "Se um comando de barra mudar a mesma configuração com o seu formulário aberto, a barra oferece Recarregar ou Manter o meu.",
 			"audit": "Toda mudança fica no log de auditoria com o autor, o antes e depois, e se veio da Web ou do Slash.",
@@ -265,7 +265,7 @@
 			},
 			"administrator": {
 				"question": "Preciso dar Administrador para ele?",
-				"answer": "Não. O {brand} pede as permissões que cada módulo precisa, e o painel diz exatamente qual permissão está faltando no ponto em que você faz a escolha — não depois de salvar."
+				"answer": "Não. A {brand} pede as permissões que cada módulo precisa, e o painel diz exatamente qual permissão está faltando no ponto em que você faz a escolha — não depois de salvar."
 			},
 			"slash": {
 				"question": "O que acontece se meus moderadores usarem comandos de barra?",
@@ -277,9 +277,9 @@
 			}
 		},
 		"cta": {
-			"title": "Adicione o {brand} a um servidor em cerca de um minuto",
+			"title": "Adicione a {brand} a um servidor em cerca de um minuto",
 			"lead": "De graça em servidores ilimitados. O assistente de instalação te guia pelo canal de log e pelos cargos de moderação, e você pode pular.",
-			"invite": "Adicionar o {brand} ao Discord",
+			"invite": "Adicionar a {brand} ao Discord",
 			"docs": "Ler a documentação"
 		},
 		"footer": {
@@ -317,7 +317,7 @@
 	"legal": {
 		"terms": "Termos",
 		"privacy": "Política de privacidade",
-		"body": "O texto legal do {brand} ainda não foi escrito. Esta página existe para que a tela de login nunca leve a lugar nenhum.",
+		"body": "O texto legal da {brand} ainda não foi escrito. Esta página existe para que a tela de login nunca leve a lugar nenhum.",
 		"back": "Voltar para o login"
 	},
 	"brand": {
@@ -335,7 +335,7 @@
 		"forever": "para sempre, em servidores ilimitados",
 		"perMonthYearly": "por mês, cobrado {price} por ano",
 		"perMonth": "por mês, por servidor",
-		"invite": "Adicionar o {brand} ao Discord",
+		"invite": "Adicionar a {brand} ao Discord",
 		"start": "Começar com o {plan}",
 		"limitsOverline": "Limites",
 		"limitsTitle": "O que cada plano deixa você manter",
@@ -375,6 +375,151 @@
 			"escape": "esc",
 			"empty": "Digite para buscar em {count} páginas.",
 			"noMatch": "Nada corresponde a “{query}”."
+		}
+	},
+	"auth": {
+		"signIn": "Entrar",
+		"connecting": "Conectando",
+		"connectingAccount": "Conectando sua conta…",
+		"handoff": "Isso leva um segundo.",
+		"failedTitle": "Não conseguimos concluir o login",
+		"returned": "O Discord retornou <mono>{code}</mono> — {reason}",
+		"tryAgain": "Tentar de novo",
+		"backHome": "Voltar ao início",
+		"reference": "ref {reference}",
+		"signingOut": "Saindo",
+		"signingOutBody": "Encerrando sua sessão…",
+		"signedOut": "Você saiu",
+		"signedOutHint": "Você pode entrar de novo com o Discord quando quiser.",
+		"signedOutLocal": "Você saiu só neste navegador",
+		"signedOutLocalHint": "A API não respondeu, então a sessão pode continuar aberta no servidor.",
+		"errors": {
+			"access_denied": {
+				"title": "Você recusou o pedido do Discord",
+				"body": "Nada foi compartilhado. Autorize o aplicativo para continuar, ou feche esta aba."
+			},
+			"session_expired": {
+				"title": "Sua sessão expirou",
+				"body": "Você ficou um tempo fora, então encerramos o login por segurança. Comece de novo."
+			},
+			"unknown": {
+				"title": "Algo deu errado do nosso lado",
+				"body": "O Discord está acessível, mas não conseguimos terminar. Tentar de novo costuma resolver."
+			}
+		},
+		"failures": {
+			"invalid_grant": "o código de autorização já tinha sido usado. Começar de novo resolve.",
+			"invalid_state": "o pedido não correspondeu ao que iniciamos. Começar de novo resolve.",
+			"unknown": "não foi possível concluir a troca. Tentar de novo costuma resolver."
+		}
+	},
+	"servers": {
+		"title": "Seus servidores",
+		"lead": "Escolha um servidor para configurar, ou adicione a {brand} a um que você gerencia.",
+		"searchLabel": "Buscar servidores",
+		"searchPlaceholder": "Buscar servidores…",
+		"filterLabel": "Filtrar servidores",
+		"filters": {
+			"all": "Todos",
+			"managed": "Com a {brand}",
+			"available": "Disponíveis"
+		},
+		"managedBy": "Gerenciados pela {brand}",
+		"addBrand": "Adicionar a {brand}",
+		"emptyTitle": "Nenhum servidor encontrado",
+		"emptyBody": "Você precisa da permissão Gerenciar servidor em um servidor do Discord para configurar a {brand}.",
+		"recheck": "Verificar as permissões de novo",
+		"unreachableTitle": "A API não respondeu",
+		"unreachableBody": "{reason}. Suba ela com <code>{command}</code> no repositório bot-api e recarregue esta página.",
+		"card": {
+			"members": "{count, number} membros",
+			"absent": "Ainda não instalada",
+			"manage": "Gerenciar",
+			"sync": "Sincronizar permissões",
+			"add": "Adicionar ao servidor",
+			"behind": "{count, plural, =1 {1 permissão faltando} other {# permissões faltando}}"
+		},
+		"add": {
+			"metaTitle": "Adicionando a {brand}",
+			"joined": "A {brand} está em {guild}",
+			"joinedUnknown": "A {brand} entrou",
+			"toSetup": "Levando você para a configuração…",
+			"waiting": "Esperando a {brand} entrar em {guild}…",
+			"waitingUnknown": "Esperando a {brand} entrar…",
+			"authorize": "Conclua a autorização na janela do Discord e recarregue esta página.",
+			"inviteTo": "Convidar para {guild}",
+			"invite": "Abrir o convite"
+		}
+	},
+	"overview": {
+		"title": "Visão geral",
+		"metaTitle": "Visão geral · {guild}",
+		"fallbackGuild": "Servidor",
+		"lead": "O que a {brand} andou fazendo em {guild} esta semana.",
+		"stats": {
+			"members": "Membros",
+			"commands": "Comandos usados · 7d",
+			"modules": "Módulos ativos",
+			"tickets": "Tickets abertos"
+		},
+		"activity": {
+			"title": "Atividade",
+			"description": "Mensagens, comandos e entradas ao longo do tempo.",
+			"rangeLabel": "Período",
+			"chartLabel": "Atividade ao longo do tempo: mensagens, comandos e entradas",
+			"messages": "Mensagens",
+			"commands": "Comandos",
+			"joins": "Entradas"
+		},
+		"status": {
+			"title": "Status da {brand}",
+			"online": "Online",
+			"offline": "Offline",
+			"uptime": "No ar há",
+			"latency": "Latência",
+			"latencyValue": "{ms} ms",
+			"shard": "Shard",
+			"missing": "Permissões faltando"
+		},
+		"feed": {
+			"title": "Atividade recente",
+			"audit": "Registro de auditoria"
+		},
+		"quick": {
+			"title": "Ações rápidas",
+			"announce": {
+				"label": "Enviar um comunicado",
+				"hint": "Publicar em um canal como o bot"
+			},
+			"ticket": {
+				"label": "Criar um painel de tickets",
+				"hint": "Um botão que os membros apertam para pedir ajuda"
+			},
+			"giveaway": {
+				"label": "Começar um sorteio",
+				"hint": "Sorteio com prazo e requisitos"
+			},
+			"invite": {
+				"label": "Convidar alguém da equipe",
+				"hint": "Dar acesso ao painel a outra pessoa"
+			}
+		},
+		"setup": {
+			"title": "Faltam três coisas para a {brand} fazer trabalho de verdade",
+			"body": "Você pode pular qualquer uma delas e voltar depois.",
+			"dismiss": "Dispensar a lista de configuração",
+			"welcome": {
+				"label": "Escolher um canal de boas-vindas",
+				"action": "Configurar"
+			},
+			"moderation": {
+				"label": "Definir seus cargos de moderação",
+				"action": "Configurar"
+			},
+			"logging": {
+				"label": "Ligar o registro de auditoria",
+				"action": "Ligar"
+			}
 		}
 	}
 }

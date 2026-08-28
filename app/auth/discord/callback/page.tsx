@@ -1,10 +1,15 @@
 import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import { callbackFailureFor } from '@/lib/auth';
 import { CallbackScreen } from './CallbackScreen';
 
-export const metadata: Metadata = { title: 'Connecting' };
-
 const FALLBACK_REFERENCE = '8f21c04e';
+
+export async function generateMetadata(): Promise<Metadata> {
+	const t = await getTranslations('auth');
+
+	return { title: t('connecting') };
+}
 
 export default async function Page({
 	searchParams

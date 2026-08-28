@@ -1,6 +1,7 @@
 'use client';
 
 import { LoaderCircle, RefreshCw, TriangleAlert } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { Button } from '@/components/ui/Button';
@@ -9,6 +10,7 @@ import type { CallbackFailure } from '@/lib/auth';
 const HANDOFF_MS = 1200;
 
 export function CallbackScreen({ failure }: { failure: CallbackFailure | null }) {
+	const t = useTranslations('auth');
 	const router = useRouter();
 
 	useEffect(() => {
@@ -29,29 +31,32 @@ export function CallbackScreen({ failure }: { failure: CallbackFailure | null })
 						<div className="grid size-16 place-items-center rounded-full bg-danger-subtle text-danger">
 							<TriangleAlert className="size-8" aria-hidden="true" />
 						</div>
-						<h1 className="text-h3">We couldn&rsquo;t complete sign-in</h1>
+						<h1 className="text-h3">{t('failedTitle')}</h1>
 						<p className="text-body-sm text-pretty text-text-muted">
-							Discord returned <span className="font-mono text-text">{failure.code}</span> &mdash;{' '}
-							{failure.reason}
+							{t.rich('returned', {
+								code: failure.code,
+								reason: t(`failures.${failure.kind}`),
+								mono: (chunks) => <span className="font-mono text-text">{chunks}</span>
+							})}
 						</p>
 						<div className="mt-2 flex flex-wrap justify-center gap-2">
 							<Button href="/login">
 								<RefreshCw aria-hidden="true" />
-								Try again
+								{t('tryAgain')}
 							</Button>
 							<Button variant="outline" href="/">
-								Back to home
+								{t('backHome')}
 							</Button>
 						</div>
 						<p className="mt-2 font-mono text-caption font-normal text-text-muted">
-							ref {failure.reference}
+							{t('reference', { reference: failure.reference })}
 						</p>
 					</>
 				) : (
 					<>
 						<LoaderCircle className="size-12 animate-spin text-primary" aria-hidden="true" />
-						<h1 className="text-h3">Connecting your account…</h1>
-						<p className="text-body-sm text-text-muted">This takes a second.</p>
+						<h1 className="text-h3">{t('connectingAccount')}</h1>
+						<p className="text-body-sm text-text-muted">{t('handoff')}</p>
 					</>
 				)}
 			</div>

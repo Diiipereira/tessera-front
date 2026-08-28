@@ -74,7 +74,7 @@
 		"noServers": "No servers match “{query}”.",
 		"currentServer": "Current server",
 		"addServer": "Add a server",
-		"members": "{count} members"
+		"members": "{count, number} members"
 	},
 	"stub": {
 		"fallback": "Screen",
@@ -375,6 +375,151 @@
 			"escape": "esc",
 			"empty": "Type to search {count} pages.",
 			"noMatch": "Nothing matches “{query}”."
+		}
+	},
+	"auth": {
+		"signIn": "Sign in",
+		"connecting": "Connecting",
+		"connectingAccount": "Connecting your account…",
+		"handoff": "This takes a second.",
+		"failedTitle": "We couldn’t complete sign-in",
+		"returned": "Discord returned <mono>{code}</mono> — {reason}",
+		"tryAgain": "Try again",
+		"backHome": "Back to home",
+		"reference": "ref {reference}",
+		"signingOut": "Signing out",
+		"signingOutBody": "Signing you out…",
+		"signedOut": "Signed out",
+		"signedOutHint": "You can sign back in with Discord any time.",
+		"signedOutLocal": "Signed out locally",
+		"signedOutLocalHint": "The API did not answer, so the session may still be open on the server.",
+		"errors": {
+			"access_denied": {
+				"title": "You declined the Discord prompt",
+				"body": "Nothing was shared. Authorize the app to continue, or close this tab."
+			},
+			"session_expired": {
+				"title": "Your session expired",
+				"body": "You were away for a while, so we ended the sign-in for safety. Start again."
+			},
+			"unknown": {
+				"title": "Something went wrong on our side",
+				"body": "Discord is reachable, but we couldn’t finish. Trying again usually works."
+			}
+		},
+		"failures": {
+			"invalid_grant": "the authorization code had already been used. Starting again fixes it.",
+			"invalid_state": "the request did not match the one we started. Starting again fixes it.",
+			"unknown": "Discord could not complete the exchange. Trying again usually works."
+		}
+	},
+	"servers": {
+		"title": "Your servers",
+		"lead": "Pick a server to configure, or add {brand} to one you manage.",
+		"searchLabel": "Search servers",
+		"searchPlaceholder": "Search servers…",
+		"filterLabel": "Filter servers",
+		"filters": {
+			"all": "All",
+			"managed": "With {brand}",
+			"available": "Available"
+		},
+		"managedBy": "Managed by {brand}",
+		"addBrand": "Add {brand}",
+		"emptyTitle": "No servers found",
+		"emptyBody": "You need Manage Server permission on a Discord server to configure {brand}.",
+		"recheck": "Recheck permissions",
+		"unreachableTitle": "The API did not answer",
+		"unreachableBody": "{reason}. Start it with <code>{command}</code> in the bot-api repository, then reload this page.",
+		"card": {
+			"members": "{count, number} members",
+			"absent": "Not installed yet",
+			"manage": "Manage",
+			"sync": "Sync permissions",
+			"add": "Add to server",
+			"behind": "{count, plural, =1 {1 permission behind} other {# permissions behind}}"
+		},
+		"add": {
+			"metaTitle": "Adding {brand}",
+			"joined": "{brand} is in {guild}",
+			"joinedUnknown": "{brand} has joined",
+			"toSetup": "Taking you to setup…",
+			"waiting": "Waiting for {brand} to join {guild}…",
+			"waitingUnknown": "Waiting for {brand} to join…",
+			"authorize": "Complete the authorization in the Discord window, then reload this page.",
+			"inviteTo": "Invite to {guild}",
+			"invite": "Open invite"
+		}
+	},
+	"overview": {
+		"title": "Overview",
+		"metaTitle": "Overview · {guild}",
+		"fallbackGuild": "Server",
+		"lead": "What {brand} has been doing in {guild} this week.",
+		"stats": {
+			"members": "Members",
+			"commands": "Commands used · 7d",
+			"modules": "Active modules",
+			"tickets": "Open tickets"
+		},
+		"activity": {
+			"title": "Activity",
+			"description": "Messages, commands and joins over time.",
+			"rangeLabel": "Range",
+			"chartLabel": "Activity over time: messages, commands and joins",
+			"messages": "Messages",
+			"commands": "Commands",
+			"joins": "Joins"
+		},
+		"status": {
+			"title": "{brand} status",
+			"online": "Online",
+			"offline": "Offline",
+			"uptime": "Uptime",
+			"latency": "Latency",
+			"latencyValue": "{ms} ms",
+			"shard": "Shard",
+			"missing": "Missing permissions"
+		},
+		"feed": {
+			"title": "Recent activity",
+			"audit": "Audit log"
+		},
+		"quick": {
+			"title": "Quick actions",
+			"announce": {
+				"label": "Send announcement",
+				"hint": "Post to a channel as the bot"
+			},
+			"ticket": {
+				"label": "Create ticket panel",
+				"hint": "A button members press for help"
+			},
+			"giveaway": {
+				"label": "Start a giveaway",
+				"hint": "Timed draw with requirements"
+			},
+			"invite": {
+				"label": "Invite a teammate",
+				"hint": "Give someone dashboard access"
+			}
+		},
+		"setup": {
+			"title": "Three things left before {brand} is doing real work",
+			"body": "You can skip any of these and come back later.",
+			"dismiss": "Dismiss setup checklist",
+			"welcome": {
+				"label": "Pick a welcome channel",
+				"action": "Set up"
+			},
+			"moderation": {
+				"label": "Set your moderator roles",
+				"action": "Set up"
+			},
+			"logging": {
+				"label": "Turn on the audit log",
+				"action": "Turn on"
+			}
 		}
 	}
 }

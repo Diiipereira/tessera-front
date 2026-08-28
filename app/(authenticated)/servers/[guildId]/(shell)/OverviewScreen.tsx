@@ -1,6 +1,7 @@
 'use client';
 
 import { Blocks, SquareSlash, Ticket, Users, type LucideIcon } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 import { useState } from 'react';
 import { ActivityFeed } from '@/components/dashboard/ActivityFeed';
@@ -71,6 +72,7 @@ export function OverviewScreen({
 	setupCompleted,
 	loading
 }: OverviewScreenProps) {
+	const t = useTranslations('overview');
 	const [dismissed, setDismissed] = useState(false);
 	const showSetup = !setupCompleted && !dismissed;
 
@@ -91,9 +93,9 @@ export function OverviewScreen({
 					) : null}
 
 					<div>
-						<h1 className="text-h1">Overview</h1>
+						<h1 className="text-h1">{t('title')}</h1>
 						<p className="text-body text-text-muted">
-							What {BRAND.name} has been doing in {guild.name} this week.
+							{t('lead', { brand: BRAND.name, guild: guild.name })}
 						</p>
 					</div>
 

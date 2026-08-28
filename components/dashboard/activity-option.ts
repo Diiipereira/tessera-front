@@ -4,11 +4,7 @@ export const SERIES_KEYS = ['messages', 'commands', 'joins'] as const;
 
 export type SeriesKey = (typeof SERIES_KEYS)[number];
 
-export const SERIES_LABELS: Record<SeriesKey, string> = {
-	messages: 'Messages',
-	commands: 'Commands',
-	joins: 'Joins'
-};
+export type SeriesLabels = Record<SeriesKey, string>;
 
 export const SERIES_DOTS: Record<SeriesKey, string> = {
 	messages: 'bg-chart-1',
@@ -57,9 +53,10 @@ export type ActivityOption = {
 
 export function buildActivityOption(
 	points: ActivityPoint[],
-	palette: ChartPalette
+	palette: ChartPalette,
+	labels: SeriesLabels
 ): ActivityOption {
-	const labels = points.map((point) => point.label);
+	const ticks = points.map((point) => point.label);
 
 	return {
 		animationDuration: 260,
@@ -82,7 +79,7 @@ export function buildActivityOption(
 		},
 		xAxis: {
 			type: 'category',
-			data: labels,
+			data: ticks,
 			boundaryGap: false,
 			axisLine: { lineStyle: { color: palette.axis } },
 			axisTick: { show: false },
@@ -98,7 +95,7 @@ export function buildActivityOption(
 			splitLine: { lineStyle: { color: palette.grid, type: 'solid' } }
 		},
 		series: SERIES_KEYS.map((key) => ({
-			name: SERIES_LABELS[key],
+			name: labels[key],
 			type: 'line' as const,
 			smooth: 0.35,
 			symbol: 'none' as const,

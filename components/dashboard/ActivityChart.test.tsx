@@ -3,7 +3,11 @@ import userEvent from '@testing-library/user-event';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import { mockActivity } from '@/lib/mock';
+import messages from '@/messages/en-US.json';
+import { Translated } from '@/tests/i18n';
 import { ActivityChart } from './ActivityChart';
+
+const copy = messages.overview.activity;
 
 function sizeContainers(width: number, height: number) {
 	for (const property of ['clientWidth', 'offsetWidth'] as const) {
@@ -26,9 +30,11 @@ beforeAll(() => {
 
 function renderChart() {
 	return render(
-		<ThemeProvider>
-			<ActivityChart data={mockActivity} />
-		</ThemeProvider>
+		<Translated>
+			<ThemeProvider>
+				<ActivityChart data={mockActivity} />
+			</ThemeProvider>
+		</Translated>
 	);
 }
 
@@ -79,9 +85,22 @@ describe('ActivityChart', () => {
 
 	it('labels every series in the legend', () => {
 		renderChart();
-		expect(screen.getByText('Messages')).toBeInTheDocument();
-		expect(screen.getByText('Commands')).toBeInTheDocument();
-		expect(screen.getByText('Joins')).toBeInTheDocument();
+		expect(screen.getByText(copy.messages)).toBeInTheDocument();
+		expect(screen.getByText(copy.commands)).toBeInTheDocument();
+		expect(screen.getByText(copy.joins)).toBeInTheDocument();
+	});
+
+	it('labels the legend in the reader language, not in the one the chart was written in', () => {
+		render(
+			<Translated locale="pt-BR">
+				<ThemeProvider>
+					<ActivityChart data={mockActivity} />
+				</ThemeProvider>
+			</Translated>
+		);
+
+		expect(screen.getByText('Mensagens')).toBeInTheDocument();
+		expect(screen.queryByText(copy.messages)).not.toBeInTheDocument();
 	});
 
 	it('redraws when another range is picked', async () => {

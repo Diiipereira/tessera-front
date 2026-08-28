@@ -10,16 +10,17 @@ import { Alert } from '@/components/ui/Alert';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { signInHref } from '@/lib/api-url';
-import type { LoginError } from '@/lib/auth';
+import type { LoginErrorKind } from '@/lib/auth';
 import type { SessionUser } from '@/lib/types/session';
 
 type SignInCardProps = {
-	error: LoginError | null;
+	error: LoginErrorKind | null;
 	user: SessionUser | null;
 };
 
 export function SignInCard({ error, user }: SignInCardProps) {
 	const t = useTranslations('marketing.signIn');
+	const failure = useTranslations('auth.errors');
 	const [redirecting, setRedirecting] = useState(false);
 
 	const signedIn = user !== null;
@@ -42,8 +43,8 @@ export function SignInCard({ error, user }: SignInCardProps) {
 				</div>
 
 				{error ? (
-					<Alert variant="danger" title={error.title}>
-						{error.body}
+					<Alert variant="danger" title={failure(`${error}.title`)}>
+						{failure(`${error}.body`)}
 					</Alert>
 				) : null}
 

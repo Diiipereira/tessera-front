@@ -1,4 +1,5 @@
 import { TriangleAlert } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { Badge } from '@/components/ui/Badge';
 import { BRAND } from '@/lib/brand';
 import type { BotHealth } from '@/lib/types/overview';
@@ -13,26 +14,26 @@ function Row({ label, value }: { label: string; value: string }) {
 }
 
 export function BotStatusCard({ health }: { health: BotHealth }) {
+	const t = useTranslations('overview.status');
+
 	return (
 		<div className="flex flex-col gap-4 rounded-lg border border-border bg-surface p-5 shadow-1">
 			<div className="flex items-center gap-2">
-				<h2 className="min-w-0 flex-1 truncate text-h4">{BRAND.name} status</h2>
+				<h2 className="min-w-0 flex-1 truncate text-h4">{t('title', { brand: BRAND.name })}</h2>
 				<Badge variant={health.online ? 'success' : 'danger'} dot>
-					{health.online ? 'Online' : 'Offline'}
+					{health.online ? t('online') : t('offline')}
 				</Badge>
 			</div>
 
 			<div className="flex flex-col gap-2.5">
-				<Row label="Uptime" value={health.uptime} />
-				<Row label="Latency" value={`${health.latencyMs.toString()} ms`} />
-				<Row label="Shard" value={health.shard} />
+				<Row label={t('uptime')} value={health.uptime} />
+				<Row label={t('latency')} value={t('latencyValue', { ms: health.latencyMs })} />
+				<Row label={t('shard')} value={health.shard} />
 			</div>
 
 			{health.warnings.length > 0 ? (
 				<div className="flex flex-col gap-2 border-t border-border pt-4">
-					<span className="font-mono text-overline text-text-muted uppercase">
-						Missing permissions
-					</span>
+					<span className="font-mono text-overline text-text-muted uppercase">{t('missing')}</span>
 					{health.warnings.map((warning) => (
 						<p
 							key={warning}

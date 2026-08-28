@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef } from 'react';
 import { toast } from 'sonner';
@@ -8,6 +9,7 @@ import { apiBaseUrl } from '@/lib/api-url';
 const SIGNED_OUT_TOAST = 'signed-out';
 
 export function LogoutScreen() {
+	const t = useTranslations('auth');
 	const router = useRouter();
 	const started = useRef(false);
 
@@ -21,14 +23,14 @@ export function LogoutScreen() {
 					method: 'POST',
 					credentials: 'include'
 				});
-				toast.success('Signed out', {
+				toast.success(t('signedOut'), {
 					id: SIGNED_OUT_TOAST,
-					description: 'You can sign back in with Discord any time.'
+					description: t('signedOutHint')
 				});
 			} catch {
-				toast.error('Signed out locally', {
+				toast.error(t('signedOutLocal'), {
 					id: SIGNED_OUT_TOAST,
-					description: 'The API did not answer, so the session may still be open on the server.'
+					description: t('signedOutLocalHint')
 				});
 			}
 
@@ -36,11 +38,11 @@ export function LogoutScreen() {
 		}
 
 		void signOut();
-	}, [router]);
+	}, [router, t]);
 
 	return (
 		<div className="grid min-h-svh place-items-center bg-bg px-6">
-			<p className="text-body-sm text-text-muted">Signing you out…</p>
+			<p className="text-body-sm text-text-muted">{t('signingOutBody')}</p>
 		</div>
 	);
 }

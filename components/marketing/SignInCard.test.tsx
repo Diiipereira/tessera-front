@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { loginErrorFor, type LoginError } from '@/lib/auth';
+import { loginErrorFor, type LoginErrorKind } from '@/lib/auth';
 import { mockUser } from '@/lib/mock';
 import type { SessionUser } from '@/lib/types/session';
 import { Translated } from '@/tests/i18n';
@@ -9,7 +9,7 @@ import { SignInCard } from './SignInCard';
 
 const assign = vi.fn();
 
-function renderCard(error: LoginError | null, user: SessionUser | null) {
+function renderCard(error: LoginErrorKind | null, user: SessionUser | null) {
 	render(
 		<Translated>
 			<SignInCard error={error} user={user} />

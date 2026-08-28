@@ -1,4 +1,5 @@
 import { Crown, Plus, RefreshCw } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -7,7 +8,6 @@ import { guildHref } from '@/lib/navigation';
 import type { Guild } from '@/lib/types/guild';
 import { cn } from '@/lib/utils/cn';
 import { readableTextOn } from '@/lib/utils/contrast';
-import { formatCount } from '@/lib/utils/format';
 
 const TIER_LABELS: Record<string, string> = {
 	pro: 'Pro',
@@ -15,6 +15,7 @@ const TIER_LABELS: Record<string, string> = {
 };
 
 export function GuildCard({ guild }: { guild: Guild }) {
+	const t = useTranslations('servers.card');
 	const tierLabel = TIER_LABELS[guild.tier];
 	const inviteHref = botInviteUrl(guild.id);
 	const behind = guild.missingPermissions.length;
@@ -58,20 +59,20 @@ export function GuildCard({ guild }: { guild: Guild }) {
 					) : null}
 					{behind > 0 ? (
 						<Badge variant="warning" className="shrink-0">
-							{behind === 1 ? '1 permission behind' : `${String(behind)} permissions behind`}
+							{t('behind', { count: behind })}
 						</Badge>
 					) : null}
 				</div>
 
 				<p className="tabular text-caption font-normal text-text-muted">
-					{guild.hasBot ? `${formatCount(guild.memberCount)} members` : 'Not installed yet'}
+					{guild.hasBot ? t('members', { count: guild.memberCount }) : t('absent')}
 				</p>
 
 				<div className="mt-3 flex flex-wrap items-center gap-2">
 					{guild.hasBot ? (
 						<>
 							<Button size="sm" href={guildHref(guild.id, '')}>
-								Manage
+								{t('manage')}
 							</Button>
 							<Button
 								size="sm"
@@ -81,7 +82,7 @@ export function GuildCard({ guild }: { guild: Guild }) {
 								disabled={inviteHref === null}
 							>
 								<RefreshCw aria-hidden="true" />
-								Sync permissions
+								{t('sync')}
 							</Button>
 						</>
 					) : (
@@ -93,7 +94,7 @@ export function GuildCard({ guild }: { guild: Guild }) {
 							disabled={inviteHref === null}
 						>
 							<Plus aria-hidden="true" />
-							Add to server
+							{t('add')}
 						</Button>
 					)}
 				</div>

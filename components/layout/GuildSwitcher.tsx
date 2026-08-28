@@ -8,7 +8,6 @@ import { Popover } from '@/components/ui/Popover';
 import { guildHref } from '@/lib/navigation';
 import type { Guild } from '@/lib/types/guild';
 import { cn } from '@/lib/utils/cn';
-import { formatCount } from '@/lib/utils/format';
 import { Avatar } from './Avatar';
 
 type GuildSwitcherProps = {
@@ -46,7 +45,7 @@ export function GuildSwitcher({
 			<span className={cn('min-w-0 flex-1 text-left', collapsible && 'sidebar-collapsed:hidden')}>
 				<span className="block truncate text-body font-medium">{guild.name}</span>
 				<span className="tabular block text-caption font-normal text-text-muted">
-					{t('members', { count: formatCount(guild.memberCount) })}
+					{t('members', { count: guild.memberCount })}
 				</span>
 			</span>
 			<ChevronsUpDown

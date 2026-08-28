@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import type { ActivityPoint } from '@/lib/types/overview';
-import { buildActivityOption, SERIES_KEYS, type ChartPalette } from './activity-option';
+import {
+	buildActivityOption,
+	SERIES_KEYS,
+	type ChartPalette,
+	type SeriesLabels
+} from './activity-option';
 
 const palette: ChartPalette = {
 	series: { messages: '#111111', commands: '#222222', joins: '#333333' },
@@ -12,6 +17,8 @@ const palette: ChartPalette = {
 	tooltipBorder: '#ffffff'
 };
 
+const labels: SeriesLabels = { messages: 'Mensagens', commands: 'Comandos', joins: 'Entradas' };
+
 const points: ActivityPoint[] = [
 	{ index: 0, label: 'Mon', messages: 10, commands: 4, joins: 1 },
 	{ index: 1, label: 'Tue', messages: 20, commands: 8, joins: 2 },
@@ -20,13 +27,22 @@ const points: ActivityPoint[] = [
 
 describe('buildActivityOption', () => {
 	it('emits exactly one series per key', () => {
-		const option = buildActivityOption(points, palette);
+		const option = buildActivityOption(points, palette, labels);
 		expect(option.series).toHaveLength(SERIES_KEYS.length);
-		expect(option.series.map((series) => series.name)).toEqual(['Messages', 'Commands', 'Joins']);
+	});
+
+	it('names each series from the caller, so the tooltip follows the reader language', () => {
+		const option = buildActivityOption(points, palette, labels);
+
+		expect(option.series.map((series) => series.name)).toEqual([
+			labels.messages,
+			labels.commands,
+			labels.joins
+		]);
 	});
 
 	it('gives each series its own data — no series shares another series values', () => {
-		const option = buildActivityOption(points, palette);
+		const option = buildActivityOption(points, palette, labels);
 
 		expect(option.series[0]?.data).toEqual([10, 20, 30]);
 		expect(option.series[1]?.data).toEqual([4, 8, 12]);
@@ -37,7 +53,7 @@ describe('buildActivityOption', () => {
 	});
 
 	it('gives each series its own colour on line, marker and area', () => {
-		const option = buildActivityOption(points, palette);
+		const option = buildActivityOption(points, palette, labels);
 		const colours = option.series.map((series) => series.lineStyle.color);
 
 		expect(colours).toEqual(['#111111', '#222222', '#333333']);
@@ -50,12 +66,12 @@ describe('buildActivityOption', () => {
 	});
 
 	it('uses the point labels as the category axis', () => {
-		const option = buildActivityOption(points, palette);
+		const option = buildActivityOption(points, palette, labels);
 		expect(option.xAxis.data).toEqual(['Mon', 'Tue', 'Wed']);
 	});
 
 	it('lets the plot use the full width instead of centring the data', () => {
-		const option = buildActivityOption(points, palette);
+		const option = buildActivityOption(points, palette, labels);
 		expect(option.grid.outerBoundsMode).toBe('same');
 		expect(option.grid.outerBoundsContain).toBe('axisLabel');
 		expect(option.grid.left).toBeLessThanOrEqual(8);
@@ -64,7 +80,7 @@ describe('buildActivityOption', () => {
 	});
 
 	it('handles an empty range without throwing', () => {
-		const option = buildActivityOption([], palette);
+		const option = buildActivityOption([], palette, labels);
 		expect(option.series).toHaveLength(3);
 		for (const series of option.series) expect(series.data).toEqual([]);
 	});

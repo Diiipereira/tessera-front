@@ -1,6 +1,7 @@
 'use client';
 
 import { RefreshCw, ServerOff } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { GuildCard } from '@/components/discord/GuildCard';
 import { Button } from '@/components/ui/Button';
@@ -11,13 +12,9 @@ import { BRAND } from '@/lib/brand';
 import type { Guild } from '@/lib/types/guild';
 import { cn } from '@/lib/utils/cn';
 
-type Filter = 'all' | 'managed' | 'available';
+const FILTERS = ['all', 'managed', 'available'] as const;
 
-const filters: { id: Filter; label: string }[] = [
-	{ id: 'all', label: 'All' },
-	{ id: 'managed', label: `With ${BRAND.name}` },
-	{ id: 'available', label: 'Available' }
-];
+type Filter = (typeof FILTERS)[number];
 
 const segment = 'h-8 rounded-sm px-3 text-body-sm transition-colors duration-120 ease-out';
 
@@ -47,6 +44,7 @@ type ServerPickerProps = {
 };
 
 export function ServerPicker({ guilds, loading, empty }: ServerPickerProps) {
+	const t = useTranslations('servers');
 	const [query, setQuery] = useState('');
 	const [filter, setFilter] = useState<Filter>('all');
 
@@ -63,42 +61,40 @@ export function ServerPicker({ guilds, loading, empty }: ServerPickerProps) {
 		<div className="flex min-h-svh w-full flex-col gap-8 px-6 py-10 sm:px-8">
 			<div className="flex flex-col gap-4">
 				<div>
-					<h1 className="text-h1">Your servers</h1>
-					<p className="text-body text-text-muted">
-						Pick a server to configure, or add {BRAND.name} to one you manage.
-					</p>
+					<h1 className="text-h1">{t('title')}</h1>
+					<p className="text-body text-text-muted">{t('lead', { brand: BRAND.name })}</p>
 				</div>
 
 				<div className="flex flex-wrap items-center gap-3">
 					<SearchInput
 						value={query}
 						onValueChange={setQuery}
-						placeholder="Search servers…"
-						aria-label="Search servers"
+						placeholder={t('searchPlaceholder')}
+						aria-label={t('searchLabel')}
 						className="max-w-80"
 					/>
 
 					<div
 						role="group"
-						aria-label="Filter servers"
+						aria-label={t('filterLabel')}
 						className="flex items-center gap-0.5 rounded-md border border-border bg-surface-sunken p-0.5"
 					>
-						{filters.map((option) => (
+						{FILTERS.map((option) => (
 							<button
-								key={option.id}
+								key={option}
 								type="button"
-								aria-pressed={filter === option.id}
+								aria-pressed={filter === option}
 								className={cn(
 									segment,
-									filter === option.id
+									filter === option
 										? 'bg-primary-subtle text-primary'
 										: 'text-text-muted hover:text-text'
 								)}
 								onClick={() => {
-									setFilter(option.id);
+									setFilter(option);
 								}}
 							>
-								{option.label}
+								{t(`filters.${option}`, { brand: BRAND.name })}
 							</button>
 						))}
 					</div>
@@ -124,8 +120,8 @@ export function ServerPicker({ guilds, loading, empty }: ServerPickerProps) {
 			) : nothingToShow ? (
 				<EmptyState
 					icon={ServerOff}
-					title="No servers found"
-					description={`You need Manage Server permission on a Discord server to configure ${BRAND.name}.`}
+					title={t('emptyTitle')}
+					description={t('emptyBody', { brand: BRAND.name })}
 					action={
 						<Button
 							variant="outline"
@@ -134,14 +130,14 @@ export function ServerPicker({ guilds, loading, empty }: ServerPickerProps) {
 							}}
 						>
 							<RefreshCw aria-hidden="true" />
-							Recheck permissions
+							{t('recheck')}
 						</Button>
 					}
 				/>
 			) : (
 				<>
-					<Section title={`Managed by ${BRAND.name}`} guilds={managed} />
-					<Section title={`Add ${BRAND.name}`} guilds={available} />
+					<Section title={t('managedBy', { brand: BRAND.name })} guilds={managed} />
+					<Section title={t('addBrand', { brand: BRAND.name })} guilds={available} />
 				</>
 			)}
 		</div>

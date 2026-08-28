@@ -1,6 +1,7 @@
 'use client';
 
 import { Bot, Check, ExternalLink } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { BrandMark } from '@/components/auth/BrandMark';
@@ -22,6 +23,8 @@ type AddServerScreenProps = {
 };
 
 export function AddServerScreen({ guild, joined, inviteHref }: AddServerScreenProps) {
+	const t = useTranslations('servers.add');
+	const common = useTranslations('common');
 	const router = useRouter();
 	const setupHref = guild ? guildHref(guild.id, '/setup') : null;
 
@@ -68,31 +71,33 @@ export function AddServerScreen({ guild, joined, inviteHref }: AddServerScreenPr
 				{joined ? (
 					<div>
 						<h1 className="text-h3">
-							{BRAND.name} is in{guild ? ` ${guild.name}` : ''}
+							{guild
+								? t('joined', { brand: BRAND.name, guild: guild.name })
+								: t('joinedUnknown', { brand: BRAND.name })}
 						</h1>
-						<p className="text-body-sm text-text-muted">Taking you to setup…</p>
+						<p className="text-body-sm text-text-muted">{t('toSetup')}</p>
 					</div>
 				) : (
 					<>
 						<div>
 							<h1 className="flex items-center justify-center gap-2 text-h3">
 								<span className="size-2 animate-pulse rounded-full bg-primary" aria-hidden="true" />
-								Waiting for {BRAND.name} to join{guild ? ` ${guild.name}` : ''}…
+								{guild
+									? t('waiting', { brand: BRAND.name, guild: guild.name })
+									: t('waitingUnknown', { brand: BRAND.name })}
 							</h1>
-							<p className="text-body-sm text-pretty text-text-muted">
-								Complete the authorization in the Discord window, then reload this page.
-							</p>
+							<p className="text-body-sm text-pretty text-text-muted">{t('authorize')}</p>
 						</div>
 
 						<div className="flex flex-wrap justify-center gap-2">
 							{inviteHref === null ? null : (
 								<Button href={inviteHref} rel="external">
 									<ExternalLink aria-hidden="true" />
-									{guild ? `Invite to ${guild.name}` : 'Open invite'}
+									{guild ? t('inviteTo', { guild: guild.name }) : t('invite')}
 								</Button>
 							)}
 							<Button variant="outline" href="/servers">
-								Cancel
+								{common('cancel')}
 							</Button>
 						</div>
 					</>

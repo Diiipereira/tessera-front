@@ -1,7 +1,12 @@
 import { render, waitFor } from '@testing-library/react';
-import { StrictMode } from 'react';
+import { StrictMode, type ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import enUS from '@/messages/en-US.json';
+import { Translated } from '@/tests/i18n';
 import { LogoutScreen } from './LogoutScreen';
+
+const renderLogout = (wrapper: (node: ReactNode) => ReactNode = (node) => node) =>
+	render(<Translated>{wrapper(<LogoutScreen />)}</Translated>);
 
 const push = vi.fn();
 const success = vi.fn();
@@ -35,7 +40,7 @@ describe('LogoutScreen', () => {
 	});
 
 	it('tells the API to revoke the session before leaving', async () => {
-		render(<LogoutScreen />);
+		renderLogout();
 
 		await waitFor(() => {
 			expect(fetchMock).toHaveBeenCalledTimes(1);
@@ -49,7 +54,7 @@ describe('LogoutScreen', () => {
 	});
 
 	it('sends the user home once the revocation answered', async () => {
-		render(<LogoutScreen />);
+		renderLogout();
 
 		await waitFor(() => {
 			expect(push).toHaveBeenCalledWith('/');
@@ -61,22 +66,21 @@ describe('LogoutScreen', () => {
 	it('still sends the user home when the API is unreachable, and says so', async () => {
 		fetchMock.mockRejectedValue(new Error('connection refused'));
 
-		render(<LogoutScreen />);
+		renderLogout();
 
 		await waitFor(() => {
 			expect(push).toHaveBeenCalledWith('/');
 		});
 
-		expect(failure).toHaveBeenCalled();
+		expect(failure).toHaveBeenCalledWith(enUS.auth.signedOutLocal, {
+			id: expect.any(String) as string,
+			description: enUS.auth.signedOutLocalHint
+		});
 		expect(success).not.toHaveBeenCalled();
 	});
 
 	it('revokes once even when the effect is mounted twice', async () => {
-		render(
-			<StrictMode>
-				<LogoutScreen />
-			</StrictMode>
-		);
+		renderLogout((node) => <StrictMode>{node}</StrictMode>);
 
 		await waitFor(() => {
 			expect(push).toHaveBeenCalledWith('/');
@@ -86,11 +90,7 @@ describe('LogoutScreen', () => {
 	});
 
 	it('gives the toast a stable id, so a remount updates it instead of stacking a second one', async () => {
-		render(
-			<StrictMode>
-				<LogoutScreen />
-			</StrictMode>
-		);
+		renderLogout((node) => <StrictMode>{node}</StrictMode>);
 
 		await waitFor(() => {
 			expect(success).toHaveBeenCalled();

@@ -1,4 +1,5 @@
 import { ArrowRight } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { Avatar } from '@/components/layout/Avatar';
 import { Badge, type BadgeVariant } from '@/components/ui/Badge';
@@ -23,15 +24,17 @@ type ActivityFeedProps = {
 };
 
 export function ActivityFeed({ entries, auditHref }: ActivityFeedProps) {
+	const t = useTranslations('overview.feed');
+
 	return (
 		<div className="flex flex-col rounded-lg border border-border bg-surface shadow-1">
 			<div className="flex items-center gap-3 border-b border-border p-5">
-				<h2 className="min-w-0 flex-1 truncate text-h4">Recent activity</h2>
+				<h2 className="min-w-0 flex-1 truncate text-h4">{t('title')}</h2>
 				<Link
 					href={auditHref}
 					className="flex items-center gap-1 text-body-sm text-link no-underline hover:text-link-hover"
 				>
-					Audit log
+					{t('audit')}
 					<ArrowRight className="size-3.5" aria-hidden="true" />
 				</Link>
 			</div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { Check, X, Zap } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/Button';
 import { BRAND } from '@/lib/brand';
 import { guildHref } from '@/lib/navigation';
@@ -14,16 +15,16 @@ type SetupBannerProps = {
 };
 
 export function SetupBanner({ items, guildId, onDismiss }: SetupBannerProps) {
+	const t = useTranslations('overview.setup');
+
 	return (
 		<div className="flex gap-4 rounded-lg border border-primary bg-primary-subtle p-5">
 			<Zap className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden="true" />
 
 			<div className="min-w-0 flex-1">
-				<h2 className="text-h4 text-primary-subtle-fg">
-					Three things left before {BRAND.name} is doing real work
-				</h2>
+				<h2 className="text-h4 text-primary-subtle-fg">{t('title', { brand: BRAND.name })}</h2>
 				<p className="mb-3 text-body-sm text-pretty text-primary-subtle-fg opacity-90">
-					You can skip any of these and come back later.
+					{t('body')}
 				</p>
 
 				<ul className="flex flex-col gap-2">
@@ -44,11 +45,11 @@ export function SetupBanner({ items, guildId, onDismiss }: SetupBannerProps) {
 									item.done ? 'text-text-muted line-through' : 'text-primary-subtle-fg'
 								)}
 							>
-								{item.label}
+								{t(`${item.id}.label`)}
 							</span>
 							{item.done ? null : (
 								<Button variant="outline" size="sm" href={guildHref(guildId, item.path)}>
-									{item.action}
+									{t(`${item.id}.action`)}
 								</Button>
 							)}
 						</li>
@@ -58,7 +59,7 @@ export function SetupBanner({ items, guildId, onDismiss }: SetupBannerProps) {
 
 			<button
 				type="button"
-				aria-label="Dismiss setup checklist"
+				aria-label={t('dismiss')}
 				className="grid size-8 shrink-0 place-items-center rounded-md text-primary-subtle-fg transition-colors duration-120 ease-out hover:bg-primary/15"
 				onClick={onDismiss}
 			>

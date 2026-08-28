@@ -1,5 +1,5 @@
 import { SessionProvider } from '@/components/providers/SessionProvider';
-import type { LoginError } from '@/lib/auth';
+import type { LoginErrorKind } from '@/lib/auth';
 import { ClosingCta } from './ClosingCta';
 import { Faq } from './Faq';
 import { HelpCards } from './HelpCards';
@@ -11,7 +11,7 @@ import { PublicHeader } from './PublicHeader';
 import { SignInCardConnected } from './SignInCardConnected';
 
 type LandingScreenProps = {
-	error?: LoginError | null;
+	error?: LoginErrorKind | null;
 	signInFirst?: boolean;
 };
 

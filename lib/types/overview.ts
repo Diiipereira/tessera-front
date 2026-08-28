@@ -2,7 +2,6 @@ export type TrendDirection = 'up' | 'down' | 'flat';
 
 export type Stat = {
 	id: string;
-	label: string;
 	value: string;
 	delta: string;
 	direction: TrendDirection;
@@ -41,8 +40,6 @@ export type ActivityEntry = {
 
 export type SetupChecklistItem = {
 	id: string;
-	label: string;
 	done: boolean;
-	action: string;
 	path: string;
 };

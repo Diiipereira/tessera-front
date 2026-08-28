@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import { redirect } from 'next/navigation';
 import { BRAND } from '@/lib/brand';
 import { botInviteUrl } from '@/lib/discord-invite';
@@ -6,7 +7,11 @@ import { loadGuilds } from '@/lib/guild-access';
 import { guildHref } from '@/lib/navigation';
 import { AddServerScreen } from './AddServerScreen';
 
-export const metadata: Metadata = { title: `Adding ${BRAND.name}` };
+export async function generateMetadata(): Promise<Metadata> {
+	const t = await getTranslations('servers.add');
+
+	return { title: t('metaTitle', { brand: BRAND.name }) };
+}
 
 export default async function Page({
 	searchParams

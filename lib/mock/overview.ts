@@ -8,22 +8,10 @@ import type {
 } from '@/lib/types/overview';
 
 export const mockStats: Stat[] = [
-	{ id: 'members', label: 'Members', value: '12,431', delta: '+184 this week', direction: 'up' },
-	{
-		id: 'commands',
-		label: 'Commands used · 7d',
-		value: '18,204',
-		delta: '+12% vs last week',
-		direction: 'up'
-	},
-	{
-		id: 'modules',
-		label: 'Active modules',
-		value: '8 of 11',
-		delta: '3 need setup',
-		direction: 'flat'
-	},
-	{ id: 'tickets', label: 'Open tickets', value: '6', delta: '−2 vs last week', direction: 'down' }
+	{ id: 'members', value: '12,431', delta: '+184 this week', direction: 'up' },
+	{ id: 'commands', value: '18,204', delta: '+12% vs last week', direction: 'up' },
+	{ id: 'modules', value: '8 of 11', delta: '3 need setup', direction: 'flat' },
+	{ id: 'tickets', value: '6', delta: '−2 vs last week', direction: 'down' }
 ];
 
 function series(
@@ -140,25 +128,7 @@ export const mockRecentActivity: ActivityEntry[] = [
 ];
 
 export const mockSetupChecklist: SetupChecklistItem[] = [
-	{
-		id: 'welcome',
-		label: 'Pick a welcome channel',
-		done: true,
-		action: 'Done',
-		path: '/modules/welcome'
-	},
-	{
-		id: 'moderation',
-		label: 'Set your moderator roles',
-		done: false,
-		action: 'Set up',
-		path: '/modules/moderation'
-	},
-	{
-		id: 'logging',
-		label: 'Turn on the audit log',
-		done: false,
-		action: 'Turn on',
-		path: '/modules/logging'
-	}
+	{ id: 'welcome', done: true, path: '/modules/welcome' },
+	{ id: 'moderation', done: false, path: '/modules/moderation' },
+	{ id: 'logging', done: false, path: '/modules/logging' }
 ];

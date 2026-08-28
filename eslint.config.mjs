@@ -39,7 +39,16 @@ const TRANSLATED = [
 	'components/layout/**/*.tsx',
 	'components/marketing/**/*.tsx',
 	'components/docs/**/*.tsx',
-	'app/(public)/**/*.tsx'
+	'app/(public)/**/*.tsx',
+	'components/auth/**/*.tsx',
+	'components/dashboard/**/*.tsx',
+	'components/discord/GuildCard.tsx',
+	'app/auth/**/*.tsx',
+	'app/login/*.tsx',
+	'app/logout/*.tsx',
+	'app/(authenticated)/servers/*.tsx',
+	'app/(authenticated)/servers/add/*.tsx',
+	'app/(authenticated)/**/OverviewScreen.tsx'
 ];
 
 const house = {
