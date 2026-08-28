@@ -33,18 +33,20 @@ export function messagesToReach(
 	return Math.ceil(totalXpForLevel(level, curve) / average);
 }
 
-export function estimateTimeToLevel(
+export type ChatEffort = { unit: 'minutes' | 'hours' | 'days'; amount: number };
+
+export function effortToLevel(
 	level: number,
 	curve: number,
 	xpMin: number,
 	xpMax: number,
 	cooldownSeconds: number
-): string {
+): ChatEffort {
 	const messages = messagesToReach(level, curve, xpMin, xpMax);
 	const seconds = messages * Math.max(cooldownSeconds, 1);
 	const hours = seconds / 3600;
 
-	if (hours < 1) return `${String(Math.max(1, Math.round(seconds / 60)))} min of chatting`;
-	if (hours < 48) return `${String(Math.round(hours))} h of chatting`;
-	return `${String(Math.round(hours / 24))} days of chatting`;
+	if (hours < 1) return { unit: 'minutes', amount: Math.max(1, Math.round(seconds / 60)) };
+	if (hours < 48) return { unit: 'hours', amount: Math.round(hours) };
+	return { unit: 'days', amount: Math.round(hours / 24) };
 }

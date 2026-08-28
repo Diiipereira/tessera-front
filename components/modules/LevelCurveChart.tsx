@@ -4,6 +4,7 @@ import { LineChart } from 'echarts/charts';
 import { GridComponent, TooltipComponent } from 'echarts/components';
 import * as echarts from 'echarts/core';
 import { SVGRenderer } from 'echarts/renderers';
+import { useTranslations } from 'next-intl';
 import { useEffect, useRef } from 'react';
 import { useTheme } from '@/components/providers/theme-context';
 import { buildCurve } from '@/lib/levels';
@@ -17,6 +18,7 @@ type LevelCurveChartProps = {
 };
 
 export function LevelCurveChart({ curve, maxLevel = 30 }: LevelCurveChartProps) {
+	const t = useTranslations('modules.levels.chart');
 	const { resolved } = useTheme();
 	const containerRef = useRef<HTMLDivElement>(null);
 	const chartRef = useRef<echarts.ECharts | null>(null);
@@ -74,7 +76,7 @@ export function LevelCurveChart({ curve, maxLevel = 30 }: LevelCurveChartProps) 
 					type: 'category',
 					data: points.map((point) => String(point.level)),
 					boundaryGap: false,
-					name: 'Level',
+					name: t('level'),
 					nameLocation: 'middle',
 					nameGap: 26,
 					nameTextStyle: { color: text, fontSize: 11 },
@@ -98,7 +100,7 @@ export function LevelCurveChart({ curve, maxLevel = 30 }: LevelCurveChartProps) 
 				},
 				series: [
 					{
-						name: 'Total XP',
+						name: t('totalXp'),
 						type: 'line',
 						smooth: 0.3,
 						symbol: 'none',
@@ -111,7 +113,7 @@ export function LevelCurveChart({ curve, maxLevel = 30 }: LevelCurveChartProps) 
 			},
 			true
 		);
-	}, [curve, maxLevel, resolved]);
+	}, [curve, maxLevel, resolved, t]);
 
 	return (
 		<div

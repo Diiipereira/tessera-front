@@ -722,6 +722,74 @@
 			"notImage": "Este não é um link direto de imagem — o Discord não vai mostrar nada. Ele precisa terminar em .png, .jpg ou .gif",
 			"expiring": "Link de anexo do Discord expira em menos de um dia e a imagem some. Hospede a figura em algum lugar permanente."
 		},
+		"levels": {
+			"title": "Níveis",
+			"description": "XP por conversar, ranques para mostrar isso, e cargos entregues pelo caminho.",
+			"saved": "Níveis salvos",
+			"leaderboard": {
+				"label": "Prévia do ranking",
+				"title": "Ranking",
+				"body": "Top 10 agora.",
+				"rank": "Posição {rank}",
+				"level": "nv {level}"
+			},
+			"xp": {
+				"title": "Ganho de XP",
+				"description": "Uma quantia aleatória por mensagem, no máximo uma vez por intervalo.",
+				"min": "XP mínimo",
+				"max": "XP máximo",
+				"cooldown": "Intervalo (segundos)",
+				"voice": "XP de voz por minuto",
+				"voiceHelp": "0 desliga o XP de voz.",
+				"inverted": "O mínimo está acima do máximo, então toda mensagem daria o máximo."
+			},
+			"curve": {
+				"title": "Curva",
+				"description": "O quanto cada nível é mais difícil que o anterior.",
+				"difficulty": "Dificuldade",
+				"difficultyHint": "Mais alto significa progresso mais lento em todo nível.",
+				"level": "Nível {level}",
+				"xp": "{xp} XP",
+				"minutes": "{amount} min de conversa",
+				"hours": "{amount} h de conversa",
+				"days": "{amount} dias de conversa"
+			},
+			"announce": {
+				"title": "Anúncio de subida de nível",
+				"toggle": "Anunciar subidas de nível",
+				"inPlace": "Responder onde a pessoa subiu de nível",
+				"inPlaceHint": "Em vez de publicar sempre em um canal só.",
+				"channel": "Canal"
+			},
+			"rewards": {
+				"title": "Cargos de recompensa",
+				"description": "Entregues quando o membro alcança o nível.",
+				"empty": "Nenhuma recompensa. Os níveis são só cosméticos.",
+				"level": "Nível",
+				"role": "Cargo",
+				"replace": "Substituir o anterior",
+				"remove": "Remover",
+				"levelLabel": "Nível da recompensa",
+				"replaceLabel": "Substituir o cargo de recompensa anterior no nível {level}",
+				"removeLabel": "Remover a recompensa do nível {level}"
+			},
+			"noXp": {
+				"title": "Sem XP aqui",
+				"description": "Nada falado nestes lugares rende alguma coisa.",
+				"channel": "Canal",
+				"channelPlaceholder": "XP em todo lugar…",
+				"roles": "Cargos",
+				"rolesPlaceholder": "Todos ganham XP…"
+			},
+			"danger": {
+				"title": "Zona de perigo",
+				"description": "Isto não tem desfazer.",
+				"reset": "Zerar todo o XP",
+				"resetPending": "Ligado à API quando ela existir. Nada foi apagado.",
+				"resetBody": "Todo membro cai para o nível 0. Os cargos de recompensa já entregues ficam."
+			},
+			"chart": { "level": "Nível", "totalXp": "XP total" }
+		},
 		"scheduled": {
 			"title": "Mensagens agendadas",
 			"description": "Publica por horário, sem ninguém precisar lembrar.",

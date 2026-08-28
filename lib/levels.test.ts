@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildCurve, estimateTimeToLevel, messagesToReach, totalXpForLevel } from './levels';
+import { buildCurve, effortToLevel, messagesToReach, totalXpForLevel } from './levels';
 
 describe('totalXpForLevel', () => {
 	it('costs nothing to be level 0', () => {
@@ -58,16 +58,23 @@ describe('messagesToReach', () => {
 	});
 });
 
-describe('estimateTimeToLevel', () => {
+describe('effortToLevel', () => {
 	it('uses minutes for a short climb', () => {
-		expect(estimateTimeToLevel(1, 10, 20, 20, 60)).toContain('min');
+		expect(effortToLevel(1, 10, 20, 20, 60).unit).toBe('minutes');
 	});
 
 	it('switches to days for a long one', () => {
-		expect(estimateTimeToLevel(50, 200, 15, 25, 60)).toContain('days');
+		expect(effortToLevel(50, 200, 15, 25, 60).unit).toBe('days');
 	});
 
 	it('does not divide by zero on a zero cooldown', () => {
-		expect(() => estimateTimeToLevel(10, 100, 15, 25, 0)).not.toThrow();
+		expect(() => effortToLevel(10, 100, 15, 25, 0)).not.toThrow();
+	});
+
+	it('reports a whole amount, so no language has to round it', () => {
+		const effort = effortToLevel(20, 100, 15, 25, 60);
+
+		expect(Number.isInteger(effort.amount)).toBe(true);
+		expect(effort.amount).toBeGreaterThan(0);
 	});
 });

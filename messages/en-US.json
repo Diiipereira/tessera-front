@@ -722,6 +722,74 @@
 			"notImage": "This is not a direct image link — Discord will show nothing. It should end in .png, .jpg or .gif",
 			"expiring": "A Discord attachment link expires within a day and the image will vanish. Host it somewhere permanent instead."
 		},
+		"levels": {
+			"title": "Levels",
+			"description": "XP for talking, ranks to show for it, and roles handed out along the way.",
+			"saved": "Levels saved",
+			"leaderboard": {
+				"label": "Leaderboard preview",
+				"title": "Leaderboard",
+				"body": "Top 10 right now.",
+				"rank": "Rank {rank}",
+				"level": "lvl {level}"
+			},
+			"xp": {
+				"title": "Earning XP",
+				"description": "A random amount per message, at most once per cooldown.",
+				"min": "Minimum XP",
+				"max": "Maximum XP",
+				"cooldown": "Cooldown (seconds)",
+				"voice": "Voice XP per minute",
+				"voiceHelp": "0 turns voice XP off.",
+				"inverted": "The minimum is above the maximum, so every message would award the maximum."
+			},
+			"curve": {
+				"title": "Curve",
+				"description": "How much harder each level is than the one before it.",
+				"difficulty": "Difficulty",
+				"difficultyHint": "Higher means slower progress at every level.",
+				"level": "Level {level}",
+				"xp": "{xp} XP",
+				"minutes": "{amount} min of chatting",
+				"hours": "{amount} h of chatting",
+				"days": "{amount} days of chatting"
+			},
+			"announce": {
+				"title": "Level-up announcement",
+				"toggle": "Announce level-ups",
+				"inPlace": "Reply where they levelled up",
+				"inPlaceHint": "Instead of always posting in one channel.",
+				"channel": "Channel"
+			},
+			"rewards": {
+				"title": "Role rewards",
+				"description": "Given when a member reaches the level.",
+				"empty": "No rewards. Levels are cosmetic only.",
+				"level": "Level",
+				"role": "Role",
+				"replace": "Replace previous",
+				"remove": "Remove",
+				"levelLabel": "Reward level",
+				"replaceLabel": "Replace the previous reward role at level {level}",
+				"removeLabel": "Remove the reward at level {level}"
+			},
+			"noXp": {
+				"title": "No XP here",
+				"description": "Nothing said in these earns anything.",
+				"channel": "Channel",
+				"channelPlaceholder": "XP everywhere…",
+				"roles": "Roles",
+				"rolesPlaceholder": "Everyone earns XP…"
+			},
+			"danger": {
+				"title": "Danger zone",
+				"description": "There is no undo for this.",
+				"reset": "Reset all XP",
+				"resetPending": "Wired to the API once it exists. Nothing was deleted.",
+				"resetBody": "Every member drops to level 0. Role rewards already given stay."
+			},
+			"chart": { "level": "Level", "totalXp": "Total XP" }
+		},
 		"scheduled": {
 			"title": "Scheduled messages",
 			"description": "Post on a timer, without anyone having to remember.",
