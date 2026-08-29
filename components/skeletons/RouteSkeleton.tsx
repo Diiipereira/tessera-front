@@ -14,6 +14,8 @@ import { ModulesSkeleton } from './ModulesSkeleton';
 import { OverviewSkeleton } from './OverviewSkeleton';
 import { ReactionRolesSkeleton } from './ReactionRolesSkeleton';
 import { ScheduledSkeleton } from './ScheduledSkeleton';
+import { SettingsSkeleton } from './SettingsSkeleton';
+import { TeamSkeleton } from './TeamSkeleton';
 import { TicketsSkeleton } from './TicketsSkeleton';
 import { WelcomeSkeleton } from './WelcomeSkeleton';
 
@@ -38,7 +40,9 @@ const byRoute: Record<string, ReactNode> = {
 	commands: <CommandsSkeleton />,
 	members: <MembersSkeleton />,
 	cases: <CasesSkeleton />,
-	audit: <AuditSkeleton />
+	audit: <AuditSkeleton />,
+	team: <TeamSkeleton />,
+	settings: <SettingsSkeleton />
 };
 
 export function routeSkeleton(href: string): ReactNode {

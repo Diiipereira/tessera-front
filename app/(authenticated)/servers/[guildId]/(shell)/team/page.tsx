@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation';
+import { TeamSkeleton } from '@/components/skeletons/TeamSkeleton';
 import { apiGet, type ApiResult } from '@/lib/api';
 import type { CapabilityCatalogDto, TeamListDto } from '@/lib/api-url';
 import { ApiUnreachableError } from '@/lib/guild-access';
@@ -16,8 +17,11 @@ function unwrap<T>(result: ApiResult<T>): T {
 	return result.data;
 }
 
-export default async function Page({ params }: GuildPageProps) {
-	const { guildId } = await params;
+export default async function Page({ params, searchParams }: GuildPageProps) {
+	const [{ guildId }, query] = await Promise.all([params, searchParams]);
+
+	if (query.state === 'loading') return <TeamSkeleton />;
+
 	const [catalogResult, teamResult] = await Promise.all([
 		apiGet<CapabilityCatalogDto>('/capabilities'),
 		apiGet<TeamListDto>(`/guilds/${guildId}/team`)
