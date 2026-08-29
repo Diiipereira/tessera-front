@@ -7,7 +7,6 @@ export {
 } from './overview';
 export { mockAccountPreferences, mockAccountSessions } from './account';
 export { findTenant, mockBlacklist, mockTenants } from './admin';
-export { mockAudit } from './audit';
 export { mockCases } from './cases';
 export { mockChannels, mockRoles } from './discord';
 export { mockCommands } from './commands';

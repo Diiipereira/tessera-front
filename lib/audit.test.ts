@@ -1,8 +1,18 @@
 import { describe, expect, it } from 'vitest';
-import { diffEntry, fieldLabel, filterAudit, formatValue, toCsv } from '@/lib/audit';
-import type { AuditEntry } from '@/lib/types/management';
+import {
+	colorOf,
+	diffKindOf,
+	fieldKeyOf,
+	fieldLabel,
+	formatValue,
+	initialsOf,
+	toCsv,
+	type CsvWords,
+	type ValueWords
+} from './audit';
+import type { AuditEntry } from './types/management';
 
-const WORDS = {
+const words: ValueWords = {
 	none: 'none',
 	on: 'on',
 	off: 'off',
@@ -11,131 +21,161 @@ const WORDS = {
 	unreadable: 'unreadable'
 };
 
-function entry(partial: Partial<AuditEntry>): AuditEntry {
-	return {
-		id: 'a',
-		actorName: 'lia',
-		actorInitials: 'L',
-		actorColor: '#fff',
-		action: 'Changed something',
-		module: 'AutoMod',
-		source: 'web',
-		at: '2026-08-25T12:00:00.000Z',
-		before: {},
-		after: {},
-		...partial
-	};
-}
+const entry = (over: Partial<AuditEntry> = {}): AuditEntry => ({
+	id: '1',
+	moduleKey: 'welcome',
+	path: 'welcome.channelId',
+	before: null,
+	after: '111111111111111111',
+	actor: { id: '222222222222222222', name: 'Lia', avatarHash: null },
+	source: 'web',
+	at: '2026-08-29T10:04:00.000Z',
+	...over
+});
 
 describe('formatValue', () => {
-	it('reads booleans as on and off, not true and false', () => {
-		expect(formatValue(true, WORDS)).toBe(WORDS.on);
-		expect(formatValue(false, WORDS)).toBe(WORDS.off);
+	it('names an absent value instead of printing null', () => {
+		expect(formatValue(null, words)).toBe('none');
+		expect(formatValue(undefined, words)).toBe('none');
 	});
 
-	it('marks an empty string apart from a missing one', () => {
-		expect(formatValue('', WORDS)).toBe(WORDS.empty);
-		expect(formatValue(null, WORDS)).toBe(WORDS.none);
+	it('says on and off rather than true and false', () => {
+		expect(formatValue(true, words)).toBe('on');
+		expect(formatValue(false, words)).toBe('off');
 	});
 
-	it('joins a list and names the empty case', () => {
-		expect(formatValue(['Staff', 'Admin'], WORDS)).toBe('Staff, Admin');
-		expect(formatValue([], WORDS)).toBe(WORDS.emptyList);
+	it('separates an empty string from an absent one', () => {
+		expect(formatValue('', words)).toBe('(empty)');
+		expect(formatValue(null, words)).toBe('none');
 	});
 
-	it('says every word it prints, so none is hardcoded in the formatter', () => {
-		const other = { ...WORDS, none: 'nada', on: 'ligado' };
+	it('reads a list, and says when it is empty', () => {
+		expect(formatValue(['a', 'b'], words)).toBe('a, b');
+		expect(formatValue([], words)).toBe('(empty list)');
+	});
 
-		expect(formatValue(null, other)).toBe('nada');
-		expect(formatValue(true, other)).toBe('ligado');
+	it('keeps a snowflake as text, never as a rounded number', () => {
+		expect(formatValue('111111111111111111', words)).toBe('111111111111111111');
+	});
+
+	it('falls back to JSON for an object rather than printing [object Object]', () => {
+		expect(formatValue({ title: 'Hi' }, words)).toBe('{"title":"Hi"}');
+	});
+});
+
+describe('diffKindOf', () => {
+	it('calls it added when there was nothing before', () => {
+		expect(diffKindOf(entry({ before: null, after: 'x' }))).toBe('added');
+	});
+
+	it('calls it removed when there is nothing after', () => {
+		expect(diffKindOf(entry({ before: 'x', after: null }))).toBe('removed');
+	});
+
+	it('calls it changed when both sides have a value', () => {
+		expect(diffKindOf(entry({ before: 'x', after: 'y' }))).toBe('changed');
+	});
+
+	it('treats false as a value, not as an absence', () => {
+		expect(diffKindOf(entry({ before: false, after: true }))).toBe('changed');
+	});
+});
+
+describe('fieldKeyOf', () => {
+	it('drops the module prefix the path carries', () => {
+		expect(fieldKeyOf(entry({ path: 'welcome.channelId' }))).toBe('channelId');
+	});
+
+	it('keeps a nested field whole', () => {
+		expect(fieldKeyOf(entry({ path: 'welcome.embed.title' }))).toBe('embed.title');
+	});
+
+	it('survives a path with no prefix at all', () => {
+		expect(fieldKeyOf(entry({ path: 'enabled' }))).toBe('enabled');
+	});
+
+	it('survives an entry with no path', () => {
+		expect(fieldKeyOf(entry({ path: null }))).toBe('');
 	});
 });
 
 describe('fieldLabel', () => {
-	it('splits camelCase into words', () => {
-		expect(fieldLabel('exemptRoleIds')).toBe('Exempt role ids');
-	});
-
-	it('flattens a dotted path', () => {
-		expect(fieldLabel('message.embed.title')).toBe('Message embed title');
+	it('spaces out a camel case key as a last resort', () => {
+		expect(fieldLabel('channelId')).toBe('Channel id');
+		expect(fieldLabel('logChannelId')).toBe('Log channel id');
 	});
 });
 
-describe('diffEntry', () => {
-	it('drops fields whose value did not move', () => {
-		const rows = diffEntry(entry({ before: { threshold: 1 }, after: { threshold: 1 } }), WORDS);
-		expect(rows).toEqual([]);
+describe('initialsOf', () => {
+	it('takes the first letter, uppercased', () => {
+		expect(initialsOf('lia', '?')).toBe('L');
 	});
 
-	it('marks a field only in `after` as added', () => {
-		const rows = diffEntry(entry({ before: {}, after: { winners: 2 } }), WORDS);
-		expect(rows).toEqual([{ field: 'winners', kind: 'added', before: null, after: '2' }]);
-	});
-
-	it('marks a field only in `before` as removed', () => {
-		const rows = diffEntry(entry({ before: { name: 'coinflip' }, after: {} }), WORDS);
-		expect(rows).toEqual([{ field: 'name', kind: 'removed', before: 'coinflip', after: null }]);
-	});
-
-	it('keeps a field explicitly set to null as a change, not a removal', () => {
-		const rows = diffEntry(
-			entry({ before: { channel: 'general' }, after: { channel: null } }),
-			WORDS
-		);
-		expect(rows[0]?.kind).toBe('changed');
-		expect(rows[0]?.after).toBe('none');
-	});
-
-	it('sorts rows by field name so the diff does not jump around', () => {
-		const rows = diffEntry(
-			entry({ before: { zeta: 1, alpha: 1 }, after: { zeta: 2, alpha: 2 } }),
-			WORDS
-		);
-		expect(rows.map((row) => row.field)).toEqual(['alpha', 'zeta']);
+	it('falls back when the actor has no name left', () => {
+		expect(initialsOf(null, '?')).toBe('?');
+		expect(initialsOf('   ', '?')).toBe('?');
 	});
 });
 
-describe('filterAudit', () => {
-	const entries = [
-		entry({ id: '1', actorName: 'lia', module: 'AutoMod', source: 'web' }),
-		entry({ id: '2', actorName: 'okra', module: 'Levels', source: 'slash' }),
-		entry({ id: '3', actorName: 'lia', module: 'Levels', source: 'api' })
-	];
-
-	const base = { query: '', actor: 'all', module: 'all', source: 'all' } as const;
-
-	it('returns everything with no filters', () => {
-		expect(filterAudit(entries, base)).toHaveLength(3);
+describe('colorOf', () => {
+	it('gives the same actor the same colour every render', () => {
+		expect(colorOf('222222222222222222')).toBe(colorOf('222222222222222222'));
 	});
 
-	it('narrows by actor and module together', () => {
-		const found = filterAudit(entries, { ...base, actor: 'lia', module: 'Levels' });
-		expect(found.map((found) => found.id)).toEqual(['3']);
-	});
-
-	it('narrows by source', () => {
-		expect(filterAudit(entries, { ...base, source: 'slash' })).toHaveLength(1);
-	});
-
-	it('searches the changed field names, not only the action sentence', () => {
-		const withField = entry({ id: '4', before: {}, after: { cooldownSeconds: 60 } });
-		const found = filterAudit([...entries, withField], { ...base, query: 'cooldown' });
-		expect(found.map((found) => found.id)).toEqual(['4']);
+	it('always answers with a colour, even with nothing to hash', () => {
+		expect(colorOf(null)).toMatch(/^#[0-9a-f]{6}$/);
 	});
 });
 
 describe('toCsv', () => {
-	it('writes a header and one row per entry', () => {
-		const csv = toCsv([entry({ before: { a: 1 }, after: { a: 2 } })], WORDS);
-		const lines = csv.split('\n');
-		expect(lines).toHaveLength(2);
-		expect(lines[0]).toContain('"actor"');
-		expect(lines[1]).toContain('A: 1 -> 2');
+	const csvWords: CsvWords = {
+		...words,
+		at: 'When',
+		actor: 'Who',
+		module: 'Module',
+		field: 'Field',
+		source: 'Source',
+		before: 'Before',
+		after: 'After',
+		unknownActor: 'Removed account'
+	};
+
+	const labels = (): { module: string; field: string; source: string } => ({
+		module: 'Welcome',
+		field: 'Welcome channel',
+		source: 'Dashboard'
 	});
 
-	it('escapes a quote inside a reason rather than breaking the row', () => {
-		const csv = toCsv([entry({ action: 'Said "hello"' })], WORDS);
-		expect(csv).toContain('"Said ""hello"""');
-		expect(csv.split('\n')).toHaveLength(2);
+	it('writes a header and one row per entry', () => {
+		const csv = toCsv([entry(), entry({ id: '2' })], csvWords, labels);
+
+		expect(csv.split('\n')).toHaveLength(3);
+	});
+
+	it('writes the translated labels, not the raw keys', () => {
+		const csv = toCsv([entry()], csvWords, labels);
+
+		expect(csv).toContain('"Welcome channel"');
+		expect(csv).not.toContain('channelId');
+	});
+
+	it('names the actor when the account is gone', () => {
+		const csv = toCsv(
+			[entry({ actor: { id: null, name: null, avatarHash: null } })],
+			csvWords,
+			labels
+		);
+
+		expect(csv).toContain('"Removed account"');
+	});
+
+	it('doubles a quote instead of breaking the row', () => {
+		const csv = toCsv([entry({ after: 'say "hi"' })], csvWords, labels);
+
+		expect(csv).toContain('"say ""hi"""');
+	});
+
+	it('writes an empty log as just the header', () => {
+		expect(toCsv([], csvWords, labels).split('\n')).toHaveLength(1);
 	});
 });

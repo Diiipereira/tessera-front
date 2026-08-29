@@ -81,19 +81,30 @@ export type ModerationCase = {
 	history: CaseEdit[];
 };
 
-export type AuditSource = 'web' | 'slash' | 'api';
+export const AUDIT_SOURCES = ['web', 'slash', 'api', 'system', 'import'] as const;
+
+export type AuditSource = (typeof AUDIT_SOURCES)[number];
+
+export type AuditActor = {
+	id: string | null;
+	name: string | null;
+	avatarHash: string | null;
+};
 
 export type AuditEntry = {
 	id: string;
-	actorName: string;
-	actorInitials: string;
-	actorColor: string;
-	action: string;
-	module: string;
+	moduleKey: string | null;
+	path: string | null;
+	before: unknown;
+	after: unknown;
+	actor: AuditActor;
 	source: AuditSource;
 	at: string;
-	before: Record<string, unknown>;
-	after: Record<string, unknown>;
+};
+
+export type AuditPage = {
+	entries: AuditEntry[];
+	nextCursor: string | null;
 };
 
 export type TeamRole = 'owner' | 'admin' | 'moderator' | 'viewer';

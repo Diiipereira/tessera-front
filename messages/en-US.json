@@ -1588,23 +1588,31 @@
 	},
 	"audit": {
 		"title": "Audit log",
-		"description": "Every change to this server, whoever made it and wherever they made it from.",
+		"description": "Every configuration change in this server: who made it, what moved, and which door they came through.",
 		"export": "Export",
 		"exported": "Exported {count} entries",
-		"exportedHint": "{bytes} bytes of CSV, once the API can stream it.",
-		"search": "Search actions and fields…",
-		"searchLabel": "Search the audit log",
-		"everyActor": "Every actor",
+		"exportedHint": "Only the entries loaded below are in the file.",
 		"everyModule": "Every module",
 		"allSources": "All",
 		"source": "Filter by source",
-		"emptyTitle": "Nothing matches",
-		"emptyBody": "No change in the retained window fits those filters. The free plan keeps 30 days.",
-		"fields": "{count, plural, =1 {1 field} other {# fields}}",
+		"module": "Filter by module",
+		"emptyTitle": "Nothing here yet",
+		"emptyBody": "No configuration change matches these filters. The free plan keeps 30 days.",
+		"failed": "The audit log could not be read",
+		"loadMore": "Load older entries",
+		"loading": "Loading…",
 		"field": "Field",
 		"before": "Before",
 		"after": "After",
-		"showing": "Showing {shown} of {total} retained entries.",
+		"unknownActor": "Removed account",
+		"unknownActorHint": "The account that made this change no longer exists. The entry stays.",
+		"loaded": "{count, plural, =1 {1 entry loaded} other {# entries loaded}}",
+		"allLoaded": "That is every retained entry.",
+		"at": "When",
+		"actor": "Who",
+		"turnedOn": "turned on",
+		"turnedOff": "turned off",
+		"summary": "{module} · {field}",
 		"value": {
 			"none": "none",
 			"on": "on",
@@ -1613,8 +1621,34 @@
 			"emptyList": "(empty list)",
 			"unreadable": "unreadable"
 		},
-		"noChange": "Nothing was written — the values sent matched what was already stored.",
-		"summary": "{module} · {fields} changed"
+		"sources": {
+			"web": "Dashboard",
+			"slash": "Slash command",
+			"api": "API",
+			"system": "System",
+			"import": "Import"
+		},
+		"modules": {
+			"welcome": "Welcome",
+			"moderation": "Moderation"
+		},
+		"fields": {
+			"enabled": "Module switch",
+			"welcome": {
+				"channelId": "Welcome channel",
+				"message": "Welcome message",
+				"useEmbed": "Send as embed",
+				"embed": "Embed",
+				"deleteAfter": "Delete after",
+				"autoRoles": "Roles on join",
+				"pingMode": "Mention mode"
+			},
+			"moderation": {
+				"logChannelId": "Log channel",
+				"mutedRoleId": "Muted role",
+				"dmOnAction": "Warn by direct message"
+			}
+		}
 	},
 	"commands": {
 		"title": "Commands",

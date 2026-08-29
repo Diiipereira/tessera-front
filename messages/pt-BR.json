@@ -1588,23 +1588,31 @@
 	},
 	"audit": {
 		"title": "Registro de auditoria",
-		"description": "Toda mudança neste servidor, quem fez e de onde fez.",
+		"description": "Toda mudança de configuração neste servidor: quem fez, o que mudou e por qual porta entrou.",
 		"export": "Exportar",
 		"exported": "{count} entradas exportadas",
-		"exportedHint": "{bytes} bytes de CSV, quando a API conseguir transmitir.",
-		"search": "Buscar ações e campos…",
-		"searchLabel": "Buscar no registro de auditoria",
-		"everyActor": "Todos os autores",
+		"exportedHint": "Só as entradas carregadas abaixo entram no arquivo.",
 		"everyModule": "Todos os módulos",
 		"allSources": "Todas",
 		"source": "Filtrar por origem",
-		"emptyTitle": "Nada corresponde",
-		"emptyBody": "Nenhuma mudança na janela retida se encaixa nesses filtros. O plano gratuito guarda 30 dias.",
-		"fields": "{count, plural, =1 {1 campo} other {# campos}}",
+		"module": "Filtrar por módulo",
+		"emptyTitle": "Nada aqui ainda",
+		"emptyBody": "Nenhuma mudança de configuração corresponde a esses filtros. O plano gratuito guarda 30 dias.",
+		"failed": "Não foi possível ler o registro de auditoria",
+		"loadMore": "Carregar entradas mais antigas",
+		"loading": "Carregando…",
 		"field": "Campo",
 		"before": "Antes",
 		"after": "Depois",
-		"showing": "Mostrando {shown} de {total} entradas retidas.",
+		"unknownActor": "Conta removida",
+		"unknownActorHint": "A conta que fez esta mudança não existe mais. A entrada permanece.",
+		"loaded": "{count, plural, =1 {1 entrada carregada} other {# entradas carregadas}}",
+		"allLoaded": "Estas são todas as entradas retidas.",
+		"at": "Quando",
+		"actor": "Quem",
+		"turnedOn": "ligou",
+		"turnedOff": "desligou",
+		"summary": "{module} · {field}",
 		"value": {
 			"none": "nenhum",
 			"on": "ligado",
@@ -1613,8 +1621,34 @@
 			"emptyList": "(lista vazia)",
 			"unreadable": "ilegível"
 		},
-		"noChange": "Nada foi escrito — os valores enviados eram iguais aos já guardados.",
-		"summary": "{module} · {fields} alterados"
+		"sources": {
+			"web": "Painel",
+			"slash": "Comando de barra",
+			"api": "API",
+			"system": "Sistema",
+			"import": "Importação"
+		},
+		"modules": {
+			"welcome": "Boas-vindas",
+			"moderation": "Moderação"
+		},
+		"fields": {
+			"enabled": "Chave do módulo",
+			"welcome": {
+				"channelId": "Canal de boas-vindas",
+				"message": "Mensagem de boas-vindas",
+				"useEmbed": "Enviar como embed",
+				"embed": "Embed",
+				"deleteAfter": "Apagar depois de",
+				"autoRoles": "Cargos ao entrar",
+				"pingMode": "Modo de menção"
+			},
+			"moderation": {
+				"logChannelId": "Canal de log",
+				"mutedRoleId": "Cargo de silenciado",
+				"dmOnAction": "Avisar por mensagem direta"
+			}
+		}
 	},
 	"commands": {
 		"title": "Comandos",

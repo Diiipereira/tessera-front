@@ -1,19 +1,6 @@
-import type { AuditEntry, AuditSource } from '@/lib/types/management';
+import type { AuditEntry } from '@/lib/types/management';
 
 export type DiffKind = 'added' | 'removed' | 'changed';
-
-export type DiffRow = {
-	field: string;
-	kind: DiffKind;
-	before: string | null;
-	after: string | null;
-};
-
-export const SOURCE_LABELS: Record<AuditSource, string> = {
-	web: 'Web',
-	slash: 'Slash',
-	api: 'API'
-};
 
 export type ValueWords = {
 	none: string;
@@ -38,80 +25,102 @@ export function formatValue(value: unknown, words: ValueWords): string {
 	return words.unreadable;
 }
 
+const isAbsent = (value: unknown): boolean => value === null || value === undefined;
+
+export function diffKindOf(entry: AuditEntry): DiffKind {
+	if (isAbsent(entry.before)) return 'added';
+	if (isAbsent(entry.after)) return 'removed';
+	return 'changed';
+}
+
+export function fieldKeyOf(entry: AuditEntry): string {
+	if (entry.path === null) return '';
+
+	const [, ...rest] = entry.path.split('.');
+
+	return rest.length === 0 ? entry.path : rest.join('.');
+}
+
 export function fieldLabel(field: string): string {
 	const spaced = field
 		.replace(/([a-z0-9])([A-Z])/g, '$1 $2')
 		.replace(/[._]/g, ' ')
 		.toLowerCase()
 		.trim();
+
 	return spaced.charAt(0).toUpperCase() + spaced.slice(1);
 }
 
-export function changedFields(entry: AuditEntry): string[] {
-	return [...new Set([...Object.keys(entry.before), ...Object.keys(entry.after)])].sort();
+export function initialsOf(name: string | null, fallback: string): string {
+	const trimmed = (name ?? '').trim();
+
+	return trimmed === '' ? fallback : (trimmed[0] ?? fallback).toUpperCase();
 }
 
-export function diffEntry(entry: AuditEntry, words: ValueWords): DiffRow[] {
-	return changedFields(entry).flatMap<DiffRow>((field) => {
-		const had = Object.hasOwn(entry.before, field);
-		const has = Object.hasOwn(entry.after, field);
-		const before = formatValue(entry.before[field], words);
-		const after = formatValue(entry.after[field], words);
+const AVATAR_COLORS = [
+	'#f97316',
+	'#fbbf24',
+	'#22c55e',
+	'#06b6d4',
+	'#6366f1',
+	'#8b5cf6',
+	'#ec4899',
+	'#ef4444'
+];
 
-		if (had && has) {
-			if (before === after) return [];
-			return [{ field, kind: 'changed', before, after }];
-		}
-		if (has) return [{ field, kind: 'added', before: null, after }];
-		return [{ field, kind: 'removed', before, after: null }];
-	});
+export function colorOf(seed: string | null): string {
+	const text = seed ?? '';
+	let total = 0;
+
+	for (let index = 0; index < text.length; index += 1) {
+		total = (total + text.charCodeAt(index)) % AVATAR_COLORS.length;
+	}
+
+	return AVATAR_COLORS[total] ?? '#6366f1';
 }
 
-export type AuditFilters = {
-	query: string;
+export type CsvWords = ValueWords & {
+	at: string;
 	actor: string;
 	module: string;
-	source: AuditSource | 'all';
+	field: string;
+	source: string;
+	before: string;
+	after: string;
+	unknownActor: string;
 };
 
-export function filterAudit(entries: AuditEntry[], filters: AuditFilters): AuditEntry[] {
-	const term = filters.query.trim().toLowerCase();
+export function toCsv(
+	entries: readonly AuditEntry[],
+	words: CsvWords,
+	labelOf: (entry: AuditEntry) => { module: string; field: string; source: string }
+): string {
+	const escape = (value: string): string => `"${value.replace(/"/g, '""')}"`;
+	const header = [
+		words.at,
+		words.actor,
+		words.module,
+		words.field,
+		words.source,
+		words.before,
+		words.after
+	];
 
-	return entries.filter((entry) => {
-		if (filters.actor !== 'all' && entry.actorName !== filters.actor) return false;
-		if (filters.module !== 'all' && entry.module !== filters.module) return false;
-		if (filters.source !== 'all' && entry.source !== filters.source) return false;
-		if (term === '') return true;
-		return (
-			entry.action.toLowerCase().includes(term) ||
-			entry.actorName.toLowerCase().includes(term) ||
-			entry.module.toLowerCase().includes(term) ||
-			changedFields(entry).some((field) => fieldLabel(field).toLowerCase().includes(term))
-		);
-	});
-}
+	const rows = entries.map((entry) => {
+		const labels = labelOf(entry);
 
-export function toCsv(entries: AuditEntry[], words: ValueWords): string {
-	const escape = (value: string) => `"${value.replace(/"/g, '""')}"`;
-	const header = ['at', 'actor', 'action', 'module', 'source', 'changes'];
-
-	const rows = entries.map((entry) =>
-		[
+		return [
 			entry.at,
-			entry.actorName,
-			entry.action,
-			entry.module,
-			SOURCE_LABELS[entry.source],
-			diffEntry(entry, words)
-				.map(
-					(row) =>
-						`${fieldLabel(row.field)}: ${row.before ?? words.none} -> ${row.after ?? words.none}`
-				)
-				.join('; ')
+			entry.actor.name ?? words.unknownActor,
+			labels.module,
+			labels.field,
+			labels.source,
+			formatValue(entry.before, words),
+			formatValue(entry.after, words)
 		]
 			.map(escape)
-			.join(',')
-	);
+			.join(',');
+	});
 
 	return [header.map(escape).join(','), ...rows].join('\n');
 }
