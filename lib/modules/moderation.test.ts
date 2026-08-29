@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import type { GuildModuleStateDto } from '@/lib/api-url';
+import enUS from '@/messages/en-US.json';
+import ptBR from '@/messages/pt-BR.json';
 import {
 	AUTO_ACTIONS,
+	TIMEOUT_KEYS,
 	asAutoActions,
 	asPurgeDays,
 	asTimeoutKey,
@@ -180,5 +183,38 @@ describe('escalationIsUnreachable', () => {
 				config({ escalationAutoActions: [...AUTO_ACTIONS], escalationChannelId: null })
 			)
 		).toBe(false);
+	});
+});
+
+describe('the labels the moderation screen asks for', () => {
+	const dictionaries = { 'en-US': enUS, 'pt-BR': ptBR };
+
+	const locales = Object.keys(dictionaries) as (keyof typeof dictionaries)[];
+
+	it.each(locales)('names every timeout the screen offers, in %s', (locale) => {
+		const labels = dictionaries[locale].durations as Record<string, string | undefined>;
+		const missing = TIMEOUT_KEYS.filter((key) => labels[key] === undefined);
+
+		expect(missing).toEqual([]);
+	});
+
+	it.each(locales)('names every action the engine can take, in %s', (locale) => {
+		const labels = dictionaries[locale].cases.action as Record<string, string | undefined>;
+		const missing = AUTO_ACTIONS.filter((action) => labels[action] === undefined);
+
+		expect(missing).toEqual([]);
+	});
+
+	it('keeps no duration label the screen never asks for', () => {
+		const orphans = Object.keys(enUS.durations).filter(
+			(key) => !TIMEOUT_KEYS.some((declared) => declared === key)
+		);
+
+		expect(orphans).toEqual([]);
+	});
+
+	it('translates the durations rather than repeating the English', () => {
+		expect(ptBR.durations['1d']).not.toBe(enUS.durations['1d']);
+		expect(ptBR.durations['28d']).not.toBe(enUS.durations['28d']);
 	});
 });

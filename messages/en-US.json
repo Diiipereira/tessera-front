@@ -739,8 +739,10 @@
 		"5m": "5 minutes",
 		"10m": "10 minutes",
 		"1h": "1 hour",
-		"24h": "24 hours",
-		"7d": "7 days"
+		"1d": "1 day",
+		"1w": "1 week",
+		"2w": "2 weeks",
+		"28d": "28 days"
 	},
 	"confirm": {
 		"type": "Type {phrase} to confirm",
