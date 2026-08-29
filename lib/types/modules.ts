@@ -62,28 +62,6 @@ export type WelcomeConfig = {
 
 export type ModerationAction = 'warn' | 'timeout' | 'mute' | 'kick' | 'ban';
 
-export type EscalationRule = {
-	id: string;
-	atWarnings: number;
-	action: ModerationAction;
-	duration: string;
-};
-
-export type ModerationConfig = {
-	enabled: boolean;
-	modRoleIds: string[];
-	mutedRoleId: string | null;
-	timeoutDefault: string;
-	muteDefault: string;
-	banDeleteDays: string;
-	reasonRequired: boolean;
-	dmOnPunish: boolean;
-	dmTemplate: string;
-	appealUrl: string;
-	protectedRoleIds: string[];
-	escalation: EscalationRule[];
-};
-
 export type MessageVariable = {
 	token: string;
 	key: string;

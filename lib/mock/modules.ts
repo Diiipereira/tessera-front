@@ -2,7 +2,6 @@ import type {
 	EmbedDraft,
 	MessageDraft,
 	MessageVariable,
-	ModerationConfig,
 	ModuleSummary,
 	WelcomeConfig
 } from '@/lib/types/modules';
@@ -128,24 +127,4 @@ export const mockWelcomeConfig: WelcomeConfig = {
 	autoRoleIds: ['801234567890123003'],
 	pingMode: 'none',
 	deleteAfter: null
-};
-
-export const mockModerationConfig: ModerationConfig = {
-	enabled: true,
-	modRoleIds: ['801234567890123011', '801234567890123012'],
-	mutedRoleId: null,
-	timeoutDefault: '1h',
-	muteDefault: '24h',
-	banDeleteDays: '1',
-	reasonRequired: true,
-	dmOnPunish: true,
-	dmTemplate:
-		'You received a {action} in {server}.\nReason: {reason}\nDuration: {duration}\n\nIf you think this was a mistake, you can appeal.',
-	appealUrl: 'https://forms.example.com/appeal',
-	protectedRoleIds: ['801234567890123010'],
-	escalation: [
-		{ id: 'e1', atWarnings: 3, action: 'timeout', duration: '1h' },
-		{ id: 'e2', atWarnings: 5, action: 'mute', duration: '24h' },
-		{ id: 'e3', atWarnings: 7, action: 'ban', duration: 'permanent' }
-	]
 };
