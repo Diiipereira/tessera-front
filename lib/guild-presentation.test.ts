@@ -7,6 +7,7 @@ const dto: GuildCardDto = {
 	name: 'Pixel Foundry',
 	iconHash: null,
 	owner: true,
+	reachedBySeat: false,
 	memberCount: 12431,
 	planKey: 'pro',
 	botPermissions: null

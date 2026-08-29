@@ -19,6 +19,7 @@ const guildOf = (id: string, name: string, hasBot: boolean): Guild => ({
 	iconUrl: null,
 	memberCount: 195,
 	hasBot,
+	reachedBySeat: false,
 	tier: 'free',
 	missingPermissions: []
 });

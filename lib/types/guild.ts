@@ -8,6 +8,7 @@ export type Guild = {
 	iconUrl: string | null;
 	memberCount: number;
 	hasBot: boolean;
+	reachedBySeat: boolean;
 	tier: PlanTier;
 	missingPermissions: readonly string[];
 };

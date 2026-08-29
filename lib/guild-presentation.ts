@@ -48,6 +48,7 @@ export function toGuild(dto: GuildCardDto, hasBot: boolean): Guild {
 		iconUrl: guildIconUrl(dto.id, dto.iconHash),
 		memberCount: dto.memberCount ?? 0,
 		hasBot,
+		reachedBySeat: dto.reachedBySeat,
 		tier: tierOf(dto.planKey),
 		missingPermissions: hasBot ? missingFrom(dto.botPermissions) : []
 	};

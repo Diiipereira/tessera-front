@@ -18,6 +18,7 @@ export type GuildCardDto = {
 	name: string;
 	iconHash: string | null;
 	owner: boolean;
+	reachedBySeat: boolean;
 	memberCount: number | null;
 	planKey: string | null;
 	botPermissions: string | null;
@@ -99,30 +100,3 @@ export type TeamListDto = {
 	viewerRole: TeamRole;
 };
 
-export type InviteDto = {
-	id: string;
-	url: string;
-	role: TeamRole;
-	createdBy: string | null;
-	createdAt: string;
-	expiresAt: string;
-};
-
-export type InviteListDto = {
-	invites: InviteDto[];
-};
-
-export type InviteState = 'open' | 'used' | 'revoked' | 'expired';
-
-export type InvitePreviewDto = {
-	guildId: string;
-	guildName: string;
-	role: TeamRole;
-	state: InviteState;
-};
-
-export type InviteAcceptedDto = {
-	guildId: string;
-	role: TeamRole;
-	alreadyHadAccess: boolean;
-};

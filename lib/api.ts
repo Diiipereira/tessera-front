@@ -19,31 +19,6 @@ async function failureReason(response: Response): Promise<string> {
 	}
 }
 
-export async function apiGetPublic<T>(path: string): Promise<ApiResult<T>> {
-	let response: Response;
-
-	try {
-		response = await fetch(`${apiBaseUrl()}${path}`, { cache: 'no-store' });
-	} catch (error) {
-		return {
-			status: 'unreachable',
-			answered: false,
-			reason: error instanceof Error ? error.message : 'Unknown transport failure'
-		};
-	}
-
-	if (!response.ok) {
-		return {
-			status: 'unreachable',
-			answered: true,
-			reason: await failureReason(response),
-			httpStatus: response.status
-		};
-	}
-
-	return { status: 'ok', data: (await response.json()) as T };
-}
-
 export async function apiGet<T>(path: string): Promise<ApiResult<T>> {
 	const jar = await cookies();
 	const session = jar.get(SESSION_COOKIE);

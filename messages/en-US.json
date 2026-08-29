@@ -7,7 +7,9 @@
 		"open": "Open",
 		"remove": "Remove",
 		"search": "Search…",
-		"select": "Select…"
+		"select": "Select…",
+		"justNow": "just now",
+		"unknownTime": "unknown"
 	},
 	"locales": {
 		"en-US": "English (US)",
@@ -444,7 +446,9 @@
 			"manage": "Manage",
 			"sync": "Sync permissions",
 			"add": "Add to server",
-			"behind": "{count, plural, =1 {1 permission behind} other {# permissions behind}}"
+			"behind": "{count, plural, =1 {1 permission behind} other {# permissions behind}}",
+			"seat": "Seat",
+			"seatReason": "You are here on a dashboard seat, not as a server admin"
 		},
 		"add": {
 			"metaTitle": "Adding {brand}",
@@ -1688,7 +1692,7 @@
 	"team": {
 		"title": "Team",
 		"description": "Who can open this dashboard, and how far each of them can reach.",
-		"add": "Invite",
+		"add": "Add person",
 		"discordTitle": "Discord permissions grant access too",
 		"discordBody": "Anyone with <b>Manage Server</b> in Discord can open this dashboard with the {role} seat, whether or not they are listed here.",
 		"access": {
@@ -1698,6 +1702,11 @@
 			"seat": "Seat",
 			"grantedBy": "Granted by",
 			"lastSeen": "Last seen",
+			"added": "{name} now has the {role} seat",
+			"addedHint": "Send them this server's address — the link button on their row copies it.",
+			"copyAddress": "Copy the dashboard address to send to {name}",
+			"addressCopied": "Dashboard address copied",
+			"copyRefused": "The browser refused to copy",
 			"changed": "{name} is now a {role}",
 			"removed": "{name} no longer has access",
 			"remove": "Remove {name}",
@@ -1716,26 +1725,14 @@
 			"moderator": "Moderator",
 			"viewer": "Viewer"
 		},
-		"links": {
-			"title": "Invite links",
-			"description": "Each one seats a single person, and only until it is used.",
-			"mintedBy": "created by {who}",
-			"expires": "expires {when}",
-			"copy": "Copy",
-			"revoke": "Revoke",
-			"revoked": "Link revoked",
-			"unavailableTitle": "Invite links could not be loaded",
-			"unavailableBody": "The rest of this page is fine. Try again in a moment — if it keeps failing, check the API log."
-		},
 		"dialog": {
-			"title": "Invite to the dashboard",
-			"description": "Pick the seat. The link carries no name — whoever opens it signs in with Discord and takes that seat.",
-			"ready": "Send this link to one person. It works once, and expires in seven days.",
-			"submit": "Generate link",
-			"copy": "Copy",
-			"copied": "Link copied",
-			"copyRefused": "The browser refused to copy",
-			"terms": "Whoever signs in through it becomes a {role}. It expires {when}.",
+			"title": "Add to the dashboard",
+			"description": "They have to be in this Discord server. They sign in with Discord and land on the seat you pick here.",
+			"submit": "Give access",
+			"userId": "Discord user ID",
+			"userIdPlaceholder": "216773149713698816",
+			"userIdHint": "In Discord, turn on Developer Mode, right-click the person and choose Copy User ID.",
+			"userIdInvalid": "A user ID is 17 to 20 digits, nothing else.",
 			"seat": "Seat",
 			"grants": "A {role} gets {granted} of {total} permissions."
 		},

@@ -1,8 +1,9 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { CapabilityCatalogDto, InviteDto, TeamListDto, TeamSeatDto } from '@/lib/api-url';
+import type { CapabilityCatalogDto, TeamListDto, TeamSeatDto } from '@/lib/api-url';
 import enUS from '@/messages/en-US.json';
+import ptBR from '@/messages/pt-BR.json';
 import { Translated } from '@/tests/i18n';
 import { TeamScreen } from './TeamScreen';
 
@@ -11,8 +12,6 @@ const toastError = vi.fn();
 const toastSuccess = vi.fn();
 const putSeat = vi.fn();
 const deleteSeat = vi.fn();
-const mintInvite = vi.fn();
-const revokeInvite = vi.fn();
 const writeText = vi.fn();
 
 vi.mock('sonner', () => ({
@@ -31,15 +30,11 @@ vi.mock('@/lib/team-client', () => ({
 	deleteSeat: (...args: unknown[]) => deleteSeat(...args) as unknown
 }));
 
-vi.mock('@/lib/invite-client', () => ({
-	mintInvite: (...args: unknown[]) => mintInvite(...args) as unknown,
-	revokeInvite: (...args: unknown[]) => revokeInvite(...args) as unknown
-}));
-
 const GUILD_ID = '842315097461823104';
 const OWNER_ID = '304918273645102938';
 const ADMIN_ID = '512038475610293847';
 const VIEWER_ID = '628374651029384756';
+const NEWCOMER_ID = '739284756102938475';
 
 const catalog: CapabilityCatalogDto = {
 	capabilities: [
@@ -93,28 +88,13 @@ const team: TeamListDto = {
 	]
 };
 
-const INVITE: InviteDto = {
-	id: 'b7c1a2d3-0000-4000-8000-000000000001',
-	url: 'http://localhost:3000/invite/a-very-long-opaque-token',
-	role: 'moderator',
-	createdBy: 'lia',
-	createdAt: '2026-08-28T09:00:00.000Z',
-	expiresAt: '2026-09-04T09:00:00.000Z'
-};
-
-function renderScreen(
-	over: Partial<TeamListDto> = {},
-	invites: InviteDto[] = [],
-	invitesFailed = false
-) {
+function renderScreen(over: Partial<TeamListDto> = {}) {
 	return render(
 		<Translated>
 			<TeamScreen
 				guildId={GUILD_ID}
 				catalog={catalog}
 				team={{ ...team, ...over }}
-				invites={invites}
-				invitesFailed={invitesFailed}
 				now="2026-08-28T10:00:00.000Z"
 			/>
 		</Translated>
@@ -140,17 +120,19 @@ const rowFor = (name: string): HTMLElement => {
 	return row;
 };
 
+const openDialog = async (): Promise<void> => {
+	await userEvent.click(screen.getByRole('button', { name: enUS.team.add }));
+};
+
+const submitButton = (): HTMLElement =>
+	screen.getByRole('button', { name: enUS.team.dialog.submit });
+
 beforeEach(() => {
 	vi.clearAllMocks();
 	putSeat.mockResolvedValue({ status: 'saved', seat: seat({ userId: VIEWER_ID }) });
 	deleteSeat.mockResolvedValue({ status: 'removed' });
-	mintInvite.mockResolvedValue({ status: 'minted', invite: INVITE });
-	revokeInvite.mockResolvedValue({ status: 'revoked' });
 	writeText.mockResolvedValue(undefined);
-	Object.defineProperty(navigator, 'clipboard', {
-		value: { writeText },
-		configurable: true
-	});
+	Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
 });
 
 describe('TeamScreen access table', () => {
@@ -231,128 +213,174 @@ describe('TeamScreen writes', () => {
 		});
 		expect(refresh).not.toHaveBeenCalled();
 	});
-
-	it('never asks for a name or an id, since the link carries neither', async () => {
-		renderScreen();
-
-		await userEvent.click(screen.getByRole('button', { name: enUS.team.add }));
-
-		expect(screen.queryByRole('textbox')).toBeNull();
-	});
-
-	it('mints the link for the seat that was picked', async () => {
-		renderScreen();
-
-		await userEvent.click(screen.getByRole('button', { name: enUS.team.add }));
-		await userEvent.click(screen.getByRole('button', { name: enUS.team.dialog.submit }));
-
-		await waitFor(() => {
-			expect(mintInvite).toHaveBeenCalledWith(GUILD_ID, 'viewer');
-		});
-	});
-
-	it('shows the minted link so it can be sent to somebody', async () => {
-		renderScreen();
-
-		await userEvent.click(screen.getByRole('button', { name: enUS.team.add }));
-		await userEvent.click(screen.getByRole('button', { name: enUS.team.dialog.submit }));
-
-		await waitFor(() => {
-			expect(screen.getByTestId('invite-link').textContent).toBe(INVITE.url);
-		});
-	});
-
-	it('copies the link to the clipboard, which is the whole point of showing it', async () => {
-		renderScreen();
-
-		await userEvent.click(screen.getByRole('button', { name: enUS.team.add }));
-		await userEvent.click(screen.getByRole('button', { name: enUS.team.dialog.submit }));
-		await waitFor(() => {
-			expect(screen.getByTestId('invite-link')).toBeDefined();
-		});
-
-		await userEvent.click(screen.getByRole('button', { name: enUS.team.dialog.copy }));
-
-		expect(writeText).toHaveBeenCalledWith(INVITE.url);
-	});
-
-	it('shows no link and says why when minting is refused', async () => {
-		mintInvite.mockResolvedValue({ status: 'error', message: 'Guild has no bot installed' });
-		renderScreen();
-
-		await userEvent.click(screen.getByRole('button', { name: enUS.team.add }));
-		await userEvent.click(screen.getByRole('button', { name: enUS.team.dialog.submit }));
-
-		await waitFor(() => {
-			expect(toastError).toHaveBeenCalledWith('Guild has no bot installed');
-		});
-		expect(screen.queryByTestId('invite-link')).toBeNull();
-	});
 });
 
-describe('TeamScreen invite links', () => {
-	const linksSection = (): HTMLElement => sectionOf(enUS.team.links.title);
+describe('TeamScreen adds someone by id', () => {
+	it('asks for the id, because the seat needs to name a person', async () => {
+		renderScreen();
+		await openDialog();
 
-	it('lists the links the API sent', () => {
-		renderScreen({}, [INVITE]);
-
-		expect(within(linksSection()).getByText(enUS.team.role.moderator)).toBeDefined();
+		expect(screen.getByRole('textbox')).toBeDefined();
 	});
 
-	it('shows no section at all when there is no open link', () => {
-		renderScreen({}, []);
+	it('refuses to submit while the id is not a snowflake, before spending a request', async () => {
+		renderScreen();
+		await openDialog();
 
-		expect(screen.queryByRole('heading', { name: enUS.team.links.title })).toBeNull();
+		expect(submitButton()).toBeDisabled();
+
+		await userEvent.type(screen.getByRole('textbox'), '42');
+
+		expect(submitButton()).toBeDisabled();
+		expect(screen.getByText(enUS.team.dialog.userIdInvalid)).toBeDefined();
+		expect(putSeat).not.toHaveBeenCalled();
 	});
 
-	it('hides the links from a seat that cannot manage the team', () => {
-		renderScreen({ viewerId: VIEWER_ID, viewerRole: 'viewer' }, [INVITE]);
+	it('seats the id that was typed, on the seat that was picked', async () => {
+		putSeat.mockResolvedValue({
+			status: 'saved',
+			seat: seat({ userId: NEWCOMER_ID, username: 'newcomer' })
+		});
+		renderScreen();
+		await openDialog();
 
-		expect(screen.queryByRole('heading', { name: enUS.team.links.title })).toBeNull();
-	});
-
-	it('revokes a link through the API and reloads', async () => {
-		renderScreen({}, [INVITE]);
-
-		await userEvent.click(
-			within(linksSection()).getByRole('button', { name: enUS.team.links.revoke })
-		);
+		await userEvent.type(screen.getByRole('textbox'), NEWCOMER_ID);
+		await userEvent.click(submitButton());
 
 		await waitFor(() => {
-			expect(revokeInvite).toHaveBeenCalledWith(GUILD_ID, INVITE.id);
+			expect(putSeat).toHaveBeenCalledWith(GUILD_ID, NEWCOMER_ID, 'viewer');
 		});
 		expect(refresh).toHaveBeenCalled();
 	});
 
-	it('keeps the rest of the page when the links panel could not be loaded', () => {
-		renderScreen({}, [], true);
+	it('names the person the API answered with, not the id that was typed', async () => {
+		putSeat.mockResolvedValue({
+			status: 'saved',
+			seat: seat({ userId: NEWCOMER_ID, username: 'newcomer', globalName: 'Newcomer' })
+		});
+		renderScreen();
+		await openDialog();
 
-		expect(screen.getByRole('heading', { name: enUS.team.access.title })).toBeDefined();
-		expect(screen.getByRole('heading', { name: enUS.team.matrix.title })).toBeDefined();
-		expect(screen.getByText(enUS.team.links.unavailableTitle)).toBeDefined();
+		await userEvent.type(screen.getByRole('textbox'), NEWCOMER_ID);
+		await userEvent.click(submitButton());
+
+		await waitFor(() => {
+			expect(toastSuccess).toHaveBeenCalledWith(
+				enUS.team.access.added
+					.replace('{name}', 'Newcomer')
+					.replace('{role}', enUS.team.role.viewer),
+				{ description: enUS.team.access.addedHint }
+			);
+		});
 	});
 
-	it('shows the failure instead of an empty list, so nothing looks fine when it is not', () => {
-		renderScreen({}, [], true);
+	it('keeps the dialog open and says why when the API refuses the id', async () => {
+		putSeat.mockResolvedValue({ status: 'error', message: 'No Discord user with that id' });
+		renderScreen();
+		await openDialog();
 
-		expect(screen.queryByRole('heading', { name: enUS.team.links.title })).toBeNull();
+		await userEvent.type(screen.getByRole('textbox'), NEWCOMER_ID);
+		await userEvent.click(submitButton());
+
+		await waitFor(() => {
+			expect(toastError).toHaveBeenCalledWith('No Discord user with that id');
+		});
+		expect(screen.getByRole('textbox')).toBeDefined();
+		expect(refresh).not.toHaveBeenCalled();
+	});
+});
+
+describe('TeamScreen hands over the dashboard address', () => {
+	const copyButton = (): HTMLElement =>
+		within(rowFor('panela.dev')).getByRole('button', {
+			name: enUS.team.access.copyAddress.replace('{name}', 'panela.dev')
+		});
+
+	it('copies a plain address, not a token — the seat is what grants access', async () => {
+		renderScreen();
+
+		await userEvent.click(copyButton());
+
+		expect(writeText).toHaveBeenCalledWith(`${window.location.origin}/servers/${GUILD_ID}`);
 	});
 
-	it('says nothing about links to a seat that cannot manage them, even on failure', () => {
-		renderScreen({ viewerId: VIEWER_ID, viewerRole: 'viewer' }, [], true);
+	it('confirms the copy, so the click is not silent', async () => {
+		renderScreen();
 
-		expect(screen.queryByText(enUS.team.links.unavailableTitle)).toBeNull();
+		await userEvent.click(copyButton());
+
+		await waitFor(() => {
+			expect(toastSuccess).toHaveBeenCalledWith(enUS.team.access.addressCopied);
+		});
 	});
 
-	it('copies a listed link without minting a new one', async () => {
-		renderScreen({}, [INVITE]);
+	it('says so when the browser refuses, instead of pretending it copied', async () => {
+		writeText.mockRejectedValue(new Error('denied'));
+		renderScreen();
 
-		await userEvent.click(
-			within(linksSection()).getByRole('button', { name: enUS.team.links.copy })
+		await userEvent.click(copyButton());
+
+		await waitFor(() => {
+			expect(toastError).toHaveBeenCalledWith(enUS.team.access.copyRefused);
+		});
+	});
+
+	it('tells you to send the address right after the seat is created', async () => {
+		putSeat.mockResolvedValue({
+			status: 'saved',
+			seat: seat({ userId: NEWCOMER_ID, username: 'newcomer' })
+		});
+		renderScreen();
+		await openDialog();
+
+		await userEvent.type(screen.getByRole('textbox'), NEWCOMER_ID);
+		await userEvent.click(submitButton());
+
+		await waitFor(() => {
+			expect(toastSuccess).toHaveBeenCalledWith(expect.any(String), {
+				description: enUS.team.access.addedHint
+			});
+		});
+	});
+
+	it('offers nothing to copy to a seat that cannot manage the team', () => {
+		renderScreen({ viewerId: VIEWER_ID, viewerRole: 'viewer' });
+
+		expect(
+			screen.queryByRole('button', {
+				name: enUS.team.access.copyAddress.replace('{name}', 'panela.dev')
+			})
+		).toBeNull();
+	});
+});
+
+describe('TeamScreen dates', () => {
+	const inPortuguese = (over: Partial<TeamListDto> = {}) =>
+		render(
+			<Translated locale="pt-BR">
+				<TeamScreen
+					guildId={GUILD_ID}
+					catalog={catalog}
+					team={{ ...team, ...over }}
+					now="2026-08-28T10:00:00.000Z"
+				/>
+			</Translated>
 		);
 
-		expect(writeText).toHaveBeenCalledWith(INVITE.url);
-		expect(mintInvite).not.toHaveBeenCalled();
+	it('writes the last-seen date in the reader language, not in English', () => {
+		inPortuguese();
+
+		expect(screen.getAllByText('há 1 dia').length).toBeGreaterThan(0);
+		expect(screen.queryByText('1 day ago')).toBeNull();
+	});
+
+	it('translates the just-now window, which used to leak English into the table', () => {
+		inPortuguese({
+			seats: [seat({ userId: VIEWER_ID, grantedAt: '2026-08-28T09:59:50.000Z' })]
+		});
+
+		expect(screen.getByText(ptBR.common.justNow)).toBeInTheDocument();
+		expect(screen.queryByText('just now')).toBeNull();
 	});
 });
 

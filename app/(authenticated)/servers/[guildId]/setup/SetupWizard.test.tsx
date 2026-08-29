@@ -16,6 +16,7 @@ const GUILD: Guild = {
 	iconUrl: null,
 	memberCount: 12431,
 	hasBot: true,
+	reachedBySeat: false,
 	tier: 'free',
 	missingPermissions: []
 };

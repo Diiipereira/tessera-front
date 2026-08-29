@@ -1,6 +1,6 @@
 'use client';
 
-import { Check, Copy, Link2, Minus, Trash2, UserPlus } from 'lucide-react';
+import { Check, Link2, Minus, Trash2, UserPlus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
@@ -13,13 +13,21 @@ import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Dialog } from '@/components/ui/Dialog';
 import { Field } from '@/components/ui/Field';
+import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { BRAND } from '@/lib/brand';
-import type { CapabilityCatalogDto, InviteDto, TeamListDto } from '@/lib/api-url';
-import { assignableRoles, can, grantedCount, isFixedSeat, toTeamMember } from '@/lib/team';
+import type { CapabilityCatalogDto, TeamListDto } from '@/lib/api-url';
+import {
+	assignableRoles,
+	can,
+	grantedCount,
+	isFixedSeat,
+	isSnowflake,
+	toTeamMember
+} from '@/lib/team';
 import { deleteSeat, putSeat } from '@/lib/team-client';
-import { mintInvite, revokeInvite } from '@/lib/invite-client';
-import { relativeTime } from '@/lib/time';
+import { guildHref } from '@/lib/navigation';
+import { useRelativeTime } from '@/lib/hooks/useRelativeTime';
 import type { TeamRole } from '@/lib/types/management';
 import { cn } from '@/lib/utils/cn';
 
@@ -27,33 +35,26 @@ type TeamScreenProps = {
 	guildId: string;
 	catalog: CapabilityCatalogDto;
 	team: TeamListDto;
-	invites: InviteDto[];
-	invitesFailed?: boolean;
 	now?: string;
 };
 
-export function TeamScreen({
-	guildId,
-	catalog,
-	team,
-	invites,
-	invitesFailed = false,
-	now
-}: TeamScreenProps) {
+export function TeamScreen({ guildId, catalog, team, now }: TeamScreenProps) {
 	const t = useTranslations('team');
 	const common = useTranslations('common');
 	const names = useTranslations('capabilities');
 	const router = useRouter();
 	const [, startTransition] = useTransition();
 	const [busy, setBusy] = useState<string | null>(null);
-	const [minting, setMinting] = useState(false);
-	const [minted, setMinted] = useState<InviteDto | null>(null);
+	const [adding, setAdding] = useState(false);
+	const [targetId, setTargetId] = useState('');
 	const [targetRole, setTargetRole] = useState<TeamRole>('viewer');
+	const relativeTime = useRelativeTime();
 
 	const at = now === undefined ? new Date() : new Date(now);
 	const members = team.seats.map(toTeamMember);
 	const options = assignableRoles(catalog, team.viewerRole);
 	const canManage = can(catalog, team.viewerRole, 'team.manage');
+	const idLooksRight = isSnowflake(targetId);
 
 	const refresh = (): void => {
 		startTransition(() => {
@@ -89,9 +90,9 @@ export function TeamScreen({
 		refresh();
 	};
 
-	const mint = async (): Promise<void> => {
-		setBusy('mint');
-		const result = await mintInvite(guildId, targetRole);
+	const add = async (): Promise<void> => {
+		setBusy('add');
+		const result = await putSeat(guildId, targetId.trim(), targetRole);
 		setBusy(null);
 
 		if (result.status === 'error') {
@@ -99,42 +100,35 @@ export function TeamScreen({
 			return;
 		}
 
-		setMinted(result.invite);
-		refresh();
-	};
-
-	const copyLink = (url: string): void => {
-		void navigator.clipboard.writeText(url).then(
-			() => {
-				toast.success(t('dialog.copied'));
-			},
-			() => {
-				toast.error(t('dialog.copyRefused'));
-			}
+		toast.success(
+			t('access.added', {
+				name: result.seat.globalName ?? result.seat.username,
+				role: t(`role.${result.seat.role}`)
+			}),
+			{ description: t('access.addedHint') }
 		);
-	};
-
-	const revoke = async (inviteId: string): Promise<void> => {
-		setBusy(inviteId);
-		const result = await revokeInvite(guildId, inviteId);
-		setBusy(null);
-
-		if (result.status === 'error') {
-			toast.error(result.message);
-			return;
-		}
-
-		toast.success(t('links.revoked'));
+		closeDialog(false);
 		refresh();
 	};
 
 	const closeDialog = (open: boolean): void => {
-		setMinting(open);
+		setAdding(open);
 
 		if (!open) {
-			setMinted(null);
+			setTargetId('');
 			setTargetRole('viewer');
 		}
+	};
+
+	const copyAddress = (): void => {
+		void navigator.clipboard.writeText(`${window.location.origin}${guildHref(guildId, '')}`).then(
+			() => {
+				toast.success(t('access.addressCopied'));
+			},
+			() => {
+				toast.error(t('access.copyRefused'));
+			}
+		);
 	};
 
 	return (
@@ -176,7 +170,7 @@ export function TeamScreen({
 									<th className="py-2 pr-4 font-mono font-semibold">{t('access.seat')}</th>
 									<th className="py-2 pr-4 font-mono font-semibold">{t('access.grantedBy')}</th>
 									<th className="py-2 pr-4 font-mono font-semibold">{t('access.lastSeen')}</th>
-									<th className="w-12 py-2 font-mono font-semibold" />
+									<th className="w-24 py-2 font-mono font-semibold" />
 								</tr>
 							</thead>
 							<tbody>
@@ -244,18 +238,29 @@ export function TeamScreen({
 											</td>
 											<td className="py-3">
 												{fixed || !canManage ? null : (
-													<Button
-														variant="ghost-danger"
-														size="sm"
-														iconOnly
-														disabled={busy !== null}
-														aria-label={t('access.remove', { name: member.name })}
-														onClick={() => {
-															void remove(member.id, member.name);
-														}}
-													>
-														<Trash2 aria-hidden="true" />
-													</Button>
+													<div className="flex items-center justify-end gap-1">
+														<Button
+															variant="ghost"
+															size="sm"
+															iconOnly
+															aria-label={t('access.copyAddress', { name: member.name })}
+															onClick={copyAddress}
+														>
+															<Link2 aria-hidden="true" />
+														</Button>
+														<Button
+															variant="ghost-danger"
+															size="sm"
+															iconOnly
+															disabled={busy !== null}
+															aria-label={t('access.remove', { name: member.name })}
+															onClick={() => {
+																void remove(member.id, member.name);
+															}}
+														>
+															<Trash2 aria-hidden="true" />
+														</Button>
+													</div>
 												)}
 											</td>
 										</tr>
@@ -265,54 +270,6 @@ export function TeamScreen({
 						</table>
 					</div>
 				</SettingsSection>
-
-				{canManage && invitesFailed ? (
-					<Alert variant="warning" title={t('links.unavailableTitle')}>
-						{t('links.unavailableBody')}
-					</Alert>
-				) : null}
-
-				{canManage && !invitesFailed && invites.length > 0 ? (
-					<SettingsSection title={t('links.title')} description={t('links.description')}>
-						<ul className="flex flex-col">
-							{invites.map((invite) => (
-								<li
-									key={invite.id}
-									className="flex flex-wrap items-center gap-3 border-b border-border py-3 last:border-0"
-								>
-									<Link2 className="size-4 shrink-0 text-text-muted" aria-hidden="true" />
-									<Badge variant="outline">{t(`role.${invite.role}`)}</Badge>
-									<span className="text-caption font-normal text-text-muted">
-										{t('links.mintedBy', { who: invite.createdBy ?? t('access.fromDiscord') })} ·{' '}
-										{t('links.expires', { when: relativeTime(invite.expiresAt, at) })}
-									</span>
-									<div className="ml-auto flex items-center gap-1">
-										<Button
-											variant="ghost"
-											size="sm"
-											onClick={() => {
-												copyLink(invite.url);
-											}}
-										>
-											<Copy aria-hidden="true" />
-											{t('links.copy')}
-										</Button>
-										<Button
-											variant="ghost-danger"
-											size="sm"
-											disabled={busy !== null}
-											onClick={() => {
-												void revoke(invite.id);
-											}}
-										>
-											{t('links.revoke')}
-										</Button>
-									</div>
-								</li>
-							))}
-						</ul>
-					</SettingsSection>
-				) : null}
 
 				<SettingsSection title={t('matrix.title')} description={t('matrix.description')}>
 					<div className="overflow-x-auto">
@@ -371,92 +328,68 @@ export function TeamScreen({
 			</div>
 
 			<Dialog
-				open={minting}
+				open={adding}
 				onOpenChange={closeDialog}
 				title={t('dialog.title')}
-				description={minted === null ? t('dialog.description') : t('dialog.ready')}
+				description={t('dialog.description')}
 				footer={
-					minted === null ? (
-						<>
-							<Button
-								variant="ghost"
-								onClick={() => {
-									closeDialog(false);
-								}}
-							>
-								{common('cancel')}
-							</Button>
-							<Button
-								disabled={busy !== null}
-								onClick={() => {
-									void mint();
-								}}
-							>
-								<Link2 aria-hidden="true" />
-								{t('dialog.submit')}
-							</Button>
-						</>
-					) : (
+					<>
 						<Button
+							variant="ghost"
 							onClick={() => {
 								closeDialog(false);
 							}}
 						>
-							{common('close')}
+							{common('cancel')}
 						</Button>
-					)
+						<Button
+							disabled={busy !== null || !idLooksRight}
+							onClick={() => {
+								void add();
+							}}
+						>
+							<UserPlus aria-hidden="true" />
+							{t('dialog.submit')}
+						</Button>
+					</>
 				}
 			>
-				{minted === null ? (
-					<div className="flex flex-col gap-4">
-						<Field label={t('dialog.seat')}>
-							<Select
-								options={options.map((role) => ({ value: role, label: t(`role.${role}`) }))}
-								value={targetRole}
-								onValueChange={(next) => {
-									const role = options.find((entry) => entry === next);
-									if (role) setTargetRole(role);
-								}}
-							/>
-						</Field>
+				<div className="flex flex-col gap-4">
+					<Field
+						label={t('dialog.userId')}
+						hint={t('dialog.userIdHint')}
+						error={targetId !== '' && !idLooksRight ? t('dialog.userIdInvalid') : undefined}
+					>
+						<Input
+							value={targetId}
+							inputMode="numeric"
+							autoComplete="off"
+							placeholder={t('dialog.userIdPlaceholder')}
+							onChange={(event) => {
+								setTargetId(event.target.value);
+							}}
+						/>
+					</Field>
 
-						<p className="text-body-sm text-text-muted">
-							{t('dialog.grants', {
-								role: t(`role.${targetRole}`),
-								granted: grantedCount(catalog, targetRole),
-								total: catalog.capabilities.length
-							})}
-						</p>
-					</div>
-				) : (
-					<div className="flex flex-col gap-3">
-						<div className="flex items-center gap-2">
-							<code
-								data-testid="invite-link"
-								className="min-w-0 flex-1 truncate rounded-md border border-border bg-surface-sunken px-2 py-1.5 font-mono text-caption text-text-muted"
-							>
-								{minted.url}
-							</code>
-							<Button
-								variant="ghost"
-								size="sm"
-								onClick={() => {
-									copyLink(minted.url);
-								}}
-							>
-								<Copy aria-hidden="true" />
-								{t('dialog.copy')}
-							</Button>
-						</div>
+					<Field label={t('dialog.seat')}>
+						<Select
+							options={options.map((role) => ({ value: role, label: t(`role.${role}`) }))}
+							value={targetRole}
+							onValueChange={(next) => {
+								const role = options.find((entry) => entry === next);
+								if (role) setTargetRole(role);
+							}}
+						/>
+					</Field>
 
-						<p className="text-body-sm text-text-muted">
-							{t('dialog.terms', {
-								role: t(`role.${minted.role}`),
-								when: relativeTime(minted.expiresAt, at)
-							})}
-						</p>
-					</div>
-				)}
+					<p className="text-body-sm text-text-muted">
+						{t('dialog.grants', {
+							role: t(`role.${targetRole}`),
+							granted: grantedCount(catalog, targetRole),
+							total: catalog.capabilities.length
+						})}
+					</p>
+				</div>
 			</Dialog>
 		</div>
 	);

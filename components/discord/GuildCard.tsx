@@ -1,4 +1,4 @@
-import { Crown, Plus, RefreshCw } from 'lucide-react';
+import { Crown, KeyRound, Plus, RefreshCw } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/Badge';
@@ -62,10 +62,20 @@ export function GuildCard({ guild }: { guild: Guild }) {
 							{t('behind', { count: behind })}
 						</Badge>
 					) : null}
+					{guild.reachedBySeat ? (
+						<Badge variant="outline" className="shrink-0">
+							<KeyRound className="size-3" aria-hidden="true" />
+							{t('seat')}
+						</Badge>
+					) : null}
 				</div>
 
 				<p className="tabular text-caption font-normal text-text-muted">
-					{guild.hasBot ? t('members', { count: guild.memberCount }) : t('absent')}
+					{guild.reachedBySeat
+						? t('seatReason')
+						: guild.hasBot
+							? t('members', { count: guild.memberCount })
+							: t('absent')}
 				</p>
 
 				<div className="mt-3 flex flex-wrap items-center gap-2">
@@ -74,16 +84,18 @@ export function GuildCard({ guild }: { guild: Guild }) {
 							<Button size="sm" href={guildHref(guild.id, '')}>
 								{t('manage')}
 							</Button>
-							<Button
-								size="sm"
-								variant="outline"
-								href={inviteHref ?? '/docs'}
-								rel="external"
-								disabled={inviteHref === null}
-							>
-								<RefreshCw aria-hidden="true" />
-								{t('sync')}
-							</Button>
+							{guild.reachedBySeat ? null : (
+								<Button
+									size="sm"
+									variant="outline"
+									href={inviteHref ?? '/docs'}
+									rel="external"
+									disabled={inviteHref === null}
+								>
+									<RefreshCw aria-hidden="true" />
+									{t('sync')}
+								</Button>
+							)}
 						</>
 					) : (
 						<Button

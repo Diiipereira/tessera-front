@@ -5,6 +5,12 @@ import type { TeamRole } from '@/lib/types/management';
 
 export const MANAGE_TEAM = 'team.manage';
 
+const SNOWFLAKE = /^\d{17,20}$/;
+
+export function isSnowflake(value: string): boolean {
+	return SNOWFLAKE.test(value.trim());
+}
+
 export type TeamMemberView = {
 	id: string;
 	name: string;

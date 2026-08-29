@@ -7,7 +7,9 @@
 		"open": "Abrir",
 		"remove": "Remover",
 		"search": "Buscar…",
-		"select": "Selecione…"
+		"select": "Selecione…",
+		"justNow": "agora mesmo",
+		"unknownTime": "desconhecido"
 	},
 	"locales": {
 		"en-US": "English (US)",
@@ -444,7 +446,9 @@
 			"manage": "Gerenciar",
 			"sync": "Sincronizar permissões",
 			"add": "Adicionar ao servidor",
-			"behind": "{count, plural, =1 {1 permissão faltando} other {# permissões faltando}}"
+			"behind": "{count, plural, =1 {1 permissão faltando} other {# permissões faltando}}",
+			"seat": "Assento",
+			"seatReason": "Você está aqui por um assento no painel, não como admin do servidor"
 		},
 		"add": {
 			"metaTitle": "Adicionando a {brand}",
@@ -1688,7 +1692,7 @@
 	"team": {
 		"title": "Equipe",
 		"description": "Quem pode abrir este painel, e até onde cada um alcança.",
-		"add": "Convidar",
+		"add": "Adicionar pessoa",
 		"discordTitle": "Permissões do Discord também dão acesso",
 		"discordBody": "Qualquer um com <b>Gerenciar Servidor</b> no Discord consegue abrir este painel com o posto de {role}, esteja ou não listado aqui.",
 		"access": {
@@ -1698,6 +1702,11 @@
 			"seat": "Posto",
 			"grantedBy": "Concedido por",
 			"lastSeen": "Visto por último",
+			"added": "{name} agora tem o posto de {role}",
+			"addedHint": "Mande o endereço deste servidor para a pessoa — o botão de link na linha copia.",
+			"copyAddress": "Copiar o endereço do painel para mandar para {name}",
+			"addressCopied": "Endereço do painel copiado",
+			"copyRefused": "O navegador recusou a cópia",
 			"changed": "{name} agora é {role}",
 			"removed": "{name} não tem mais acesso",
 			"remove": "Remover {name}",
@@ -1716,26 +1725,14 @@
 			"moderator": "Moderador",
 			"viewer": "Observador"
 		},
-		"links": {
-			"title": "Links de convite",
-			"description": "Cada um dá posto a uma pessoa só, e só até ser usado.",
-			"mintedBy": "criado por {who}",
-			"expires": "expira {when}",
-			"copy": "Copiar",
-			"revoke": "Revogar",
-			"revoked": "Link revogado",
-			"unavailableTitle": "Não foi possível carregar os links de convite",
-			"unavailableBody": "O resto da página está de pé. Tente de novo em instantes — se continuar falhando, veja o log da API."
-		},
 		"dialog": {
-			"title": "Convidar para o painel",
-			"description": "Escolha o posto. O link não carrega nome — quem abrir entra com o Discord e assume esse posto.",
-			"ready": "Mande este link para uma pessoa. Ele funciona uma vez e expira em sete dias.",
-			"submit": "Gerar link",
-			"copy": "Copiar",
-			"copied": "Link copiado",
-			"copyRefused": "O navegador recusou a cópia",
-			"terms": "Quem entrar por ele vira {role}. Expira {when}.",
+			"title": "Adicionar ao painel",
+			"description": "A pessoa precisa estar neste servidor do Discord. Ela entra com o Discord e cai no posto que você escolher aqui.",
+			"submit": "Dar acesso",
+			"userId": "ID de usuário do Discord",
+			"userIdPlaceholder": "216773149713698816",
+			"userIdHint": "No Discord, ligue o Modo Desenvolvedor, clique com o botão direito na pessoa e escolha Copiar ID de usuário.",
+			"userIdInvalid": "Um ID de usuário tem de 17 a 20 dígitos, e nada além disso.",
 			"seat": "Posto",
 			"grants": "Um {role} recebe {granted} de {total} permissões."
 		},

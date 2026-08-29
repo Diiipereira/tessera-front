@@ -27,6 +27,7 @@ const card = (id: string, name: string) => ({
 	name,
 	iconHash: null,
 	owner: true,
+	reachedBySeat: false,
 	memberCount: 3,
 	planKey: 'free',
 	botPermissions: null

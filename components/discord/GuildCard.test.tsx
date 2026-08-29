@@ -18,6 +18,7 @@ const guildOf = (overrides: Partial<Guild> = {}): Guild => ({
 	iconUrl: null,
 	memberCount: 195,
 	hasBot: true,
+	reachedBySeat: false,
 	tier: 'free',
 	missingPermissions: [],
 	...overrides
@@ -103,6 +104,34 @@ describe('GuildCard', () => {
 
 			expect(screen.getByText(copy.absent)).toBeInTheDocument();
 			expect(screen.queryByText(/members/)).not.toBeInTheDocument();
+		});
+	});
+
+	describe('a server reached only by a dashboard seat', () => {
+		it('says why it is on the list, which nothing else on the card explains', () => {
+			renderCard(guildOf({ reachedBySeat: true }));
+
+			expect(screen.getByText(copy.seat)).toBeInTheDocument();
+			expect(screen.getByText(copy.seatReason)).toBeInTheDocument();
+		});
+
+		it('still opens the dashboard, which is the whole point of the seat', () => {
+			renderCard(guildOf({ reachedBySeat: true }));
+
+			expect(screen.getByRole('link', { name: copy.manage })).toBeInTheDocument();
+		});
+
+		it('hides the sync, because a seat cannot re-authorise the bot', () => {
+			renderCard(guildOf({ reachedBySeat: true }));
+
+			expect(screen.queryByRole('link', { name: copy.sync })).not.toBeInTheDocument();
+		});
+
+		it('leaves the ordinary card alone', () => {
+			renderCard(guildOf());
+
+			expect(screen.queryByText(copy.seat)).not.toBeInTheDocument();
+			expect(screen.getByRole('link', { name: copy.sync })).toBeInTheDocument();
 		});
 	});
 
