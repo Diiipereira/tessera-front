@@ -146,6 +146,10 @@ export function WelcomeScreen({
 					}}
 					variables={variables}
 				/>
+
+				{draft.message.mode === 'text' && draft.message.text.trim() === '' ? (
+					<p className="text-caption font-normal text-text-muted">{t('message.emptyHint')}</p>
+				) : null}
 			</SettingsSection>
 
 			<SettingsSection title={t('mention.title')} description={t('mention.description')}>

@@ -1578,7 +1578,8 @@
 				"title": "Mensagem de boas-vindas",
 				"description": "Publicada em um canal assim que alguém entra.",
 				"channel": "Canal",
-				"channelHint": "Obrigatório antes de o módulo poder ser ligado."
+				"channelHint": "Obrigatório antes de o módulo poder ser ligado.",
+				"emptyHint": "Deixe em branco e o bot envia a mensagem dele, no idioma do servidor."
 			},
 			"mention": {
 				"title": "Menção",

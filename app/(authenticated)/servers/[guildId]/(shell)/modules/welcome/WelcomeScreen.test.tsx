@@ -258,3 +258,29 @@ describe('WelcomeScreen', () => {
 		expect(screen.queryByText('6 roles')).not.toBeInTheDocument();
 	});
 });
+
+describe('a welcome message nobody wrote', () => {
+	it('says the bot has its own, rather than pretending the field has a value', () => {
+		renderScreen({ message: { mode: 'text', text: '', embed: config.message.embed } });
+
+		expect(screen.getByText(copy.message.emptyHint)).toBeInTheDocument();
+	});
+
+	it('says the same for a box holding only spaces', () => {
+		renderScreen({ message: { mode: 'text', text: '   ', embed: config.message.embed } });
+
+		expect(screen.getByText(copy.message.emptyHint)).toBeInTheDocument();
+	});
+
+	it('stays quiet once the owner writes something', () => {
+		renderScreen({ message: { mode: 'text', text: 'Oi {user}', embed: config.message.embed } });
+
+		expect(screen.queryByText(copy.message.emptyHint)).not.toBeInTheDocument();
+	});
+
+	it('stays quiet in embed mode, where an empty text box is not the message', () => {
+		renderScreen({ message: { mode: 'embed', text: '', embed: config.message.embed } });
+
+		expect(screen.queryByText(copy.message.emptyHint)).not.toBeInTheDocument();
+	});
+});

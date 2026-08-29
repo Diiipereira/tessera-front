@@ -1578,7 +1578,8 @@
 				"title": "Welcome message",
 				"description": "Posted in a channel the moment someone joins.",
 				"channel": "Channel",
-				"channelHint": "Required before the module can be switched on."
+				"channelHint": "Required before the module can be switched on.",
+				"emptyHint": "Leave it blank and the bot sends its own welcome, in the server language."
 			},
 			"mention": {
 				"title": "Mention",
