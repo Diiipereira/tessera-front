@@ -597,21 +597,23 @@ one, so those keep the old behaviour of holding the previous page. `SidebarNav` 
 read `pendingHref ?? pathname` so the highlight and the trail name the screen that is loading
 rather than the one being replaced.
 
-That is why the seventeen dashboard skeletons live in `components/skeletons/` instead of beside
+That is why the eighteen dashboard skeletons live in `components/skeletons/` instead of beside
 their routes — the shell is a client component and has to import all of them to choose one.
 `DocsSkeleton` sits in the same folder for consistency and is the one the shell never reads:
 `/docs` is outside `AppShell`, so its `loading.tsx` is the whole mechanism.
 
-**`holdSkeleton()` is scaffolding and comes out when `bot-api` exists.** The seventeen dashboard
-routes await it — the two docs routes do not, because their content is compiled in and there is no
-future request to stand in for. It makes the transition last long enough to inspect; measured with
-a 25ms poll, the skeleton appears
-**28ms** after the click and the real screen replaces it at **3143ms**. `lib/skeleton-hold.ts`
-returns 0 outside `NODE_ENV=development`, so nothing ships, and `SKELETON_HOLD_MS` overrides the
-wait (`0` turns it off) without touching a file. It skips `?state=loading` so the frozen preview
-stays instant. It stands in for latency that does not exist yet — the mock data is already in the
-process. Once the routes call the API, delete the helper and every `await holdSkeleton(query)`
-with it; the pending skeleton above stays, and then shows for exactly as long as the request takes.
+**`holdSkeleton()` was scaffolding and came out in 29/08/2026, as this file said it would.** It
+stood in for latency that did not exist while every route read mock data in-process, and it made
+the transition last long enough to inspect. With the routes moving onto the API there is real
+latency to show, so the helper and all sixteen `await holdSkeleton(query)` calls are gone and
+`lib/skeleton-hold.ts` is deleted. **The `loading.tsx` boundaries stay and are now the whole
+mechanism** — the skeleton shows for exactly as long as the request takes, which is the behaviour
+the scaffolding was imitating.
+
+**`?state=loading` survived the removal on purpose.** It is not a delay: each route returns its
+skeleton outright when the query is present, so the frozen preview stays instant and stays the way
+to inspect a skeleton while editing one. A screen whose layout changes has to have its skeleton
+changed in the same edit, and that preview is how you check.
 
 ## Typed routes
 

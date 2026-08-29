@@ -9,7 +9,6 @@ import {
 	mockSetupChecklist,
 	mockStats
 } from '@/lib/mock';
-import { holdSkeleton } from '@/lib/skeleton-hold';
 import type { GuildPageProps } from '@/lib/types/page';
 import { OverviewScreen } from './OverviewScreen';
 
@@ -37,8 +36,6 @@ export default function Page({ params, searchParams }: GuildPageProps) {
 async function Overview({ params, searchParams }: GuildPageProps) {
 	const [{ guildId }, query] = await Promise.all([params, searchParams]);
 	const guild = await resolveGuild(guildId);
-
-	await holdSkeleton(query);
 
 	return (
 		<OverviewScreen

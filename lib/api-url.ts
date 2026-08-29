@@ -99,4 +99,3 @@ export type TeamListDto = {
 	viewerId: string;
 	viewerRole: TeamRole;
 };
-
