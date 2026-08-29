@@ -1668,7 +1668,17 @@
 			"moderation": {
 				"logChannelId": "Canal de log",
 				"mutedRoleId": "Cargo de silenciado",
-				"dmOnAction": "Avisar por mensagem direta"
+				"dmOnAction": "Avisar por mensagem direta",
+				"requireReason": "Exigir motivo",
+				"protectedRoleIds": "Cargos protegidos",
+				"banPurgeDays": "Dias que o ban apaga",
+				"softbanPurgeDays": "Dias que o softban apaga",
+				"timeoutDefault": "Timeout padrão",
+				"dmExtra": "Texto extra na mensagem direta",
+				"appealUrl": "Link de recurso",
+				"escalationChannelId": "Canal do chamado da staff",
+				"escalationPingRoleIds": "Cargos que o chamado menciona",
+				"escalationAutoActions": "O que o motor faz sozinho"
 			}
 		}
 	},

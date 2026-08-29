@@ -218,3 +218,29 @@ describe('the labels the moderation screen asks for', () => {
 		expect(ptBR.durations['28d']).not.toBe(enUS.durations['28d']);
 	});
 });
+
+describe('the audit log labels for this module', () => {
+	const dictionaries = { 'en-US': enUS, 'pt-BR': ptBR };
+
+	const locales = Object.keys(dictionaries) as (keyof typeof dictionaries)[];
+
+	const declared = Object.keys(toModerationPatch(config()));
+
+	it.each(locales)('names every field this module can write, in %s', (locale) => {
+		const labels = dictionaries[locale].audit.fields.moderation as Record<
+			string,
+			string | undefined
+		>;
+		const missing = declared.filter((field) => labels[field] === undefined);
+
+		expect(missing).toEqual([]);
+	});
+
+	it('keeps no label for a field the module no longer writes', () => {
+		const orphans = Object.keys(enUS.audit.fields.moderation).filter(
+			(field) => !declared.includes(field)
+		);
+
+		expect(orphans).toEqual([]);
+	});
+});

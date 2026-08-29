@@ -1668,7 +1668,17 @@
 			"moderation": {
 				"logChannelId": "Log channel",
 				"mutedRoleId": "Muted role",
-				"dmOnAction": "Warn by direct message"
+				"dmOnAction": "Warn by direct message",
+				"requireReason": "Require a reason",
+				"protectedRoleIds": "Protected roles",
+				"banPurgeDays": "Days a ban deletes",
+				"softbanPurgeDays": "Days a softban deletes",
+				"timeoutDefault": "Default timeout",
+				"dmExtra": "Extra text in the direct message",
+				"appealUrl": "Appeal link",
+				"escalationChannelId": "Staff call channel",
+				"escalationPingRoleIds": "Roles the staff call mentions",
+				"escalationAutoActions": "What the engine does on its own"
 			}
 		}
 	},
