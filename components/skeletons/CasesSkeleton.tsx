@@ -22,10 +22,8 @@ export function CasesSkeleton() {
 	return (
 		<ManagementPageSkeleton label="Cases" titleWidth="w-21" descriptionWidth="w-146">
 			<div className="mt-6 flex flex-wrap items-center gap-3">
-				<Skeleton className="h-9 w-68 max-w-full rounded-md" />
-				<Skeleton className="h-9 w-40 shrink-0 rounded-md" />
 				<Skeleton className="h-9 w-44 shrink-0 rounded-md" />
-				<Skeleton className="h-8.5 w-59 shrink-0 rounded-md" />
+				<Skeleton className="h-8.5 w-72 max-w-full shrink-0 rounded-md" />
 			</div>
 
 			<TableSkeleton
@@ -70,7 +68,10 @@ export function CasesSkeleton() {
 				))}
 			</TableSkeleton>
 
-			<TextSkeleton line="caption" width="w-40" className="mt-3" />
+			<div className="mt-3 flex flex-wrap items-center gap-3">
+				<TextSkeleton line="caption" width="w-40" />
+				<Skeleton className="h-8 w-44 rounded-md" />
+			</div>
 		</ManagementPageSkeleton>
 	);
 }

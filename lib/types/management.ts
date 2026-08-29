@@ -53,32 +53,52 @@ export type Member = {
 	notes: MemberNote[];
 };
 
-export type CaseStatus = 'active' | 'expired' | 'revoked';
+export const INFRACTION_TYPES = [
+	'note',
+	'warn',
+	'timeout',
+	'mute',
+	'unmute',
+	'kick',
+	'ban',
+	'softban',
+	'unban'
+] as const;
 
-export type CaseEdit = {
+export type InfractionType = (typeof INFRACTION_TYPES)[number];
+
+export const CASE_STATUS_FILTERS = ['standing', 'revoked', 'done'] as const;
+
+export type CaseStatusFilter = (typeof CASE_STATUS_FILTERS)[number];
+
+export type CaseStatus = 'standing' | 'expired' | 'revoked' | 'done';
+
+export type CaseParticipant = {
 	id: string;
-	at: string;
-	author: string;
-	summary: string;
+	name: string | null;
+	handle: string | null;
+	avatarHash: string | null;
 };
 
 export type ModerationCase = {
 	id: string;
 	number: number;
-	action: ModerationAction;
-	targetId: string;
-	targetName: string;
-	targetInitials: string;
-	targetColor: string;
-	moderatorName: string;
-	moderatorInitials: string;
-	moderatorColor: string;
-	reason: string;
-	createdAt: string;
+	type: InfractionType;
+	target: CaseParticipant;
+	moderator: CaseParticipant;
+	reason: string | null;
+	durationSeconds: number | null;
 	expiresAt: string | null;
-	revoked: boolean;
-	evidence: string[];
-	history: CaseEdit[];
+	active: boolean;
+	revokedAt: string | null;
+	revokedBy: string | null;
+	revokeReason: string | null;
+	createdAt: string;
+};
+
+export type CasePage = {
+	cases: ModerationCase[];
+	nextCursor: string | null;
 };
 
 export const AUDIT_SOURCES = ['web', 'slash', 'api', 'system', 'import'] as const;

@@ -2,109 +2,133 @@
 
 import { Gavel } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useMemo, useState } from 'react';
-import { PageHeader } from '@/components/management/PageHeader';
+import { useMemo, useState, useTransition } from 'react';
+import { toast } from 'sonner';
 import { Avatar } from '@/components/layout/Avatar';
+import { PageHeader } from '@/components/management/PageHeader';
 import { Badge, type BadgeVariant } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
-import { SearchInput } from '@/components/ui/SearchInput';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
 import { Select } from '@/components/ui/Select';
-import { caseStatus, filterCases } from '@/lib/cases';
-import { relativeTime } from '@/lib/time';
-import type { CaseStatus, ModerationCase } from '@/lib/types/management';
-import type { ModerationAction } from '@/lib/types/modules';
+import { caseStatus, colorOf, displayName, initialsOf } from '@/lib/cases';
+import { listCases } from '@/lib/cases-client';
+import { useRelativeTime } from '@/lib/hooks/useRelativeTime';
+import {
+	CASE_STATUS_FILTERS,
+	INFRACTION_TYPES,
+	type CaseStatus,
+	type CaseStatusFilter,
+	type InfractionType,
+	type ModerationCase
+} from '@/lib/types/management';
 import { CaseDrawer } from './CaseDrawer';
 
-const ACTION_VARIANTS: Record<ModerationAction, BadgeVariant> = {
+const TYPE_VARIANTS: Record<InfractionType, BadgeVariant> = {
+	note: 'neutral',
 	warn: 'warning',
 	timeout: 'warning',
 	mute: 'info',
+	unmute: 'outline',
 	kick: 'danger',
-	ban: 'danger'
+	ban: 'danger',
+	softban: 'danger',
+	unban: 'outline'
 };
 
 const STATUS_VARIANTS: Record<CaseStatus, BadgeVariant> = {
-	active: 'success',
+	standing: 'success',
 	expired: 'neutral',
-	revoked: 'outline'
+	revoked: 'outline',
+	done: 'neutral'
 };
 
-const ACTIONS: ModerationAction[] = ['warn', 'timeout', 'mute', 'kick', 'ban'];
+const asType = (value: string): InfractionType | 'all' =>
+	INFRACTION_TYPES.find((entry) => entry === value) ?? 'all';
 
-const STATUSES: CaseStatus[] = ['active', 'expired', 'revoked'];
+export type CasesScreenProps = {
+	guildId: string;
+	cases: ModerationCase[];
+	nextCursor: string | null;
+	now: string;
+};
 
-export function CasesScreen({ cases }: { cases: ModerationCase[] }) {
+export function CasesScreen({ guildId, cases, nextCursor, now }: CasesScreenProps) {
 	const t = useTranslations('cases');
-	const [items, setItems] = useState(cases);
-	const [query, setQuery] = useState('');
-	const [action, setAction] = useState<ModerationAction | 'all'>('all');
-	const [status, setStatus] = useState<CaseStatus | 'all'>('all');
-	const [moderator, setModerator] = useState('all');
-	const [selectedId, setSelectedId] = useState<string | null>(null);
+	const relativeTime = useRelativeTime();
+	const at = useMemo(() => new Date(now), [now]);
 
-	const moderators = useMemo(
-		() =>
-			[...new Set(items.map((entry) => entry.moderatorName))].sort((a, b) => a.localeCompare(b)),
-		[items]
-	);
+	const [loaded, setLoaded] = useState(cases);
+	const [cursor, setCursor] = useState(nextCursor);
+	const [type, setType] = useState<InfractionType | 'all'>('all');
+	const [status, setStatus] = useState<CaseStatusFilter | 'all'>('all');
+	const [selected, setSelected] = useState<ModerationCase | null>(null);
+	const [pending, startTransition] = useTransition();
 
-	const visible = filterCases(items, { query, action, status, moderator });
-	const selected = items.find((entry) => entry.id === selectedId) ?? null;
-	const activeCount = items.filter((entry) => caseStatus(entry) === 'active').length;
+	const load = (next: {
+		type?: InfractionType | 'all';
+		status?: CaseStatusFilter | 'all';
+		append?: boolean;
+	}): void => {
+		const wantedType = next.type ?? type;
+		const wantedStatus = next.status ?? status;
+
+		startTransition(async () => {
+			const result = await listCases(guildId, {
+				...(wantedType === 'all' ? {} : { type: wantedType }),
+				...(wantedStatus === 'all' ? {} : { status: wantedStatus }),
+				...(next.append === true && cursor !== null ? { cursor } : {})
+			});
+
+			if (result.status === 'error') {
+				toast.error(t('failed'), { description: result.message });
+				return;
+			}
+
+			setLoaded((current) =>
+				next.append === true ? [...current, ...result.page.cases] : result.page.cases
+			);
+			setCursor(result.page.nextCursor);
+		});
+	};
 
 	return (
 		<div className="w-full p-6 sm:p-8">
-			<PageHeader
-				title={t('title')}
-				description={t('description', { count: items.length, active: activeCount })}
-			/>
+			<PageHeader title={t('title')} description={t('description')} />
 
 			<div className="mt-6 flex flex-wrap items-center gap-3">
-				<SearchInput
-					value={query}
-					onValueChange={setQuery}
-					placeholder={t('search')}
-					aria-label={t('searchLabel')}
-					className="max-w-72"
-				/>
-
 				<Select
 					options={[
-						{ value: 'all', label: t('everyAction') },
-						...ACTIONS.map((value) => ({ value, label: t(`action.`) }))
+						{ value: 'all', label: t('everyType') },
+						...INFRACTION_TYPES.map((value) => ({ value, label: t(`action.${value}`) }))
 					]}
-					value={action}
+					value={type}
 					onValueChange={(next) => {
-						setAction(next as ModerationAction | 'all');
+						const chosen = asType(next);
+						setType(chosen);
+						load({ type: chosen });
 					}}
-					className="w-40"
-				/>
-
-				<Select
-					options={[
-						{ value: 'all', label: t('everyModerator') },
-						...moderators.map((name) => ({ value: name, label: name }))
-					]}
-					value={moderator}
-					onValueChange={setModerator}
 					className="w-44"
+					aria-label={t('type')}
 				/>
 
 				<SegmentedControl
 					options={[
 						{ value: 'all', label: t('all') },
-						...STATUSES.map((value) => ({ value, label: t(value) }))
+						...CASE_STATUS_FILTERS.map((value) => ({ value, label: t(`filters.${value}`) }))
 					]}
 					value={status}
-					onValueChange={setStatus}
+					onValueChange={(next) => {
+						setStatus(next);
+						load({ status: next });
+					}}
 					label={t('status')}
 					size="sm"
 				/>
 			</div>
 
 			<div className="mt-6 overflow-hidden rounded-lg border border-border bg-surface shadow-1">
-				{visible.length === 0 ? (
+				{loaded.length === 0 ? (
 					<EmptyState icon={Gavel} title={t('emptyTitle')} description={t('emptyBody')} />
 				) : (
 					<div className="overflow-x-auto">
@@ -121,8 +145,8 @@ export function CasesScreen({ cases }: { cases: ModerationCase[] }) {
 								</tr>
 							</thead>
 							<tbody>
-								{visible.map((entry) => {
-									const entryStatus = caseStatus(entry);
+								{loaded.map((entry) => {
+									const entryStatus = caseStatus(entry, at);
 
 									return (
 										<tr
@@ -131,12 +155,12 @@ export function CasesScreen({ cases }: { cases: ModerationCase[] }) {
 											role="button"
 											aria-label={t('open', { number: entry.number })}
 											onClick={() => {
-												setSelectedId(entry.id);
+												setSelected(entry);
 											}}
 											onKeyDown={(event) => {
 												if (event.key !== 'Enter' && event.key !== ' ') return;
 												event.preventDefault();
-												setSelectedId(entry.id);
+												setSelected(entry);
 											}}
 											className="cursor-pointer border-b border-border transition-colors duration-120 ease-out last:border-0 hover:bg-surface-hover"
 										>
@@ -144,35 +168,35 @@ export function CasesScreen({ cases }: { cases: ModerationCase[] }) {
 												#{entry.number}
 											</td>
 											<td className="px-4 py-3">
-												<Badge variant={ACTION_VARIANTS[entry.action]}>
-													{t(`action.${entry.action}`)}
+												<Badge variant={TYPE_VARIANTS[entry.type]}>
+													{t(`action.${entry.type}`)}
 												</Badge>
 											</td>
 											<td className="px-4 py-3">
 												<div className="flex items-center gap-2">
 													<Avatar
-														initials={entry.targetInitials}
-														color={entry.targetColor}
+														initials={initialsOf(entry.target)}
+														color={colorOf(entry.target)}
 														shape="circle"
 														size="sm"
 													/>
-													<span className="truncate text-body-sm">{entry.targetName}</span>
+													<span className="truncate text-body-sm">{displayName(entry.target)}</span>
 												</div>
 											</td>
 											<td className="px-4 py-3 text-body-sm text-text-muted">
-												{entry.moderatorName}
+												{displayName(entry.moderator)}
 											</td>
 											<td className="max-w-80 px-4 py-3">
 												<span className="block truncate text-body-sm text-text-muted">
-													{entry.reason}
+													{entry.reason ?? t('noReason')}
 												</span>
 											</td>
 											<td className="px-4 py-3 text-body-sm whitespace-nowrap text-text-muted">
-												{relativeTime(entry.createdAt)}
+												{relativeTime(entry.createdAt, at)}
 											</td>
 											<td className="px-4 py-3">
 												<Badge variant={STATUS_VARIANTS[entryStatus]} dot>
-													{t(entryStatus)}
+													{t(`statuses.${entryStatus}`)}
 												</Badge>
 											</td>
 										</tr>
@@ -184,28 +208,34 @@ export function CasesScreen({ cases }: { cases: ModerationCase[] }) {
 				)}
 			</div>
 
-			<p className="mt-3 text-caption font-normal text-text-muted">
-				{t('showing', { shown: visible.length, total: items.length })}
-			</p>
+			<div className="mt-3 flex flex-wrap items-center gap-3">
+				<p className="text-caption font-normal text-text-muted">
+					{cursor === null ? t('allLoaded') : t('loaded', { count: loaded.length })}
+				</p>
+
+				{cursor === null ? null : (
+					<Button
+						variant="ghost"
+						size="sm"
+						disabled={pending}
+						onClick={() => {
+							load({ append: true });
+						}}
+					>
+						{pending ? t('loading') : t('loadMore')}
+					</Button>
+				)}
+			</div>
 
 			<CaseDrawer
 				key={selected?.id ?? 'none'}
+				guildId={guildId}
 				entry={selected}
-				cases={items}
+				now={at}
 				onClose={() => {
-					setSelectedId(null);
+					setSelected(null);
 				}}
-				onRevoke={(id) => {
-					setItems((current) =>
-						current.map((entry) => (entry.id === id ? { ...entry, revoked: true } : entry))
-					);
-				}}
-				onEditReason={(id, reason) => {
-					setItems((current) =>
-						current.map((entry) => (entry.id === id ? { ...entry, reason } : entry))
-					);
-				}}
-				onOpenCase={setSelectedId}
+				onOpenCase={setSelected}
 			/>
 		</div>
 	);

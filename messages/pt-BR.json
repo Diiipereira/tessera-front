@@ -648,27 +648,22 @@
 	},
 	"cases": {
 		"title": "Casos",
-		"search": "Buscar membro, motivo ou nº…",
-		"searchLabel": "Buscar casos",
-		"everyAction": "Todas as ações",
-		"everyModerator": "Todos os moderadores",
-		"status": "Filtrar por estado",
-		"all": "Todos",
-		"active": "Ativos",
-		"expired": "Expirados",
-		"revoked": "Revogados",
-		"emptyTitle": "Nenhum caso corresponde",
-		"emptyBody": "Ou ninguém foi punido dentro desses filtros, ou a busca está estreita demais.",
-		"showing": "Mostrando {shown} de {total} casos.",
-		"action": {
-			"warn": "Advertência",
-			"timeout": "Timeout",
-			"mute": "Silenciamento",
-			"kick": "Expulsão",
-			"ban": "Banimento"
-		},
-		"description": "{count} casos registrados, {active} ainda em vigor. Toda punição abre um, venha de onde vier.",
+		"description": "Toda punição abre um, venha de onde vier. Os números nunca se repetem e nunca pulam.",
+		"everyType": "Todas as ações",
+		"type": "Filtrar por ação",
+		"status": "Filtrar por situação",
+		"all": "Todas",
+		"emptyTitle": "Nenhum caso ainda",
+		"emptyBody": "Nada corresponde a esses filtros. Toda advertência, timeout, expulsão e banimento abre um caso aqui.",
+		"failed": "Não foi possível ler o registro de casos",
+		"loadMore": "Carregar casos mais antigos",
+		"loading": "Carregando…",
+		"loaded": "{count, plural, =1 {1 caso carregado} other {# casos carregados}}",
+		"allLoaded": "Estes são todos os casos registrados.",
 		"open": "Abrir o caso {number}",
+		"noReason": "Sem motivo informado",
+		"unknownMember": "Membro desconhecido",
+		"unknownMemberHint": "Esta conta não existe mais no Discord, ou nunca foi vista aqui. O caso permanece.",
 		"columns": {
 			"case": "Caso",
 			"action": "Ação",
@@ -676,30 +671,58 @@
 			"moderator": "Moderador",
 			"reason": "Motivo",
 			"opened": "Aberto",
-			"status": "Estado"
+			"status": "Situação"
+		},
+		"statuses": {
+			"standing": "Em vigor",
+			"expired": "Expirado",
+			"revoked": "Revogado",
+			"done": "Concluído"
+		},
+		"statusHelp": {
+			"standing": "A punição continua de pé.",
+			"expired": "O prazo acabou. Ninguém levantou à mão.",
+			"revoked": "Um moderador levantou a punição.",
+			"done": "Aconteceu e não deixou nada de pé."
+		},
+		"filters": {
+			"standing": "Em vigor",
+			"revoked": "Revogados",
+			"done": "Concluídos"
+		},
+		"action": {
+			"note": "Anotação",
+			"warn": "Advertência",
+			"timeout": "Timeout",
+			"mute": "Silenciar",
+			"unmute": "Dessilenciar",
+			"kick": "Expulsão",
+			"ban": "Banimento",
+			"softban": "Softban",
+			"unban": "Desbanimento"
+		},
+		"duration": {
+			"day": "{count, plural, =1 {1 dia} other {# dias}}",
+			"hour": "{count, plural, =1 {1 hora} other {# horas}}",
+			"minute": "{count, plural, =1 {1 minuto} other {# minutos}}",
+			"second": "{count, plural, =1 {1 segundo} other {# segundos}}"
 		},
 		"drawer": {
-			"revoke": "Revogar",
-			"alreadyRevoked": "Já revogado",
-			"revoked": "Caso nº {number} revogado",
-			"revokedHint": "O membro é avisado, e a punição é levantada.",
+			"title": "Caso #{number}",
 			"target": "Alvo",
 			"moderator": "Moderador",
 			"reason": "Motivo",
-			"reasonHelp": "O membro vê este texto se a DM na punição estiver ligada.",
-			"saveReason": "Salvar o motivo",
-			"reasonSaved": "Motivo atualizado",
-			"reasonSavedHint": "A mudança fica guardada no histórico do caso.",
 			"opened": "Aberto",
 			"duration": "Duração",
-			"permanent": "Permanente",
-			"liftsIn": "Termina em",
-			"evidence": "Provas",
-			"noEvidence": "Nada anexado. Capturas de tela enviadas pelo comando de barra caem aqui.",
+			"permanent": "Sem data de término",
+			"liftsAt": "Termina",
+			"revokedAt": "Levantado",
+			"revokedBy": "Levantado por",
+			"revokeReason": "Por que foi levantado",
 			"otherCases": "Outros casos de {name}",
 			"onlyCase": "Este é o único caso da pessoa.",
-			"history": "Histórico",
-			"neverEdited": "Nunca editado desde que foi aberto."
+			"loadingOthers": "Procurando outros casos…",
+			"revokeHint": "Levantar um caso é o /case revoke no Discord. Ainda não está nesta tela."
 		}
 	},
 	"modulesList": {

@@ -648,27 +648,22 @@
 	},
 	"cases": {
 		"title": "Cases",
-		"search": "Search member, reason or #number…",
-		"searchLabel": "Search cases",
-		"everyAction": "Every action",
-		"everyModerator": "Every moderator",
+		"description": "Every punishment opens one, wherever it came from. Numbers never repeat and never skip.",
+		"everyType": "Every action",
+		"type": "Filter by action",
 		"status": "Filter by status",
 		"all": "All",
-		"active": "Active",
-		"expired": "Expired",
-		"revoked": "Revoked",
-		"emptyTitle": "No cases match",
-		"emptyBody": "Either nobody has been actioned under those filters, or the search is too narrow.",
-		"showing": "Showing {shown} of {total} cases.",
-		"action": {
-			"warn": "Warn",
-			"timeout": "Timeout",
-			"mute": "Mute",
-			"kick": "Kick",
-			"ban": "Ban"
-		},
-		"description": "{count} cases on record, {active} still in force. Every punishment opens one, wherever it came from.",
+		"emptyTitle": "No cases yet",
+		"emptyBody": "Nothing matches these filters. Every warn, timeout, kick and ban opens a case here.",
+		"failed": "The case log could not be read",
+		"loadMore": "Load older cases",
+		"loading": "Loading…",
+		"loaded": "{count, plural, =1 {1 case loaded} other {# cases loaded}}",
+		"allLoaded": "That is every case on record.",
 		"open": "Open case {number}",
+		"noReason": "No reason given",
+		"unknownMember": "Unknown member",
+		"unknownMemberHint": "This account is gone from Discord, or was never seen here. The case stays.",
 		"columns": {
 			"case": "Case",
 			"action": "Action",
@@ -678,28 +673,56 @@
 			"opened": "Opened",
 			"status": "Status"
 		},
+		"statuses": {
+			"standing": "In force",
+			"expired": "Expired",
+			"revoked": "Revoked",
+			"done": "Done"
+		},
+		"statusHelp": {
+			"standing": "The punishment is still in place.",
+			"expired": "The time ran out. Nothing was lifted by hand.",
+			"revoked": "A moderator lifted it.",
+			"done": "It happened and left nothing standing."
+		},
+		"filters": {
+			"standing": "In force",
+			"revoked": "Revoked",
+			"done": "Done"
+		},
+		"action": {
+			"note": "Note",
+			"warn": "Warn",
+			"timeout": "Timeout",
+			"mute": "Mute",
+			"unmute": "Unmute",
+			"kick": "Kick",
+			"ban": "Ban",
+			"softban": "Softban",
+			"unban": "Unban"
+		},
+		"duration": {
+			"day": "{count, plural, =1 {1 day} other {# days}}",
+			"hour": "{count, plural, =1 {1 hour} other {# hours}}",
+			"minute": "{count, plural, =1 {1 minute} other {# minutes}}",
+			"second": "{count, plural, =1 {1 second} other {# seconds}}"
+		},
 		"drawer": {
-			"revoke": "Revoke",
-			"alreadyRevoked": "Already revoked",
-			"revoked": "Case #{number} revoked",
-			"revokedHint": "The member is told, and the punishment is lifted.",
+			"title": "Case #{number}",
 			"target": "Target",
 			"moderator": "Moderator",
 			"reason": "Reason",
-			"reasonHelp": "The member sees this text if DM on punishment is on.",
-			"saveReason": "Save reason",
-			"reasonSaved": "Reason updated",
-			"reasonSavedHint": "The change is kept in the case history.",
 			"opened": "Opened",
 			"duration": "Duration",
-			"permanent": "Permanent",
-			"liftsIn": "Lifts in",
-			"evidence": "Evidence",
-			"noEvidence": "Nothing attached. Screenshots uploaded with the slash command land here.",
+			"permanent": "No end date",
+			"liftsAt": "Lifts",
+			"revokedAt": "Lifted",
+			"revokedBy": "Lifted by",
+			"revokeReason": "Why it was lifted",
 			"otherCases": "Other cases for {name}",
 			"onlyCase": "This is their only case.",
-			"history": "History",
-			"neverEdited": "Never edited since it was opened."
+			"loadingOthers": "Looking for other cases…",
+			"revokeHint": "Lifting a case is /case revoke in Discord. It is not on this screen yet."
 		}
 	},
 	"modulesList": {

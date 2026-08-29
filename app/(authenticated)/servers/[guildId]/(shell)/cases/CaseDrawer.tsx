@@ -1,67 +1,87 @@
 'use client';
 
-import { Paperclip, Undo2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
-import { toast } from 'sonner';
+import { useEffect, useState } from 'react';
 import { Avatar } from '@/components/layout/Avatar';
 import { Badge, type BadgeVariant } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
 import { Drawer } from '@/components/ui/Drawer';
-import { Field } from '@/components/ui/Field';
-import { Textarea } from '@/components/ui/Textarea';
-import { caseStatus, relatedCases } from '@/lib/cases';
-import { absoluteTime, relativeTime, remaining } from '@/lib/time';
-import type { CaseStatus, ModerationCase } from '@/lib/types/management';
-import type { ModerationAction } from '@/lib/types/modules';
-
-const ACTION_VARIANTS: Record<ModerationAction, BadgeVariant> = {
-	warn: 'warning',
-	timeout: 'warning',
-	mute: 'info',
-	kick: 'danger',
-	ban: 'danger'
-};
+import { caseStatus, colorOf, displayName, durationParts, initialsOf } from '@/lib/cases';
+import { listCases } from '@/lib/cases-client';
+import { useRelativeTime } from '@/lib/hooks/useRelativeTime';
+import type { CaseParticipant, CaseStatus, ModerationCase } from '@/lib/types/management';
 
 const STATUS_VARIANTS: Record<CaseStatus, BadgeVariant> = {
-	active: 'success',
+	standing: 'success',
 	expired: 'neutral',
-	revoked: 'outline'
-};
-
-const STATUS_LABELS: Record<CaseStatus, string> = {
-	active: 'Active',
-	expired: 'Expired',
-	revoked: 'Revoked'
+	revoked: 'outline',
+	done: 'neutral'
 };
 
 type CaseDrawerProps = {
+	guildId: string;
 	entry: ModerationCase | null;
-	cases: ModerationCase[];
+	now: Date;
 	onClose: () => void;
-	onRevoke: (id: string) => void;
-	onEditReason: (id: string, reason: string) => void;
-	onOpenCase: (id: string) => void;
+	onOpenCase: (entry: ModerationCase) => void;
 };
 
-export function CaseDrawer({
-	entry,
-	cases,
-	onClose,
-	onRevoke,
-	onEditReason,
-	onOpenCase
-}: CaseDrawerProps) {
+function Person({ participant }: { participant: CaseParticipant }) {
+	return (
+		<div className="flex items-center gap-2.5">
+			<Avatar
+				initials={initialsOf(participant)}
+				color={colorOf(participant)}
+				shape="circle"
+				size="sm"
+			/>
+			<div className="min-w-0">
+				<p className="truncate text-body">{displayName(participant)}</p>
+				<p className="truncate font-mono text-caption font-normal text-text-muted">
+					{participant.id}
+				</p>
+			</div>
+		</div>
+	);
+}
+
+function Row({ label, children }: { label: string; children: React.ReactNode }) {
+	return (
+		<div className="flex flex-col gap-1 border-b border-border py-3 last:border-0">
+			<p className="text-overline text-text-muted uppercase">{label}</p>
+			<div className="text-body-sm">{children}</div>
+		</div>
+	);
+}
+
+export function CaseDrawer({ guildId, entry, now, onClose, onOpenCase }: CaseDrawerProps) {
 	const t = useTranslations('cases');
-	const shared = useTranslations('common');
-	const [editing, setEditing] = useState(false);
-	const [reason, setReason] = useState(entry?.reason ?? '');
+	const relativeTime = useRelativeTime();
+	const [others, setOthers] = useState<ModerationCase[] | null>(null);
+	const targetId = entry?.target.id ?? null;
+	const currentId = entry?.id ?? null;
 
-	if (!entry) return null;
+	useEffect(() => {
+		if (targetId === null) return;
 
-	const status = caseStatus(entry);
-	const related = relatedCases(cases, entry);
-	const expiresIn = remaining(entry.expiresAt);
+		let live = true;
+
+		void listCases(guildId, { targetId, limit: 10 }).then((result) => {
+			if (!live) return;
+
+			setOthers(
+				result.status === 'ok' ? result.page.cases.filter((other) => other.id !== currentId) : []
+			);
+		});
+
+		return () => {
+			live = false;
+		};
+	}, [guildId, targetId, currentId]);
+
+	if (entry === null) return null;
+
+	const status = caseStatus(entry, now);
+	const duration = entry.durationSeconds === null ? null : durationParts(entry.durationSeconds);
 
 	return (
 		<Drawer
@@ -69,166 +89,79 @@ export function CaseDrawer({
 			onOpenChange={(next) => {
 				if (!next) onClose();
 			}}
-			title={`Case #${String(entry.number)}`}
-			header={
-				<div className="flex items-center gap-2">
-					<span className="font-mono text-h3">#{entry.number}</span>
-					<Badge variant={ACTION_VARIANTS[entry.action]}>{t(`action.${entry.action}`)}</Badge>
-					<Badge variant={STATUS_VARIANTS[status]} dot>
-						{STATUS_LABELS[status]}
-					</Badge>
-				</div>
-			}
-			footer={
-				<div className="flex flex-wrap gap-2">
-					<Button
-						variant="outline"
-						size="sm"
-						disabled={editing}
-						onClick={() => {
-							setReason(entry.reason);
-							setEditing(true);
-						}}
-					>
-						Edit reason
-					</Button>
-					<Button
-						variant="danger"
-						size="sm"
-						disabled={status === 'revoked'}
-						onClick={() => {
-							onRevoke(entry.id);
-							toast.success(t('drawer.revoked', { number: entry.number }), {
-								description: t('drawer.revokedHint')
-							});
-						}}
-					>
-						<Undo2 aria-hidden="true" />
-						{status === 'revoked' ? t('drawer.alreadyRevoked') : t('drawer.revoke')}
-					</Button>
-				</div>
-			}
+			title={t('drawer.title', { number: entry.number })}
 		>
-			<div className="flex flex-col gap-5">
-				<div className="grid gap-3 sm:grid-cols-2">
-					<Party
-						label={t('drawer.target')}
-						name={entry.targetName}
-						initials={entry.targetInitials}
-						color={entry.targetColor}
-					/>
-					<Party
-						label={t('drawer.moderator')}
-						name={entry.moderatorName}
-						initials={entry.moderatorInitials}
-						color={entry.moderatorColor}
-					/>
+			<div className="flex flex-col gap-4">
+				<div className="flex flex-wrap items-center gap-2">
+					<Badge variant={STATUS_VARIANTS[status]} dot>
+						{t(`statuses.${status}`)}
+					</Badge>
+					<span className="text-body-sm text-text-muted">{t(`statusHelp.${status}`)}</span>
 				</div>
 
 				<div>
-					<p className="mb-1.5 font-mono text-overline text-text-muted uppercase">
-						{t('drawer.reason')}
-					</p>
-					{editing ? (
-						<div className="flex flex-col gap-2">
-							<Field help={t('drawer.reasonHelp')}>
-								<Textarea
-									value={reason}
-									onChange={(event) => {
-										setReason(event.target.value);
-									}}
-									maxLength={512}
-									showCount
-								/>
-							</Field>
-							<div className="flex gap-2">
-								<Button
-									size="sm"
-									onClick={() => {
-										onEditReason(entry.id, reason);
-										setEditing(false);
-										toast.success(t('drawer.reasonSaved'), {
-											description: t('drawer.reasonSavedHint')
-										});
-									}}
-								>
-									{t('drawer.saveReason')}
-								</Button>
-								<Button
-									variant="ghost"
-									size="sm"
-									onClick={() => {
-										setEditing(false);
-									}}
-								>
-									{shared('cancel')}
-								</Button>
-							</div>
-						</div>
-					) : (
-						<p className="text-body text-pretty">{entry.reason}</p>
+					<Row label={t('drawer.target')}>
+						<Person participant={entry.target} />
+						{entry.target.name === null ? (
+							<p className="mt-1 text-caption font-normal text-text-muted">
+								{t('unknownMemberHint')}
+							</p>
+						) : null}
+					</Row>
+
+					<Row label={t('drawer.moderator')}>
+						<Person participant={entry.moderator} />
+					</Row>
+
+					<Row label={t('drawer.reason')}>
+						<p className="text-pretty">{entry.reason ?? t('noReason')}</p>
+					</Row>
+
+					<Row label={t('drawer.opened')}>{relativeTime(entry.createdAt, now)}</Row>
+
+					<Row label={t('drawer.duration')}>
+						{duration === null
+							? t('drawer.permanent')
+							: t(`duration.${duration.unit}`, { count: duration.count })}
+					</Row>
+
+					{entry.expiresAt === null ? null : (
+						<Row label={t('drawer.liftsAt')}>{relativeTime(entry.expiresAt, now)}</Row>
 					)}
-				</div>
 
-				<dl className="flex flex-col gap-2">
-					<Row
-						label={t('drawer.opened')}
-						value={`${relativeTime(entry.createdAt)} · ${absoluteTime(entry.createdAt)}`}
-					/>
-					<Row
-						label={t('drawer.duration')}
-						value={entry.expiresAt === null ? t('drawer.permanent') : absoluteTime(entry.expiresAt)}
-					/>
-					{expiresIn === null ? null : <Row label={t('drawer.liftsIn')} value={expiresIn} />}
-				</dl>
+					{entry.revokedAt === null ? null : (
+						<Row label={t('drawer.revokedAt')}>{relativeTime(entry.revokedAt, now)}</Row>
+					)}
 
-				<div>
-					<p className="mb-1.5 font-mono text-overline text-text-muted uppercase">
-						{t('drawer.evidence')}
-					</p>
-					{entry.evidence.length === 0 ? (
-						<p className="text-body-sm text-text-muted">{t('drawer.noEvidence')}</p>
-					) : (
-						<ul className="flex flex-col gap-1.5">
-							{entry.evidence.map((file) => (
-								<li
-									key={file}
-									className="flex items-center gap-2 rounded-md border border-border bg-surface-sunken px-3 py-2"
-								>
-									<Paperclip className="size-4 shrink-0 text-text-subtle" aria-hidden="true" />
-									<span className="min-w-0 flex-1 truncate font-mono text-caption text-text-muted">
-										{file}
-									</span>
-								</li>
-							))}
-						</ul>
+					{entry.revokeReason === null ? null : (
+						<Row label={t('drawer.revokeReason')}>{entry.revokeReason}</Row>
 					)}
 				</div>
 
 				<div>
-					<p className="mb-1.5 font-mono text-overline text-text-muted uppercase">
-						{t('drawer.otherCases', { name: entry.targetName })}
+					<p className="text-overline text-text-muted uppercase">
+						{t('drawer.otherCases', { name: displayName(entry.target) })}
 					</p>
-					{related.length === 0 ? (
-						<p className="text-body-sm text-text-muted">{t('drawer.onlyCase')}</p>
+
+					{others === null ? (
+						<p className="mt-2 text-body-sm text-text-muted">{t('drawer.loadingOthers')}</p>
+					) : others.length === 0 ? (
+						<p className="mt-2 text-body-sm text-text-muted">{t('drawer.onlyCase')}</p>
 					) : (
-						<ul className="flex flex-col gap-1.5">
-							{related.map((other) => (
+						<ul className="mt-2 flex flex-col gap-1">
+							{others.map((other) => (
 								<li key={other.id}>
 									<button
 										type="button"
 										onClick={() => {
-											onOpenCase(other.id);
+											onOpenCase(other);
 										}}
-										className="flex w-full items-center gap-2 rounded-md border border-border bg-surface-sunken px-3 py-2 text-left transition-colors duration-120 ease-out hover:border-border-strong"
+										className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left transition-colors duration-120 ease-out hover:bg-surface-hover"
 									>
 										<span className="font-mono text-caption text-text-muted">#{other.number}</span>
-										<Badge variant={ACTION_VARIANTS[other.action]}>
-											{t(`action.${other.action}`)}
-										</Badge>
-										<span className="min-w-0 flex-1 truncate text-body-sm">{other.reason}</span>
-										<span className="shrink-0 text-caption font-normal text-text-muted">
-											{relativeTime(other.createdAt)}
+										<Badge variant="outline">{t(`action.${other.type}`)}</Badge>
+										<span className="truncate text-body-sm text-text-muted">
+											{relativeTime(other.createdAt, now)}
 										</span>
 									</button>
 								</li>
@@ -237,57 +170,8 @@ export function CaseDrawer({
 					)}
 				</div>
 
-				<div>
-					<p className="mb-1.5 font-mono text-overline text-text-muted uppercase">
-						{t('drawer.history')}
-					</p>
-					{entry.history.length === 0 ? (
-						<p className="text-body-sm text-text-muted">{t('drawer.neverEdited')}</p>
-					) : (
-						<ul className="flex flex-col gap-2 border-l border-border pl-3">
-							{entry.history.map((edit) => (
-								<li key={edit.id}>
-									<p className="text-body-sm">{edit.summary}</p>
-									<p className="text-caption font-normal text-text-muted">
-										{edit.author} · {relativeTime(edit.at)}
-									</p>
-								</li>
-							))}
-						</ul>
-					)}
-				</div>
+				<p className="text-caption font-normal text-text-muted">{t('drawer.revokeHint')}</p>
 			</div>
 		</Drawer>
-	);
-}
-
-function Party({
-	label,
-	name,
-	initials,
-	color
-}: {
-	label: string;
-	name: string;
-	initials: string;
-	color: string;
-}) {
-	return (
-		<div className="rounded-md border border-border bg-surface-sunken p-3">
-			<p className="font-mono text-overline text-text-muted uppercase">{label}</p>
-			<div className="mt-1.5 flex items-center gap-2">
-				<Avatar initials={initials} color={color} shape="circle" size="sm" />
-				<span className="min-w-0 truncate text-body">{name}</span>
-			</div>
-		</div>
-	);
-}
-
-function Row({ label, value }: { label: string; value: string }) {
-	return (
-		<div className="flex items-baseline justify-between gap-4 border-b border-border pb-2 last:border-0">
-			<dt className="text-body-sm text-text-muted">{label}</dt>
-			<dd className="text-right text-body-sm">{value}</dd>
-		</div>
 	);
 }

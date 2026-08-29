@@ -13,10 +13,8 @@ export function AuditSkeleton() {
 			actionSize="h-9 w-25"
 		>
 			<div className="mt-6 flex flex-wrap items-center gap-3">
-				<Skeleton className="h-9 w-68 max-w-full rounded-md" />
-				<Skeleton className="h-9 w-44 shrink-0 rounded-md" />
-				<Skeleton className="h-9 w-44 shrink-0 rounded-md" />
-				<Skeleton className="h-8.5 w-46 shrink-0 rounded-md" />
+				<Skeleton className="h-9 w-52 shrink-0 rounded-md" />
+				<Skeleton className="h-8.5 w-96 max-w-full shrink-0 rounded-md" />
 			</div>
 
 			<PanelSkeleton className="mt-6">
@@ -43,7 +41,10 @@ export function AuditSkeleton() {
 				))}
 			</PanelSkeleton>
 
-			<TextSkeleton line="caption" width="w-52" className="mt-3" />
+			<div className="mt-3 flex flex-wrap items-center gap-3">
+				<TextSkeleton line="caption" width="w-52" />
+				<Skeleton className="h-8 w-48 rounded-md" />
+			</div>
 		</ManagementPageSkeleton>
 	);
 }
