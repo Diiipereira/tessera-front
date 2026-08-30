@@ -133,6 +133,10 @@ export function CaseDrawer({ guildId, entry, now, onClose, onOpenCase }: CaseDra
 						<Row label={t('drawer.revokedAt')}>{relativeTime(entry.revokedAt, now)}</Row>
 					)}
 
+					{entry.revokedBy === null ? null : (
+						<Row label={t('drawer.revokedBy')}>{displayName(entry.revokedBy)}</Row>
+					)}
+
 					{entry.revokeReason === null ? null : (
 						<Row label={t('drawer.revokeReason')}>{entry.revokeReason}</Row>
 					)}

@@ -91,7 +91,7 @@ export type ModerationCase = {
 	expiresAt: string | null;
 	active: boolean;
 	revokedAt: string | null;
-	revokedBy: string | null;
+	revokedBy: CaseParticipant | null;
 	revokeReason: string | null;
 	createdAt: string;
 };

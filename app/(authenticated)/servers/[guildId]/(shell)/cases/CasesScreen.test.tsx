@@ -252,4 +252,51 @@ describe('CasesScreen', () => {
 			)
 		).toBeInTheDocument();
 	});
+
+	const withdrawn = (over: Partial<CaseParticipant> = {}): ModerationCase =>
+		entry({
+			active: false,
+			revokedAt: '2026-08-29T11:30:00.000Z',
+			revokedBy: person({ id: '999999999999999999', name: 'Rafa', handle: 'rafa', ...over }),
+			revokeReason: 'Warned the wrong person'
+		});
+
+	it('names who withdrew the case, which the drawer never used to say', async () => {
+		const user = userEvent.setup();
+		paint([withdrawn()]);
+
+		await user.click(screen.getByRole('button', { name: 'Open case 44' }));
+
+		expect(await screen.findByText('Lifted by')).toBeInTheDocument();
+		expect(screen.getByText('Rafa')).toBeInTheDocument();
+	});
+
+	it('falls back to the handle, then the id, so the row is never blank', async () => {
+		const user = userEvent.setup();
+		paint([withdrawn({ name: null, handle: null })]);
+
+		await user.click(screen.getByRole('button', { name: 'Open case 44' }));
+
+		expect(await screen.findByText('999999999999999999')).toBeInTheDocument();
+	});
+
+	it('says nothing about who withdrew a case that nobody withdrew', async () => {
+		const user = userEvent.setup();
+		paint();
+
+		await user.click(screen.getByRole('button', { name: 'Open case 44' }));
+
+		await screen.findByRole('dialog');
+
+		expect(screen.queryByText('Lifted by')).not.toBeInTheDocument();
+	});
+
+	it('names the withdrawer in Portuguese too', async () => {
+		const user = userEvent.setup();
+		paint([withdrawn()], null, 'pt-BR');
+
+		await user.click(screen.getByRole('button', { name: 'Abrir o caso 44' }));
+
+		expect(await screen.findByText('Levantado por')).toBeInTheDocument();
+	});
 });
