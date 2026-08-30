@@ -137,6 +137,7 @@ describe('toModerationPatch', () => {
 				'escalationAutoActions',
 				'escalationChannelId',
 				'escalationPingRoleIds',
+				'escalationWindowDays',
 				'logChannelId',
 				'mutedRoleId',
 				'protectedRoleIds',

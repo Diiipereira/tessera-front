@@ -22,6 +22,16 @@ vi.mock('@/lib/module-client', () => ({
 	patchModule: (...args: unknown[]) => patchModule(...args) as unknown
 }));
 
+const loadLadder = vi.fn();
+const addRule = vi.fn();
+const removeRule = vi.fn();
+
+vi.mock('@/lib/escalation-client', () => ({
+	loadLadder: (...args: unknown[]) => loadLadder(...args) as unknown,
+	addRule: (...args: unknown[]) => addRule(...args) as unknown,
+	removeRule: (...args: unknown[]) => removeRule(...args) as unknown
+}));
+
 const GUILD_ID = '842315097461823104';
 const LOG_CHANNEL = '111111111111111111';
 const STAFF_ROLE = '222222222222222222';
@@ -52,7 +62,8 @@ const config: ModerationConfig = {
 	appealUrl: '',
 	escalationChannelId: null,
 	escalationPingRoleIds: [],
-	escalationAutoActions: []
+	escalationAutoActions: [],
+	escalationWindowDays: 30
 };
 
 const paint = (overrides: Partial<ModerationConfig> = {}) =>
@@ -71,6 +82,9 @@ const paint = (overrides: Partial<ModerationConfig> = {}) =>
 describe('ModerationScreen', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
+		loadLadder.mockResolvedValue({ status: 'ok', ladder: { rules: [], windowDays: 30 } });
+		addRule.mockResolvedValue({ status: 'ok' });
+		removeRule.mockResolvedValue({ status: 'ok' });
 	});
 
 	it('offers a log channel, which the screen never had before', () => {
@@ -140,10 +154,110 @@ describe('ModerationScreen', () => {
 		expect(screen.getByText(copy.escalation.protectedNote)).toBeInTheDocument();
 	});
 
-	it('says the ladder itself does not exist yet, rather than implying it does', () => {
+	it('explains what each severity is worth, which is what decides the points', () => {
 		paint();
 
 		expect(screen.getByText(copy.escalation.notBuilt)).toBeInTheDocument();
+	});
+
+	it('says over how many days the points keep counting', async () => {
+		paint();
+
+		expect(
+			await screen.findByText('Points add up over 30 days, then stop counting.')
+		).toBeInTheDocument();
+	});
+
+	it('says the ladder is empty rather than leaving a blank space', async () => {
+		paint();
+
+		expect(
+			await screen.findByText('No rungs yet. Nothing happens on its own.')
+		).toBeInTheDocument();
+	});
+
+	it('reads the rungs the guild wrote, with the duration where there is one', async () => {
+		loadLadder.mockResolvedValue({
+			status: 'ok',
+			ladder: {
+				windowDays: 30,
+				rules: [
+					{ id: 'r1', threshold: 3, action: 'timeout', durationSeconds: 3600 },
+					{ id: 'r2', threshold: 10, action: 'ban', durationSeconds: null }
+				]
+			}
+		});
+
+		paint();
+
+		expect(await screen.findByText('3 points — Timeout for 1 hour')).toBeInTheDocument();
+		expect(screen.getByText('10 points — Ban')).toBeInTheDocument();
+	});
+
+	it('writes a rung with the points, the action and the duration', async () => {
+		const user = userEvent.setup();
+		paint();
+
+		await screen.findByText('No rungs yet. Nothing happens on its own.');
+		await user.click(screen.getByRole('button', { name: 'Add rung' }));
+
+		await waitFor(() => {
+			expect(addRule).toHaveBeenCalledWith(GUILD_ID, {
+				threshold: 3,
+				action: 'timeout',
+				durationSeconds: 3600
+			});
+		});
+	});
+
+	it('sends no duration on a step that cannot carry one', async () => {
+		const user = userEvent.setup();
+		paint();
+
+		await screen.findByText('No rungs yet. Nothing happens on its own.');
+		await user.click(screen.getByRole('combobox', { name: 'Action' }));
+		await user.click(screen.getByRole('option', { name: 'Ban' }));
+		await user.click(screen.getByRole('button', { name: 'Add rung' }));
+
+		await waitFor(() => {
+			expect(addRule).toHaveBeenCalledWith(GUILD_ID, {
+				threshold: 3,
+				action: 'ban',
+				durationSeconds: null
+			});
+		});
+	});
+
+	it('refuses points that are not a whole number, instead of asking the API', async () => {
+		const user = userEvent.setup();
+		paint();
+
+		await screen.findByText('No rungs yet. Nothing happens on its own.');
+		await user.clear(screen.getByRole('textbox', { name: 'Points' }));
+		await user.type(screen.getByRole('textbox', { name: 'Points' }), 'many');
+		await user.click(screen.getByRole('button', { name: 'Add rung' }));
+
+		expect(addRule).not.toHaveBeenCalled();
+		expect(toastError).toHaveBeenCalled();
+	});
+
+	it('removes a rung by its points', async () => {
+		loadLadder.mockResolvedValue({
+			status: 'ok',
+			ladder: {
+				windowDays: 30,
+				rules: [{ id: 'r1', threshold: 3, action: 'kick', durationSeconds: null }]
+			}
+		});
+
+		const user = userEvent.setup();
+		paint();
+
+		await user.click(await screen.findByRole('button', { name: 'Remove the rung at 3 points' }));
+
+		await waitFor(() => {
+			expect(removeRule).toHaveBeenCalledWith(GUILD_ID, 3);
+		});
 	});
 
 	it('starts clean, so no save bar', () => {

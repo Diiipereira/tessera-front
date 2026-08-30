@@ -1587,7 +1587,7 @@
 			},
 			"escalation": {
 				"title": "Quando o motor age sozinho",
-				"description": "A escada de escalonamento ainda não existe. Estes campos decidem o que acontece quando ela existir.",
+				"description": "A escada que pune reincidente, e o que a Tessera faz sozinha quando um degrau é alcançado.",
 				"auto": "O que o motor faz sem perguntar",
 				"autoHint": "O que ficar de fora vira chamado da staff em vez de punição.",
 				"channel": "Canal do chamado da staff",
@@ -1597,7 +1597,24 @@
 				"pingPlaceholder": "Não mencionar ninguém…",
 				"protectedNote": "Membro protegido sempre vira chamado da staff, marque o que marcar acima.",
 				"unreachable": "Algumas ações precisam de gente, e não há canal para pedir. Escolha um, ou deixe o motor fazer tudo.",
-				"notBuilt": "A escada em si — quantos pontos vale cada infração e onde ficam os degraus — ainda vai ser construída."
+				"window": "Dias em que os pontos contam",
+				"windowHint": "Infração mais velha fica no histórico, mas para de pesar.",
+				"notBuilt": "Leve vale 1 ponto, moderada 3, pesada 6, gravíssima 10. O moderador classifica cada punição na hora de aplicar."
+			},
+			"ladder": {
+				"counting": "Os pontos somam ao longo de {days} dias e depois param de contar.",
+				"loading": "Lendo a escada…",
+				"empty": "Nenhum degrau ainda. Nada acontece sozinho.",
+				"rung": "{points} pontos — {action}",
+				"rungWithDuration": "{points} pontos — {action} por {duration}",
+				"remove": "Tirar o degrau de {points} pontos",
+				"points": "Pontos",
+				"action": "Ação",
+				"duration": "Por quanto tempo",
+				"add": "Acrescentar degrau",
+				"badPoints": "Os pontos precisam ser um número inteiro, de um para cima.",
+				"addFailed": "Não foi possível acrescentar o degrau",
+				"removeFailed": "Não foi possível tirar o degrau"
 			}
 		},
 		"welcome": {
@@ -1713,7 +1730,8 @@
 				"appealUrl": "Link de recurso",
 				"escalationChannelId": "Canal do chamado da staff",
 				"escalationPingRoleIds": "Cargos que o chamado menciona",
-				"escalationAutoActions": "O que o motor faz sozinho"
+				"escalationAutoActions": "O que o motor faz sozinho",
+				"escalationWindowDays": "Dias em que os pontos contam"
 			}
 		}
 	},

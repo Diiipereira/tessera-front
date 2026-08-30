@@ -25,12 +25,14 @@ import {
 	MODERATION_LOG_CHANNEL_KINDS,
 	TIMEOUT_KEYS,
 	asTimeoutKey,
+	asWindowDays,
 	escalationIsUnreachable,
 	toModerationConfig,
 	toModerationPatch,
 	type ModerationConfig
 } from '@/lib/modules/moderation';
 import type { Channel, Role } from '@/lib/types/discord';
+import { LadderEditor } from './LadderEditor';
 import { toast } from 'sonner';
 
 const PURGE_DAYS = Array.from({ length: MAX_PURGE_DAYS + 1 }, (_, day) => day);
@@ -303,6 +305,18 @@ export function ModerationScreen({
 						{t('escalation.unreachable')}
 					</Alert>
 				) : null}
+
+				<Field label={t('escalation.window')} hint={t('escalation.windowHint')} className="w-40">
+					<Input
+						value={String(draft.escalationWindowDays)}
+						inputMode="numeric"
+						onChange={(event) => {
+							form.set('escalationWindowDays', asWindowDays(Number(event.target.value)));
+						}}
+					/>
+				</Field>
+
+				<LadderEditor guildId={guildId} canWrite={true} />
 
 				<p className="text-caption font-normal text-text-muted">{t('escalation.protectedNote')}</p>
 				<p className="text-caption font-normal text-text-muted">{t('escalation.notBuilt')}</p>

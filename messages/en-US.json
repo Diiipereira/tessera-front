@@ -1587,7 +1587,7 @@
 			},
 			"escalation": {
 				"title": "When the engine acts on its own",
-				"description": "The escalation ladder is not built yet. These decide what happens once it is.",
+				"description": "The ladder that punishes a repeat offender, and what Tessera does on its own when a rung is reached.",
 				"auto": "What the engine does without asking",
 				"autoHint": "Anything left out becomes a staff call instead of a punishment.",
 				"channel": "Staff call channel",
@@ -1597,7 +1597,24 @@
 				"pingPlaceholder": "Mention nobody…",
 				"protectedNote": "A protected member always becomes a staff call, whatever is ticked above.",
 				"unreachable": "Some actions need a human, and there is no channel to ask in. Pick one, or let the engine do everything.",
-				"notBuilt": "The ladder itself — how many points each infraction is worth and where the rungs are — is still to be built."
+				"window": "Days the points count",
+				"windowHint": "Older infractions stay in the history but stop weighing.",
+				"notBuilt": "Light is 1 point, moderate 3, heavy 6, severe 10. A moderator grades each punishment as they give it."
+			},
+			"ladder": {
+				"counting": "Points add up over {days} days, then stop counting.",
+				"loading": "Reading the ladder…",
+				"empty": "No rungs yet. Nothing happens on its own.",
+				"rung": "{points} points — {action}",
+				"rungWithDuration": "{points} points — {action} for {duration}",
+				"remove": "Remove the rung at {points} points",
+				"points": "Points",
+				"action": "Action",
+				"duration": "For how long",
+				"add": "Add rung",
+				"badPoints": "Points must be a whole number, one or more.",
+				"addFailed": "Could not add the rung",
+				"removeFailed": "Could not remove the rung"
 			}
 		},
 		"welcome": {
@@ -1713,7 +1730,8 @@
 				"appealUrl": "Appeal link",
 				"escalationChannelId": "Staff call channel",
 				"escalationPingRoleIds": "Roles the staff call mentions",
-				"escalationAutoActions": "What the engine does on its own"
+				"escalationAutoActions": "What the engine does on its own",
+				"escalationWindowDays": "Days the points count"
 			}
 		}
 	},

@@ -36,6 +36,7 @@ export type ModerationConfig = {
 	escalationChannelId: string | null;
 	escalationPingRoleIds: string[];
 	escalationAutoActions: AutoAction[];
+	escalationWindowDays: number;
 };
 
 const asId = (value: unknown): string | null => (typeof value === 'string' ? value : null);
@@ -54,6 +55,20 @@ export const asPurgeDays = (value: unknown, fallback: number): number =>
 
 export const asTimeoutKey = (value: unknown): TimeoutKey =>
 	TIMEOUT_KEYS.find((key) => key === value) ?? '1h';
+
+export const MIN_WINDOW_DAYS = 1;
+
+export const MAX_WINDOW_DAYS = 365;
+
+export const DEFAULT_WINDOW_DAYS = 30;
+
+export const asWindowDays = (value: unknown): number =>
+	typeof value === 'number' &&
+	Number.isInteger(value) &&
+	value >= MIN_WINDOW_DAYS &&
+	value <= MAX_WINDOW_DAYS
+		? value
+		: DEFAULT_WINDOW_DAYS;
 
 export const asAutoActions = (value: unknown): AutoAction[] =>
 	Array.isArray(value) ? AUTO_ACTIONS.filter((action) => value.includes(action)) : [];
@@ -75,7 +90,8 @@ export function toModerationConfig(state: GuildModuleStateDto): ModerationConfig
 		appealUrl: asText(config.appealUrl),
 		escalationChannelId: asId(config.escalationChannelId),
 		escalationPingRoleIds: asIdList(config.escalationPingRoleIds, MAX_ESCALATION_PING_ROLES),
-		escalationAutoActions: asAutoActions(config.escalationAutoActions)
+		escalationAutoActions: asAutoActions(config.escalationAutoActions),
+		escalationWindowDays: asWindowDays(config.escalationWindowDays)
 	};
 }
 
@@ -93,7 +109,8 @@ export function toModerationPatch(config: ModerationConfig): Record<string, unkn
 		appealUrl: config.appealUrl.trim() === '' ? null : config.appealUrl,
 		escalationChannelId: config.escalationChannelId,
 		escalationPingRoleIds: config.escalationPingRoleIds,
-		escalationAutoActions: config.escalationAutoActions
+		escalationAutoActions: config.escalationAutoActions,
+		escalationWindowDays: config.escalationWindowDays
 	};
 }
 
