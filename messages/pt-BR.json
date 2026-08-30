@@ -11,6 +11,12 @@
 		"justNow": "agora mesmo",
 		"unknownTime": "desconhecido"
 	},
+	"channelSwitch": {
+		"first": "A partir de salvar, #{to} recebe a mensagem de boas-vindas.",
+		"moved": "A partir de salvar, #{to} recebe a mensagem de boas-vindas. #{from} deixa de receber.",
+		"cleared": "A partir de salvar, #{from} deixa de receber a mensagem de boas-vindas, e nenhum canal entra no lugar.",
+		"moduleOff": "O módulo está desligado, então nada é enviado de todo jeito até você ligá-lo."
+	},
 	"failure": {
 		"title": "Não deu para carregar esta tela.",
 		"body": "Pode ser passageiro. Tente de novo — e se continuar falhando, a referência abaixo é o que liga esta tela ao log do servidor.",

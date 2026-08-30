@@ -38,8 +38,11 @@ vi.mock('sonner', () => ({
 const GUILD_ID = '931562055025168435';
 const CHANNEL_ID = '901234567890123001';
 
+const CHANNEL_ID_B = '701234567890123499';
+
 const channels: Channel[] = [
-	{ id: CHANNEL_ID, name: 'teste', categoryId: 'cat-1', category: 'Text channels', kind: 'text' }
+	{ id: CHANNEL_ID, name: 'teste', categoryId: 'cat-1', category: 'Text channels', kind: 'text' },
+	{ id: CHANNEL_ID_B, name: 'regras', categoryId: 'cat-1', category: 'Text channels', kind: 'text' }
 ];
 
 const roles: Role[] = [
@@ -282,5 +285,54 @@ describe('a welcome message nobody wrote', () => {
 		renderScreen({ message: { mode: 'embed', text: '', embed: config.message.embed } });
 
 		expect(screen.queryByText(copy.message.emptyHint)).not.toBeInTheDocument();
+	});
+});
+
+describe('changing where the welcome message goes', () => {
+	const pickChannel = async (name: string) => {
+		const user = userEvent.setup();
+
+		await user.click(screen.getByRole('button', { name: /teste/ }));
+		await user.click(await screen.findByRole('button', { name }));
+
+		return user;
+	};
+
+	it('says nothing while the channel is the one already saved', () => {
+		renderScreen();
+
+		expect(screen.queryByText(/receives the welcome message/)).not.toBeInTheDocument();
+	});
+
+	it('names both channels when one replaces the other', async () => {
+		renderScreen();
+		await pickChannel('regras');
+
+		expect(
+			await screen.findByText(
+				'From the moment you save, #regras receives the welcome message. #teste stops receiving it.'
+			)
+		).toBeInTheDocument();
+	});
+
+	it('names only the arriving channel on a first configuration', async () => {
+		renderScreen({ channelId: null });
+		const user = userEvent.setup();
+
+		await user.click(screen.getByRole('button', { name: /Pick a channel|Select|channel/i }));
+		await user.click(await screen.findByRole('button', { name: 'regras' }));
+
+		expect(
+			await screen.findByText('From the moment you save, #regras receives the welcome message.')
+		).toBeInTheDocument();
+	});
+
+	it('does not promise a delivery the module is switched off for', async () => {
+		renderScreen({ enabled: false });
+		await pickChannel('regras');
+
+		expect(
+			await screen.findByText(/The module is off, so nothing is sent either way/)
+		).toBeInTheDocument();
 	});
 });

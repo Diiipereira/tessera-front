@@ -11,6 +11,12 @@
 		"justNow": "just now",
 		"unknownTime": "unknown"
 	},
+	"channelSwitch": {
+		"first": "From the moment you save, #{to} receives the welcome message.",
+		"moved": "From the moment you save, #{to} receives the welcome message. #{from} stops receiving it.",
+		"cleared": "From the moment you save, #{from} stops receiving the welcome message, and no channel takes its place.",
+		"moduleOff": "The module is off, so nothing is sent either way until you turn it on."
+	},
 	"failure": {
 		"title": "This screen could not load.",
 		"body": "It may be temporary. Try again — and if it keeps failing, the reference below is what ties this screen to the server log.",

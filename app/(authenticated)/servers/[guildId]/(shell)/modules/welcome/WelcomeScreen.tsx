@@ -2,6 +2,7 @@
 
 import { DoorOpen } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { channelSwitch } from '@/lib/channel-switch';
 import { useCallback, useRef } from 'react';
 import { DiscordPreview } from '@/components/modules/DiscordPreview';
 import { MessageComposer } from '@/components/modules/MessageComposer';
@@ -57,6 +58,7 @@ export function WelcomeScreen({
 }: WelcomeScreenProps) {
 	const t = useTranslations('modules.welcome');
 	const previewText = useTranslations('modules.preview');
+	const switchText = useTranslations('channelSwitch');
 	const versionRef = useRef(version);
 
 	const save = useCallback(
@@ -80,6 +82,7 @@ export function WelcomeScreen({
 
 	const form = useConfigDraft<WelcomeConfig>(config, { save });
 	const draft = form.draft;
+	const switching = channelSwitch(form.saved.channelId, draft.channelId, channels);
 
 	const preview = (
 		<section
@@ -128,7 +131,17 @@ export function WelcomeScreen({
 			}
 		>
 			<SettingsSection title={t('message.title')} description={t('message.description')}>
-				<Field label={t('message.channel')} hint={t('message.channelHint')}>
+				<Field
+					label={t('message.channel')}
+					hint={t('message.channelHint')}
+					{...(switching.kind === 'none'
+						? {}
+						: {
+								help: `${switchText(switching.kind, { ...switching })}${
+									draft.enabled ? '' : ` ${switchText('moduleOff')}`
+								}`
+							})}
+				>
 					<ChannelPicker
 						channels={channels}
 						kinds={WELCOME_CHANNEL_KINDS}
