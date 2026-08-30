@@ -77,10 +77,17 @@ const UNDO_KINDS: Partial<Record<InfractionType, UndoKind>> = {
 	timeout: 'unsilence'
 };
 
-export function undoKind(entry: ModerationCase): UndoKind | null {
+const deadlinePassed = (entry: ModerationCase, now: Date): boolean =>
+	entry.expiresAt !== null && new Date(entry.expiresAt).getTime() <= now.getTime();
+
+export function undoKind(entry: ModerationCase, now: Date): UndoKind | null {
 	if (entry.revokedAt !== null) return null;
 
-	return UNDO_KINDS[entry.type] ?? null;
+	const kind = UNDO_KINDS[entry.type] ?? null;
+
+	if (kind === null) return null;
+
+	return entry.type === 'timeout' && deadlinePassed(entry, now) ? 'withdraw' : kind;
 }
 
 export function touchesDiscord(kind: UndoKind): boolean {

@@ -37,10 +37,13 @@ type CaseDrawerProps = {
 	canWrite: boolean;
 	onClose: () => void;
 	onOpenCase: (entry: ModerationCase) => void;
+	onFilterByMember: (participant: CaseParticipant) => void;
 	onRevoked: (entry: ModerationCase) => void;
 };
 
 function Person({ participant }: { participant: CaseParticipant }) {
+	const name = displayName(participant);
+
 	return (
 		<div className="flex items-center gap-2.5">
 			<Avatar
@@ -50,10 +53,12 @@ function Person({ participant }: { participant: CaseParticipant }) {
 				size="sm"
 			/>
 			<div className="min-w-0">
-				<p className="truncate text-body">{displayName(participant)}</p>
-				<p className="truncate font-mono text-caption font-normal text-text-muted">
-					{participant.id}
-				</p>
+				<p className="truncate text-body">{name}</p>
+				{name === participant.id ? null : (
+					<p className="truncate font-mono text-caption font-normal text-text-muted">
+						{participant.id}
+					</p>
+				)}
 			</div>
 		</div>
 	);
@@ -75,6 +80,7 @@ export function CaseDrawer({
 	canWrite,
 	onClose,
 	onOpenCase,
+	onFilterByMember,
 	onRevoked
 }: CaseDrawerProps) {
 	const t = useTranslations('cases');
@@ -138,7 +144,7 @@ export function CaseDrawer({
 
 	const status = caseStatus(entry, now);
 	const duration = entry.durationSeconds === null ? null : durationParts(entry.durationSeconds);
-	const kind = undoKind(entry);
+	const kind = undoKind(entry, now);
 
 	return (
 		<Drawer
@@ -192,7 +198,9 @@ export function CaseDrawer({
 					)}
 
 					{entry.revokedBy === null ? null : (
-						<Row label={t('drawer.revokedBy')}>{displayName(entry.revokedBy)}</Row>
+						<Row label={t('drawer.revokedBy')}>
+							<Person participant={entry.revokedBy} />
+						</Row>
 					)}
 
 					{entry.revokeReason === null ? null : (
@@ -230,6 +238,17 @@ export function CaseDrawer({
 							))}
 						</ul>
 					)}
+
+					<Button
+						variant="ghost"
+						size="sm"
+						className="mt-2"
+						onClick={() => {
+							onFilterByMember(entry.target);
+						}}
+					>
+						{t('drawer.filterByMember')}
+					</Button>
 				</div>
 
 				{kind === null || !canWrite ? (

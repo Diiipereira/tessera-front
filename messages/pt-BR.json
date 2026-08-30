@@ -650,6 +650,7 @@
 		"title": "Casos",
 		"description": "Toda punição abre um, venha de onde vier. Os números nunca se repetem e nunca pulam.",
 		"everyType": "Todas as ações",
+		"memberFilter": "Só os casos de {name}",
 		"type": "Filtrar por ação",
 		"status": "Filtrar por situação",
 		"all": "Todas",
@@ -687,6 +688,7 @@
 		},
 		"filters": {
 			"standing": "Em vigor",
+			"expired": "Expirados",
 			"revoked": "Revogados",
 			"done": "Concluídos"
 		},
@@ -720,6 +722,7 @@
 			"revokedBy": "Levantado por",
 			"revokeReason": "Por que foi levantado",
 			"otherCases": "Outros casos de {name}",
+			"filterByMember": "Ver todos os casos deste membro",
 			"onlyCase": "Este é o único caso da pessoa.",
 			"loadingOthers": "Procurando outros casos…",
 			"revokeHint": "Só moderadores podem anular um caso."

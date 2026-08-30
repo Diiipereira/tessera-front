@@ -150,7 +150,6 @@ describe('CasesScreen', () => {
 			expect(listCases).toHaveBeenCalledWith(GUILD_ID, expect.objectContaining({ type: 'ban' }));
 		});
 	});
-
 	it('sends the status filter to the API too', async () => {
 		const user = userEvent.setup();
 		paint();
@@ -161,6 +160,20 @@ describe('CasesScreen', () => {
 			expect(listCases).toHaveBeenCalledWith(
 				GUILD_ID,
 				expect.objectContaining({ status: 'revoked' })
+			);
+		});
+	});
+
+	it('lets the reader ask for the expired, which the badge showed and nothing could filter', async () => {
+		const user = userEvent.setup();
+		paint();
+
+		await user.click(screen.getByRole('button', { name: 'Expired', pressed: false }));
+
+		await waitFor(() => {
+			expect(listCases).toHaveBeenCalledWith(
+				GUILD_ID,
+				expect.objectContaining({ status: 'expired' })
 			);
 		});
 	});
@@ -340,6 +353,38 @@ describe('CasesScreen', () => {
 
 		expect(await screen.findByText('Levantado por')).toBeInTheDocument();
 	});
+
+	it('filters the whole list by the member in the drawer, not just the page on screen', async () => {
+		const user = userEvent.setup();
+		paint([entry()]);
+
+		await user.click(screen.getByRole('button', { name: 'Open case 44' }));
+		await screen.findByRole('dialog');
+		await user.click(screen.getByRole('button', { name: 'See every case for this member' }));
+
+		await waitFor(() => {
+			expect(listCases).toHaveBeenLastCalledWith(GUILD_ID, {
+				targetId: '444444444444444444'
+			});
+		});
+	});
+
+	it('says whose cases it is showing, and offers a way back', async () => {
+		const user = userEvent.setup();
+		paint([entry()]);
+
+		await user.click(screen.getByRole('button', { name: 'Open case 44' }));
+		await screen.findByRole('dialog');
+		await user.click(screen.getByRole('button', { name: 'See every case for this member' }));
+
+		const clear = await screen.findByRole('button', { name: 'Only cases for Tigre' });
+
+		await user.click(clear);
+
+		await waitFor(() => {
+			expect(listCases).toHaveBeenLastCalledWith(GUILD_ID, {});
+		});
+	});
 });
 
 describe('undoing a case from the drawer', () => {
@@ -464,14 +509,69 @@ describe('undoing a case from the drawer', () => {
 		expect(toastSuccess).not.toHaveBeenCalled();
 	});
 
-	it('reloads the list, so the row and any new case are both current', async () => {
+	it('keeps the pages already loaded, instead of snapping back to the first', async () => {
+		const user = userEvent.setup();
+		listCases.mockResolvedValueOnce({
+			status: 'ok',
+			page: { cases: [entry({ id: 'uuid-2', number: 43, type: 'ban' })], nextCursor: null }
+		});
+		paint([entry({ type: 'warn', expiresAt: null })], '44');
+
+		await user.click(screen.getByRole('button', { name: 'Load older cases' }));
+		await waitFor(() => {
+			expect(within(screen.getByRole('table')).getByText('#43')).toBeInTheDocument();
+		});
+
+		await user.click(screen.getByRole('button', { name: 'Open case 44' }));
+		await screen.findByRole('dialog');
+		await user.click(screen.getByRole('button', { name: 'Withdraw case' }));
+
+		await waitFor(() => {
+			expect(revokeCase).toHaveBeenCalled();
+		});
+
+		await user.keyboard('{Escape}');
+		await waitFor(() => {
+			expect(screen.queryByRole('dialog')).toBeNull();
+		});
+
+		expect(within(screen.getByRole('table')).getByText('#43')).toBeInTheDocument();
+	});
+
+	it('marks the row it just undid, without waiting for a reload', async () => {
 		const user = await open({ type: 'warn', expiresAt: null });
 
 		await user.click(screen.getByRole('button', { name: 'Withdraw case' }));
 
 		await waitFor(() => {
-			expect(listCases).toHaveBeenCalled();
+			expect(revokeCase).toHaveBeenCalled();
 		});
+
+		await user.keyboard('{Escape}');
+		await waitFor(() => {
+			expect(screen.queryByRole('dialog')).toBeNull();
+		});
+
+		expect(within(screen.getByRole('table')).getByText('Revoked')).toBeInTheDocument();
+	});
+
+	it('treats a timeout whose clock ran out as a record to clear, since Discord lowered it', async () => {
+		await open({ type: 'timeout', expiresAt: '2026-08-29T11:00:00.000Z' });
+
+		expect(screen.getByRole('button', { name: 'Withdraw case' })).toBeInTheDocument();
+		expect(screen.queryByRole('button', { name: 'Let them talk again' })).not.toBeInTheDocument();
+	});
+
+	it('still offers to unmute past the deadline, because nothing ever removed the role', async () => {
+		await open({ type: 'mute', expiresAt: '2026-08-29T11:00:00.000Z' });
+
+		expect(screen.getByRole('button', { name: 'Let them talk again' })).toBeInTheDocument();
+	});
+
+	it('still offers to unban past the deadline, because nothing ever lifted the ban', async () => {
+		await open({ type: 'ban', expiresAt: '2026-08-29T11:00:00.000Z' });
+
+		expect(screen.getByRole('button', { name: 'Lift the ban' })).toBeInTheDocument();
 	});
 
 	it('labels the buttons in Portuguese too', async () => {

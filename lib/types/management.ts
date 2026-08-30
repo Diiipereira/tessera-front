@@ -67,11 +67,11 @@ export const INFRACTION_TYPES = [
 
 export type InfractionType = (typeof INFRACTION_TYPES)[number];
 
-export const CASE_STATUS_FILTERS = ['standing', 'revoked', 'done'] as const;
+export const CASE_STATUS_FILTERS = ['standing', 'expired', 'revoked', 'done'] as const;
 
 export type CaseStatusFilter = (typeof CASE_STATUS_FILTERS)[number];
 
-export type CaseStatus = 'standing' | 'expired' | 'revoked' | 'done';
+export type CaseStatus = CaseStatusFilter;
 
 export type CaseParticipant = {
 	id: string;

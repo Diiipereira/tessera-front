@@ -1,6 +1,6 @@
 'use client';
 
-import { Gavel } from 'lucide-react';
+import { Gavel, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useMemo, useState, useTransition } from 'react';
 import { toast } from 'sonner';
@@ -19,6 +19,7 @@ import { useRelativeTime } from '@/lib/hooks/useRelativeTime';
 import {
 	CASE_STATUS_FILTERS,
 	INFRACTION_TYPES,
+	type CaseParticipant,
 	type CaseStatus,
 	type CaseStatusFilter,
 	type InfractionType,
@@ -75,20 +76,24 @@ export function CasesScreen({
 	const [type, setType] = useState<InfractionType | 'all'>('all');
 	const [status, setStatus] = useState<CaseStatusFilter | 'all'>('all');
 	const [selected, setSelected] = useState<ModerationCase | null>(null);
+	const [member, setMember] = useState<CaseParticipant | null>(null);
 	const [pending, startTransition] = useTransition();
 
 	const load = (next: {
 		type?: InfractionType | 'all';
+		member?: CaseParticipant | null;
 		status?: CaseStatusFilter | 'all';
 		append?: boolean;
 	}): void => {
 		const wantedType = next.type ?? type;
 		const wantedStatus = next.status ?? status;
+		const wantedMember = next.member === undefined ? member : next.member;
 
 		startTransition(async () => {
 			const result = await listCases(guildId, {
 				...(wantedType === 'all' ? {} : { type: wantedType }),
 				...(wantedStatus === 'all' ? {} : { status: wantedStatus }),
+				...(wantedMember === null ? {} : { targetId: wantedMember.id }),
 				...(next.append === true && cursor !== null ? { cursor } : {})
 			});
 
@@ -137,6 +142,20 @@ export function CasesScreen({
 					label={t('status')}
 					size="sm"
 				/>
+
+				{member === null ? null : (
+					<Button
+						variant="ghost"
+						size="sm"
+						onClick={() => {
+							setMember(null);
+							load({ member: null });
+						}}
+					>
+						<X className="size-3.5" aria-hidden />
+						{t('memberFilter', { name: displayName(member) })}
+					</Button>
+				)}
 			</div>
 
 			<div className="mt-6 overflow-hidden rounded-lg border border-border bg-surface shadow-1">
@@ -249,12 +268,16 @@ export function CasesScreen({
 					setSelected(null);
 				}}
 				onOpenCase={setSelected}
+				onFilterByMember={(participant) => {
+					setSelected(null);
+					setMember(participant);
+					load({ member: participant });
+				}}
 				onRevoked={(updated) => {
 					setSelected(updated);
 					setLoaded((current) =>
 						current.map((entry) => (entry.id === updated.id ? updated : entry))
 					);
-					load({});
 				}}
 			/>
 		</div>

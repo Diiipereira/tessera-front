@@ -650,6 +650,7 @@
 		"title": "Cases",
 		"description": "Every punishment opens one, wherever it came from. Numbers never repeat and never skip.",
 		"everyType": "Every action",
+		"memberFilter": "Only cases for {name}",
 		"type": "Filter by action",
 		"status": "Filter by status",
 		"all": "All",
@@ -687,6 +688,7 @@
 		},
 		"filters": {
 			"standing": "In force",
+			"expired": "Expired",
 			"revoked": "Revoked",
 			"done": "Done"
 		},
@@ -720,6 +722,7 @@
 			"revokedBy": "Lifted by",
 			"revokeReason": "Why it was lifted",
 			"otherCases": "Other cases for {name}",
+			"filterByMember": "See every case for this member",
 			"onlyCase": "This is their only case.",
 			"loadingOthers": "Looking for other cases…",
 			"revokeHint": "Only moderators can undo a case."
