@@ -1,4 +1,9 @@
-import type { CaseParticipant, CaseStatus, ModerationCase } from '@/lib/types/management';
+import type {
+	CaseParticipant,
+	CaseStatus,
+	InfractionType,
+	ModerationCase
+} from '@/lib/types/management';
 
 export function caseStatus(entry: ModerationCase, now: Date): CaseStatus {
 	if (entry.revokedAt !== null) return 'revoked';
@@ -57,3 +62,29 @@ export function durationParts(seconds: number): DurationParts {
 
 	return { unit: 'second', count: seconds };
 }
+
+export const WRITE_CASES = 'cases.write';
+
+export type UndoKind = 'withdraw' | 'unban' | 'unsilence';
+
+const UNDO_KINDS: Partial<Record<InfractionType, UndoKind>> = {
+	note: 'withdraw',
+	warn: 'withdraw',
+	kick: 'withdraw',
+	softban: 'withdraw',
+	ban: 'unban',
+	mute: 'unsilence',
+	timeout: 'unsilence'
+};
+
+export function undoKind(entry: ModerationCase): UndoKind | null {
+	if (entry.revokedAt !== null) return null;
+
+	return UNDO_KINDS[entry.type] ?? null;
+}
+
+export function touchesDiscord(kind: UndoKind): boolean {
+	return kind !== 'withdraw';
+}
+
+export const MAX_REVOKE_REASON = 512;

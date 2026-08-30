@@ -11,7 +11,9 @@ import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
 import { Select } from '@/components/ui/Select';
-import { caseStatus, colorOf, displayName, initialsOf } from '@/lib/cases';
+import { WRITE_CASES, caseStatus, colorOf, displayName, initialsOf } from '@/lib/cases';
+import { can } from '@/lib/team';
+import type { CapabilityCatalogDto } from '@/lib/api-url';
 import { listCases } from '@/lib/cases-client';
 import { useRelativeTime } from '@/lib/hooks/useRelativeTime';
 import {
@@ -20,7 +22,8 @@ import {
 	type CaseStatus,
 	type CaseStatusFilter,
 	type InfractionType,
-	type ModerationCase
+	type ModerationCase,
+	type TeamRole
 } from '@/lib/types/management';
 import { CaseDrawer } from './CaseDrawer';
 
@@ -48,12 +51,21 @@ const asType = (value: string): InfractionType | 'all' =>
 
 export type CasesScreenProps = {
 	guildId: string;
+	catalog: CapabilityCatalogDto;
+	viewerRole: TeamRole;
 	cases: ModerationCase[];
 	nextCursor: string | null;
 	now: string;
 };
 
-export function CasesScreen({ guildId, cases, nextCursor, now }: CasesScreenProps) {
+export function CasesScreen({
+	guildId,
+	catalog,
+	viewerRole,
+	cases,
+	nextCursor,
+	now
+}: CasesScreenProps) {
 	const t = useTranslations('cases');
 	const relativeTime = useRelativeTime();
 	const at = useMemo(() => new Date(now), [now]);
@@ -232,10 +244,18 @@ export function CasesScreen({ guildId, cases, nextCursor, now }: CasesScreenProp
 				guildId={guildId}
 				entry={selected}
 				now={at}
+				canWrite={can(catalog, viewerRole, WRITE_CASES)}
 				onClose={() => {
 					setSelected(null);
 				}}
 				onOpenCase={setSelected}
+				onRevoked={(updated) => {
+					setSelected(updated);
+					setLoaded((current) =>
+						current.map((entry) => (entry.id === updated.id ? updated : entry))
+					);
+					load({});
+				}}
 			/>
 		</div>
 	);

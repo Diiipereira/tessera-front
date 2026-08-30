@@ -722,7 +722,20 @@
 			"otherCases": "Other cases for {name}",
 			"onlyCase": "This is their only case.",
 			"loadingOthers": "Looking for other cases…",
-			"revokeHint": "Lifting a case is /case revoke in Discord. It is not on this screen yet."
+			"revokeHint": "Only moderators can undo a case."
+		},
+		"undo": {
+			"withdraw": "Withdraw case",
+			"unban": "Lift the ban",
+			"unsilence": "Let them talk again",
+			"reason": "Why (optional)",
+			"reasonHint": "Discord records this in its own audit log.",
+			"confirmWithdraw": "This clears the record. Nothing changes in Discord.",
+			"confirmDiscord": "This acts in Discord right now, not just here.",
+			"done": "Case #{number} withdrawn.",
+			"doneWithCase": "Case #{number} withdrawn, and case #{created} opened for the lift.",
+			"failed": "The case could not be withdrawn",
+			"working": "Working…"
 		}
 	},
 	"modulesList": {

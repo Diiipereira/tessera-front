@@ -4,7 +4,7 @@ import type { CasePage } from './types/management';
 
 const GUILD_ID = '931562055025168435';
 
-const page: CasePage = { cases: [], nextCursor: null };
+const page: CasePage = { cases: [], nextCursor: null, viewerRole: 'moderator' };
 
 const json = (status: number, body: unknown): Response =>
 	({

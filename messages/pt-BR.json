@@ -722,7 +722,20 @@
 			"otherCases": "Outros casos de {name}",
 			"onlyCase": "Este é o único caso da pessoa.",
 			"loadingOthers": "Procurando outros casos…",
-			"revokeHint": "Levantar um caso é o /case revoke no Discord. Ainda não está nesta tela."
+			"revokeHint": "Só moderadores podem anular um caso."
+		},
+		"undo": {
+			"withdraw": "Anular caso",
+			"unban": "Desbanir",
+			"unsilence": "Devolver a fala",
+			"reason": "Motivo (opcional)",
+			"reasonHint": "O Discord registra isso no log de auditoria dele.",
+			"confirmWithdraw": "Isso limpa o registro. Nada muda no Discord.",
+			"confirmDiscord": "Isso age no Discord agora, não só aqui.",
+			"done": "Caso #{number} anulado.",
+			"doneWithCase": "Caso #{number} anulado, e o caso #{created} foi aberto para a revogação.",
+			"failed": "Não consegui anular o caso",
+			"working": "Trabalhando…"
 		}
 	},
 	"modulesList": {

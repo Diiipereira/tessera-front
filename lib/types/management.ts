@@ -96,7 +96,13 @@ export type ModerationCase = {
 	createdAt: string;
 };
 
+export type RevokedCase = {
+	case: ModerationCase;
+	createdNumber: number | null;
+};
+
 export type CasePage = {
+	viewerRole: TeamRole;
 	cases: ModerationCase[];
 	nextCursor: string | null;
 };

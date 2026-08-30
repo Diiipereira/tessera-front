@@ -4,7 +4,8 @@ import type {
 	CasePage,
 	CaseStatusFilter,
 	InfractionType,
-	ModerationCase
+	ModerationCase,
+	RevokedCase
 } from '@/lib/types/management';
 
 export type CaseQuery = {
@@ -69,6 +70,36 @@ export async function readCase(guildId: string, number: number): Promise<CaseRea
 
 	if (response.ok) {
 		return { status: 'ok', entry: (await response.json()) as ModerationCase };
+	}
+
+	const failure = (await response.json().catch(() => ({}))) as ErrorBody;
+
+	return { status: 'error', message: describeFailure(failure, response.status) };
+}
+
+export type CaseRevokeResult =
+	{ status: 'ok'; revoked: RevokedCase } | { status: 'error'; message: string };
+
+export async function revokeCase(
+	guildId: string,
+	number: number,
+	reason: string | null
+): Promise<CaseRevokeResult> {
+	let response: Response;
+
+	try {
+		response = await fetch(`${apiBaseUrl()}/guilds/${guildId}/cases/${String(number)}/revoke`, {
+			method: 'POST',
+			credentials: 'include',
+			headers: { 'content-type': 'application/json' },
+			body: JSON.stringify(reason === null ? {} : { reason })
+		});
+	} catch (error) {
+		return { status: 'error', message: unreachable(error) };
+	}
+
+	if (response.ok) {
+		return { status: 'ok', revoked: (await response.json()) as RevokedCase };
 	}
 
 	const failure = (await response.json().catch(() => ({}))) as ErrorBody;

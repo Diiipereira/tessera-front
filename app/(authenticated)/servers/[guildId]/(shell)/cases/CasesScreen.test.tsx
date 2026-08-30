@@ -2,21 +2,25 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { Translated } from '@/tests/i18n';
-import type { CaseParticipant, ModerationCase } from '@/lib/types/management';
+import type { CapabilityCatalogDto } from '@/lib/api-url';
+import type { CaseParticipant, ModerationCase, TeamRole } from '@/lib/types/management';
 import { CasesScreen } from './CasesScreen';
 
 const toastError = vi.fn();
+const toastSuccess = vi.fn();
 const listCases = vi.fn();
+const revokeCase = vi.fn();
 
 vi.mock('sonner', () => ({
 	toast: {
 		error: (...args: unknown[]) => toastError(...args) as unknown,
-		success: vi.fn()
+		success: (...args: unknown[]) => toastSuccess(...args) as unknown
 	}
 }));
 
 vi.mock('@/lib/cases-client', () => ({
-	listCases: (...args: unknown[]) => listCases(...args) as unknown
+	listCases: (...args: unknown[]) => listCases(...args) as unknown,
+	revokeCase: (...args: unknown[]) => revokeCase(...args) as unknown
 }));
 
 const GUILD_ID = '842315097461823104';
@@ -47,14 +51,33 @@ const entry = (over: Partial<ModerationCase> = {}): ModerationCase => ({
 	...over
 });
 
+const CATALOG: CapabilityCatalogDto = {
+	capabilities: [],
+	roles: ['owner', 'admin', 'moderator', 'viewer'],
+	presets: {
+		owner: ['cases.read', 'cases.write'],
+		admin: ['cases.read', 'cases.write'],
+		moderator: ['cases.read', 'cases.write'],
+		viewer: ['cases.read']
+	}
+};
+
 const paint = (
 	cases: ModerationCase[] = [entry()],
 	nextCursor: string | null = null,
-	locale: 'en-US' | 'pt-BR' = 'en-US'
+	locale: 'en-US' | 'pt-BR' = 'en-US',
+	role: TeamRole = 'moderator'
 ) =>
 	render(
 		<Translated locale={locale}>
-			<CasesScreen guildId={GUILD_ID} cases={cases} nextCursor={nextCursor} now={NOW} />
+			<CasesScreen
+				guildId={GUILD_ID}
+				catalog={CATALOG}
+				viewerRole={role}
+				cases={cases}
+				nextCursor={nextCursor}
+				now={NOW}
+			/>
 		</Translated>
 	);
 
@@ -262,17 +285,13 @@ describe('CasesScreen', () => {
 		});
 	});
 
-	it('says where revoking lives, since the screen cannot do it yet', async () => {
+	it('tells a viewer why there is nothing to press', async () => {
 		const user = userEvent.setup();
-		paint();
+		paint([entry()], null, 'en-US', 'viewer');
 
 		await user.click(screen.getByRole('button', { name: 'Open case 44' }));
 
-		expect(
-			await screen.findByText(
-				'Lifting a case is /case revoke in Discord. It is not on this screen yet.'
-			)
-		).toBeInTheDocument();
+		expect(await screen.findByText('Only moderators can undo a case.')).toBeInTheDocument();
 	});
 
 	const withdrawn = (over: Partial<CaseParticipant> = {}): ModerationCase =>
@@ -320,5 +339,148 @@ describe('CasesScreen', () => {
 		await user.click(screen.getByRole('button', { name: 'Abrir o caso 44' }));
 
 		expect(await screen.findByText('Levantado por')).toBeInTheDocument();
+	});
+});
+
+describe('undoing a case from the drawer', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+		listCases.mockResolvedValue({ status: 'ok', page: { cases: [], nextCursor: null } });
+		revokeCase.mockResolvedValue({
+			status: 'ok',
+			revoked: { case: entry({ revokedAt: '2026-08-29T12:00:00.000Z' }), createdNumber: null }
+		});
+	});
+
+	const open = async (over: Partial<ModerationCase> = {}, role: TeamRole = 'moderator') => {
+		const user = userEvent.setup();
+		paint([entry(over)], null, 'en-US', role);
+
+		await user.click(screen.getByRole('button', { name: 'Open case 44' }));
+		await screen.findByRole('dialog');
+
+		return user;
+	};
+
+	it('offers to withdraw a warning, which changes nothing in Discord', async () => {
+		await open({ type: 'warn', expiresAt: null });
+
+		expect(screen.getByRole('button', { name: 'Withdraw case' })).toBeInTheDocument();
+		expect(
+			screen.getByText('This clears the record. Nothing changes in Discord.')
+		).toBeInTheDocument();
+	});
+
+	it('offers to lift a ban, and says it acts in Discord', async () => {
+		await open({ type: 'ban', expiresAt: null });
+
+		expect(screen.getByRole('button', { name: 'Lift the ban' })).toBeInTheDocument();
+		expect(screen.getByText('This acts in Discord right now, not just here.')).toBeInTheDocument();
+	});
+
+	it('offers to let a timed out member talk again', async () => {
+		await open({ type: 'timeout' });
+
+		expect(screen.getByRole('button', { name: 'Let them talk again' })).toBeInTheDocument();
+	});
+
+	it('offers nothing on a case that was already withdrawn', async () => {
+		await open({ type: 'warn', revokedAt: '2026-08-29T11:30:00.000Z' });
+
+		expect(screen.queryByRole('button', { name: 'Withdraw case' })).not.toBeInTheDocument();
+	});
+
+	it('offers nothing on a lift, because undoing one means punishing again', async () => {
+		await open({ type: 'unban', expiresAt: null });
+
+		expect(screen.queryByRole('button', { name: 'Withdraw case' })).not.toBeInTheDocument();
+		expect(screen.queryByRole('button', { name: 'Lift the ban' })).not.toBeInTheDocument();
+	});
+
+	it('shows a viewer nothing to press, since the API would refuse them', async () => {
+		await open({ type: 'ban', expiresAt: null }, 'viewer');
+
+		expect(screen.queryByRole('button', { name: 'Lift the ban' })).not.toBeInTheDocument();
+	});
+
+	it('sends the case number and no reason when the box is empty', async () => {
+		const user = await open({ type: 'warn', expiresAt: null });
+
+		await user.click(screen.getByRole('button', { name: 'Withdraw case' }));
+
+		await waitFor(() => {
+			expect(revokeCase).toHaveBeenCalledWith(GUILD_ID, 44, null);
+		});
+	});
+
+	it('sends the reason the moderator typed, trimmed', async () => {
+		const user = await open({ type: 'warn', expiresAt: null });
+
+		await user.type(screen.getByRole('textbox'), '  Wrong person  ');
+		await user.click(screen.getByRole('button', { name: 'Withdraw case' }));
+
+		await waitFor(() => {
+			expect(revokeCase).toHaveBeenCalledWith(GUILD_ID, 44, 'Wrong person');
+		});
+	});
+
+	it('says which case fell', async () => {
+		const user = await open({ type: 'warn', expiresAt: null });
+
+		await user.click(screen.getByRole('button', { name: 'Withdraw case' }));
+
+		await waitFor(() => {
+			expect(toastSuccess).toHaveBeenCalledWith('Case #44 withdrawn.');
+		});
+	});
+
+	it('names the case the lift opened, so the new row is not a surprise', async () => {
+		revokeCase.mockResolvedValue({
+			status: 'ok',
+			revoked: { case: entry({ revokedAt: '2026-08-29T12:00:00.000Z' }), createdNumber: 45 }
+		});
+
+		const user = await open({ type: 'ban', expiresAt: null });
+
+		await user.click(screen.getByRole('button', { name: 'Lift the ban' }));
+
+		await waitFor(() => {
+			expect(toastSuccess).toHaveBeenCalledWith(
+				'Case #44 withdrawn, and case #45 opened for the lift.'
+			);
+		});
+	});
+
+	it('says what went wrong instead of pretending it worked', async () => {
+		revokeCase.mockResolvedValue({ status: 'error', message: 'Discord refused the action' });
+
+		const user = await open({ type: 'ban', expiresAt: null });
+
+		await user.click(screen.getByRole('button', { name: 'Lift the ban' }));
+
+		await waitFor(() => {
+			expect(toastError).toHaveBeenCalled();
+		});
+		expect(toastSuccess).not.toHaveBeenCalled();
+	});
+
+	it('reloads the list, so the row and any new case are both current', async () => {
+		const user = await open({ type: 'warn', expiresAt: null });
+
+		await user.click(screen.getByRole('button', { name: 'Withdraw case' }));
+
+		await waitFor(() => {
+			expect(listCases).toHaveBeenCalled();
+		});
+	});
+
+	it('labels the buttons in Portuguese too', async () => {
+		const user = userEvent.setup();
+		paint([entry({ type: 'ban', expiresAt: null })], null, 'pt-BR');
+
+		await user.click(screen.getByRole('button', { name: 'Abrir o caso 44' }));
+		await screen.findByRole('dialog');
+
+		expect(screen.getByRole('button', { name: 'Desbanir' })).toBeInTheDocument();
 	});
 });

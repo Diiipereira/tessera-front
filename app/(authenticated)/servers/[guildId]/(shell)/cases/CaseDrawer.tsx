@@ -2,11 +2,24 @@
 
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 import { Avatar } from '@/components/layout/Avatar';
 import { Badge, type BadgeVariant } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
 import { Drawer } from '@/components/ui/Drawer';
-import { caseStatus, colorOf, displayName, durationParts, initialsOf } from '@/lib/cases';
-import { listCases } from '@/lib/cases-client';
+import { Field } from '@/components/ui/Field';
+import { Input } from '@/components/ui/Input';
+import {
+	caseStatus,
+	colorOf,
+	displayName,
+	durationParts,
+	initialsOf,
+	MAX_REVOKE_REASON,
+	touchesDiscord,
+	undoKind
+} from '@/lib/cases';
+import { listCases, revokeCase } from '@/lib/cases-client';
 import { useRelativeTime } from '@/lib/hooks/useRelativeTime';
 import type { CaseParticipant, CaseStatus, ModerationCase } from '@/lib/types/management';
 
@@ -21,8 +34,10 @@ type CaseDrawerProps = {
 	guildId: string;
 	entry: ModerationCase | null;
 	now: Date;
+	canWrite: boolean;
 	onClose: () => void;
 	onOpenCase: (entry: ModerationCase) => void;
+	onRevoked: (entry: ModerationCase) => void;
 };
 
 function Person({ participant }: { participant: CaseParticipant }) {
@@ -53,10 +68,20 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
 	);
 }
 
-export function CaseDrawer({ guildId, entry, now, onClose, onOpenCase }: CaseDrawerProps) {
+export function CaseDrawer({
+	guildId,
+	entry,
+	now,
+	canWrite,
+	onClose,
+	onOpenCase,
+	onRevoked
+}: CaseDrawerProps) {
 	const t = useTranslations('cases');
 	const relativeTime = useRelativeTime();
 	const [others, setOthers] = useState<ModerationCase[] | null>(null);
+	const [reason, setReason] = useState('');
+	const [busy, setBusy] = useState(false);
 	const targetId = entry?.target.id ?? null;
 	const currentId = entry?.id ?? null;
 
@@ -78,10 +103,42 @@ export function CaseDrawer({ guildId, entry, now, onClose, onOpenCase }: CaseDra
 		};
 	}, [guildId, targetId, currentId]);
 
+	const undo = (target: ModerationCase): void => {
+		setBusy(true);
+
+		void revokeCase(guildId, target.number, reason.trim() === '' ? null : reason.trim()).then(
+			(result) => {
+				setBusy(false);
+
+				if (result.status === 'error') {
+					toast.error(t('undo.failed'), { description: result.message });
+					return;
+				}
+
+				const created = result.revoked.createdNumber;
+
+				toast.success(
+					created === null
+						? t('undo.done', { number: target.number })
+						: t('undo.doneWithCase', { number: target.number, created })
+				);
+
+				onRevoked(result.revoked.case);
+			},
+			(error: unknown) => {
+				setBusy(false);
+				toast.error(t('undo.failed'), {
+					description: error instanceof Error ? error.message : ''
+				});
+			}
+		);
+	};
+
 	if (entry === null) return null;
 
 	const status = caseStatus(entry, now);
 	const duration = entry.durationSeconds === null ? null : durationParts(entry.durationSeconds);
+	const kind = undoKind(entry);
 
 	return (
 		<Drawer
@@ -175,7 +232,36 @@ export function CaseDrawer({ guildId, entry, now, onClose, onOpenCase }: CaseDra
 					)}
 				</div>
 
-				<p className="text-caption font-normal text-text-muted">{t('drawer.revokeHint')}</p>
+				{kind === null || !canWrite ? (
+					<p className="text-caption font-normal text-text-muted">{t('drawer.revokeHint')}</p>
+				) : (
+					<div className="flex flex-col gap-3 border-t border-border pt-4">
+						<Field label={t('undo.reason')} hint={t('undo.reasonHint')}>
+							<Input
+								value={reason}
+								maxLength={MAX_REVOKE_REASON}
+								onChange={(event) => {
+									setReason(event.target.value);
+								}}
+							/>
+						</Field>
+
+						<p className="text-caption font-normal text-text-muted">
+							{touchesDiscord(kind) ? t('undo.confirmDiscord') : t('undo.confirmWithdraw')}
+						</p>
+
+						<Button
+							variant="danger"
+							loading={busy}
+							disabled={busy}
+							onClick={() => {
+								undo(entry);
+							}}
+						>
+							{t(`undo.${kind}`)}
+						</Button>
+					</div>
+				)}
 			</div>
 		</Drawer>
 	);
