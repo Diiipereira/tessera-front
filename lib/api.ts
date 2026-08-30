@@ -4,18 +4,31 @@ import { apiBaseUrl, SESSION_COOKIE } from './api-url';
 export type ApiResult<T> =
 	| { status: 'ok'; data: T }
 	| { status: 'unauthenticated' }
-	| { status: 'unreachable'; answered: boolean; reason: string; httpStatus?: number };
+	| {
+			status: 'unreachable';
+			answered: boolean;
+			reason: string;
+			code?: string;
+			httpStatus?: number;
+	  };
 
-async function failureReason(response: Response): Promise<string> {
+interface Failure {
+	readonly reason: string;
+	readonly code?: string;
+}
+
+async function failureReason(response: Response): Promise<Failure> {
 	const status = `The API answered ${String(response.status)}`;
 
 	try {
 		const body = (await response.json()) as { error?: { code?: string; message?: string } };
 		const { code, message } = body.error ?? {};
 
-		return code === undefined ? status : `${status} (${code}): ${message ?? ''}`.trim();
+		if (code === undefined) return { reason: status };
+
+		return { reason: `${status} (${code}): ${message ?? ''}`.trim(), code };
 	} catch {
-		return status;
+		return { reason: status };
 	}
 }
 
@@ -46,7 +59,7 @@ export async function apiGet<T>(path: string): Promise<ApiResult<T>> {
 		return {
 			status: 'unreachable',
 			answered: true,
-			reason: await failureReason(response),
+			...(await failureReason(response)),
 			httpStatus: response.status
 		};
 	}

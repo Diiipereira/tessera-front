@@ -11,6 +11,12 @@
 		"justNow": "agora mesmo",
 		"unknownTime": "desconhecido"
 	},
+	"failure": {
+		"title": "Não deu para carregar esta tela.",
+		"body": "Pode ser passageiro. Tente de novo — e se continuar falhando, a referência abaixo é o que liga esta tela ao log do servidor.",
+		"retry": "Tentar de novo",
+		"reference": "Referência {digest}"
+	},
 	"locales": {
 		"en-US": "English (US)",
 		"pt-BR": "Português (Brasil)"

@@ -25,10 +25,11 @@ export default async function Page({ params, searchParams }: GuildPageProps) {
 	]);
 
 	if (state.status === 'unauthenticated') redirect('/login');
-	if (state.status === 'unreachable') throw new ApiUnreachableError(state.reason, state.answered);
+	if (state.status === 'unreachable')
+		throw new ApiUnreachableError(state.reason, state.answered, state.code ?? null);
 	if (settings.status === 'unauthenticated') redirect('/login');
 	if (settings.status === 'unreachable')
-		throw new ApiUnreachableError(settings.reason, settings.answered);
+		throw new ApiUnreachableError(settings.reason, settings.answered, settings.code ?? null);
 
 	return (
 		<WelcomeScreen

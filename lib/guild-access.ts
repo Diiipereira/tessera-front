@@ -11,13 +11,16 @@ export type GuildDirectory = {
 };
 
 export class ApiUnreachableError extends Error {
-	constructor(reason: string, answered = false) {
+	readonly code: string | null;
+
+	constructor(reason: string, answered = false, code: string | null = null) {
 		super(
 			answered
 				? `The API failed: ${reason}.`
 				: `The API did not answer: ${reason}. Start it with "npm run dev:api" in bot-api.`
 		);
 		this.name = 'ApiUnreachableError';
+		this.code = code;
 	}
 }
 
@@ -26,7 +29,7 @@ export const loadGuilds = cache(async (): Promise<GuildDirectory> => {
 
 	if (result.status === 'unauthenticated') redirect('/login');
 	if (result.status === 'unreachable')
-		throw new ApiUnreachableError(result.reason, result.answered);
+		throw new ApiUnreachableError(result.reason, result.answered, result.code ?? null);
 
 	return {
 		managed: result.data.managed.map((guild) => toGuild(guild, true)),

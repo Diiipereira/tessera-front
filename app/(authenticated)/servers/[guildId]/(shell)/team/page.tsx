@@ -11,7 +11,7 @@ export const metadata = { title: 'Team' };
 function unwrap<T>(result: ApiResult<T>): T {
 	if (result.status === 'unauthenticated') redirect('/login');
 	if (result.status === 'unreachable') {
-		throw new ApiUnreachableError(result.reason, result.answered);
+		throw new ApiUnreachableError(result.reason, result.answered, result.code ?? null);
 	}
 
 	return result.data;

@@ -24,7 +24,7 @@ export default async function Page({ params, searchParams }: GuildPageProps) {
 
 	if (state.status === 'unauthenticated') redirect('/login');
 	if (state.status === 'unreachable') {
-		throw new ApiUnreachableError(state.reason, state.answered);
+		throw new ApiUnreachableError(state.reason, state.answered, state.code ?? null);
 	}
 
 	return (

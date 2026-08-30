@@ -11,6 +11,12 @@
 		"justNow": "just now",
 		"unknownTime": "unknown"
 	},
+	"failure": {
+		"title": "This screen could not load.",
+		"body": "It may be temporary. Try again — and if it keeps failing, the reference below is what ties this screen to the server log.",
+		"retry": "Try again",
+		"reference": "Reference {digest}"
+	},
 	"locales": {
 		"en-US": "English (US)",
 		"pt-BR": "Português (Brasil)"
