@@ -17,7 +17,7 @@ import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { BRAND } from '@/lib/brand';
 import { EMBED_SWATCHES } from '@/lib/discord-colors';
-import { removeBot } from '@/lib/guild-bot-client';
+import { removeBot, resetAllModules } from '@/lib/guild-bot-client';
 import { useConfigDraft, type SaveOutcome } from '@/lib/hooks/useConfigDraft';
 import { SUPPORTED_LOCALES } from '@/lib/locale';
 import { patchSettings } from '@/lib/settings-client';
@@ -76,6 +76,35 @@ export function SettingsScreen({ guildId, settings, guildName }: SettingsScreenP
 			}
 		);
 	}, [guildId, guildName, router, t]);
+
+	const [confirmingReset, setConfirmingReset] = useState(false);
+	const [resetting, setResetting] = useState(false);
+
+	const wipe = useCallback(() => {
+		setResetting(true);
+
+		void resetAllModules(guildId).then(
+			(result) => {
+				setResetting(false);
+
+				if (result.status === 'error') {
+					toast.error(t('danger.resetFailed'), { description: result.message });
+
+					return;
+				}
+
+				setConfirmingReset(false);
+				toast.success(t('danger.wasReset'), { description: t('danger.wasResetHint') });
+				router.refresh();
+			},
+			(error: unknown) => {
+				setResetting(false);
+				toast.error(t('danger.resetFailed'), {
+					description: error instanceof Error ? error.message : t('unknownFailure')
+				});
+			}
+		);
+	}, [guildId, router, t]);
 
 	return (
 		<div className="w-full p-6 sm:p-8">
@@ -193,12 +222,17 @@ export function SettingsScreen({ guildId, settings, guildName }: SettingsScreenP
 
 				<SettingsSection title={t('danger.title')} description={t('danger.description')} danger>
 					<ActionRow
-						pending
 						title={t('danger.resetTitle')}
 						body={t('danger.resetBody')}
-						pendingLabel={t('notAvailable')}
 						action={
-							<Button variant="danger" size="sm" disabled>
+							<Button
+								variant="danger"
+								size="sm"
+								loading={resetting}
+								onClick={() => {
+									setConfirmingReset(true);
+								}}
+							>
 								<RotateCcw aria-hidden="true" />
 								{t('danger.reset')}
 							</Button>
@@ -235,6 +269,18 @@ export function SettingsScreen({ guildId, settings, guildName }: SettingsScreenP
 				onConfirm={leave}
 			>
 				<p className="text-body-sm text-text-muted">{t('danger.confirmBody')}</p>
+			</ConfirmDialog>
+
+			<ConfirmDialog
+				open={confirmingReset}
+				onOpenChange={setConfirmingReset}
+				title={t('danger.resetConfirmTitle', { guild: guildName })}
+				description={t('danger.resetConfirmDescription')}
+				confirmPhrase={guildName}
+				confirmLabel={t('danger.resetConfirmLabel')}
+				onConfirm={wipe}
+			>
+				<p className="text-body-sm text-text-muted">{t('danger.resetConfirmBody')}</p>
 			</ConfirmDialog>
 
 			<SaveBar

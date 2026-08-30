@@ -10,6 +10,8 @@ import { SettingsScreen } from './SettingsScreen';
 
 const push = vi.fn();
 const removeBot = vi.fn();
+const resetAllModules = vi.fn();
+const refresh = vi.fn();
 const toastError = vi.fn();
 const toastSuccess = vi.fn();
 
@@ -25,11 +27,12 @@ vi.mock('@/lib/settings-client', () => ({
 }));
 
 vi.mock('@/lib/guild-bot-client', () => ({
-	removeBot: (guildId: string) => removeBot(guildId) as unknown
+	removeBot: (guildId: string) => removeBot(guildId) as unknown,
+	resetAllModules: (guildId: string) => resetAllModules(guildId) as unknown
 }));
 
 vi.mock('next/navigation', () => ({
-	useRouter: () => ({ push })
+	useRouter: () => ({ push, refresh })
 }));
 
 const GUILD_ID = '842315097461823104';
@@ -46,7 +49,7 @@ const copy = enUS.settings;
 
 const t = createTranslator({ locale: 'en-US', messages: enUS });
 
-const UNBUILT = [copy.backup.export, copy.backup.import, copy.danger.reset];
+const UNBUILT = [copy.backup.export, copy.backup.import];
 
 function setup() {
 	render(<SettingsScreen guildId={GUILD_ID} settings={SETTINGS} guildName={GUILD_NAME} />, {
@@ -69,6 +72,8 @@ describe('SettingsScreen', () => {
 		toastError.mockReset();
 		toastSuccess.mockReset();
 		removeBot.mockResolvedValue({ status: 'removed' });
+		resetAllModules.mockReset();
+		resetAllModules.mockResolvedValue({ status: 'reset' });
 	});
 
 	it.each(UNBUILT)('keeps %s disabled while no API can carry it out', (name) => {
@@ -81,6 +86,54 @@ describe('SettingsScreen', () => {
 		setup();
 
 		expect(screen.getAllByText(copy.notAvailable)).toHaveLength(UNBUILT.length);
+	});
+
+	it('now offers to reset every module, which no route used to carry out', () => {
+		setup();
+
+		expect(screen.getByRole('button', { name: copy.danger.reset })).toBeEnabled();
+	});
+
+	it('asks for the server name before wiping the configuration', async () => {
+		const user = userEvent.setup();
+		setup();
+
+		await user.click(screen.getByRole('button', { name: copy.danger.reset }));
+
+		expect(await screen.findByRole('dialog')).toBeInTheDocument();
+		expect(resetAllModules).not.toHaveBeenCalled();
+	});
+
+	it('resets every module once the name is typed', async () => {
+		const user = userEvent.setup();
+		setup();
+
+		await user.click(screen.getByRole('button', { name: copy.danger.reset }));
+		await user.type(screen.getByLabelText(t('confirm.type', { phrase: GUILD_NAME })), GUILD_NAME);
+		await user.click(screen.getByRole('button', { name: copy.danger.resetConfirmLabel }));
+
+		await waitFor(() => {
+			expect(resetAllModules).toHaveBeenCalledWith(GUILD_ID);
+		});
+		expect(toastSuccess).toHaveBeenCalledWith(copy.danger.wasReset, {
+			description: copy.danger.wasResetHint
+		});
+	});
+
+	it('says the reset failed instead of claiming the modules are clean', async () => {
+		resetAllModules.mockResolvedValue({ status: 'error', message: 'The API answered 403' });
+
+		const user = userEvent.setup();
+		setup();
+
+		await user.click(screen.getByRole('button', { name: copy.danger.reset }));
+		await user.type(screen.getByLabelText(t('confirm.type', { phrase: GUILD_NAME })), GUILD_NAME);
+		await user.click(screen.getByRole('button', { name: copy.danger.resetConfirmLabel }));
+
+		await waitFor(() => {
+			expect(toastError).toHaveBeenCalled();
+		});
+		expect(toastSuccess).not.toHaveBeenCalled();
 	});
 
 	it('leaves the settings that do save alone', () => {

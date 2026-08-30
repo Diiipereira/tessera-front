@@ -23,3 +23,26 @@ export async function removeBot(guildId: string): Promise<BotRemovalResult> {
 
 	return { status: 'error', message: describeFailure(failure, response.status) };
 }
+
+export type ConfigResetResult = { status: 'reset' } | { status: 'error'; message: string };
+
+const resetUrl = (guildId: string): string => `${apiBaseUrl()}/guilds/${guildId}/modules/reset`;
+
+export async function resetAllModules(guildId: string): Promise<ConfigResetResult> {
+	let response: Response;
+
+	try {
+		response = await fetch(resetUrl(guildId), { method: 'POST', credentials: 'include' });
+	} catch (error) {
+		return {
+			status: 'error',
+			message: error instanceof Error ? error.message : 'The API could not be reached'
+		};
+	}
+
+	if (response.ok) return { status: 'reset' };
+
+	const failure = (await response.json().catch(() => ({}))) as ErrorBody;
+
+	return { status: 'error', message: describeFailure(failure, response.status) };
+}
