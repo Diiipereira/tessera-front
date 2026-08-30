@@ -93,6 +93,7 @@ export function CaseDrawer({ guildId, entry, now, onClose, onOpenCase }: CaseDra
 		>
 			<div className="flex flex-col gap-4">
 				<div className="flex flex-wrap items-center gap-2">
+					<Badge variant="outline">{t(`action.${entry.type}`)}</Badge>
 					<Badge variant={STATUS_VARIANTS[status]} dot>
 						{t(`statuses.${status}`)}
 					</Badge>

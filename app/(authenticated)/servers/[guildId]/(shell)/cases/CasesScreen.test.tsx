@@ -199,6 +199,28 @@ describe('CasesScreen', () => {
 		expect(screen.getByText('Case #44')).toBeInTheDocument();
 	});
 
+	it('says what kind of case it is, which only the rows below used to say', async () => {
+		const user = userEvent.setup();
+		paint([entry({ type: 'ban', expiresAt: null })]);
+
+		await user.click(screen.getByRole('button', { name: 'Open case 44' }));
+
+		const drawer = await screen.findByRole('dialog');
+
+		expect(within(drawer).getByText('Ban')).toBeInTheDocument();
+	});
+
+	it('names the kind in the reader language', async () => {
+		const user = userEvent.setup();
+		paint([entry({ type: 'ban', expiresAt: null })], null, 'pt-BR');
+
+		await user.click(screen.getByRole('button', { name: 'Abrir o caso 44' }));
+
+		const drawer = await screen.findByRole('dialog');
+
+		expect(within(drawer).getByText('Banimento')).toBeInTheDocument();
+	});
+
 	it('explains what the status means inside the drawer', async () => {
 		const user = userEvent.setup();
 		paint();
