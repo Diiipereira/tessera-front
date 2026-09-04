@@ -169,19 +169,22 @@ export type ReactionRolesConfig = {
 	panels: ReactionPanel[];
 };
 
-export type GiveawayState = 'active' | 'scheduled' | 'ended';
+export type GiveawayState = 'active' | 'ended';
 
 export type Giveaway = {
 	id: string;
 	prize: string;
+	description: string;
 	winners: number;
 	entries: number;
+	channelId: string;
+	messageId: string | null;
 	hostName: string;
 	hostInitials: string;
 	hostColor: string;
 	state: GiveawayState;
-	endsInSeconds: number;
-	startsIn: string;
+	endsAt: string;
+	endedAt: string | null;
 	wonBy: string[];
 	requiredRoleIds: string[];
 	requiredLevel: number;
@@ -189,7 +192,6 @@ export type Giveaway = {
 
 export type GiveawaysConfig = {
 	enabled: boolean;
-	giveaways: Giveaway[];
 	defaultWinners: number;
 	dmWinners: boolean;
 };

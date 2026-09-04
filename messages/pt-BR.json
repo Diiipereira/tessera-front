@@ -1203,12 +1203,9 @@
 				"title": "Sorteios",
 				"state": "Estado do sorteio",
 				"active": "Ativos",
-				"scheduled": "Agendados",
 				"ended": "Encerrados",
 				"emptyActive": "Nada rodando",
 				"emptyActiveBody": "Comece um e ele aparece aqui com a contagem ao vivo.",
-				"emptyScheduled": "Nada agendado",
-				"emptyScheduledBody": "Sorteios marcados para começar depois aparecem aqui.",
 				"emptyEnded": "Nada encerrado",
 				"emptyEndedBody": "Sorteios terminados e seus ganhadores ficam aqui."
 			},
@@ -1223,7 +1220,8 @@
 				"reroll": "Sortear de novo",
 				"didEnd": "“{prize}” encerrado",
 				"didReroll": "“{prize}” sorteado de novo",
-				"rerollPending": "Um novo ganhador é escolhido quando a API existir."
+				"didRemove": "“{prize}” removido",
+				"remove": "Remover sorteio"
 			},
 			"defaults": {
 				"title": "Padrões",
@@ -1244,7 +1242,13 @@
 				"rolesHint": "Deixe vazio para liberar a entrada de todos.",
 				"rolesPlaceholder": "Qualquer um pode entrar…",
 				"level": "Nível mínimo",
-				"levelHint": "0 significa nenhuma exigência de nível."
+				"levelHint": "0 significa nenhuma exigência de nível.",
+				"open": "Novo sorteio",
+				"started": "“{prize}” está no ar",
+				"channel": "Canal",
+				"channelHint": "Onde o sorteio e o botão dele são publicados.",
+				"detail": "Detalhe",
+				"detailHint": "Uma linha abaixo do prêmio. Deixe vazio para nenhuma."
 			}
 		},
 		"reactionRoles": {

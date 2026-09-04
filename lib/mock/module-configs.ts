@@ -418,69 +418,7 @@ export const mockReactionRolesConfig: ReactionRolesConfig = {
 export const mockGiveawaysConfig: GiveawaysConfig = {
 	enabled: true,
 	defaultWinners: 1,
-	dmWinners: true,
-	giveaways: [
-		{
-			id: 'g1',
-			prize: 'Nitro for a month',
-			winners: 1,
-			entries: 284,
-			hostName: 'mora',
-			hostInitials: 'MO',
-			hostColor: '#0d9488',
-			state: 'active',
-			endsInSeconds: 7245,
-			startsIn: '',
-			wonBy: [],
-			requiredRoleIds: ['801234567890123002'],
-			requiredLevel: 5
-		},
-		{
-			id: 'g2',
-			prize: 'Steam key bundle',
-			winners: 3,
-			entries: 96,
-			hostName: 'ferro',
-			hostInitials: 'FE',
-			hostColor: '#eb459e',
-			state: 'active',
-			endsInSeconds: 176400,
-			startsIn: '',
-			wonBy: [],
-			requiredRoleIds: [],
-			requiredLevel: 0
-		},
-		{
-			id: 'g3',
-			prize: 'Custom role colour',
-			winners: 2,
-			entries: 0,
-			hostName: 'juno',
-			hostInitials: 'JU',
-			hostColor: '#d97706',
-			state: 'scheduled',
-			endsInSeconds: 0,
-			startsIn: 'in 2 days',
-			wonBy: [],
-			requiredRoleIds: [],
-			requiredLevel: 0
-		},
-		{
-			id: 'g4',
-			prize: 'Server booster slot',
-			winners: 1,
-			entries: 412,
-			hostName: 'kestrel',
-			hostInitials: 'KE',
-			hostColor: '#5865f2',
-			state: 'ended',
-			endsInSeconds: 0,
-			startsIn: '',
-			wonBy: ['okra'],
-			requiredRoleIds: [],
-			requiredLevel: 0
-		}
-	]
+	dmWinners: true
 };
 
 export const mockCustomCommandsConfig: CustomCommandsConfig = {

@@ -1203,12 +1203,9 @@
 				"title": "Giveaways",
 				"state": "Giveaway state",
 				"active": "Active",
-				"scheduled": "Scheduled",
 				"ended": "Ended",
 				"emptyActive": "Nothing running",
 				"emptyActiveBody": "Start one and it shows up here with a live count.",
-				"emptyScheduled": "Nothing scheduled",
-				"emptyScheduledBody": "Giveaways set to start later appear here.",
 				"emptyEnded": "Nothing finished",
 				"emptyEndedBody": "Finished giveaways and their winners land here."
 			},
@@ -1223,7 +1220,8 @@
 				"reroll": "Reroll",
 				"didEnd": "Ended “{prize}”",
 				"didReroll": "Rerolled “{prize}”",
-				"rerollPending": "A new winner is picked once the API exists."
+				"didRemove": "Removed “{prize}”",
+				"remove": "Remove giveaway"
 			},
 			"defaults": {
 				"title": "Defaults",
@@ -1244,7 +1242,13 @@
 				"rolesHint": "Leave empty to let everyone enter.",
 				"rolesPlaceholder": "Anyone can enter…",
 				"level": "Minimum level",
-				"levelHint": "0 means no level requirement."
+				"levelHint": "0 means no level requirement.",
+				"open": "New giveaway",
+				"started": "“{prize}” is up",
+				"channel": "Channel",
+				"channelHint": "Where the giveaway and its button are posted.",
+				"detail": "Detail",
+				"detailHint": "A line under the prize. Leave it empty for none."
 			}
 		},
 		"reactionRoles": {

@@ -1,9 +1,10 @@
 'use client';
 
-import { CircleStop, Dices, Gift, Plus } from 'lucide-react';
+import { CircleStop, Dices, Gift, Plus, Trash2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useCallback, useRef, useState, useTransition } from 'react';
 import { toast } from 'sonner';
+import { ChannelPicker } from '@/components/discord/ChannelPicker';
 import { RolePicker } from '@/components/discord/RolePicker';
 import { Avatar } from '@/components/layout/Avatar';
 import { ModulePage } from '@/components/modules/ModulePage';
@@ -18,36 +19,119 @@ import { Input } from '@/components/ui/Input';
 import { NumberInput } from '@/components/ui/NumberInput';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
 import { Switch } from '@/components/ui/Switch';
-import { EMBED_SWATCHES } from '@/lib/discord-colors';
-import { useConfigDraft } from '@/lib/hooks/useConfigDraft';
-import type { Role } from '@/lib/types/discord';
+import { Textarea } from '@/components/ui/Textarea';
+import {
+	endGiveaway,
+	removeGiveaway,
+	rerollGiveaway,
+	startGiveaway,
+	type GiveawayResult
+} from '@/lib/giveaways-client';
+import { useConfigDraft, type SaveOutcome } from '@/lib/hooks/useConfigDraft';
+import { useRelativeTime } from '@/lib/hooks/useRelativeTime';
+import { patchModule } from '@/lib/module-client';
+import {
+	GIVEAWAY_CHANNEL_KINDS,
+	MAX_GIVEAWAY_DESCRIPTION_LENGTH,
+	MAX_GIVEAWAY_HOURS,
+	MAX_PRIZE_LENGTH,
+	MAX_REQUIRED_LEVEL,
+	MAX_REQUIRED_ROLES,
+	MAX_WINNERS,
+	countBy,
+	toGiveaway,
+	toGiveawaysConfig,
+	toGiveawaysPatch,
+	toStartPayload
+} from '@/lib/modules/giveaways';
+import type { Channel, Role } from '@/lib/types/discord';
 import type { Giveaway, GiveawayState, GiveawaysConfig } from '@/lib/types/module-configs';
-import { formatCountdown } from '@/lib/time';
 import { formatCount } from '@/lib/utils/format';
-import { newId } from '@/lib/utils/id';
 
-const TAB_KEY = { active: 'Active', scheduled: 'Scheduled', ended: 'Ended' } as const;
+const TAB_KEY = { active: 'Active', ended: 'Ended' } as const;
 
 type GiveawaysScreenProps = {
+	guildId: string;
 	config: GiveawaysConfig;
+	version: number;
+	giveaways: Giveaway[];
+	channels: Channel[];
 	roles: Role[];
+	now: string;
 };
 
-export function GiveawaysScreen({ config, roles }: GiveawaysScreenProps) {
+export function GiveawaysScreen({
+	guildId,
+	config,
+	version,
+	giveaways,
+	channels,
+	roles,
+	now
+}: GiveawaysScreenProps) {
 	const t = useTranslations('modules.giveaways');
-	const form = useConfigDraft<GiveawaysConfig>(config);
+	const relativeTime = useRelativeTime();
+	const rightNow = new Date(now);
+	const versionRef = useRef(version);
+
+	const save = useCallback(
+		async (next: GiveawaysConfig): Promise<SaveOutcome<GiveawaysConfig>> => {
+			const patched = await patchModule(guildId, 'giveaways', {
+				version: versionRef.current,
+				enabled: next.enabled,
+				config: toGiveawaysPatch(next)
+			});
+
+			if (patched.status === 'error') return patched;
+
+			versionRef.current = patched.state.version;
+
+			return patched.status === 'conflict'
+				? { status: 'conflict', current: toGiveawaysConfig(patched.state) }
+				: { status: 'saved', saved: toGiveawaysConfig(patched.state) };
+		},
+		[guildId]
+	);
+
+	const form = useConfigDraft<GiveawaysConfig>(config, { save });
 	const draft = form.draft;
 
+	const [rows, setRows] = useState<Giveaway[]>(giveaways);
 	const [tab, setTab] = useState<GiveawayState>('active');
 	const [creating, setCreating] = useState(false);
+	const [busyId, setBusyId] = useState<string | null>(null);
+	const [, startTransition] = useTransition();
 
 	const counts: Record<GiveawayState, number> = {
-		active: draft.giveaways.filter((entry) => entry.state === 'active').length,
-		scheduled: draft.giveaways.filter((entry) => entry.state === 'scheduled').length,
-		ended: draft.giveaways.filter((entry) => entry.state === 'ended').length
+		active: countBy(rows, 'active'),
+		ended: countBy(rows, 'ended')
 	};
 
-	const visible = draft.giveaways.filter((entry) => entry.state === tab);
+	const visible = rows.filter((giveaway) => giveaway.state === tab);
+
+	const replace = (giveaway: Giveaway) => {
+		setRows((current) => current.map((entry) => (entry.id === giveaway.id ? giveaway : entry)));
+	};
+
+	const act = (giveaway: Giveaway, run: () => Promise<GiveawayResult>, success: string) => {
+		setBusyId(giveaway.id);
+
+		startTransition(() => {
+			void run()
+				.then((result) => {
+					if (result.status === 'error') {
+						toast.error(result.message);
+						return;
+					}
+
+					replace(toGiveaway(result.giveaway));
+					toast.success(success);
+				})
+				.finally(() => {
+					setBusyId(null);
+				});
+		});
+	};
 
 	return (
 		<ModulePage
@@ -68,7 +152,7 @@ export function GiveawaysScreen({ config, roles }: GiveawaysScreenProps) {
 					}}
 				>
 					<Plus aria-hidden="true" />
-					New giveaway
+					{t('create.open')}
 				</Button>
 			}
 			saveBar={
@@ -78,8 +162,8 @@ export function GiveawaysScreen({ config, roles }: GiveawaysScreenProps) {
 					state={form.state}
 					onDiscard={form.discard}
 					onSave={() => {
-						void form.save().then(() => {
-							toast.success(t('saved'));
+						void form.save().then((state) => {
+							if (state === 'idle') toast.success(t('saved'));
 						});
 					}}
 					onResolveConflict={form.resolveConflict}
@@ -92,7 +176,6 @@ export function GiveawaysScreen({ config, roles }: GiveawaysScreenProps) {
 					<SegmentedControl
 						options={[
 							{ value: 'active', label: t('list.active'), count: counts.active },
-							{ value: 'scheduled', label: t('list.scheduled'), count: counts.scheduled },
 							{ value: 'ended', label: t('list.ended'), count: counts.ended }
 						]}
 						value={tab}
@@ -115,21 +198,38 @@ export function GiveawaysScreen({ config, roles }: GiveawaysScreenProps) {
 								key={giveaway.id}
 								giveaway={giveaway}
 								roles={roles}
+								busy={busyId === giveaway.id}
+								when={relativeTime(giveaway.endedAt ?? giveaway.endsAt, rightNow)}
 								onEnd={() => {
-									form.set(
-										'giveaways',
-										draft.giveaways.map((entry) =>
-											entry.id === giveaway.id
-												? { ...entry, state: 'ended', endsInSeconds: 0, wonBy: ['okra'] }
-												: entry
-										)
+									act(
+										giveaway,
+										async () => endGiveaway(guildId, giveaway.id),
+										t('card.didEnd', { prize: giveaway.prize })
 									);
-									toast.success(t('card.didEnd', { prize: giveaway.prize }));
 								}}
 								onReroll={() => {
-									toast.success(t('card.didReroll', { prize: giveaway.prize }), {
-										description: t('card.rerollPending')
-									});
+									act(
+										giveaway,
+										async () => rerollGiveaway(guildId, giveaway.id),
+										t('card.didReroll', { prize: giveaway.prize })
+									);
+								}}
+								onRemove={() => {
+									setBusyId(giveaway.id);
+
+									void removeGiveaway(guildId, giveaway.id)
+										.then((result) => {
+											if (result.status === 'error') {
+												toast.error(result.message);
+												return;
+											}
+
+											setRows((current) => current.filter((entry) => entry.id !== giveaway.id));
+											toast.success(t('card.didRemove', { prize: giveaway.prize }));
+										})
+										.finally(() => {
+											setBusyId(null);
+										});
 								}}
 							/>
 						))}
@@ -141,7 +241,7 @@ export function GiveawaysScreen({ config, roles }: GiveawaysScreenProps) {
 				<Field label={t('defaults.winners')} className="w-32">
 					<NumberInput
 						min={1}
-						max={50}
+						max={MAX_WINNERS}
 						value={draft.defaultWinners}
 						onValueChange={(next) => {
 							form.set('defaultWinners', next);
@@ -161,16 +261,18 @@ export function GiveawaysScreen({ config, roles }: GiveawaysScreenProps) {
 
 			{creating ? (
 				<NewGiveawayDialog
+					channels={channels}
 					roles={roles}
 					defaultWinners={draft.defaultWinners}
 					onCancel={() => {
 						setCreating(false);
 					}}
-					onCreate={(giveaway) => {
-						form.set('giveaways', [giveaway, ...draft.giveaways]);
+					onCreate={(started) => {
+						setRows((current) => [started, ...current]);
 						setCreating(false);
-						setTab(giveaway.state);
+						setTab('active');
 					}}
+					guildId={guildId}
 				/>
 			) : null}
 		</ModulePage>
@@ -180,11 +282,22 @@ export function GiveawaysScreen({ config, roles }: GiveawaysScreenProps) {
 type GiveawayCardProps = {
 	giveaway: Giveaway;
 	roles: Role[];
+	busy: boolean;
+	when: string;
 	onEnd: () => void;
 	onReroll: () => void;
+	onRemove: () => void;
 };
 
-function GiveawayCard({ giveaway, roles, onEnd, onReroll }: GiveawayCardProps) {
+function GiveawayCard({
+	giveaway,
+	roles,
+	busy,
+	when,
+	onEnd,
+	onReroll,
+	onRemove
+}: GiveawayCardProps) {
 	const t = useTranslations('modules.giveaways.card');
 	const required = roles.filter((role) => giveaway.requiredRoleIds.includes(role.id));
 
@@ -200,10 +313,8 @@ function GiveawayCard({ giveaway, roles, onEnd, onReroll }: GiveawayCardProps) {
 
 				{giveaway.state === 'active' ? (
 					<Badge variant="success" dot>
-						{formatCountdown(giveaway.endsInSeconds)}
+						{when}
 					</Badge>
-				) : giveaway.state === 'scheduled' ? (
-					<Badge variant="info">{giveaway.startsIn}</Badge>
 				) : (
 					<Badge variant="neutral">{t('ended')}</Badge>
 				)}
@@ -251,37 +362,67 @@ function GiveawayCard({ giveaway, roles, onEnd, onReroll }: GiveawayCardProps) {
 
 			<div className="mt-auto flex items-center gap-2 pt-1">
 				{giveaway.state === 'active' ? (
-					<Button variant="outline" size="sm" onClick={onEnd}>
+					<Button variant="outline" size="sm" disabled={busy} onClick={onEnd}>
 						<CircleStop aria-hidden="true" />
 						{t('endNow')}
 					</Button>
-				) : null}
-				{giveaway.state === 'ended' ? (
-					<Button variant="outline" size="sm" onClick={onReroll}>
+				) : (
+					<Button variant="outline" size="sm" disabled={busy} onClick={onReroll}>
 						<Dices aria-hidden="true" />
 						{t('reroll')}
 					</Button>
-				) : null}
+				)}
+				<Button
+					variant="ghost-danger"
+					size="sm"
+					disabled={busy}
+					onClick={onRemove}
+					aria-label={t('remove')}
+				>
+					<Trash2 aria-hidden="true" />
+				</Button>
 			</div>
 		</div>
 	);
 }
 
 type NewGiveawayDialogProps = {
+	guildId: string;
+	channels: Channel[];
 	roles: Role[];
 	defaultWinners: number;
 	onCancel: () => void;
 	onCreate: (giveaway: Giveaway) => void;
 };
 
-function NewGiveawayDialog({ roles, defaultWinners, onCancel, onCreate }: NewGiveawayDialogProps) {
+function NewGiveawayDialog({
+	guildId,
+	channels,
+	roles,
+	defaultWinners,
+	onCancel,
+	onCreate
+}: NewGiveawayDialogProps) {
 	const t = useTranslations('modules.giveaways.create');
 	const shared = useTranslations('common');
+	const [channelId, setChannelId] = useState<string | null>(null);
 	const [prize, setPrize] = useState('');
+	const [description, setDescription] = useState('');
 	const [winners, setWinners] = useState(defaultWinners);
 	const [hours, setHours] = useState(24);
 	const [requiredRoleIds, setRequiredRoleIds] = useState<string[]>([]);
 	const [requiredLevel, setRequiredLevel] = useState(0);
+	const [saving, setSaving] = useState(false);
+
+	const payload = toStartPayload({
+		channelId,
+		prize,
+		description,
+		winners,
+		hours,
+		requiredRoleIds,
+		requiredLevel
+	});
 
 	return (
 		<Dialog
@@ -298,23 +439,25 @@ function NewGiveawayDialog({ roles, defaultWinners, onCancel, onCreate }: NewGiv
 						{shared('cancel')}
 					</Button>
 					<Button
-						disabled={prize.trim() === ''}
+						disabled={payload === null || saving}
 						onClick={() => {
-							onCreate({
-								id: newId('g'),
-								prize: prize.trim(),
-								winners,
-								entries: 0,
-								hostName: 'you',
-								hostInitials: 'YO',
-								hostColor: EMBED_SWATCHES[0],
-								state: 'active',
-								endsInSeconds: hours * 3600,
-								startsIn: '',
-								wonBy: [],
-								requiredRoleIds,
-								requiredLevel
-							});
+							if (payload === null) return;
+
+							setSaving(true);
+
+							void startGiveaway(guildId, payload)
+								.then((result) => {
+									if (result.status === 'error') {
+										toast.error(result.message);
+										return;
+									}
+
+									onCreate(toGiveaway(result.giveaway));
+									toast.success(t('started', { prize: result.giveaway.prize }));
+								})
+								.finally(() => {
+									setSaving(false);
+								});
 						}}
 					>
 						{t('submit')}
@@ -326,6 +469,7 @@ function NewGiveawayDialog({ roles, defaultWinners, onCancel, onCreate }: NewGiv
 				<Field label={t('prize')} required>
 					<Input
 						value={prize}
+						maxLength={MAX_PRIZE_LENGTH}
 						onChange={(event) => {
 							setPrize(event.target.value);
 						}}
@@ -333,12 +477,32 @@ function NewGiveawayDialog({ roles, defaultWinners, onCancel, onCreate }: NewGiv
 					/>
 				</Field>
 
+				<Field label={t('channel')} required hint={t('channelHint')}>
+					<ChannelPicker
+						channels={channels}
+						kinds={GIVEAWAY_CHANNEL_KINDS}
+						value={channelId}
+						onValueChange={setChannelId}
+					/>
+				</Field>
+
+				<Field label={t('detail')} hint={t('detailHint')}>
+					<Textarea
+						value={description}
+						maxLength={MAX_GIVEAWAY_DESCRIPTION_LENGTH}
+						rows={2}
+						onChange={(event) => {
+							setDescription(event.target.value);
+						}}
+					/>
+				</Field>
+
 				<div className="flex flex-wrap items-end gap-4">
 					<Field label={t('winners')} className="w-32">
-						<NumberInput min={1} max={50} value={winners} onValueChange={setWinners} />
+						<NumberInput min={1} max={MAX_WINNERS} value={winners} onValueChange={setWinners} />
 					</Field>
 					<Field label={t('hours')} className="w-40">
-						<NumberInput min={1} max={720} value={hours} onValueChange={setHours} />
+						<NumberInput min={1} max={MAX_GIVEAWAY_HOURS} value={hours} onValueChange={setHours} />
 					</Field>
 				</div>
 
@@ -346,13 +510,20 @@ function NewGiveawayDialog({ roles, defaultWinners, onCancel, onCreate }: NewGiv
 					<RolePicker
 						roles={roles}
 						value={requiredRoleIds}
-						onValueChange={setRequiredRoleIds}
+						onValueChange={(next) => {
+							setRequiredRoleIds(next.slice(0, MAX_REQUIRED_ROLES));
+						}}
 						placeholder={t('rolesPlaceholder')}
 					/>
 				</Field>
 
 				<Field label={t('level')} hint={t('levelHint')} className="w-32">
-					<NumberInput min={0} max={200} value={requiredLevel} onValueChange={setRequiredLevel} />
+					<NumberInput
+						min={0}
+						max={MAX_REQUIRED_LEVEL}
+						value={requiredLevel}
+						onValueChange={setRequiredLevel}
+					/>
 				</Field>
 			</div>
 		</Dialog>
