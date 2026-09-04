@@ -529,11 +529,23 @@ não cabe embaixo:
   daqui; `lg` é a escolha segura.
 
 **A busca do topo é centralizada por grid, não por espaçador.** `grid-cols-[minmax(0,1fr)_auto_
-minmax(0,1fr)]`: medido, o campo fica a **0px do centro** em 1440, 1280, 1024, 900, 768 e 640, com
-breadcrumb curto ou comprido — o `flex-1` de antes o deixava centralizado no que sobrava, que anda
-conforme o breadcrumb cresce. O campo encolhe para `w-44` abaixo de `lg` porque a coluna da direita
-não pode espremer: as trilhas `1fr` são iguais, então o que falta de um lado não é emprestado do
-outro.
+1fr]`: medido, o campo fica a **0px do centro** em quase toda largura, com breadcrumb curto ou
+comprido — o `flex-1` de antes o deixava centralizado no que sobrava, que anda conforme o breadcrumb
+cresce.
+
+**A trilha da direita é `1fr`, não `minmax(0,1fr)`, e a diferença é quem cede quando falta espaço.**
+`1fr` é `minmax(auto,1fr)`, ou seja, seu mínimo é o conteúdo — os dois toggles, a ajuda e o avatar
+nunca são espremidos. Quem cede é o breadcrumb, que já trunca. Com `minmax(0,1fr)` dos dois lados a
+conta não fechava e **eu não tinha contado a barra lateral de 260px**: medido, num viewport de 1024
+o header tem 764px, a direita pede 310 e recebia **198** — os controles amassavam, e só não se via
+porque a tela do dono é larga. Com `1fr` a direita fica nos 310 em toda largura medida (1920 a 640) e
+o preço é o campo sair do centro entre 1024 e ~1200 com a barra lateral aberta; recolhida, volta ao
+centro.
+
+**A largura do campo é escalonada, e cada degrau foi medido contra o pior caso da faixa:**
+`w-44` (176) abaixo de `md`, `md:w-64` (256), `xl:w-80` (320) e `2xl:w-96` (384) — o mesmo teto da
+busca da documentação. A regra que gera esses números é `busca ≤ header − 80 − 2 × direita`, com
+`direita` em 310 no painel com idioma e 196 sem ele.
 
 **A busca (Ctrl K) não imprime mais o caminho.** Ela mostrava `/modules/welcome` ao lado de
 _Boas-vindas_ — a única coisa em inglês numa lista em português. Traduzir o texto mantendo a URL

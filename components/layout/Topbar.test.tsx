@@ -46,7 +46,12 @@ describe('Topbar', () => {
 
 		expect(cells).toHaveLength(3);
 		expect(cells[1]?.contains(search)).toBe(true);
-		expect(header.className).toContain('grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]');
+	});
+
+	it('lets the breadcrumbs give way before the toggles do, so nothing is ever squashed', () => {
+		const header = renderBar();
+
+		expect(header.className).toContain('grid-cols-[minmax(0,1fr)_auto_1fr]');
 	});
 
 	it('puts the language beside the theme, on the far side from the breadcrumbs', () => {

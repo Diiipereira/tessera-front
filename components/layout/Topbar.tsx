@@ -31,7 +31,7 @@ export function Topbar({ guild, user, onSearch, onOpenAccount, accountTriggerRef
 	const shortcut = useShortcut('K');
 
 	return (
-		<header className="grid h-14 shrink-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-4 border-b border-border bg-bg px-4 sm:px-6">
+		<header className="grid h-14 shrink-0 grid-cols-[minmax(0,1fr)_auto_1fr] items-center gap-4 border-b border-border bg-bg px-4 sm:px-6">
 			<div className="flex min-w-0 items-center gap-4">
 				<button
 					type="button"
@@ -50,7 +50,7 @@ export function Topbar({ guild, user, onSearch, onOpenAccount, accountTriggerRef
 			<div className="flex items-center justify-center">
 				<button
 					type="button"
-					className="hidden h-8 w-44 items-center gap-2 rounded-md border border-border bg-surface px-2.5 text-body-sm text-text-muted transition-colors duration-120 ease-out hover:border-border-strong sm:flex lg:w-60"
+					className="hidden h-8 w-44 items-center gap-2 rounded-md border border-border bg-surface px-2.5 text-body-sm text-text-muted transition-colors duration-120 ease-out hover:border-border-strong sm:flex md:w-64 xl:w-80 2xl:w-96"
 					onClick={onSearch}
 				>
 					<Search className="size-4 shrink-0" aria-hidden="true" />
