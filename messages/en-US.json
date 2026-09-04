@@ -73,6 +73,8 @@
 		"accountMenu": "Account menu",
 		"account": "Account",
 		"theme": "Theme",
+		"language": "Language",
+		"switchTo": "Switch to {language}",
 		"themeLight": "Light",
 		"themeDark": "Dark",
 		"themeSystem": "System",
@@ -134,8 +136,7 @@
 		},
 		"interface": {
 			"title": "Interface",
-			"description": "Applies everywhere you sign in.",
-			"language": "Language",
+			"description": "How the dashboard looks on this browser.",
 			"theme": "Theme",
 			"themeHint": "Saved in this browser, not on your account."
 		},

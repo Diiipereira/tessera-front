@@ -3,6 +3,7 @@
 import { Menu } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
+import { LocaleToggle } from '@/components/layout/LocaleToggle';
 import { Drawer } from '@/components/ui/Drawer';
 import type { DocNavGroup } from '@/lib/docs';
 import { DocsNavTree } from './DocsNavTree';
@@ -10,6 +11,7 @@ import { useActiveSlug } from './use-active-slug';
 
 export function DocsMobileNav({ groups }: { groups: DocNavGroup[] }) {
 	const t = useTranslations('docs');
+	const shell = useTranslations('shell');
 	const [open, setOpen] = useState(false);
 	const activeSlug = useActiveSlug();
 
@@ -37,6 +39,11 @@ export function DocsMobileNav({ groups }: { groups: DocNavGroup[] }) {
 							setOpen(false);
 						}}
 					/>
+				</div>
+
+				<div className="flex items-center justify-between gap-3 border-t border-border px-4 py-3">
+					<span className="text-body-sm text-text-muted">{shell('language')}</span>
+					<LocaleToggle />
 				</div>
 			</Drawer>
 		</>

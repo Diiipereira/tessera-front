@@ -49,7 +49,7 @@ function renderPanel(locale: SupportedLocale = 'en-US') {
 					onOpenChange={() => undefined}
 					returnFocusTo={createRef<HTMLElement>()}
 					user={mockUser}
-					preferences={{ ...mockAccountPreferences, locale }}
+					preferences={mockAccountPreferences}
 					sessions={mockAccountSessions}
 					guilds={mockGuilds}
 					now={NOW}
@@ -127,50 +127,7 @@ describe('AccountPanel', () => {
 		expect(screen.getByRole('region', { name: 'Unsaved changes' })).toBeInTheDocument();
 	});
 
-	it('shows the language the app is actually rendering in, not a hardcoded default', async () => {
-		const user = userEvent.setup();
-		renderPanel('pt-BR');
-
-		await user.click(tab(ptBR.account.tabs.interface));
-
-		expect(
-			screen.getByRole('combobox', { name: ptBR.account.interface.language })
-		).toHaveTextContent(ptBR.locales['pt-BR']);
-	});
-
-	async function switchLanguageTo(from: SupportedLocale, target: string): Promise<unknown> {
-		const user = userEvent.setup();
-		const copy = from === 'pt-BR' ? ptBR : enUS;
-
-		renderPanel(from);
-
-		await user.click(tab(copy.account.tabs.interface));
-		await user.click(screen.getByRole('combobox', { name: copy.account.interface.language }));
-		await user.click(await screen.findByRole('option', { name: target }));
-		await user.click(screen.getByRole('button', { name: copy.modules.save.submit }));
-
-		await waitFor(() => {
-			expect(success).toHaveBeenCalled();
-		});
-
-		return success.mock.calls.at(-1)?.[0];
-	}
-
-	it('confirms in the language being switched to, not the one being left', async () => {
-		const said = await switchLanguageTo('en-US', ptBR.locales['pt-BR']);
-
-		expect(said).toBe(ptBR.account.saved);
-		expect(said).not.toBe(enUS.account.saved);
-	});
-
-	it('confirms in English when English is the one being switched to', async () => {
-		const said = await switchLanguageTo('pt-BR', enUS.locales['en-US']);
-
-		expect(said).toBe(enUS.account.saved);
-		expect(said).not.toBe(ptBR.account.saved);
-	});
-
-	it('keeps the current language when the save changed something else', async () => {
+	it('confirms a save in the language the panel is showing', async () => {
 		const user = userEvent.setup();
 		renderPanel('pt-BR');
 

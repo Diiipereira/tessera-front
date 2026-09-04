@@ -1,7 +1,6 @@
 import type { AccountPreferences, AccountSession } from '@/lib/types/account';
 
 export const mockAccountPreferences: AccountPreferences = {
-	locale: 'en-US',
 	emailOnMention: true,
 	emailOnCase: false,
 	emailProduct: false

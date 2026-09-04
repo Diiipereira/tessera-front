@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { BrandMark } from '@/components/auth/BrandMark';
+import { LocaleToggle } from '@/components/layout/LocaleToggle';
 import { ThemeToggle } from '@/components/layout/ThemeToggle';
 import { UserMenu } from '@/components/layout/UserMenu';
 import { Button } from '@/components/ui/Button';
@@ -34,6 +35,8 @@ export function AccountBar({ user }: { user: SessionUser | null }) {
 			<div className="flex-1" />
 
 			<ThemeToggle />
+
+			<LocaleToggle className="hidden lg:flex" />
 
 			{user === null ? (
 				<Button variant="ghost" size="sm" href="/logout">

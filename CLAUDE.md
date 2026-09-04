@@ -495,6 +495,54 @@ arrows move and wrap, Home and End jump to the ends. Tabs, not one long scroll: 
 about 1800px of content do not belong in a modal that you scroll. `SaveBar` gained a `className`
 so the panel can cancel the negative margins it uses to bleed to the edges of a page.
 
+## O idioma é do cabeçalho, não da conta
+
+**O idioma sempre foi cookie, e a modal de Conta prometia outra coisa.** `tessera-locale` é lido
+pelo `i18n/request.ts` e escrito pelo `rememberLocale`; nunca houve coluna nem rota. Mesmo assim a
+aba Interface o oferecia junto de um texto — _"Vale em todo lugar onde você entrar"_ — que descreve
+preferência de conta, e o trocava atrás de um **SaveBar**, como se fosse escrita no servidor. Em
+04/09 ele saiu de lá e virou o `LocaleToggle`, no mesmo formato do `ThemeToggle` e ao lado dele:
+`PT-BR | EN`, um clique, `rememberLocale` mais `router.refresh()`. Sem salvar, porque não há nada
+para salvar. A descrição da aba passou a falar só do tema, que é o que sobrou nela.
+
+**O `router.refresh()` é o que faz o painel inteiro virar de idioma sem recarregar.** O cookie muda,
+os server components são renderizados de novo com o dicionário novo e o `NextIntlClientProvider`
+recebe as mensagens novas. Medido no app rodando: clicar em `EN` na documentação leva o
+`<html lang>` de `pt-BR` para `en-US` e a navegação de _Primeiros passos_ para _Getting started_, com
+o cookie gravado — sem reload.
+
+**A lista de idiomas do botão mora em `lib/locale.ts`, não no componente.** Duas razões: a regra de
+Fast Refresh não deixa um arquivo de componente exportar constante, e um teste compara
+`LOCALE_SHORT_NAMES` com `SUPPORTED_LOCALES` — idioma novo que entre no suporte e não no botão
+quebra o teste em vez de sumir do cabeçalho.
+
+**Em que largura ele aparece é medido, não escolhido.** O `ThemeToggle` custa **142px** no mobile
+(três alvos de toque de 44px), e os cabeçalhos já estavam no limite: medido em Chrome, o header da
+documentação em 390px ocupava **419px num viewport de 390** — ele já rolava de lado antes de eu
+encostar nele, e o `gap-2 px-3` no mobile resolveu isso (391px). Com esse aperto, o segundo controle
+não cabe embaixo:
+
+- **LP** — cabe a partir de `sm` (medido: 640, 758, 890 e 1430 sem overflow), então é `hidden sm:flex`.
+- **Topbar e documentação** — `hidden lg:flex`, e abaixo disso ele mora na **gaveta** de navegação,
+  que é `lg:hidden` nos dois. Assim nenhuma largura fica sem o controle.
+- **AccountBar e AdminShell** — `hidden lg:flex`, porque `/servers` exige login e não dá para medir
+  daqui; `lg` é a escolha segura.
+
+**A busca do topo é centralizada por grid, não por espaçador.** `grid-cols-[minmax(0,1fr)_auto_
+minmax(0,1fr)]`: medido, o campo fica a **0px do centro** em 1440, 1280, 1024, 900, 768 e 640, com
+breadcrumb curto ou comprido — o `flex-1` de antes o deixava centralizado no que sobrava, que anda
+conforme o breadcrumb cresce. O campo encolhe para `w-44` abaixo de `lg` porque a coluna da direita
+não pode espremer: as trilhas `1fr` são iguais, então o que falta de um lado não é emprestado do
+outro.
+
+**A busca (Ctrl K) não imprime mais o caminho.** Ela mostrava `/modules/welcome` ao lado de
+_Boas-vindas_ — a única coisa em inglês numa lista em português. Traduzir o texto mantendo a URL
+real seria a mesma mentira dos botões que não puniam, e localizar a rota de verdade é frente
+própria (está em `pendencias.md` §2.7). O que sobrou é o nome traduzido e o grupo; a prosa do
+`meta` continua onde ela é verdade — _"Trocar de servidor"_. Junto saiu a barra azul de 2px
+(`shadow-[inset_2px_0_0_var(--primary)]`) do item selecionado: o fundo e o ícone em `text-primary`
+já dizem onde está o cursor.
+
 ## Loading skeletons
 
 `Skeleton` is `animate-pulse` — Tailwind 4.3.3 defines it as `pulse 2s cubic-bezier(0.4, 0, 0.6, 1)

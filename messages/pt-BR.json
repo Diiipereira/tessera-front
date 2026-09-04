@@ -73,6 +73,8 @@
 		"accountMenu": "Menu da conta",
 		"account": "Conta",
 		"theme": "Tema",
+		"language": "Idioma",
+		"switchTo": "Mudar para {language}",
 		"themeLight": "Claro",
 		"themeDark": "Escuro",
 		"themeSystem": "Sistema",
@@ -134,8 +136,7 @@
 		},
 		"interface": {
 			"title": "Interface",
-			"description": "Vale em todo lugar onde você entrar.",
-			"language": "Idioma",
+			"description": "Como o painel aparece neste navegador.",
 			"theme": "Tema",
 			"themeHint": "Salvo neste navegador, não na sua conta."
 		},

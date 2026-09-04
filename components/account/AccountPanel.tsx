@@ -15,8 +15,7 @@ import {
 	X,
 	type LucideIcon
 } from 'lucide-react';
-import { useLocale, useTranslations } from 'next-intl';
-import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useRef, useState, type KeyboardEvent, type ReactNode, type RefObject } from 'react';
 import { toast } from 'sonner';
 import { Avatar } from '@/components/layout/Avatar';
@@ -27,15 +26,11 @@ import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Field } from '@/components/ui/Field';
 import { Input } from '@/components/ui/Input';
-import { Select } from '@/components/ui/Select';
 import { Switch } from '@/components/ui/Switch';
 import { revokeOtherSessions, revokeSession } from '@/lib/account-client';
 import { BRAND } from '@/lib/brand';
 import { useConfigDraft } from '@/lib/hooks/useConfigDraft';
 import { useRelativeTime } from '@/lib/hooks/useRelativeTime';
-import { SUPPORTED_LOCALES, toLocale } from '@/lib/locale';
-import { rememberLocale } from '@/lib/locale-client';
-import { translateIn } from '@/lib/locale-message';
 import { guildHref } from '@/lib/navigation';
 import type { AccountPreferences, AccountSession } from '@/lib/types/account';
 import type { Guild } from '@/lib/types/guild';
@@ -85,10 +80,7 @@ export function AccountPanel({
 	now
 }: AccountPanelProps) {
 	const t = useTranslations('account');
-	const localeNames = useTranslations('locales');
-	const locale = useLocale();
 	const shared = useTranslations('common');
-	const router = useRouter();
 	const form = useConfigDraft<AccountPreferences>(preferences);
 	const draft = form.draft;
 	const [active, setActive] = useState(sessions);
@@ -130,8 +122,6 @@ export function AccountPanel({
 			toast.success(t('sessions.revoked', { device: session.device }));
 		});
 	}
-
-	const localeOptions = SUPPORTED_LOCALES.map((value) => ({ value, label: localeNames(value) }));
 
 	function move(next: TabId) {
 		setTab(next);
@@ -256,17 +246,6 @@ export function AccountPanel({
 
 							{tab === 'interface' ? (
 								<Pane title={t('interface.title')} description={t('interface.description')}>
-									<Field label={t('interface.language')}>
-										<Select
-											options={localeOptions}
-											value={draft.locale}
-											onValueChange={(next) => {
-												form.set('locale', next);
-											}}
-											className="max-w-80"
-										/>
-									</Field>
-
 									<div className="flex items-start justify-between gap-4">
 										<div className="min-w-0">
 											<p className="text-body-sm font-medium">{t('interface.theme')}</p>
@@ -462,14 +441,8 @@ export function AccountPanel({
 						state={form.state}
 						onDiscard={form.discard}
 						onSave={() => {
-							void form.save().then(async () => {
-								const next = toLocale(draft.locale);
-
-								rememberLocale(next);
-								router.refresh();
-								toast.success(
-									next === locale ? t('saved') : await translateIn(next, 'account.saved')
-								);
+							void form.save().then(() => {
+								toast.success(t('saved'));
 							});
 						}}
 						onResolveConflict={form.resolveConflict}

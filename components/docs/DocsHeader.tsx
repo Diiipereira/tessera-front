@@ -4,6 +4,7 @@ import { LayoutDashboard } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { BrandMark } from '@/components/auth/BrandMark';
+import { LocaleToggle } from '@/components/layout/LocaleToggle';
 import { ThemeToggle } from '@/components/layout/ThemeToggle';
 import { Button } from '@/components/ui/Button';
 import { BRAND } from '@/lib/brand';
@@ -24,7 +25,7 @@ export function DocsHeader({
 
 	return (
 		<header className="sticky top-0 z-30 border-b border-border bg-bg/88 backdrop-blur-md">
-			<div className="flex h-16 items-center gap-4 px-4 sm:px-6">
+			<div className="flex h-16 items-center gap-2 px-3 sm:gap-4 sm:px-6">
 				<Link
 					href="/"
 					className="flex shrink-0 items-center gap-2.5 text-text no-underline hover:no-underline"
@@ -44,6 +45,7 @@ export function DocsHeader({
 
 				<div className="flex shrink-0 items-center gap-2 sm:gap-3">
 					<ThemeToggle />
+					<LocaleToggle className="hidden lg:flex" />
 					<Button variant="outline" href={dashboardHref} aria-label={t('dashboard')}>
 						<LayoutDashboard aria-hidden="true" />
 						<span className="hidden sm:inline">{t('dashboard')}</span>

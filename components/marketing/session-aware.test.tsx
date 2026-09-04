@@ -12,7 +12,8 @@ import { PublicHeaderActions } from './PublicHeaderActions';
 const pathname = vi.hoisted(() => ({ current: '/' }));
 
 vi.mock('next/navigation', () => ({
-	usePathname: () => pathname.current
+	usePathname: () => pathname.current,
+	useRouter: () => ({ refresh: () => undefined })
 }));
 
 const assign = vi.fn();

@@ -13,7 +13,7 @@ import { Avatar } from './Avatar';
 type Entry = {
 	id: string;
 	label: string;
-	meta: string;
+	meta?: string;
 	href: GuildHref;
 	group: string;
 	guild?: Guild;
@@ -41,7 +41,6 @@ export function CommandPalette({ open, onOpenChange, guild, guilds }: CommandPal
 				group.items.map((item) => ({
 					id: `${group.id}:${item.id}`,
 					label: nav(item.id),
-					meta: item.path === '' ? '/' : item.path,
 					href: guildHref(guild.id, item.path),
 					group: group.id === 'overview' ? nav('navigation') : nav(`groups.${group.id}`),
 					icon: item.icon
@@ -182,7 +181,7 @@ export function CommandPalette({ open, onOpenChange, guild, guilds }: CommandPal
 												className={cn(
 													'flex h-10 w-full items-center gap-3 rounded-sm px-2 text-left transition-colors duration-120 ease-out',
 													selected
-														? 'bg-surface-hover text-text shadow-[inset_2px_0_0_var(--primary)]'
+														? 'bg-surface-hover text-text'
 														: 'text-text-muted hover:bg-surface-hover'
 												)}
 												onMouseMove={() => {
@@ -206,9 +205,11 @@ export function CommandPalette({ open, onOpenChange, guild, guilds }: CommandPal
 													/>
 												) : null}
 												<span className="min-w-0 flex-1 truncate text-body">{entry.label}</span>
-												<span className="shrink-0 font-mono text-caption font-normal text-text-muted">
-													{entry.meta}
-												</span>
+												{entry.meta === undefined ? null : (
+													<span className="shrink-0 truncate text-caption font-normal text-text-muted">
+														{entry.meta}
+													</span>
+												)}
 											</button>
 										);
 									})}

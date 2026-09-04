@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { BrandMark } from '@/components/auth/BrandMark';
+import { LocaleToggle } from '@/components/layout/LocaleToggle';
 import { ThemeToggle } from '@/components/layout/ThemeToggle';
 import { Badge } from '@/components/ui/Badge';
 import { BRAND } from '@/lib/brand';
@@ -89,6 +90,8 @@ export function AdminShell({ children }: { children: ReactNode }) {
 					</nav>
 
 					<ThemeToggle />
+
+					<LocaleToggle className="hidden lg:flex" />
 				</header>
 
 				<main className="min-w-0 flex-1">{children}</main>

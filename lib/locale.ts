@@ -8,6 +8,11 @@ export const LOCALE_COOKIE = 'tessera-locale';
 
 export const LOCALE_COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
 
+export const LOCALE_SHORT_NAMES: { locale: SupportedLocale; short: string }[] = [
+	{ locale: 'pt-BR', short: 'PT-BR' },
+	{ locale: 'en-US', short: 'EN' }
+];
+
 export function isSupportedLocale(value: string): value is SupportedLocale {
 	return SUPPORTED_LOCALES.some((locale) => locale === value);
 }

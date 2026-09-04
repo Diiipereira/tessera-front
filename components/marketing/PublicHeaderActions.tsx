@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
+import { LocaleToggle } from '@/components/layout/LocaleToggle';
 import { ThemeToggle } from '@/components/layout/ThemeToggle';
 import { UserMenu } from '@/components/layout/UserMenu';
 import { useSession } from '@/components/providers/session-context';
@@ -35,6 +36,8 @@ export function PublicHeaderActions() {
 	return (
 		<div className="ml-auto flex shrink-0 items-center gap-3">
 			<ThemeToggle />
+
+			<LocaleToggle className="hidden sm:flex" />
 
 			{control === null ? null : (
 				<div className="flex min-w-20 items-center justify-end">{control}</div>

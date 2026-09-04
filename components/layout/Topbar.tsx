@@ -10,6 +10,7 @@ import type { Guild } from '@/lib/types/guild';
 import type { SessionUser } from '@/lib/types/session';
 import { cn } from '@/lib/utils/cn';
 import { Breadcrumbs } from './Breadcrumbs';
+import { LocaleToggle } from './LocaleToggle';
 import { ThemeToggle } from './ThemeToggle';
 import { UserMenu } from './UserMenu';
 
@@ -30,50 +31,65 @@ export function Topbar({ guild, user, onSearch, onOpenAccount, accountTriggerRef
 	const shortcut = useShortcut('K');
 
 	return (
-		<header className="flex h-14 shrink-0 items-center gap-4 border-b border-border bg-bg px-4 sm:px-6">
-			<button
-				type="button"
-				aria-label={t('openNavigation')}
-				className={cn(iconButton, 'lg:hidden')}
-				onClick={() => {
-					setMobileOpen(true);
-				}}
-			>
-				<Menu className="size-4" aria-hidden="true" />
-			</button>
+		<header className="grid h-14 shrink-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-4 border-b border-border bg-bg px-4 sm:px-6">
+			<div className="flex min-w-0 items-center gap-4">
+				<button
+					type="button"
+					aria-label={t('openNavigation')}
+					className={cn(iconButton, 'lg:hidden')}
+					onClick={() => {
+						setMobileOpen(true);
+					}}
+				>
+					<Menu className="size-4" aria-hidden="true" />
+				</button>
 
-			<Breadcrumbs guild={guild} />
+				<Breadcrumbs guild={guild} />
+			</div>
 
-			<div className="flex-1" />
+			<div className="flex items-center justify-center">
+				<button
+					type="button"
+					className="hidden h-8 w-44 items-center gap-2 rounded-md border border-border bg-surface px-2.5 text-body-sm text-text-muted transition-colors duration-120 ease-out hover:border-border-strong sm:flex lg:w-60"
+					onClick={onSearch}
+				>
+					<Search className="size-4 shrink-0" aria-hidden="true" />
+					<span className="min-w-0 flex-1 truncate text-left">{t('searchOrJump')}</span>
+					<span className="rounded-sm border border-border px-1.5 font-mono text-caption font-normal whitespace-nowrap">
+						{shortcut}
+					</span>
+				</button>
 
-			<button
-				type="button"
-				className="hidden h-8 max-w-60 items-center gap-2 rounded-md border border-border bg-surface px-2.5 text-body-sm text-text-muted transition-colors duration-120 ease-out hover:border-border-strong sm:flex"
-				onClick={onSearch}
-			>
-				<Search className="size-4 shrink-0" aria-hidden="true" />
-				<span className="min-w-0 flex-1 truncate text-left">{t('searchOrJump')}</span>
-				<span className="rounded-sm border border-border px-1.5 font-mono text-caption font-normal whitespace-nowrap">
-					{shortcut}
-				</span>
-			</button>
+				<button
+					type="button"
+					aria-label={t('search')}
+					className={cn(iconButton, 'sm:hidden')}
+					onClick={onSearch}
+				>
+					<Search className="size-4" aria-hidden="true" />
+				</button>
+			</div>
 
-			<button
-				type="button"
-				aria-label={t('search')}
-				className={cn(iconButton, 'sm:hidden')}
-				onClick={onSearch}
-			>
-				<Search className="size-4" aria-hidden="true" />
-			</button>
+			<div className="flex items-center justify-end gap-4">
+				<ThemeToggle />
 
-			<ThemeToggle />
+				<LocaleToggle className="hidden lg:flex" />
 
-			<Link href="/docs" aria-label={t('helpAndDocs')} className={cn(iconButton, 'hidden sm:grid')}>
-				<CircleQuestionMark className="size-4" aria-hidden="true" />
-			</Link>
+				<Link
+					href="/docs"
+					aria-label={t('helpAndDocs')}
+					className={cn(iconButton, 'hidden sm:grid')}
+				>
+					<CircleQuestionMark className="size-4" aria-hidden="true" />
+				</Link>
 
-			<UserMenu user={user} onOpenAccount={onOpenAccount} triggerRef={accountTriggerRef} compact />
+				<UserMenu
+					user={user}
+					onOpenAccount={onOpenAccount}
+					triggerRef={accountTriggerRef}
+					compact
+				/>
+			</div>
 		</header>
 	);
 }

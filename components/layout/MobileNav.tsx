@@ -7,6 +7,7 @@ import { useSidebar } from '@/components/providers/sidebar-context';
 import type { Plan } from '@/lib/types/billing';
 import type { Guild } from '@/lib/types/guild';
 import { GuildSwitcher } from './GuildSwitcher';
+import { LocaleToggle } from './LocaleToggle';
 import { PlanCard } from './PlanCard';
 import { SidebarNav } from './SidebarNav';
 
@@ -18,6 +19,7 @@ type MobileNavProps = {
 
 export function MobileNav({ guild, guilds, plan }: MobileNavProps) {
 	const t = useTranslations('nav');
+	const shell = useTranslations('shell');
 	const { mobileOpen, setMobileOpen } = useSidebar();
 	const close = () => {
 		setMobileOpen(false);
@@ -47,8 +49,13 @@ export function MobileNav({ guild, guilds, plan }: MobileNavProps) {
 
 					<SidebarNav guildId={guild.id} onNavigate={close} />
 
-					<div className="border-t border-border p-3">
+					<div className="flex flex-col gap-3 border-t border-border p-3">
 						<PlanCard plan={plan} guildId={guild.id} />
+
+						<div className="flex items-center justify-between gap-3 px-1">
+							<span className="text-body-sm text-text-muted">{shell('language')}</span>
+							<LocaleToggle />
+						</div>
 					</div>
 				</DialogPrimitive.Content>
 			</DialogPrimitive.Portal>

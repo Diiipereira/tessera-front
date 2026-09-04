@@ -11,7 +11,6 @@ export type AccountSession = {
 };
 
 export type AccountPreferences = {
-	locale: string;
 	emailOnMention: boolean;
 	emailOnCase: boolean;
 	emailProduct: boolean;
