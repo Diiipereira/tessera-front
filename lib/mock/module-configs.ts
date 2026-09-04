@@ -470,6 +470,8 @@ export const mockScheduledConfig: ScheduledConfig = {
 			days: ['fri'],
 			timeOfDay: '19:00',
 			enabled: true,
+			nextRunAt: null,
+			lastRunAt: null,
 			message: text('Event tonight at 20:00. Bring a friend.')
 		},
 		{
@@ -481,6 +483,8 @@ export const mockScheduledConfig: ScheduledConfig = {
 			days: ['mon', 'wed'],
 			timeOfDay: '09:30',
 			enabled: true,
+			nextRunAt: null,
+			lastRunAt: null,
 			message: text('Standup in 30 minutes.')
 		},
 		{
@@ -492,6 +496,8 @@ export const mockScheduledConfig: ScheduledConfig = {
 			days: [],
 			timeOfDay: '22:00',
 			enabled: false,
+			nextRunAt: null,
+			lastRunAt: null,
 			message: text('The game server is down for maintenance from 22:00 to 23:00.')
 		}
 	]

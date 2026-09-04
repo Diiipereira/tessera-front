@@ -2,7 +2,7 @@
 
 import { CalendarClock, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { ChannelPicker } from '@/components/discord/ChannelPicker';
 import { MessageComposer } from '@/components/modules/MessageComposer';
@@ -14,61 +14,92 @@ import { Field } from '@/components/ui/Field';
 import { DateTimeInput } from '@/components/ui/DateTimeInput';
 import { Input } from '@/components/ui/Input';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
-import { Select } from '@/components/ui/Select';
 import { Switch } from '@/components/ui/Switch';
-import { useConfigDraft } from '@/lib/hooks/useConfigDraft';
-import { nextRuns, readSchedule, toCron, WEEKDAYS, type Run } from '@/lib/schedule';
+import { useConfigDraft, type SaveOutcome } from '@/lib/hooks/useConfigDraft';
+import { useRelativeTime } from '@/lib/hooks/useRelativeTime';
+import { patchModule } from '@/lib/module-client';
+import { loadScheduled, saveScheduled } from '@/lib/scheduled-client';
+import {
+	MAX_SCHEDULED_MESSAGES,
+	MAX_SCHEDULED_NAME_LENGTH,
+	SCHEDULED_CHANNEL_KINDS,
+	blankScheduledMessage,
+	dateless,
+	dayless,
+	nameless,
+	sendable,
+	speechless,
+	toSchedulePayload,
+	toScheduledConfig,
+	unroutable
+} from '@/lib/modules/scheduled';
+import { nextRuns, readSchedule, WEEKDAYS, type Run } from '@/lib/schedule';
 import type { Channel } from '@/lib/types/discord';
 import type { ScheduledConfig, ScheduledMessage } from '@/lib/types/module-configs';
 import type { MessageVariable } from '@/lib/types/modules';
-import { EMBED_SWATCHES } from '@/lib/discord-colors';
 import { cn } from '@/lib/utils/cn';
 import { newId } from '@/lib/utils/id';
 
-const TIMEZONES = [
-	{ value: 'America/Sao_Paulo', label: 'America/São Paulo (GMT-3)' },
-	{ value: 'UTC', label: 'UTC' },
-	{ value: 'Europe/Lisbon', label: 'Europe/Lisbon (GMT+0)' },
-	{ value: 'America/New_York', label: 'America/New York (GMT-5)' }
-];
-
-function blankMessage(): ScheduledMessage {
-	return {
-		id: newId('sm'),
-		name: '',
-		channelId: null,
-		kind: 'recurring',
-		runAt: '',
-		days: ['mon'],
-		timeOfDay: '09:00',
-		enabled: true,
-		message: {
-			mode: 'text',
-			text: '',
-			embed: {
-				authorName: '',
-				title: '',
-				description: '',
-				color: EMBED_SWATCHES[0],
-				fields: [],
-				imageUrl: '',
-				thumbnailUrl: '',
-				footerText: '',
-				timestamp: false
-			}
-		}
-	};
-}
-
 type ScheduledScreenProps = {
+	guildId: string;
 	config: ScheduledConfig;
+	defaultColor: string;
+	version: number;
 	channels: Channel[];
 	variables: MessageVariable[];
+	now: string;
 };
 
-export function ScheduledScreen({ config, channels, variables }: ScheduledScreenProps) {
+export function ScheduledScreen({
+	guildId,
+	config,
+	defaultColor,
+	version,
+	channels,
+	variables,
+	now
+}: ScheduledScreenProps) {
 	const t = useTranslations('modules.scheduled');
-	const form = useConfigDraft<ScheduledConfig>(config);
+	const relativeTime = useRelativeTime();
+	const rightNow = new Date(now);
+	const versionRef = useRef(version);
+
+	const save = useCallback(
+		async (next: ScheduledConfig): Promise<SaveOutcome<ScheduledConfig>> => {
+			const patched = await patchModule(guildId, 'scheduled', {
+				version: versionRef.current,
+				enabled: next.enabled,
+				config: {}
+			});
+
+			if (patched.status === 'error') return patched;
+
+			versionRef.current = patched.state.version;
+
+			if (patched.status === 'conflict') {
+				const stored = await loadScheduled(guildId);
+
+				if (stored.status === 'error') return stored;
+
+				return {
+					status: 'conflict',
+					current: toScheduledConfig(patched.state, stored.page, defaultColor)
+				};
+			}
+
+			const written = await saveScheduled(guildId, toSchedulePayload(next.messages));
+
+			if (written.status === 'error') return written;
+
+			return {
+				status: 'saved',
+				saved: toScheduledConfig(patched.state, written.page, defaultColor)
+			};
+		},
+		[guildId, defaultColor]
+	);
+
+	const form = useConfigDraft<ScheduledConfig>(config, { save });
 	const draft = form.draft;
 
 	const [selectedId, setSelectedId] = useState(draft.messages[0]?.id ?? null);
@@ -113,6 +144,12 @@ export function ScheduledScreen({ config, channels, variables }: ScheduledScreen
 	}
 
 	const runs = selected ? nextRuns(selected) : [];
+	const dropped =
+		nameless(draft.messages) +
+		unroutable(draft.messages) +
+		speechless(draft.messages) +
+		dayless(draft.messages) +
+		dateless(draft.messages);
 
 	return (
 		<ModulePage
@@ -131,8 +168,8 @@ export function ScheduledScreen({ config, channels, variables }: ScheduledScreen
 					state={form.state}
 					onDiscard={form.discard}
 					onSave={() => {
-						void form.save().then(() => {
-							toast.success(t('saved'));
+						void form.save().then((state) => {
+							if (state === 'idle') toast.success(t('saved'));
 						});
 					}}
 					onResolveConflict={form.resolveConflict}
@@ -146,8 +183,9 @@ export function ScheduledScreen({ config, channels, variables }: ScheduledScreen
 					<Button
 						variant="outline"
 						size="sm"
+						disabled={draft.messages.length >= MAX_SCHEDULED_MESSAGES}
 						onClick={() => {
-							const message = blankMessage();
+							const message = blankScheduledMessage(newId('sm'), defaultColor);
 							form.set('messages', [...draft.messages, message]);
 							setSelectedId(message.id);
 						}}
@@ -157,15 +195,18 @@ export function ScheduledScreen({ config, channels, variables }: ScheduledScreen
 					</Button>
 				}
 			>
-				<Field label={t('list.timezone')} className="max-w-80">
-					<Select
-						options={TIMEZONES}
-						value={draft.timezone}
-						onValueChange={(next) => {
-							form.set('timezone', next);
-						}}
-					/>
-				</Field>
+				<p className="text-body-sm text-text-muted">
+					{t.rich('list.timezone', {
+						zone: draft.timezone,
+						code: (chunks) => <span className="font-mono text-text">{chunks}</span>
+					})}
+				</p>
+
+				{dropped > 0 ? (
+					<p className="text-caption font-normal text-warning-fg">
+						{t('list.dropped', { count: dropped })}
+					</p>
+				) : null}
 
 				{draft.messages.length === 0 ? (
 					<p className="text-body-sm text-text-muted">{t('list.empty')}</p>
@@ -247,6 +288,7 @@ export function ScheduledScreen({ config, channels, variables }: ScheduledScreen
 						<Field label={t('form.name')} hint={t('form.nameHint')}>
 							<Input
 								value={selected.name}
+								maxLength={MAX_SCHEDULED_NAME_LENGTH}
 								onChange={(event) => {
 									update(selected.id, { name: event.target.value });
 								}}
@@ -257,6 +299,7 @@ export function ScheduledScreen({ config, channels, variables }: ScheduledScreen
 						<Field label={t('form.channel')}>
 							<ChannelPicker
 								channels={channels}
+								kinds={SCHEDULED_CHANNEL_KINDS}
 								value={selected.channelId}
 								onValueChange={(next) => {
 									update(selected.id, { channelId: next });
@@ -330,19 +373,16 @@ export function ScheduledScreen({ config, channels, variables }: ScheduledScreen
 										}}
 									/>
 								</Field>
-
-								<div className="rounded-md border border-border bg-surface-sunken p-3">
-									<p className="mb-1 font-mono text-overline text-text-muted uppercase">
-										{t('form.cron')}
-									</p>
-									<code className="font-mono text-body-sm text-text">
-										{toCron(selected.days, selected.timeOfDay)}
-									</code>
-								</div>
 							</>
 						)}
 
-						{runs.length > 0 ? (
+						{selected.nextRunAt !== null && !form.dirty ? (
+							<p className="text-body-sm text-text-muted">
+								{t('form.runsNext', {
+									when: relativeTime(selected.nextRunAt, rightNow)
+								})}
+							</p>
+						) : runs.length > 0 ? (
 							<div>
 								<p className="mb-1.5 font-mono text-overline text-text-muted uppercase">
 									{t('form.next', { count: runs.length })}
@@ -358,6 +398,16 @@ export function ScheduledScreen({ config, channels, variables }: ScheduledScreen
 						) : (
 							<p className="text-caption font-normal text-warning-fg">{t('form.nothing')}</p>
 						)}
+
+						{selected.lastRunAt !== null ? (
+							<p className="text-caption font-normal text-text-muted">
+								{t('form.ranLast', { when: relativeTime(selected.lastRunAt, rightNow) })}
+							</p>
+						) : null}
+
+						{!sendable(selected) ? (
+							<p className="text-caption font-normal text-warning-fg">{t('form.incomplete')}</p>
+						) : null}
 					</SettingsSection>
 
 					<SettingsSection title={t('message.title')}>

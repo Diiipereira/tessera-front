@@ -226,6 +226,8 @@ export type ScheduledMessage = {
 	timeOfDay: string;
 	enabled: boolean;
 	message: MessageDraft;
+	nextRunAt: string | null;
+	lastRunAt: string | null;
 };
 
 export type ScheduledConfig = {

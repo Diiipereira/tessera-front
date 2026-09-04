@@ -1,61 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { nextRuns, readSchedule, toCron } from './schedule';
-import type { ScheduledMessage } from './types/module-configs';
+import { nextRuns, readSchedule, type SchedulePreview } from './schedule';
 
-function message(overrides: Partial<ScheduledMessage> = {}): ScheduledMessage {
+function message(overrides: Partial<SchedulePreview> = {}): SchedulePreview {
 	return {
-		id: 'm',
-		name: 'Test',
-		channelId: null,
 		kind: 'recurring',
 		runAt: '',
 		days: ['mon'],
 		timeOfDay: '09:00',
-		enabled: true,
-		message: {
-			mode: 'text',
-			text: '',
-			embed: {
-				authorName: '',
-				title: '',
-				description: '',
-				color: '#000000',
-				fields: [],
-				imageUrl: '',
-				thumbnailUrl: '',
-				footerText: '',
-				timestamp: false
-			}
-		},
 		...overrides
 	};
 }
-
-describe('toCron', () => {
-	it('puts minute and hour in the right fields', () => {
-		expect(toCron(['mon'], '09:30')).toBe('30 9 * * 1');
-	});
-
-	it('strips the leading zero from the hour', () => {
-		expect(toCron(['tue'], '07:05')).toBe('5 7 * * 2');
-	});
-
-	it('sorts days numerically rather than by the order they were clicked', () => {
-		expect(toCron(['fri', 'mon', 'wed'], '12:00')).toBe('0 12 * * 1,3,5');
-	});
-
-	it('uses the wildcard when every day is picked', () => {
-		expect(toCron(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'], '08:00')).toBe('0 8 * * *');
-	});
-
-	it('uses the wildcard rather than an empty field when no day is picked', () => {
-		expect(toCron([], '08:00')).toBe('0 8 * * *');
-	});
-
-	it('maps Sunday to 0, the way cron does', () => {
-		expect(toCron(['sun'], '00:00')).toBe('0 0 * * 0');
-	});
-});
 
 describe('readSchedule', () => {
 	it('names the days a weekly schedule runs on, in week order', () => {

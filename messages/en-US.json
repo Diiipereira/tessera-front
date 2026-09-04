@@ -1393,11 +1393,12 @@
 			"list": {
 				"title": "Messages",
 				"description": "Every schedule runs in the server timezone.",
-				"timezone": "Server timezone",
+				"timezone": "Times below are read in <code>{zone}</code>, the clock this server runs on.",
 				"empty": "Nothing scheduled.",
 				"enable": "Enable {name}",
 				"edit": "Edit {name}",
-				"delete": "Delete {name}"
+				"delete": "Delete {name}",
+				"dropped": "{count, plural, =1 {1 message is not ready and will not be saved} other {# messages are not ready and will not be saved}}"
 			},
 			"form": {
 				"title": "Schedule",
@@ -1414,7 +1415,10 @@
 				"time": "Time",
 				"cron": "Cron",
 				"next": "Next {count}",
-				"nothing": "Nothing is scheduled — pick at least one day, or a date."
+				"nothing": "Nothing is scheduled — pick at least one day, or a date.",
+				"runsNext": "Runs {when}.",
+				"ranLast": "Last went out {when}.",
+				"incomplete": "This one still needs a name, a channel, something to say and a moment."
 			},
 			"message": {
 				"title": "Message"

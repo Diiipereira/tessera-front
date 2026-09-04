@@ -1,28 +1,6 @@
 import type { ScheduledMessage, Weekday } from '@/lib/types/module-configs';
 
-const CRON_DAY: Record<Weekday, number> = {
-	sun: 0,
-	mon: 1,
-	tue: 2,
-	wed: 3,
-	thu: 4,
-	fri: 5,
-	sat: 6
-};
-
 export const WEEKDAYS: Weekday[] = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
-
-export function toCron(days: Weekday[], timeOfDay: string): string {
-	const [hour = '0', minute = '0'] = timeOfDay.split(':');
-	const dayField =
-		days.length === 0 || days.length === 7
-			? '*'
-			: [...days]
-					.map((day) => CRON_DAY[day])
-					.sort((a, b) => a - b)
-					.join(',');
-	return `${String(Number(minute))} ${String(Number(hour))} * * ${dayField}`;
-}
 
 export type Schedule =
 	| { kind: 'no-date' }
@@ -31,7 +9,9 @@ export type Schedule =
 	| { kind: 'daily'; time: string }
 	| { kind: 'days'; days: Weekday[]; time: string };
 
-export function readSchedule(message: ScheduledMessage): Schedule {
+export type SchedulePreview = Pick<ScheduledMessage, 'kind' | 'runAt' | 'days' | 'timeOfDay'>;
+
+export function readSchedule(message: SchedulePreview): Schedule {
 	if (message.kind === 'once') {
 		return message.runAt === '' ? { kind: 'no-date' } : { kind: 'once', at: message.runAt };
 	}
@@ -47,7 +27,7 @@ export function readSchedule(message: ScheduledMessage): Schedule {
 
 export type Run = { at: string } | { week: number; day: Weekday; time: string };
 
-export function nextRuns(message: ScheduledMessage, count = 3): Run[] {
+export function nextRuns(message: SchedulePreview, count = 3): Run[] {
 	if (message.kind === 'once') {
 		return message.runAt === '' ? [] : [{ at: message.runAt }];
 	}

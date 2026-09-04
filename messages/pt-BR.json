@@ -1393,11 +1393,12 @@
 			"list": {
 				"title": "Mensagens",
 				"description": "Todo agendamento roda no fuso horário do servidor.",
-				"timezone": "Fuso horário do servidor",
+				"timezone": "Os horários abaixo valem em <code>{zone}</code>, o relógio deste servidor.",
 				"empty": "Nada agendado.",
 				"enable": "Ligar {name}",
 				"edit": "Editar {name}",
-				"delete": "Excluir {name}"
+				"delete": "Excluir {name}",
+				"dropped": "{count, plural, =1 {1 mensagem está incompleta e não será salva} other {# mensagens estão incompletas e não serão salvas}}"
 			},
 			"form": {
 				"title": "Agendamento",
@@ -1414,7 +1415,10 @@
 				"time": "Horário",
 				"cron": "Cron",
 				"next": "Próximas {count}",
-				"nothing": "Nada está agendado — escolha ao menos um dia, ou uma data."
+				"nothing": "Nada está agendado — escolha ao menos um dia, ou uma data.",
+				"runsNext": "Vai {when}.",
+				"ranLast": "Saiu pela última vez {when}.",
+				"incomplete": "Falta nome, canal, o que dizer ou o momento."
 			},
 			"message": {
 				"title": "Mensagem"
