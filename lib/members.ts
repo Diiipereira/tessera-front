@@ -1,45 +1,112 @@
+import { colorOf, initialsOf } from '@/lib/guild-presentation';
 import type { Member, MemberStanding } from '@/lib/types/management';
 
-export type MemberSort = 'joined' | 'level' | 'balance' | 'warnings' | 'name';
+export const MEMBER_SORTS = ['active', 'level', 'balance', 'warnings', 'name'] as const;
 
-export function warningCount(member: Member): number {
-	return member.infractions.filter((entry) => entry.action === 'warn').length;
-}
+export type MemberSort = (typeof MEMBER_SORTS)[number];
 
-export type MemberFilters = {
-	query: string;
-	roleId: string;
-	standing: MemberStanding | 'all';
+export const MEMBER_STANDINGS = ['clean', 'warned', 'timed-out', 'banned'] as const;
+
+export const DEFAULT_MEMBER_SORT: MemberSort = 'active';
+
+export const MEMBERS_PER_PAGE = 25;
+
+export const MAX_MEMBER_SEARCH = 50;
+
+export type MemberDto = {
+	id: string;
+	name: string | null;
+	handle: string | null;
+	avatarHash: string | null;
+	level: number;
+	xp: number;
+	earningMessages: number;
+	voiceSeconds: number;
+	lastEarnedAt: string | null;
+	balance: number;
+	warnings: number;
+	infractions: number;
+	standing: MemberStanding;
 };
 
-export function filterMembers(members: Member[], filters: MemberFilters): Member[] {
-	const term = filters.query.trim().toLowerCase();
+export type MemberListDto = {
+	members: MemberDto[];
+	total: number;
+	searched: boolean;
+};
 
-	return members.filter((member) => {
-		if (filters.roleId !== 'all' && !member.roleIds.includes(filters.roleId)) return false;
-		if (filters.standing !== 'all' && member.standing !== filters.standing) return false;
-		if (term === '') return true;
-		return (
-			member.name.toLowerCase().includes(term) ||
-			member.handle.toLowerCase().includes(term) ||
-			member.id.includes(term)
-		);
-	});
+export type MemberDetailDto = {
+	member: MemberDto;
+	present: boolean;
+	nickname: string | null;
+	bot: boolean;
+	roleIds: string[];
+	joinedAt: string | null;
+	timedOutUntil: string | null;
+};
+
+export type MemberQuery = {
+	query: string;
+	standing: MemberStanding | 'all';
+	sort: MemberSort;
+	page: number;
+};
+
+export const blankMemberQuery: MemberQuery = {
+	query: '',
+	standing: 'all',
+	sort: DEFAULT_MEMBER_SORT,
+	page: 0
+};
+
+export function toMember(dto: MemberDto): Member {
+	const name = dto.name ?? dto.handle ?? dto.id;
+
+	return {
+		id: dto.id,
+		name,
+		handle: dto.handle === null ? dto.id : `@${dto.handle}`,
+		initials: initialsOf(name),
+		color: colorOf(dto.id),
+		avatarHash: dto.avatarHash,
+		level: dto.level,
+		xp: dto.xp,
+		earningMessages: dto.earningMessages,
+		voiceSeconds: dto.voiceSeconds,
+		lastEarnedAt: dto.lastEarnedAt,
+		balance: dto.balance,
+		warnings: dto.warnings,
+		infractions: dto.infractions,
+		standing: dto.standing
+	};
 }
 
-export function sortMembers(members: Member[], sort: MemberSort): Member[] {
-	const copy = [...members];
+export const toMembers = (dtos: readonly MemberDto[]): Member[] => dtos.map(toMember);
 
-	switch (sort) {
-		case 'joined':
-			return copy.sort((a, b) => Date.parse(b.joinedAt) - Date.parse(a.joinedAt));
-		case 'level':
-			return copy.sort((a, b) => b.level - a.level || b.xp - a.xp);
-		case 'balance':
-			return copy.sort((a, b) => b.balance - a.balance);
-		case 'warnings':
-			return copy.sort((a, b) => warningCount(b) - warningCount(a));
-		case 'name':
-			return copy.sort((a, b) => a.name.localeCompare(b.name));
+export function toSearchParams(query: MemberQuery): URLSearchParams {
+	const params = new URLSearchParams();
+	const term = query.query.trim();
+
+	if (term === '') {
+		params.set('sort', query.sort);
+		params.set('limit', String(MEMBERS_PER_PAGE));
+		params.set('offset', String(query.page * MEMBERS_PER_PAGE));
+	} else {
+		params.set('query', term);
+		params.set('limit', String(MAX_MEMBER_SEARCH));
 	}
+
+	if (query.standing !== 'all') params.set('standing', query.standing);
+
+	return params;
 }
+
+export const isSearching = (query: MemberQuery): boolean => query.query.trim() !== '';
+
+export const pageCount = (total: number): number =>
+	Math.max(1, Math.ceil(total / MEMBERS_PER_PAGE));
+
+export const firstShown = (page: number, shown: number): number =>
+	shown === 0 ? 0 : page * MEMBERS_PER_PAGE + 1;
+
+export const lastShown = (page: number, shown: number): number => page * MEMBERS_PER_PAGE + shown;

@@ -10,7 +10,6 @@ export { findTenant, mockBlacklist, mockTenants } from './admin';
 export { mockChannels, mockRoles } from './discord';
 export { mockCommands } from './commands';
 export { mockGuilds } from './guilds';
-export { mockMembers } from './members';
 export { mockBotOnline, mockPlan, mockUser } from './session';
 export { mockBilling, mockGuildSettings } from './server';
 export { mockVariables, mockWelcomeConfig } from './modules';

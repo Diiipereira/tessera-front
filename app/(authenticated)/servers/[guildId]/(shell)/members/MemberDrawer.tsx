@@ -1,20 +1,28 @@
 'use client';
 
-import { Ban, Copy, Gavel, ShieldAlert, Timer } from 'lucide-react';
+import { Copy } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { RoleChips } from '@/components/management/RoleChips';
 import { Avatar } from '@/components/layout/Avatar';
+import { RoleChips } from '@/components/management/RoleChips';
 import { Badge, type BadgeVariant } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Drawer } from '@/components/ui/Drawer';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
-import { warningCount } from '@/lib/members';
-import { absoluteTime, relativeTime } from '@/lib/time';
+import { listCases } from '@/lib/cases-client';
+import { useRelativeTime } from '@/lib/hooks/useRelativeTime';
+import { loadMember } from '@/lib/members-client';
+import { guildHref } from '@/lib/navigation';
+import { absoluteTime } from '@/lib/time';
 import type { Role } from '@/lib/types/discord';
-import type { Member, MemberStanding } from '@/lib/types/management';
-import type { ModerationAction } from '@/lib/types/modules';
+import type {
+	InfractionType,
+	Member,
+	MemberDetail,
+	MemberStanding,
+	ModerationCase
+} from '@/lib/types/management';
 import { formatCount } from '@/lib/utils/format';
 
 const STANDING_VARIANTS: Record<MemberStanding, BadgeVariant> = {
@@ -24,32 +32,75 @@ const STANDING_VARIANTS: Record<MemberStanding, BadgeVariant> = {
 	banned: 'danger'
 };
 
-const ACTION_VARIANTS: Record<ModerationAction, BadgeVariant> = {
+const CASE_VARIANTS: Record<InfractionType, BadgeVariant> = {
+	note: 'neutral',
 	warn: 'warning',
 	timeout: 'warning',
 	mute: 'info',
+	unmute: 'success',
 	kick: 'danger',
-	ban: 'danger'
+	ban: 'danger',
+	softban: 'danger',
+	unban: 'success'
 };
 
-type Tab = 'overview' | 'infractions' | 'economy' | 'roles';
+const CASES_SHOWN = 10;
+
+type Tab = 'overview' | 'infractions' | 'roles';
 
 type MemberDrawerProps = {
+	guildId: string;
 	member: Member | null;
-	roles: Role[];
+	roles?: Role[];
 	currency: string;
+	levelsOn: boolean;
+	now?: string;
 	onClose: () => void;
 };
 
-export function MemberDrawer({ member, roles, currency, onClose }: MemberDrawerProps) {
+export function MemberDrawer({
+	guildId,
+	member,
+	roles = [],
+	currency,
+	levelsOn,
+	now,
+	onClose
+}: MemberDrawerProps) {
 	const t = useTranslations('members.drawer');
 	const caseActions = useTranslations('cases.action');
 	const standings = useTranslations('members.standing');
+	const relativeTime = useRelativeTime();
 	const [tab, setTab] = useState<Tab>('overview');
+	const [detail, setDetail] = useState<MemberDetail | null>(null);
+	const [cases, setCases] = useState<ModerationCase[] | null>(null);
 
-	if (!member) return null;
+	const at = now === undefined ? new Date() : new Date(now);
+	const memberId = member?.id ?? null;
 
-	const warnings = warningCount(member);
+	useEffect(() => {
+		if (memberId === null) return;
+
+		let dropped = false;
+
+		void loadMember(guildId, memberId).then((result) => {
+			if (dropped || result.status === 'error') return;
+
+			setDetail(result.detail);
+		});
+
+		void listCases(guildId, { targetId: memberId, limit: CASES_SHOWN }).then((result) => {
+			if (dropped || result.status === 'error') return;
+
+			setCases(result.page.cases);
+		});
+
+		return () => {
+			dropped = true;
+		};
+	}, [guildId, memberId]);
+
+	if (member === null) return null;
 
 	return (
 		<Drawer
@@ -78,50 +129,6 @@ export function MemberDrawer({ member, roles, currency, onClose }: MemberDrawerP
 					</Badge>
 				</div>
 			}
-			footer={
-				<div className="flex flex-wrap gap-2">
-					<Button
-						variant="outline"
-						size="sm"
-						onClick={() => {
-							toast.success(t('didWarn', { name: member.name }), { description: t('didWarnHint') });
-						}}
-					>
-						<ShieldAlert aria-hidden="true" />
-						{t('warn')}
-					</Button>
-					<Button
-						variant="outline"
-						size="sm"
-						onClick={() => {
-							toast.success(t('didTimeout', { name: member.name }));
-						}}
-					>
-						<Timer aria-hidden="true" />
-						{t('timeout')}
-					</Button>
-					<Button
-						variant="outline"
-						size="sm"
-						onClick={() => {
-							toast.success(t('didKick', { name: member.name }));
-						}}
-					>
-						<Gavel aria-hidden="true" />
-						{t('kick')}
-					</Button>
-					<Button
-						variant="danger"
-						size="sm"
-						onClick={() => {
-							toast.success(t('didBan', { name: member.name }));
-						}}
-					>
-						<Ban aria-hidden="true" />
-						{t('ban')}
-					</Button>
-				</div>
-			}
 		>
 			<div className="flex flex-col gap-5">
 				<div className="flex items-center gap-2">
@@ -147,107 +154,117 @@ export function MemberDrawer({ member, roles, currency, onClose }: MemberDrawerP
 					</Button>
 				</div>
 
+				{detail !== null && !detail.present ? (
+					<p className="rounded-md border border-border bg-surface-sunken p-3 text-body-sm text-text-muted">
+						{t('gone')}
+					</p>
+				) : null}
+
 				<dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
 					<Stat label={t('level')} value={String(member.level)} />
-					<Stat label={t('messages')} value={formatCount(member.messages)} />
+					<Stat label={t('earningMessages')} value={formatCount(member.earningMessages)} />
 					<Stat label={currency} value={formatCount(member.balance)} />
 					<Stat
 						label={t('warnings')}
-						value={String(warnings)}
-						tone={warnings > 0 ? 'warn' : 'flat'}
+						value={String(member.warnings)}
+						tone={member.warnings > 0 ? 'warn' : 'flat'}
 					/>
 				</dl>
 
 				<SegmentedControl
 					options={[
 						{ value: 'overview', label: t('overview') },
-						{ value: 'infractions', label: t('infractions'), count: member.infractions.length },
-						{ value: 'economy', label: t('economy') },
-						{ value: 'roles', label: t('roles'), count: member.roleIds.length }
+						{ value: 'infractions', label: t('infractions'), count: member.infractions },
+						{ value: 'roles', label: t('roles'), count: detail?.roleIds.length ?? 0 }
 					]}
 					value={tab}
-					onValueChange={setTab}
+					onValueChange={(next) => {
+						setTab(next);
+					}}
 					label={t('section')}
 					size="sm"
 				/>
 
 				{tab === 'overview' ? (
 					<div className="flex flex-col gap-4">
-						<Row
-							label={t('joined')}
-							value={`${relativeTime(member.joinedAt)} · ${absoluteTime(member.joinedAt)}`}
-						/>
-						<Row label={t('lastSeen')} value={relativeTime(member.lastSeenAt)} />
+						{detail?.joinedAt == null ? null : (
+							<Row
+								label={t('joined')}
+								value={`${relativeTime(detail.joinedAt, at)} · ${absoluteTime(detail.joinedAt)}`}
+							/>
+						)}
+						{detail?.nickname == null ? null : (
+							<Row label={t('nickname')} value={detail.nickname} />
+						)}
+						{levelsOn ? (
+							<Row label={t('lastEarned')} value={relativeTime(member.lastEarnedAt, at)} />
+						) : (
+							<Row label={t('lastEarned')} value={t('levelsOff')} />
+						)}
 						<Row label={t('xp')} value={t('xpTotal', { amount: formatCount(member.xp) })} />
-
-						<div>
-							<p className="mb-2 font-mono text-overline text-text-muted uppercase">{t('notes')}</p>
-							{member.notes.length === 0 ? (
-								<p className="text-body-sm text-text-muted">{t('noNotes')}</p>
-							) : (
-								<ul className="flex flex-col gap-2">
-									{member.notes.map((note) => (
-										<li
-											key={note.id}
-											className="rounded-md border border-border bg-surface-sunken p-3"
-										>
-											<p className="text-body-sm">{note.body}</p>
-											<p className="mt-1 text-caption font-normal text-text-muted">
-												{note.author} · {relativeTime(note.at)}
-											</p>
-										</li>
-									))}
-								</ul>
-							)}
-						</div>
+						<Row
+							label={t('voice')}
+							value={t('voiceMinutes', { amount: Math.floor(member.voiceSeconds / 60) })}
+						/>
+						{detail?.timedOutUntil == null ? null : (
+							<Row
+								label={t('timedOut')}
+								value={`${relativeTime(detail.timedOutUntil, at)} · ${absoluteTime(detail.timedOutUntil)}`}
+							/>
+						)}
+						<p className="text-body-sm text-text-muted">{t('countedOnly')}</p>
 					</div>
 				) : null}
 
 				{tab === 'infractions' ? (
-					member.infractions.length === 0 ? (
+					cases === null ? (
+						<p className="text-body-sm text-text-muted">{t('loadingCases')}</p>
+					) : cases.length === 0 ? (
 						<p className="text-body-sm text-text-muted">{t('noInfractions')}</p>
 					) : (
-						<ul className="flex flex-col gap-2">
-							{member.infractions.map((infraction) => (
-								<li
-									key={infraction.id}
-									className="rounded-md border border-border bg-surface-sunken p-3"
-								>
-									<div className="flex items-center gap-2">
-										<Badge variant={ACTION_VARIANTS[infraction.action]}>
-											{caseActions(infraction.action)}
-										</Badge>
-										<span className="font-mono text-caption text-text-muted">
-											#{infraction.caseNumber}
-										</span>
-										<span className="ml-auto text-caption font-normal text-text-muted">
-											{relativeTime(infraction.at)}
-										</span>
-									</div>
-									<p className="mt-2 text-body-sm">{infraction.reason}</p>
-									<p className="mt-1 text-caption font-normal text-text-muted">
-										{t('by', { who: infraction.moderator })}
-									</p>
-								</li>
-							))}
-						</ul>
+						<div className="flex flex-col gap-3">
+							<ul className="flex flex-col gap-2">
+								{cases.map((entry) => (
+									<li
+										key={entry.id}
+										className="rounded-md border border-border bg-surface-sunken p-3"
+									>
+										<div className="flex items-center gap-2">
+											<Badge variant={CASE_VARIANTS[entry.type]}>{caseActions(entry.type)}</Badge>
+											<span className="font-mono text-caption text-text-muted">
+												#{entry.number}
+											</span>
+											<span className="ml-auto text-caption font-normal text-text-muted">
+												{relativeTime(entry.createdAt, at)}
+											</span>
+										</div>
+										{entry.reason === null ? null : (
+											<p className="mt-2 text-body-sm">{entry.reason}</p>
+										)}
+										<p className="mt-1 text-caption font-normal text-text-muted">
+											{t('by', {
+												who: entry.moderator.name ?? entry.moderator.id
+											})}
+										</p>
+									</li>
+								))}
+							</ul>
+							<Button variant="outline" size="sm" href={guildHref(guildId, '/cases')}>
+								{t('allCases')}
+							</Button>
+						</div>
 					)
-				) : null}
-
-				{tab === 'economy' ? (
-					<div className="flex flex-col gap-4">
-						<Row
-							label={t('balance')}
-							value={t('balanceValue', { amount: formatCount(member.balance), currency })}
-						/>
-						<Row label={t('rank')} value={t('rankPending')} />
-						<p className="text-body-sm text-text-muted">{t('economyElsewhere')}</p>
-					</div>
 				) : null}
 
 				{tab === 'roles' ? (
 					<div className="flex flex-col gap-3">
-						<RoleChips roles={roles} roleIds={member.roleIds} max={20} />
+						{detail === null ? (
+							<p className="text-body-sm text-text-muted">{t('loadingRoles')}</p>
+						) : detail.roleIds.length === 0 ? (
+							<p className="text-body-sm text-text-muted">{t('noRoles')}</p>
+						) : (
+							<RoleChips roles={roles} roleIds={detail.roleIds} max={20} />
+						)}
 						<p className="text-body-sm text-text-muted">{t('rolesUpstream')}</p>
 					</div>
 				) : null}

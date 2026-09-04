@@ -1,5 +1,5 @@
 import type { PlanTier } from './billing';
-import type { ModerationAction, ModuleId } from './modules';
+import type { ModuleId } from './modules';
 
 export type CommandCategory =
 	'Moderation' | 'Levels' | 'Economy' | 'Tickets' | 'Community' | 'Utility';
@@ -19,38 +19,32 @@ export type BotCommand = {
 
 export type MemberStanding = 'clean' | 'warned' | 'timed-out' | 'banned';
 
-export type MemberNote = {
-	id: string;
-	author: string;
-	body: string;
-	at: string;
-};
-
-export type MemberInfraction = {
-	id: string;
-	caseNumber: number;
-	action: ModerationAction;
-	reason: string;
-	moderator: string;
-	at: string;
-};
-
 export type Member = {
 	id: string;
 	name: string;
 	handle: string;
 	initials: string;
 	color: string;
-	joinedAt: string;
-	lastSeenAt: string;
+	avatarHash: string | null;
 	level: number;
 	xp: number;
+	earningMessages: number;
+	voiceSeconds: number;
+	lastEarnedAt: string | null;
 	balance: number;
-	messages: number;
+	warnings: number;
+	infractions: number;
 	standing: MemberStanding;
+};
+
+export type MemberDetail = {
+	member: Member;
+	present: boolean;
+	nickname: string | null;
+	bot: boolean;
 	roleIds: string[];
-	infractions: MemberInfraction[];
-	notes: MemberNote[];
+	joinedAt: string | null;
+	timedOutUntil: string | null;
 };
 
 export const INFRACTION_TYPES = [
