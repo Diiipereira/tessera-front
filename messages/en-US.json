@@ -485,7 +485,13 @@
 			"members": "Members",
 			"commands": "Commands used · 7d",
 			"modules": "Active modules",
-			"tickets": "Open tickets"
+			"tickets": "Open tickets",
+			"membersDelta": "{count, plural, =0 {no change this week} other {{net} this week}}",
+			"commandsDelta": "{percent} vs last week",
+			"noComparison": "no week to compare with yet",
+			"modulesValue": "{enabled} of {total}",
+			"modulesDelta": "{count, plural, =0 {all set up} one {1 needs setup} other {# need setup}}",
+			"ticketsDelta": "{count, plural, =0 {none opened this week} one {1 opened this week} other {# opened this week}}"
 		},
 		"activity": {
 			"title": "Activity",
@@ -504,11 +510,17 @@
 			"latency": "Latency",
 			"latencyValue": "{ms} ms",
 			"shard": "Shard",
-			"missing": "Missing permissions"
+			"unknown": "Unknown",
+			"neverReported": "{brand} has not reported in yet. It reports once it connects to Discord.",
+			"uptimeDays": "{days}d {hours}h",
+			"uptimeHours": "{hours}h {minutes}m",
+			"uptimeMinutes": "{minutes}m",
+			"shardValue": "{count, plural, one {1 shard} other {# shards}}"
 		},
 		"feed": {
 			"title": "Recent activity",
-			"audit": "Audit log"
+			"audit": "Audit log",
+			"empty": "Nothing has been configured here yet. Changes show up as they happen."
 		},
 		"quick": {
 			"title": "Quick actions",

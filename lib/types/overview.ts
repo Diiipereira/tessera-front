@@ -17,27 +17,6 @@ export type ActivityPoint = {
 	joins: number;
 };
 
-export type BotHealth = {
-	online: boolean;
-	uptime: string;
-	latencyMs: number;
-	shard: string;
-	warnings: string[];
-};
-
-export type ActivitySource = 'web' | 'slash' | 'api';
-
-export type ActivityEntry = {
-	id: string;
-	actorName: string;
-	actorInitials: string;
-	actorColor: string;
-	action: string;
-	target: string;
-	source: ActivitySource;
-	at: string;
-};
-
 export type SetupChecklistItem = {
 	id: string;
 	done: boolean;

@@ -2,12 +2,27 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
-import { mockActivity } from '@/lib/mock';
+import { toActivity, type DayPointDto } from '@/lib/overview';
 import messages from '@/messages/en-US.json';
 import { Translated } from '@/tests/i18n';
 import { ActivityChart } from './ActivityChart';
 
 const copy = messages.overview.activity;
+
+const day = (index: number): DayPointDto => ({
+	day: `2026-06-${String(index + 1).padStart(2, '0')}`,
+	messages: 400 + index * 10,
+	commands: 120 + index * 4,
+	joins: 18 + index,
+	leaves: 2,
+	modActions: 1,
+	ticketsOpened: 0
+});
+
+const activity = toActivity(
+	Array.from({ length: 90 }, (_unused, index) => day(index)),
+	(value) => value
+);
 
 function sizeContainers(width: number, height: number) {
 	for (const property of ['clientWidth', 'offsetWidth'] as const) {
@@ -32,7 +47,7 @@ function renderChart() {
 	return render(
 		<Translated>
 			<ThemeProvider>
-				<ActivityChart data={mockActivity} />
+				<ActivityChart data={activity} />
 			</ThemeProvider>
 		</Translated>
 	);
@@ -94,7 +109,7 @@ describe('ActivityChart', () => {
 		render(
 			<Translated locale="pt-BR">
 				<ThemeProvider>
-					<ActivityChart data={mockActivity} />
+					<ActivityChart data={activity} />
 				</ThemeProvider>
 			</Translated>
 		);
