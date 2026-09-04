@@ -963,7 +963,8 @@
 				"stockLeft": "{count} left",
 				"perUser": "max {count} each",
 				"edit": "Edit",
-				"remove": "Remove {name}"
+				"remove": "Remove {name}",
+				"nameless": "{count, plural, one {# item has no name and will not be saved} other {# items have no name and will not be saved}}"
 			},
 			"item": {
 				"new": "New shop item",
@@ -1001,6 +1002,16 @@
 				"transfer": "transfer",
 				"purchase": "purchase",
 				"admin": "admin"
+			},
+			"danger": {
+				"title": "Danger zone",
+				"description": "There is no undo for this.",
+				"reset": "Reset all balances",
+				"resetBody": "Every wallet drops to zero. What members already bought stays in their inventory.",
+				"confirm": "Reset all balances",
+				"confirmBody": "Every member goes back to nothing and the rich list starts over. The record of what moved stays.",
+				"cancel": "Cancel",
+				"cleared": "{members, plural, one {# wallet was reset} other {# wallets were reset}}"
 			}
 		},
 		"automod": {

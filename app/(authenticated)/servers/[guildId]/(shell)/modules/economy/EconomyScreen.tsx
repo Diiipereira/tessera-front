@@ -1,8 +1,8 @@
 'use client';
 
-import { Coins, Pencil, Plus, Trash2 } from 'lucide-react';
+import { Coins, Pencil, Plus, RotateCcw, Trash2, TriangleAlert } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { toast } from 'sonner';
 import { RolePicker } from '@/components/discord/RolePicker';
 import { Avatar } from '@/components/layout/Avatar';
@@ -18,7 +18,23 @@ import { NumberInput } from '@/components/ui/NumberInput';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
 import { Switch } from '@/components/ui/Switch';
 import { Textarea } from '@/components/ui/Textarea';
-import { useConfigDraft } from '@/lib/hooks/useConfigDraft';
+import { clearWallets, loadShop, loadTransactions, saveShop } from '@/lib/economy-client';
+import { useConfigDraft, type SaveOutcome } from '@/lib/hooks/useConfigDraft';
+import { useRelativeTime } from '@/lib/hooks/useRelativeTime';
+import { patchModule } from '@/lib/module-client';
+import {
+	MAX_CLAIM_AMOUNT,
+	MAX_CURRENCY_NAME_LENGTH,
+	MAX_CURRENCY_SYMBOL_LENGTH,
+	MAX_ITEM_PRICE,
+	MAX_STARTING_BALANCE,
+	MAX_STREAK_BONUS,
+	nameless,
+	toEconomyConfig,
+	toEconomyPatch,
+	toShopPayload,
+	toTransactions
+} from '@/lib/modules/economy';
 import type { Role } from '@/lib/types/discord';
 import type {
 	EconomyConfig,
@@ -89,26 +105,89 @@ function blankItem(): ShopItem {
 }
 
 type EconomyScreenProps = {
+	guildId: string;
 	config: EconomyConfig;
+	version: number;
 	roles: Role[];
 	transactions: Transaction[];
+	now: string;
 };
 
-export function EconomyScreen({ config, roles, transactions }: EconomyScreenProps) {
+export function EconomyScreen({
+	guildId,
+	config,
+	version,
+	roles,
+	transactions,
+	now
+}: EconomyScreenProps) {
 	const t = useTranslations('modules.economy');
-	const form = useConfigDraft<EconomyConfig>(config);
+	const versionRef = useRef(version);
+	const relativeTime = useRelativeTime();
+	const rightNow = new Date(now);
+
+	const save = useCallback(
+		async (next: EconomyConfig): Promise<SaveOutcome<EconomyConfig>> => {
+			const patched = await patchModule(guildId, 'economy', {
+				version: versionRef.current,
+				enabled: next.enabled,
+				config: toEconomyPatch(next)
+			});
+
+			if (patched.status === 'error') return patched;
+
+			versionRef.current = patched.state.version;
+
+			if (patched.status === 'conflict') {
+				const stored = await loadShop(guildId);
+
+				if (stored.status === 'error') return stored;
+
+				return { status: 'conflict', current: toEconomyConfig(patched.state, stored.items) };
+			}
+
+			const written = await saveShop(guildId, toShopPayload(next.shop));
+
+			if (written.status === 'error') return written;
+
+			return { status: 'saved', saved: toEconomyConfig(patched.state, written.items) };
+		},
+		[guildId]
+	);
+
+	const form = useConfigDraft<EconomyConfig>(config, { save });
 	const draft = form.draft;
 
 	const [editing, setEditing] = useState<ShopItem | null>(null);
 	const [isNew, setIsNew] = useState(false);
 	const [filter, setFilter] = useState<TransactionKind | 'all'>('all');
+	const [rows, setRows] = useState<Transaction[]>(transactions);
+	const [clearing, setClearing] = useState(false);
 
 	const money = (value: number) => {
 		const gap = ASCII_SYMBOL.test(draft.currencySymbol) ? '' : ' ';
 		return `${draft.currencySymbol}${gap}${formatCount(Math.abs(value))}`;
 	};
-	const visible =
-		filter === 'all' ? transactions : transactions.filter((entry) => entry.kind === filter);
+	useEffect(() => {
+		const controller = new AbortController();
+
+		void loadTransactions(guildId, filter).then((result) => {
+			if (controller.signal.aborted) return;
+
+			if (result.status === 'error') {
+				toast.error(result.message);
+				return;
+			}
+
+			setRows(toTransactions(result.page));
+		});
+
+		return () => {
+			controller.abort();
+		};
+	}, [guildId, filter]);
+
+	const unnamed = nameless(draft.shop);
 
 	function commitItem(item: ShopItem) {
 		const exists = draft.shop.some((entry) => entry.id === item.id);
@@ -151,6 +230,7 @@ export function EconomyScreen({ config, roles, transactions }: EconomyScreenProp
 					<Field label={t('currency.name')} className="w-48">
 						<Input
 							value={draft.currencyName}
+							maxLength={MAX_CURRENCY_NAME_LENGTH}
 							onChange={(event) => {
 								form.set('currencyName', event.target.value);
 							}}
@@ -163,14 +243,14 @@ export function EconomyScreen({ config, roles, transactions }: EconomyScreenProp
 							onChange={(event) => {
 								form.set('currencySymbol', event.target.value);
 							}}
-							maxLength={3}
+							maxLength={MAX_CURRENCY_SYMBOL_LENGTH}
 							className="text-center font-mono"
 						/>
 					</Field>
 					<Field label={t('currency.starting')} className="w-40">
 						<NumberInput
 							min={0}
-							max={1000000}
+							max={MAX_STARTING_BALANCE}
 							leading={draft.currencySymbol}
 							value={draft.startingBalance}
 							onValueChange={(next) => {
@@ -238,7 +318,7 @@ export function EconomyScreen({ config, roles, transactions }: EconomyScreenProp
 						<Field label={t('earning.amount')} className="w-32">
 							<NumberInput
 								min={0}
-								max={100000}
+								max={MAX_CLAIM_AMOUNT}
 								leading={draft.currencySymbol}
 								value={draft.dailyAmount}
 								onValueChange={(next) => {
@@ -259,7 +339,7 @@ export function EconomyScreen({ config, roles, transactions }: EconomyScreenProp
 						<Field label={t('earning.streak')} className="w-36">
 							<NumberInput
 								min={0}
-								max={10000}
+								max={MAX_STREAK_BONUS}
 								leading={draft.currencySymbol}
 								value={draft.streakBonus}
 								onValueChange={(next) => {
@@ -273,7 +353,7 @@ export function EconomyScreen({ config, roles, transactions }: EconomyScreenProp
 						<Field label={t('earning.amount')} className="w-32">
 							<NumberInput
 								min={0}
-								max={100000}
+								max={MAX_CLAIM_AMOUNT}
 								leading={draft.currencySymbol}
 								value={draft.workAmount}
 								onValueChange={(next) => {
@@ -345,6 +425,13 @@ export function EconomyScreen({ config, roles, transactions }: EconomyScreenProp
 					</Button>
 				}
 			>
+				{unnamed > 0 ? (
+					<p className="flex items-center gap-1.5 text-caption font-normal text-warning">
+						<TriangleAlert className="size-3.5 shrink-0" aria-hidden="true" />
+						{t('shop.nameless', { count: unnamed })}
+					</p>
+				) : null}
+
 				{draft.shop.length === 0 ? (
 					<p className="text-body-sm text-text-muted">{t('shop.empty')}</p>
 				) : (
@@ -442,11 +529,11 @@ export function EconomyScreen({ config, roles, transactions }: EconomyScreenProp
 					/>
 				}
 			>
-				{visible.length === 0 ? (
+				{rows.length === 0 ? (
 					<p className="text-body-sm text-text-muted">{t('transactions.empty')}</p>
 				) : (
 					<ul className="flex flex-col">
-						{visible.map((entry) => (
+						{rows.map((entry) => (
 							<li
 								key={entry.id}
 								className="flex items-center gap-3 border-b border-border py-3 last:border-0"
@@ -461,7 +548,9 @@ export function EconomyScreen({ config, roles, transactions }: EconomyScreenProp
 									<p className="truncate text-body-sm">
 										<span className="font-medium">{entry.actorName}</span> &mdash; {entry.note}
 									</p>
-									<span className="text-caption font-normal text-text-muted">{entry.at}</span>
+									<span className="text-caption font-normal text-text-muted">
+										{relativeTime(entry.at, rightNow)}
+									</span>
 								</div>
 								<Badge variant={KIND_VARIANTS[entry.kind]} className="shrink-0">
 									{t(`kind.${entry.kind}`)}
@@ -479,6 +568,57 @@ export function EconomyScreen({ config, roles, transactions }: EconomyScreenProp
 						))}
 					</ul>
 				)}
+			</SettingsSection>
+
+			<SettingsSection title={t('danger.title')} description={t('danger.description')} danger>
+				<div className="flex flex-wrap items-center gap-3">
+					<Dialog
+						open={clearing}
+						onOpenChange={setClearing}
+						title={t('danger.reset')}
+						description={t('danger.confirm')}
+						danger
+						triggerAsChild
+						trigger={
+							<Button variant="danger">
+								<RotateCcw aria-hidden="true" />
+								{t('danger.reset')}
+							</Button>
+						}
+						footer={
+							<>
+								<Button
+									variant="ghost"
+									onClick={() => {
+										setClearing(false);
+									}}
+								>
+									{t('danger.cancel')}
+								</Button>
+								<Button
+									variant="danger"
+									onClick={() => {
+										void clearWallets(guildId).then((result) => {
+											setClearing(false);
+
+											if (result.status === 'error') {
+												toast.error(result.message);
+												return;
+											}
+
+											toast.success(t('danger.cleared', { members: result.cleared }));
+										});
+									}}
+								>
+									{t('danger.reset')}
+								</Button>
+							</>
+						}
+					>
+						<p className="text-body-sm text-text-muted">{t('danger.confirmBody')}</p>
+					</Dialog>
+					<p className="text-body-sm text-text-muted">{t('danger.resetBody')}</p>
+				</div>
 			</SettingsSection>
 
 			{editing ? (
@@ -571,7 +711,7 @@ function ItemDialog({ item, isNew, roles, symbol, onCancel, onSave }: ItemDialog
 				<Field label={t('price')} className="w-40">
 					<NumberInput
 						min={0}
-						max={10000000}
+						max={MAX_ITEM_PRICE}
 						leading={symbol}
 						value={work.price}
 						onValueChange={(next) => {

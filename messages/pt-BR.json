@@ -963,7 +963,8 @@
 				"stockLeft": "{count} restantes",
 				"perUser": "no máximo {count} cada",
 				"edit": "Editar",
-				"remove": "Remover {name}"
+				"remove": "Remover {name}",
+				"nameless": "{count, plural, one {# item está sem nome e não será salvo} other {# itens estão sem nome e não serão salvos}}"
 			},
 			"item": {
 				"new": "Novo item da loja",
@@ -1001,6 +1002,16 @@
 				"transfer": "transferência",
 				"purchase": "compra",
 				"admin": "admin"
+			},
+			"danger": {
+				"title": "Zona de perigo",
+				"description": "Isto não tem desfazer.",
+				"reset": "Zerar todos os saldos",
+				"resetBody": "Toda carteira vai a zero. O que os membros já compraram fica no inventário.",
+				"confirm": "Zerar todos os saldos",
+				"confirmBody": "Todo membro volta ao zero e a lista dos mais ricos recomeça. O registro do que movimentou fica.",
+				"cancel": "Cancelar",
+				"cleared": "{members, plural, one {# carteira foi zerada} other {# carteiras foram zeradas}}"
 			}
 		},
 		"automod": {
