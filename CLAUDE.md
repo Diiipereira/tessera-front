@@ -523,8 +523,26 @@ carries `Field`'s own `mb-0.5`/`mb-1.5` around a 20px label and a 16px hint, so 
 Every card was checked against the real screen by measuring both and diffing each card's top and
 height. Thirteen of the seventeen match block for block — overview, automod, economy, tickets,
 reaction roles, giveaways, custom commands, scheduled, commands, members, cases, audit and
-modules' header block; welcome and moderation match in total with cards inside 2px; levels and
+modules' header block; moderation matches in total with cards inside 2px; levels and
 logging still drift 4px.
+
+**Aquela medição foi feita contra o mock, e o welcome pagou por isso.** O
+`mockWelcomeConfig` nasce `mode: 'embed'` com dois campos de embed preenchidos, então o
+`WelcomeSkeleton` desenhava `ComposerSkeleton embed` — que é exatamente essa forma, dois cards de
+campo inclusive — e batia. Ligada na API, a tela abre no modo que uma guild nova realmente tem:
+`useEmbed` false, ou seja **texto**, com uma caixa `min-h-24`. O skeleton continuou desenhando o
+construtor de embed inteiro, mais uma seção de switch e um segundo composer que a tela nunca teve,
+e ficou perto do dobro da altura da tela — que enchia de bloco falso e desabava quando o conteúdo
+chegava, o único module screen com esse tamanho de erro. **A proporção sai somada das classes, não
+medida no browser:** medir a tela autenticada pedia uma sessão, e a comparação bloco a bloco já
+basta para o defeito. **Skeleton se mede contra o que
+a API devolve para uma guild recém-criada, nunca contra o mock**, e quando a tela tem modos
+(texto/embed) ele desenha o modo padrão: ficar curto e crescer incomoda menos que encher a tela e
+desabar. Havia um segundo sinal ignorado — o `WelcomeSkeleton` era o único a passar `embed` para o
+`ComposerSkeleton`; levels, scheduled e tickets sempre usaram o de texto. O
+`WelcomeSkeleton.test.tsx` renderiza o skeleton e a tela lado a lado e prende as três coisas:
+mesma contagem de painéis, um switch só (o do módulo, no cabeçalho) e nenhum card de campo de
+embed.
 
 **There are two skeleton vocabularies, one per page shape, and each lives beside the component it
 mirrors.** `components/modules/ModuleSkeleton.tsx` sits with `ModulePage` and covers the eleven
