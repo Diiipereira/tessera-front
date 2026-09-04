@@ -542,7 +542,8 @@ desabar. Havia um segundo sinal ignorado — o `WelcomeSkeleton` era o único a 
 `ComposerSkeleton`; levels, scheduled e tickets sempre usaram o de texto. O
 `WelcomeSkeleton.test.tsx` renderiza o skeleton e a tela lado a lado e prende as três coisas:
 mesma contagem de painéis, um switch só (o do módulo, no cabeçalho) e nenhum card de campo de
-embed.
+embed. Na mesma varredura apareceu que o `EconomySkeleton` desenhava cinco painéis para uma tela
+de seis — faltava a zona de perigo, que é incondicional; entrou.
 
 **There are two skeleton vocabularies, one per page shape, and each lives beside the component it
 mirrors.** `components/modules/ModuleSkeleton.tsx` sits with `ModulePage` and covers the eleven
@@ -705,6 +706,19 @@ a matter of filling them in:
 - `SaveBar` — sticky at the bottom of the content area, bleeding to the page edge with
   `-mx-6 sm:-mx-8`. It respects the sidebar because it lives inside the content column,
   not at the viewport edge.
+
+**`sticky bottom-0` só gruda enquanto o pai chega no fundo do scroller, e por muito tempo cinco
+telas não chegavam.** AutoMod, Tickets, Cargos por reação, Sorteios e Mensagens agendadas têm
+pouco conteúdo numa guild nova: a raiz da página terminava logo abaixo do último card e a barra de
+salvar parava no meio da tela, com área vazia embaixo — as outras seis escapavam só por serem
+altas o bastante para rolar. A correção é a raiz do `ModulePage` ser `flex min-h-full flex-col`
+com o corpo em `flex-1`: ela passa a ocupar o scroller inteiro, o corpo come a folga e a barra cai
+no rodapé. **Medido em Chrome, não deduzido** — num harness que reproduz o aninhamento
+(`h-svh` > `flex-1 min-h-0 overflow-y-auto` > raiz), a barra ficava **477px acima** do fundo antes
+e **0px** depois; com conteúdo alto a diferença é zero nos dois, ou seja o comportamento de rolagem
+não mudou. O `min-h-full` resolve porque `main` é item de flex com altura definida. O
+`SettingsScreen`, que é management e não `ModulePage`, tinha o mesmo defeito latente e recebeu o
+mesmo tratamento; tela nova com `SaveBar` precisa da mesma raiz.
 
 State comes from `useConfigDraft`, which owns draft-vs-saved, the dirty flag and the
 changed-key count that the SaveBar prints. It compares **deeply**: a shallow compare

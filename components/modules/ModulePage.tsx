@@ -37,7 +37,7 @@ export function ModulePage({
 	const t = useTranslations('modules');
 
 	return (
-		<div className="w-full p-6 sm:p-8">
+		<div className="flex min-h-full w-full flex-col p-6 sm:p-8">
 			<header className="flex flex-wrap items-start gap-4">
 				<span className="grid size-10 shrink-0 place-items-center rounded-lg bg-primary-subtle">
 					<Icon className="size-5 text-primary" aria-hidden="true" />
@@ -67,7 +67,7 @@ export function ModulePage({
 
 			<div
 				className={cn(
-					'mt-6 gap-6',
+					'mt-6 flex-1 gap-6',
 					aside ? 'grid xl:grid-cols-[minmax(0,1fr)_440px]' : 'flex flex-col'
 				)}
 			>

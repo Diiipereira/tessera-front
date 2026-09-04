@@ -52,7 +52,7 @@ const t = createTranslator({ locale: 'en-US', messages: enUS });
 const UNBUILT = [copy.backup.export, copy.backup.import];
 
 function setup() {
-	render(<SettingsScreen guildId={GUILD_ID} settings={SETTINGS} guildName={GUILD_NAME} />, {
+	return render(<SettingsScreen guildId={GUILD_ID} settings={SETTINGS} guildName={GUILD_NAME} />, {
 		wrapper: Translated
 	});
 }
@@ -74,6 +74,13 @@ describe('SettingsScreen', () => {
 		removeBot.mockResolvedValue({ status: 'removed' });
 		resetAllModules.mockReset();
 		resetAllModules.mockResolvedValue({ status: 'reset' });
+	});
+
+	it('fills the scroll area, so the save bar ends at the bottom of a short screen', () => {
+		const root = setup().container.firstElementChild as HTMLElement;
+
+		expect(root.classList.contains('min-h-full')).toBe(true);
+		expect(root.classList.contains('flex-col')).toBe(true);
 	});
 
 	it.each(UNBUILT)('keeps %s disabled while no API can carry it out', (name) => {

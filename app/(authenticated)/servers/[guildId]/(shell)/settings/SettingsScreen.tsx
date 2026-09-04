@@ -108,13 +108,13 @@ export function SettingsScreen({ guildId, settings, guildName }: SettingsScreenP
 	}, [guildId, router, t]);
 
 	return (
-		<div className="w-full p-6 sm:p-8">
+		<div className="flex min-h-full w-full flex-col p-6 sm:p-8">
 			<PageHeader
 				title={t('title')}
 				description={t('description', { brand: BRAND.name, guild: guildName })}
 			/>
 
-			<div className="mt-6 flex flex-col gap-6">
+			<div className="mt-6 flex flex-1 flex-col gap-6">
 				<SettingsSection title={t('language.title')} description={t('language.description')}>
 					<div className="grid gap-4 sm:grid-cols-2">
 						<Field label={t('language.serverLanguage')} hint={t('language.serverLanguageHint')}>

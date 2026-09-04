@@ -132,6 +132,13 @@ export function EconomySkeleton() {
 					))}
 				</div>
 			</SectionSkeleton>
+
+			<SectionSkeleton danger>
+				<div className="flex flex-wrap items-center gap-3">
+					<Skeleton className="h-9 w-44 shrink-0 rounded-md" />
+					<TextSkeleton line="body-sm" width="w-140 max-w-full" />
+				</div>
+			</SectionSkeleton>
 		</ModulePageSkeleton>
 	);
 }
