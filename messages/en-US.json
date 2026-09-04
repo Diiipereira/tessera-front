@@ -1075,14 +1075,17 @@
 				"sample": "Sample message",
 				"clear": "Nothing fires. This message would go through.",
 				"fires": "would fire",
-				"untestable": "{names} cannot be tested here — {count, plural, =1 {it needs} other {they need}} message history or attachments."
+				"untestable": "{names} cannot be tested here — {count, plural, =1 {it needs} other {they need}} message history or attachments.",
+				"unfinished": "{count, plural, =1 {One rule is} other {# rules are}} still missing a name, a word or an action, so nothing is being tested yet."
 			},
 			"reason": {
 				"invites": "found {count} invite link(s)",
 				"links": "found {count} link(s)",
 				"mentions": "{count} mentions, limit is {limit}",
 				"caps": "{ratio}% capitals, limit is {limit}%",
-				"words": "matched {found}"
+				"words": "matched {found}",
+				"spam": "{count} messages inside the window, limit is {limit}",
+				"attachments": "{count} attachments, limit is {limit}"
 			},
 			"dialog": {
 				"new": "New rule",
@@ -1102,8 +1105,11 @@
 				"exemptChannel": "Never applies in this channel",
 				"exemptChannelPlaceholder": "Applies everywhere…",
 				"capsHint": "Above this share of letters.",
-				"needAction": "Pick at least one action, or the rule does nothing."
-			}
+				"needAction": "Pick at least one action, or the rule does nothing.",
+				"needName": "Give the rule a name, or nobody will know what it was for.",
+				"needWords": "Add at least one word, or the rule blocks nothing."
+			},
+			"saveFailed": "AutoMod rules could not be saved"
 		},
 		"tickets": {
 			"title": "Tickets",
@@ -1530,7 +1536,8 @@
 					"name": "Voice join or leave",
 					"body": "Noisy on big servers."
 				}
-			}
+			},
+			"saveFailed": "Logging settings could not be saved"
 		},
 		"moderation": {
 			"title": "Moderation",

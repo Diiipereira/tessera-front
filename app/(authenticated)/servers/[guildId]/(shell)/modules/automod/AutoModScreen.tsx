@@ -16,7 +16,7 @@ import {
 	type LucideIcon
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useId, useState } from 'react';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { ChannelPicker } from '@/components/discord/ChannelPicker';
 import { RolePicker } from '@/components/discord/RolePicker';
@@ -31,7 +31,20 @@ import { Input } from '@/components/ui/Input';
 import { NumberInput } from '@/components/ui/NumberInput';
 import { Switch } from '@/components/ui/Switch';
 import { Textarea } from '@/components/ui/Textarea';
-import { evaluateMessage, untestableTriggers, type HitReason } from '@/lib/automod';
+import { loadRules, saveRules, testMessage } from '@/lib/automod-client';
+import { useConfigDraft, type SaveOutcome } from '@/lib/hooks/useConfigDraft';
+import { patchModule } from '@/lib/module-client';
+import {
+	MAX_THRESHOLD,
+	MAX_WINDOW_SECONDS,
+	cleanWords,
+	incomplete,
+	testable,
+	toAutoModConfig,
+	toRulePayload,
+	type AutomodReading,
+	type FiredReason
+} from '@/lib/modules/automod';
 import type {
 	AutoModAction,
 	AutoModConfig,
@@ -39,7 +52,6 @@ import type {
 	AutoModTrigger
 } from '@/lib/types/module-configs';
 import type { Channel, Role } from '@/lib/types/discord';
-import { useConfigDraft } from '@/lib/hooks/useConfigDraft';
 import { cn } from '@/lib/utils/cn';
 import { newId } from '@/lib/utils/id';
 
@@ -64,6 +76,10 @@ const ACTION_VARIANTS: Record<AutoModAction, BadgeVariant> = {
 	log: 'info'
 };
 
+const QUIET = 400;
+
+const NOTHING: AutomodReading = { fired: [], untestable: [] };
+
 function newRule(): AutoModRule {
 	return {
 		id: newId('rule'),
@@ -80,53 +96,114 @@ function newRule(): AutoModRule {
 }
 
 type AutoModScreenProps = {
+	guildId: string;
 	config: AutoModConfig;
+	version: number;
 	channels: Channel[];
 	roles: Role[];
 };
 
-export function AutoModScreen({ config, channels, roles }: AutoModScreenProps) {
+export function AutoModScreen({ guildId, config, version, channels, roles }: AutoModScreenProps) {
 	const t = useTranslations('modules.automod');
-	const form = useConfigDraft<AutoModConfig>(config);
+	const versionRef = useRef(version);
+
+	const save = useCallback(
+		async (next: AutoModConfig): Promise<SaveOutcome<AutoModConfig>> => {
+			const patched = await patchModule(guildId, 'automod', {
+				version: versionRef.current,
+				enabled: next.enabled
+			});
+
+			if (patched.status === 'error') return patched;
+
+			versionRef.current = patched.state.version;
+
+			if (patched.status === 'conflict') {
+				const stored = await loadRules(guildId);
+
+				if (stored.status === 'error') return stored;
+
+				return { status: 'conflict', current: toAutoModConfig(patched.state, stored.rules) };
+			}
+
+			const written = await saveRules(guildId, toRulePayload(next.rules));
+
+			if (written.status === 'error') return written;
+
+			return { status: 'saved', saved: toAutoModConfig(patched.state, written.rules) };
+		},
+		[guildId]
+	);
+
+	const form = useConfigDraft<AutoModConfig>(config, { save });
 	const draft = form.draft;
+	const rules = draft.rules;
 
 	const [editing, setEditing] = useState<AutoModRule | null>(null);
 	const [isNew, setIsNew] = useState(false);
 	const [sample, setSample] = useState('CHECK THIS OUT discord.gg/freestuff @everyone');
+	const [reading, setReading] = useState<AutomodReading>(NOTHING);
+	const [problem, setProblem] = useState<string | null>(null);
 
-	const hits = evaluateMessage(sample, draft.rules);
-	const untestable = untestableTriggers(draft.rules);
+	const idle = rules.length === 0 || !testable(rules);
+	const shown = idle ? NOTHING : reading;
+	const failure = idle ? null : problem;
+
+	useEffect(() => {
+		if (rules.length === 0 || !testable(rules)) return;
+
+		const controller = new AbortController();
+
+		const timer = setTimeout(() => {
+			void testMessage(guildId, sample, toRulePayload(rules), controller.signal).then((result) => {
+				if (controller.signal.aborted) return;
+
+				if (result.status === 'error') {
+					setProblem(result.message);
+					return;
+				}
+
+				setProblem(null);
+				setReading(result.reading);
+			});
+		}, QUIET);
+
+		return () => {
+			clearTimeout(timer);
+			controller.abort();
+		};
+	}, [guildId, sample, rules]);
 
 	function summaryFor(rule: AutoModRule): string {
 		return t(`summary.${rule.trigger}`, {
 			threshold: rule.threshold,
 			window: rule.windowSeconds,
-			count: rule.words.length
+			count: cleanWords(rule.words).length
 		});
 	}
 
-	function reasonFor(reason: HitReason): string {
+	function reasonFor(reason: FiredReason): string {
 		if (reason.kind === 'words') return t('reason.words', { found: reason.found.join(', ') });
 		if (reason.kind === 'caps') {
 			return t('reason.caps', { ratio: reason.ratio, limit: reason.limit });
 		}
-		if (reason.kind === 'mentions') {
-			return t('reason.mentions', { count: reason.count, limit: reason.limit });
+		if (reason.kind === 'mentions' || reason.kind === 'spam' || reason.kind === 'attachments') {
+			return t(`reason.${reason.kind}`, { count: reason.count, limit: reason.limit });
 		}
 
 		return t(`reason.${reason.kind}`, { count: reason.count });
 	}
 
 	function commitRule(rule: AutoModRule) {
-		const exists = draft.rules.some((entry) => entry.id === rule.id);
+		const exists = rules.some((entry) => entry.id === rule.id);
 		form.set(
 			'rules',
-			exists
-				? draft.rules.map((entry) => (entry.id === rule.id ? rule : entry))
-				: [...draft.rules, rule]
+			exists ? rules.map((entry) => (entry.id === rule.id ? rule : entry)) : [...rules, rule]
 		);
 		setEditing(null);
 	}
+
+	const unfinished = rules.filter((rule) => incomplete(rule) !== null);
 
 	return (
 		<ModulePage
@@ -148,7 +225,7 @@ export function AutoModScreen({ config, channels, roles }: AutoModScreenProps) {
 					}}
 				>
 					<Plus aria-hidden="true" />
-					New rule
+					{t('new')}
 				</Button>
 			}
 			saveBar={
@@ -158,16 +235,21 @@ export function AutoModScreen({ config, channels, roles }: AutoModScreenProps) {
 					state={form.state}
 					onDiscard={form.discard}
 					onSave={() => {
-						void form.save().then(() => {
-							toast.success(t('saved'));
-						});
+						void form
+							.save()
+							.then(() => {
+								toast.success(t('saved'));
+							})
+							.catch((error: unknown) => {
+								toast.error(error instanceof Error ? error.message : t('saveFailed'));
+							});
 					}}
 					onResolveConflict={form.resolveConflict}
 				/>
 			}
 		>
 			<SettingsSection title={t('rules.title')} description={t('rules.description')}>
-				{draft.rules.length === 0 ? (
+				{rules.length === 0 ? (
 					<p className="text-body-sm text-text-muted">{t('rules.empty')}</p>
 				) : (
 					<div className="overflow-x-auto">
@@ -189,7 +271,7 @@ export function AutoModScreen({ config, channels, roles }: AutoModScreenProps) {
 								</tr>
 							</thead>
 							<tbody>
-								{draft.rules.map((rule) => {
+								{rules.map((rule) => {
 									const label = rule.name === '' ? t('untitled') : rule.name;
 									return (
 										<tr key={rule.id} className="border-b border-border last:border-0">
@@ -225,7 +307,7 @@ export function AutoModScreen({ config, channels, roles }: AutoModScreenProps) {
 													onCheckedChange={(next) => {
 														form.set(
 															'rules',
-															draft.rules.map((entry) =>
+															rules.map((entry) =>
 																entry.id === rule.id ? { ...entry, enabled: next } : entry
 															)
 														);
@@ -254,7 +336,7 @@ export function AutoModScreen({ config, channels, roles }: AutoModScreenProps) {
 														onClick={() => {
 															form.set(
 																'rules',
-																draft.rules.filter((entry) => entry.id !== rule.id)
+																rules.filter((entry) => entry.id !== rule.id)
 															);
 														}}
 													>
@@ -282,26 +364,36 @@ export function AutoModScreen({ config, channels, roles }: AutoModScreenProps) {
 					/>
 				</Field>
 
+				{unfinished.length > 0 ? (
+					<p className="rounded-md border border-warning bg-warning-subtle px-3 py-2 text-body-sm text-warning-fg">
+						{t('playground.unfinished', { count: unfinished.length })}
+					</p>
+				) : null}
+
 				<div
 					aria-live="polite"
 					className={cn(
 						'rounded-lg border p-4',
-						hits.length > 0 ? 'border-warning bg-warning-subtle' : 'border-border bg-surface-sunken'
+						shown.fired.length > 0
+							? 'border-warning bg-warning-subtle'
+							: 'border-border bg-surface-sunken'
 					)}
 				>
-					{hits.length === 0 ? (
+					{failure !== null ? (
+						<p className="text-body-sm text-danger">{failure}</p>
+					) : shown.fired.length === 0 ? (
 						<p className="text-body-sm text-text-muted">{t('playground.clear')}</p>
 					) : (
 						<ul className="flex flex-col gap-2">
-							{hits.map((hit) => (
-								<li key={hit.rule.id} className="flex items-start gap-2">
+							{shown.fired.map((hit, index) => (
+								<li key={`${hit.name}:${String(index)}`} className="flex items-start gap-2">
 									<TriangleAlert
 										className="mt-0.5 size-3.5 shrink-0 text-warning"
 										aria-hidden="true"
 									/>
 									<span className="text-body-sm text-warning-fg">
-										<span className="font-medium">{hit.rule.name}</span> {t('playground.fires')}{' '}
-										&mdash; {reasonFor(hit.reason)}
+										<span className="font-medium">{hit.name}</span> {t('playground.fires')} &mdash;{' '}
+										{reasonFor(hit.reason)}
 									</span>
 								</li>
 							))}
@@ -309,11 +401,11 @@ export function AutoModScreen({ config, channels, roles }: AutoModScreenProps) {
 					)}
 				</div>
 
-				{untestable.length > 0 ? (
+				{shown.untestable.length > 0 ? (
 					<p className="text-caption font-normal text-text-muted">
 						{t('playground.untestable', {
-							names: untestable.map((rule) => rule.name).join(', '),
-							count: untestable.length
+							names: shown.untestable.join(', '),
+							count: shown.untestable.length
 						})}
 					</p>
 				) : null}
@@ -374,6 +466,7 @@ function RuleDialog({ rule, isNew, channels, roles, onCancel, onSave }: RuleDial
 	const needsThreshold = work.trigger !== 'invites' && work.trigger !== 'links';
 	const needsWindow = work.trigger === 'spam';
 	const needsWords = work.trigger === 'words';
+	const missing = incomplete(work);
 
 	return (
 		<Dialog
@@ -390,9 +483,9 @@ function RuleDialog({ rule, isNew, channels, roles, onCancel, onSave }: RuleDial
 						{shared('cancel')}
 					</Button>
 					<Button
-						disabled={work.actions.length === 0}
+						disabled={missing !== null}
 						onClick={() => {
-							onSave(work);
+							onSave({ ...work, name: work.name.trim(), words: cleanWords(work.words) });
 						}}
 					>
 						{isNew ? t('dialog.create') : t('dialog.save')}
@@ -401,7 +494,10 @@ function RuleDialog({ rule, isNew, channels, roles, onCancel, onSave }: RuleDial
 			}
 		>
 			<div className="flex flex-col gap-5">
-				<Field label={t('dialog.name')}>
+				<Field
+					label={t('dialog.name')}
+					hint={missing === 'name' ? t('dialog.needName') : undefined}
+				>
 					<Input
 						value={work.name}
 						onChange={(event) => {
@@ -456,13 +552,14 @@ function RuleDialog({ rule, isNew, channels, roles, onCancel, onSave }: RuleDial
 				</div>
 
 				{needsWords ? (
-					<Field label={t('dialog.words')} hint={t('dialog.wordsHint')}>
+					<Field
+						label={t('dialog.words')}
+						hint={missing === 'words' ? t('dialog.needWords') : t('dialog.wordsHint')}
+					>
 						<Textarea
 							value={work.words.join('\n')}
 							onChange={(event) => {
-								patch({
-									words: event.target.value.split('\n').map((word) => word.trim())
-								});
+								patch({ words: event.target.value.split('\n') });
 							}}
 							className="min-h-24 font-mono"
 						/>
@@ -478,7 +575,7 @@ function RuleDialog({ rule, isNew, channels, roles, onCancel, onSave }: RuleDial
 							>
 								<NumberInput
 									min={1}
-									max={work.trigger === 'caps' ? 100 : 50}
+									max={MAX_THRESHOLD}
 									value={work.threshold}
 									onValueChange={(next) => {
 										patch({ threshold: next });
@@ -491,7 +588,7 @@ function RuleDialog({ rule, isNew, channels, roles, onCancel, onSave }: RuleDial
 							<Field label={t('dialog.window')}>
 								<NumberInput
 									min={1}
-									max={120}
+									max={MAX_WINDOW_SECONDS}
 									value={work.windowSeconds}
 									onValueChange={(next) => {
 										patch({ windowSeconds: next });

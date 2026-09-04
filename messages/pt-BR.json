@@ -1075,14 +1075,17 @@
 				"sample": "Mensagem de exemplo",
 				"clear": "Nada dispara. Esta mensagem passaria.",
 				"fires": "dispararia",
-				"untestable": "{names} não dá para testar aqui — {count, plural, =1 {ela precisa} other {elas precisam}} de histórico de mensagens ou de anexos."
+				"untestable": "{names} não dá para testar aqui — {count, plural, =1 {ela precisa} other {elas precisam}} de histórico de mensagens ou de anexos.",
+				"unfinished": "{count, plural, =1 {Uma regra ainda está} other {# regras ainda estão}} sem nome, sem palavra ou sem ação, então nada está sendo testado."
 			},
 			"reason": {
 				"invites": "encontrou {count} link(s) de convite",
 				"links": "encontrou {count} link(s)",
 				"mentions": "{count} menções, o limite é {limit}",
 				"caps": "{ratio}% de maiúsculas, o limite é {limit}%",
-				"words": "casou com {found}"
+				"words": "casou com {found}",
+				"spam": "{count} mensagens dentro da janela, o limite é {limit}",
+				"attachments": "{count} anexos, o limite é {limit}"
 			},
 			"dialog": {
 				"new": "Nova regra",
@@ -1102,8 +1105,11 @@
 				"exemptChannel": "Nunca vale neste canal",
 				"exemptChannelPlaceholder": "Vale em todo lugar…",
 				"capsHint": "Acima desta proporção de letras.",
-				"needAction": "Escolha ao menos uma ação, ou a regra não faz nada."
-			}
+				"needAction": "Escolha ao menos uma ação, ou a regra não faz nada.",
+				"needName": "Dê um nome à regra, ou ninguém vai saber para que ela servia.",
+				"needWords": "Coloque pelo menos uma palavra, ou a regra não bloqueia nada."
+			},
+			"saveFailed": "Não consegui salvar as regras do AutoMod"
 		},
 		"tickets": {
 			"title": "Tickets",
@@ -1530,7 +1536,8 @@
 					"name": "Entrada ou saída de voz",
 					"body": "Barulhento em servidor grande."
 				}
-			}
+			},
+			"saveFailed": "Não consegui salvar as configurações de logs"
 		},
 		"moderation": {
 			"title": "Moderação",

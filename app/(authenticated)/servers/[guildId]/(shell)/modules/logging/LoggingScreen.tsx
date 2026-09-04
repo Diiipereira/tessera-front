@@ -108,9 +108,14 @@ export function LoggingScreen({ guildId, config, version, channels, roles }: Log
 					state={form.state}
 					onDiscard={form.discard}
 					onSave={() => {
-						void form.save().then(() => {
-							toast.success(t('saved'));
-						});
+						void form
+							.save()
+							.then(() => {
+								toast.success(t('saved'));
+							})
+							.catch((error: unknown) => {
+								toast.error(error instanceof Error ? error.message : t('saveFailed'));
+							});
 					}}
 					onResolveConflict={form.resolveConflict}
 				/>
