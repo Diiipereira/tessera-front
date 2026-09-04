@@ -1,20 +1,54 @@
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
-import { mockModules } from '@/lib/mock';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { guildHref } from '@/lib/navigation';
-import { ModulesScreen } from './ModulesScreen';
+import type { ModuleSummary } from '@/lib/types/modules';
 import { Translated } from '@/tests/i18n';
+import { ModulesScreen } from './ModulesScreen';
+
+const patchModule = vi.hoisted(() => vi.fn());
+
+vi.mock('@/lib/module-client', () => ({ patchModule }));
+
+const success = vi.hoisted(() => vi.fn());
+const failure = vi.hoisted(() => vi.fn());
+const warning = vi.hoisted(() => vi.fn());
+
+vi.mock('sonner', () => ({
+	toast: {
+		success: (message: string) => {
+			success(message);
+		},
+		error: (message: string) => {
+			failure(message);
+		},
+		warning: (message: string) => {
+			warning(message);
+		}
+	}
+}));
 
 const GUILD_ID = '842315097461823104';
 
-function renderScreen(planIsPaid = true) {
-	return render(
-		<ModulesScreen modules={mockModules} guildId={GUILD_ID} planIsPaid={planIsPaid} />,
-		{
-			wrapper: Translated
-		}
-	);
+const modules: ModuleSummary[] = [
+	{ id: 'welcome', category: 'engagement', status: 'active', version: 3 },
+	{ id: 'levels', category: 'engagement', status: 'off', version: 1 },
+	{ id: 'moderation', category: 'safety', status: 'active', version: 7 },
+	{ id: 'tickets', category: 'community', status: 'off', version: 2 },
+	{ id: 'reaction-roles', category: 'community', status: 'off', version: 1 },
+	{ id: 'scheduled', category: 'utility', status: 'needs-setup', version: 1 }
+];
+
+const stateOf = (key: string, enabled: boolean, version: number) => ({
+	key,
+	enabled,
+	configured: true,
+	config: {},
+	version
+});
+
+function renderScreen(items: ModuleSummary[] = modules) {
+	return render(<ModulesScreen modules={items} guildId={GUILD_ID} />, { wrapper: Translated });
 }
 
 function cardFor(name: string) {
@@ -22,9 +56,14 @@ function cardFor(name: string) {
 }
 
 describe('ModulesScreen', () => {
-	it('shows every module', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+		patchModule.mockResolvedValue({ status: 'saved', state: stateOf('welcome', false, 4) });
+	});
+
+	it('shows a card for every module the API listed', () => {
 		renderScreen();
-		expect(screen.getAllByRole('heading', { level: 2 })).toHaveLength(mockModules.length);
+		expect(screen.getAllByRole('heading', { level: 2 })).toHaveLength(modules.length);
 	});
 
 	it('links each card at its own settings route', () => {
@@ -56,7 +95,7 @@ describe('ModulesScreen', () => {
 		expect(screen.getByRole('heading', { name: 'Levels', level: 2 })).toBeInTheDocument();
 	});
 
-	it('narrows by category', async () => {
+	it('narrows by the category the API gave each module', async () => {
 		const user = userEvent.setup();
 		renderScreen();
 
@@ -74,43 +113,96 @@ describe('ModulesScreen', () => {
 		expect(screen.getByText('No modules match')).toBeInTheDocument();
 	});
 
-	it('flips a module status from the card switch', async () => {
-		const user = userEvent.setup();
-		renderScreen();
-
-		const card = cardFor('Welcome');
-		expect(within(card).getByText('Active')).toBeInTheDocument();
-
-		await user.click(within(card).getByRole('switch'));
-
-		expect(within(cardFor('Welcome')).getByText('Off')).toBeInTheDocument();
-	});
-
 	it('counts the active modules in the subheading', () => {
 		renderScreen();
-		const active = mockModules.filter((module) => module.status === 'active').length;
+		const active = modules.filter((module) => module.status === 'active').length;
 		expect(
-			screen.getByText(new RegExp(`${String(active)} of ${String(mockModules.length)} running`))
+			screen.getByText(new RegExp(`${String(active)} of ${String(modules.length)} running`))
 		).toBeInTheDocument();
 	});
 
-	it('locks premium modules on a free plan and points at billing instead', () => {
-		renderScreen(false);
+	it('sends the switch to the API with the version it was given', async () => {
+		const user = userEvent.setup();
+		renderScreen();
 
-		const economy = cardFor('Economy');
-		expect(within(economy).getByRole('switch')).toBeDisabled();
-		expect(within(economy).getByRole('link', { name: /Upgrade/ })).toHaveAttribute(
-			'href',
-			guildHref(GUILD_ID, '/billing')
-		);
-		expect(within(economy).queryByRole('link', { name: /Configure/ })).not.toBeInTheDocument();
+		await user.click(within(cardFor('Welcome')).getByRole('switch'));
+
+		await waitFor(() => {
+			expect(patchModule).toHaveBeenCalledWith(GUILD_ID, 'welcome', {
+				version: 3,
+				enabled: false
+			});
+		});
 	});
 
-	it('leaves premium modules usable on a paid plan', () => {
-		renderScreen(true);
+	it('takes the new version from the answer, so a second flip is not a conflict', async () => {
+		const user = userEvent.setup();
+		renderScreen();
 
-		const economy = cardFor('Economy');
-		expect(within(economy).getByRole('switch')).toBeEnabled();
-		expect(within(economy).getByRole('link', { name: /Configure/ })).toBeInTheDocument();
+		await user.click(within(cardFor('Welcome')).getByRole('switch'));
+		await waitFor(() => {
+			expect(within(cardFor('Welcome')).getByText('Off')).toBeInTheDocument();
+		});
+
+		patchModule.mockResolvedValue({ status: 'saved', state: stateOf('welcome', true, 5) });
+		await user.click(within(cardFor('Welcome')).getByRole('switch'));
+
+		await waitFor(() => {
+			expect(patchModule).toHaveBeenLastCalledWith(GUILD_ID, 'welcome', {
+				version: 4,
+				enabled: true
+			});
+		});
+	});
+
+	it('puts the switch back when the API refuses', async () => {
+		const user = userEvent.setup();
+
+		patchModule.mockResolvedValue({ status: 'error', message: 'The API answered 400' });
+		renderScreen();
+
+		await user.click(within(cardFor('Welcome')).getByRole('switch'));
+
+		await waitFor(() => {
+			expect(failure).toHaveBeenCalledWith('The API answered 400');
+		});
+		expect(within(cardFor('Welcome')).getByText('Active')).toBeInTheDocument();
+	});
+
+	it('adopts what the server holds when somebody else moved it first', async () => {
+		const user = userEvent.setup();
+
+		patchModule.mockResolvedValue({ status: 'conflict', state: stateOf('welcome', true, 9) });
+		renderScreen();
+
+		await user.click(within(cardFor('Welcome')).getByRole('switch'));
+
+		await waitFor(() => {
+			expect(warning).toHaveBeenCalled();
+		});
+		expect(within(cardFor('Welcome')).getByText('Active')).toBeInTheDocument();
+		expect(success).not.toHaveBeenCalled();
+	});
+
+	it('shows a module short of a required field as needing setup, and will not flip it', () => {
+		renderScreen();
+
+		const card = cardFor('Scheduled messages');
+
+		expect(within(card).getByText('Needs setup')).toBeInTheDocument();
+		expect(within(card).getByRole('switch')).toBeDisabled();
+	});
+
+	it('reads back what the API says rather than what the click asked for', async () => {
+		const user = userEvent.setup();
+
+		patchModule.mockResolvedValue({ status: 'saved', state: stateOf('levels', false, 2) });
+		renderScreen();
+
+		await user.click(within(cardFor('Levels')).getByRole('switch'));
+
+		await waitFor(() => {
+			expect(within(cardFor('Levels')).getByText('Off')).toBeInTheDocument();
+		});
 	});
 });

@@ -3,40 +3,42 @@
 import { PackageSearch } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
+import { toast } from 'sonner';
 import { ModuleCard } from '@/components/modules/ModuleCard';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { SearchInput } from '@/components/ui/SearchInput';
 import { BRAND } from '@/lib/brand';
-import type { ModuleCategory, ModuleId, ModuleSummary } from '@/lib/types/modules';
+import { statusOf } from '@/lib/modules/catalog';
+import { patchModule } from '@/lib/module-client';
+import {
+	MODULE_CATEGORIES,
+	type ModuleCategory,
+	type ModuleId,
+	type ModuleSummary
+} from '@/lib/types/modules';
 import { cn } from '@/lib/utils/cn';
 
-const CATEGORIES: (ModuleCategory | 'All')[] = [
-	'All',
-	'Engagement',
-	'Safety',
-	'Community',
-	'Utility'
-];
+const CATEGORIES: (ModuleCategory | 'all')[] = ['all', ...MODULE_CATEGORIES];
 
 const segment = 'h-8 rounded-sm px-3 text-body-sm transition-colors duration-120 ease-out';
 
 type ModulesScreenProps = {
 	modules: ModuleSummary[];
 	guildId: string;
-	planIsPaid: boolean;
 };
 
-export function ModulesScreen({ modules, guildId, planIsPaid }: ModulesScreenProps) {
+export function ModulesScreen({ modules, guildId }: ModulesScreenProps) {
 	const t = useTranslations('modulesList');
 	const catalog = useTranslations('catalog');
 	const names = useTranslations('nav');
 	const [items, setItems] = useState(modules);
+	const [saving, setSaving] = useState<ModuleId | null>(null);
 	const [query, setQuery] = useState('');
-	const [category, setCategory] = useState<ModuleCategory | 'All'>('All');
+	const [category, setCategory] = useState<ModuleCategory | 'all'>('all');
 
 	const term = query.trim().toLowerCase();
 	const matches = items.filter((module) => {
-		const inCategory = category === 'All' || module.category === category;
+		const inCategory = category === 'all' || module.category === category;
 		const inSearch =
 			term === '' ||
 			names(module.id).toLowerCase().includes(term) ||
@@ -44,11 +46,41 @@ export function ModulesScreen({ modules, guildId, planIsPaid }: ModulesScreenPro
 		return inCategory && inSearch;
 	});
 
-	function toggle(id: ModuleId, enabled: boolean) {
+	function replace(id: ModuleId, next: Partial<ModuleSummary>) {
 		setItems((current) =>
-			current.map((module) =>
-				module.id === id ? { ...module, status: enabled ? 'active' : 'off' } : module
-			)
+			current.map((module) => (module.id === id ? { ...module, ...next } : module))
+		);
+	}
+
+	async function toggle(id: ModuleId, enabled: boolean) {
+		const current = items.find((module) => module.id === id);
+
+		if (current === undefined || saving !== null) return;
+
+		setSaving(id);
+		replace(id, { status: enabled ? 'active' : 'off' });
+
+		const result = await patchModule(guildId, id, { version: current.version, enabled });
+
+		setSaving(null);
+
+		if (result.status === 'error') {
+			replace(id, { status: current.status });
+			toast.error(result.message);
+			return;
+		}
+
+		replace(id, { status: statusOf(result.state), version: result.state.version });
+
+		if (result.status === 'conflict') {
+			toast.warning(t('movedElsewhere', { name: names(id) }));
+			return;
+		}
+
+		toast.success(
+			result.state.enabled
+				? t('turnedOn', { name: names(id) })
+				: t('turnedOff', { name: names(id) })
 		);
 	}
 
@@ -114,8 +146,10 @@ export function ModulesScreen({ modules, guildId, planIsPaid }: ModulesScreenPro
 								key={module.id}
 								module={module}
 								guildId={guildId}
-								locked={module.premium && !planIsPaid}
-								onToggle={toggle}
+								busy={saving !== null}
+								onToggle={(id, next) => {
+									void toggle(id, next);
+								}}
 							/>
 						))}
 					</div>

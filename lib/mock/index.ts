@@ -13,7 +13,7 @@ export { mockGuilds } from './guilds';
 export { mockMembers } from './members';
 export { mockBotOnline, mockPlan, mockUser } from './session';
 export { mockBilling, mockGuildSettings } from './server';
-export { mockModules, mockVariables, mockWelcomeConfig } from './modules';
+export { mockVariables, mockWelcomeConfig } from './modules';
 export {
 	mockAutoModConfig,
 	mockCustomCommandsConfig,

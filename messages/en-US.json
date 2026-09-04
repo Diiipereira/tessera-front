@@ -9,7 +9,8 @@
 		"search": "Search…",
 		"select": "Select…",
 		"justNow": "just now",
-		"unknownTime": "unknown"
+		"unknownTime": "unknown",
+		"unknown": "Unknown"
 	},
 	"channelSwitch": {
 		"first": "From the moment you save, #{to} receives the welcome message.",
@@ -161,7 +162,8 @@
 			"signedOutOthers": "Signed out everywhere else",
 			"thisDevice": "This device",
 			"revoke": "Revoke",
-			"revoked": "Signed out of {device}"
+			"revoked": "Signed out of {device}",
+			"revokeFailed": "Could not sign that session out"
 		},
 		"data": {
 			"title": "Your data",
@@ -560,14 +562,13 @@
 	},
 	"catalog": {
 		"enable": "Enable {name}",
-		"upgrade": "Upgrade",
 		"configure": "Configure",
 		"categories": {
-			"All": "All",
-			"Engagement": "Engagement",
-			"Safety": "Safety",
-			"Community": "Community",
-			"Utility": "Utility"
+			"all": "All",
+			"engagement": "Engagement",
+			"safety": "Safety",
+			"community": "Community",
+			"utility": "Utility"
 		},
 		"status": {
 			"active": "Active",
@@ -760,7 +761,10 @@
 		"searchLabel": "Search modules",
 		"filter": "Filter by category",
 		"emptyTitle": "No modules match",
-		"emptyBody": "Nothing in {brand} answers to that. Try another word, or clear the category filter."
+		"emptyBody": "Nothing in {brand} answers to that. Try another word, or clear the category filter.",
+		"turnedOn": "{name} is on.",
+		"turnedOff": "{name} is off.",
+		"movedElsewhere": "{name} had already changed somewhere else. This is where it stands now."
 	},
 	"durations": {
 		"60s": "60 seconds",
@@ -2114,44 +2118,54 @@
 		"steps": {
 			"basics": "Basics",
 			"modules": "Modules",
-			"staff": "Staff",
+			"channels": "Channels",
 			"done": "Done"
 		},
 		"basics": {
-			"title": "Where is this server?",
-			"body": "{brand} uses this to format dates and pick its replies.",
+			"title": "Where does this server live?",
+			"body": "{brand} uses this to format dates and to pick which replies it sends.",
 			"language": "Server language",
-			"languageHint": "Slash command replies use this language.",
+			"languageHint": "Command replies use this language.",
 			"timezone": "Timezone",
-			"timezoneHint": "Schedules and log timestamps follow it."
+			"timezoneHint": "Scheduled messages and log times follow it.",
+			"timezonePlaceholder": "Pick a timezone",
+			"timezoneSearch": "Search timezones",
+			"timezoneEmpty": "No timezone matches"
 		},
 		"modules": {
 			"title": "What should {brand} do?",
-			"body": "Turn on what you need now — the rest is one switch away later."
+			"body": "Turn on what you need now — the rest is one click away later."
 		},
-		"staff": {
-			"title": "Who is staff, and where do logs go?",
-			"body": "Both can change later. Channels {brand} cannot post in are locked here.",
-			"logChannel": "Log channel",
-			"logChannelHint": "Moderation and server events are written here.",
-			"roles": "Moderator roles",
-			"rolesHint": "These roles can use moderation commands."
+		"channels": {
+			"title": "Where {brand} writes, and who it never touches",
+			"body": "All of this can change later. Channels {brand} cannot post in are blocked here.",
+			"welcomeChannel": "Welcome channel",
+			"welcomeChannelHint": "New members are greeted here.",
+			"welcomeChannelMissing": "Welcome cannot be turned on without a channel.",
+			"logChannel": "Moderation log channel",
+			"logChannelHint": "Warns, timeouts and bans are written here.",
+			"protectedRoles": "Protected roles",
+			"protectedRolesHint": "{brand} never punishes anyone holding these roles."
 		},
 		"done": {
-			"title": "You’re set",
-			"body": "{brand} is live in {guild}. Here is what you chose.",
+			"title": "Ready to save",
+			"body": "This is what {brand} will set up in {guild}.",
 			"language": "Language",
 			"timezone": "Timezone",
 			"modulesOn": "Modules on",
 			"noneYet": "None yet",
-			"logChannel": "Log channel",
+			"welcomeChannel": "Welcome channel",
+			"logChannel": "Moderation log channel",
 			"notSet": "Not set",
-			"roles": "Moderator roles"
+			"protectedRoles": "Protected roles"
 		},
 		"back": "Back",
 		"next": "Next",
-		"dashboard": "Go to dashboard",
-		"skip": "Skip setup"
+		"finish": "Save and open the dashboard",
+		"saving": "Saving…",
+		"saved": "{brand} is set up.",
+		"failed": "Nothing was saved",
+		"skip": "Skip the setup"
 	},
 	"capabilities": {
 		"guild": {

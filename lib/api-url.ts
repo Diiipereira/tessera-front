@@ -32,8 +32,13 @@ export type GuildListDto = {
 export type GuildModuleStateDto = {
 	key: string;
 	enabled: boolean;
+	configured: boolean;
 	config: Record<string, unknown>;
 	version: number;
+};
+
+export type GuildModuleListDto = {
+	modules: GuildModuleStateDto[];
 };
 
 export type GuildChannelDto = {

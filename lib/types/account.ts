@@ -5,7 +5,6 @@ export type AccountSession = {
 	deviceKind: SessionDeviceKind;
 	device: string;
 	browser: string;
-	location: string;
 	ip: string;
 	lastSeenAt: string;
 	current: boolean;

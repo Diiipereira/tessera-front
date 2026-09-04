@@ -17,6 +17,7 @@ const BLUE = '901234567890123002';
 
 const state = (enabled: boolean): GuildModuleStateDto => ({
 	key: 'reaction-roles',
+	configured: true,
 	enabled,
 	config: {},
 	version: 2

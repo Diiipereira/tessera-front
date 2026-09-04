@@ -24,6 +24,7 @@ const ALICE = '111111111111111111';
 
 const state = (config: Record<string, unknown> = {}, enabled = true): GuildModuleStateDto => ({
 	key: 'economy',
+	configured: true,
 	enabled,
 	config,
 	version: 4

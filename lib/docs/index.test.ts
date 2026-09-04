@@ -11,7 +11,7 @@ import {
 	searchDocs
 } from '@/lib/docs';
 import { docsHref, type DocBlock } from '@/lib/docs/types';
-import { mockModules } from '@/lib/mock';
+import { MODULE_IDS } from '@/lib/types/modules';
 
 function textOf(block: DocBlock): string[] {
 	switch (block.kind) {
@@ -36,8 +36,8 @@ function textOf(block: DocBlock): string[] {
 
 describe('documentation content', () => {
 	it('gives every module its own page, so the module header link never dead-ends', () => {
-		for (const entry of mockModules) {
-			expect(findDocPage(`modules/${entry.id}`)).not.toBeNull();
+		for (const id of MODULE_IDS) {
+			expect(findDocPage(`modules/${id}`)).not.toBeNull();
 		}
 	});
 

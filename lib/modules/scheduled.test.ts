@@ -24,6 +24,7 @@ const CHANNEL = '901234567890123008';
 
 const state = (enabled = true): GuildModuleStateDto => ({
 	key: 'scheduled',
+	configured: true,
 	enabled,
 	config: {},
 	version: 4

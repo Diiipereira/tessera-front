@@ -1,15 +1,15 @@
 import { apiBaseUrl } from '@/lib/api-url';
 import { describeFailure, type ErrorBody } from '@/lib/module-client';
-import type { GuildSettings } from '@/lib/types/management';
+import type { GuildSettingsDto } from '@/lib/types/management';
 
 export type SettingsWriteResult =
-	{ status: 'saved'; settings: GuildSettings } | { status: 'error'; message: string };
+	{ status: 'saved'; settings: GuildSettingsDto } | { status: 'error'; message: string };
 
 const settingsUrl = (guildId: string): string => `${apiBaseUrl()}/guilds/${guildId}/settings`;
 
 export async function patchSettings(
 	guildId: string,
-	body: Partial<GuildSettings>
+	body: Partial<GuildSettingsDto>
 ): Promise<SettingsWriteResult> {
 	let response: Response;
 
@@ -28,7 +28,7 @@ export async function patchSettings(
 	}
 
 	if (response.ok) {
-		return { status: 'saved', settings: (await response.json()) as GuildSettings };
+		return { status: 'saved', settings: (await response.json()) as GuildSettingsDto };
 	}
 
 	const failure = (await response.json().catch(() => ({}))) as ErrorBody;

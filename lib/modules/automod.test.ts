@@ -13,6 +13,7 @@ import {
 
 const state = (enabled: boolean): GuildModuleStateDto => ({
 	key: 'automod',
+	configured: true,
 	enabled,
 	config: {},
 	version: 3

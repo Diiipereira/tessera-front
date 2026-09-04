@@ -20,6 +20,7 @@ const CHANNEL = '901234567890123008';
 
 const state = (config: Record<string, unknown> = {}, enabled = true): GuildModuleStateDto => ({
 	key: 'levels',
+	configured: true,
 	enabled,
 	config,
 	version: 3

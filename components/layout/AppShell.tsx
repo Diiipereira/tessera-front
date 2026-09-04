@@ -25,6 +25,7 @@ type AppShellProps = {
 	botOnline: boolean;
 	preferences: AccountPreferences;
 	sessions: AccountSession[];
+	now?: string;
 	children: ReactNode;
 };
 
@@ -45,6 +46,7 @@ export function AppShell({
 	botOnline,
 	preferences,
 	sessions,
+	now,
 	children
 }: AppShellProps) {
 	const [paletteOpen, setPaletteOpen] = useState(false);
@@ -94,6 +96,7 @@ export function AppShell({
 					user={user}
 					preferences={preferences}
 					sessions={sessions}
+					now={now}
 					guilds={guilds}
 				/>
 			</NavigationProvider>

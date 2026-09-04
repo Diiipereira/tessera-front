@@ -29,13 +29,14 @@ import { Field } from '@/components/ui/Field';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { Switch } from '@/components/ui/Switch';
+import { revokeOtherSessions, revokeSession } from '@/lib/account-client';
 import { BRAND } from '@/lib/brand';
 import { useConfigDraft } from '@/lib/hooks/useConfigDraft';
+import { useRelativeTime } from '@/lib/hooks/useRelativeTime';
 import { SUPPORTED_LOCALES, toLocale } from '@/lib/locale';
 import { rememberLocale } from '@/lib/locale-client';
 import { translateIn } from '@/lib/locale-message';
 import { guildHref } from '@/lib/navigation';
-import { relativeTime } from '@/lib/time';
 import type { AccountPreferences, AccountSession } from '@/lib/types/account';
 import type { Guild } from '@/lib/types/guild';
 import type { SessionUser } from '@/lib/types/session';
@@ -70,6 +71,7 @@ type AccountPanelProps = {
 	preferences: AccountPreferences;
 	sessions: AccountSession[];
 	guilds: Guild[];
+	now?: string;
 };
 
 export function AccountPanel({
@@ -79,7 +81,8 @@ export function AccountPanel({
 	user,
 	preferences,
 	sessions,
-	guilds
+	guilds,
+	now
 }: AccountPanelProps) {
 	const t = useTranslations('account');
 	const localeNames = useTranslations('locales');
@@ -89,9 +92,44 @@ export function AccountPanel({
 	const form = useConfigDraft<AccountPreferences>(preferences);
 	const draft = form.draft;
 	const [active, setActive] = useState(sessions);
+	const [revoking, setRevoking] = useState(false);
 	const [deleting, setDeleting] = useState(false);
 	const [tab, setTab] = useState<TabId>('profile');
 	const rail = useRef<HTMLDivElement>(null);
+	const relativeTime = useRelativeTime();
+	const seenAt = now === undefined ? new Date() : new Date(now);
+
+	function signOutOthers() {
+		setRevoking(true);
+
+		void revokeOtherSessions().then((result) => {
+			setRevoking(false);
+
+			if (result.status === 'error') {
+				toast.error(t('sessions.revokeFailed'), { description: result.message });
+				return;
+			}
+
+			setActive((current) => current.filter((entry) => entry.current));
+			toast.success(t('sessions.signedOutOthers'));
+		});
+	}
+
+	function signOut(session: AccountSession) {
+		setRevoking(true);
+
+		void revokeSession(session.id).then((result) => {
+			setRevoking(false);
+
+			if (result.status === 'error') {
+				toast.error(t('sessions.revokeFailed'), { description: result.message });
+				return;
+			}
+
+			setActive((current) => current.filter((entry) => entry.id !== session.id));
+			toast.success(t('sessions.revoked', { device: session.device }));
+		});
+	}
 
 	const localeOptions = SUPPORTED_LOCALES.map((value) => ({ value, label: localeNames(value) }));
 
@@ -317,10 +355,8 @@ export function AccountPanel({
 										<Button
 											variant="outline"
 											size="sm"
-											onClick={() => {
-												setActive((current) => current.filter((entry) => entry.current));
-												toast.success(t('sessions.signedOutOthers'));
-											}}
+											disabled={revoking || active.length < 2}
+											onClick={signOutOthers}
 										>
 											{t('sessions.signOutOthers')}
 										</Button>
@@ -353,18 +389,16 @@ export function AccountPanel({
 														) : null}
 													</p>
 													<p className="font-mono text-caption font-normal text-text-muted">
-														{session.location} · {session.ip} · {relativeTime(session.lastSeenAt)}
+														{session.ip} · {relativeTime(session.lastSeenAt, seenAt)}
 													</p>
 												</div>
 												{session.current ? null : (
 													<Button
 														variant="ghost-danger"
 														size="sm"
+														disabled={revoking}
 														onClick={() => {
-															setActive((current) =>
-																current.filter((entry) => entry.id !== session.id)
-															);
-															toast.success(t('sessions.revoked', { device: session.device }));
+															signOut(session);
 														}}
 													>
 														{t('sessions.revoke')}

@@ -17,6 +17,7 @@ import {
 
 const state = (config: Record<string, unknown> = {}, enabled = true): GuildModuleStateDto => ({
 	key: 'moderation',
+	configured: true,
 	enabled,
 	config,
 	version: 3

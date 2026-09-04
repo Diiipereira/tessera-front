@@ -20,6 +20,7 @@ import { EMBED_SWATCHES } from '@/lib/discord-colors';
 import { removeBot, resetAllModules } from '@/lib/guild-bot-client';
 import { useConfigDraft, type SaveOutcome } from '@/lib/hooks/useConfigDraft';
 import { SUPPORTED_LOCALES } from '@/lib/locale';
+import { toEditableSettings } from '@/lib/settings';
 import { patchSettings } from '@/lib/settings-client';
 import { timezoneOptions } from '@/lib/timezones';
 import type { GuildSettings } from '@/lib/types/management';
@@ -38,7 +39,7 @@ export function SettingsScreen({ guildId, settings, guildName }: SettingsScreenP
 			const result = await patchSettings(guildId, next);
 
 			return result.status === 'saved'
-				? { status: 'saved', saved: result.settings }
+				? { status: 'saved', saved: toEditableSettings(result.settings) }
 				: { status: 'error', message: result.message };
 		},
 		[guildId]

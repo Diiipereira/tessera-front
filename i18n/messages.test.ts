@@ -3,7 +3,7 @@ import enUS from '@/messages/en-US.json';
 import ptBR from '@/messages/pt-BR.json';
 import { SUPPORTED_LOCALES } from '@/lib/locale';
 import { DOC_GROUPS } from '@/lib/docs';
-import { mockModules } from '@/lib/mock';
+import { MODULE_IDS } from '@/lib/types/modules';
 
 type Tree = { [key: string]: string | Tree };
 
@@ -90,10 +90,10 @@ describe('message dictionaries', () => {
 	});
 
 	it('names every module, which every screen resolves by id', () => {
-		const missing = mockModules.flatMap((module) =>
+		const missing = MODULE_IDS.flatMap((id) =>
 			[...Object.entries(DICTIONARIES)]
-				.filter(([, tree]) => flatten(tree).get(`nav.${module.id}`) === undefined)
-				.map(([locale]) => `${locale}: nav.${module.id}`)
+				.filter(([, tree]) => flatten(tree).get(`nav.${id}`) === undefined)
+				.map(([locale]) => `${locale}: nav.${id}`)
 		);
 
 		expect(missing).toEqual([]);

@@ -1,17 +1,13 @@
+import { getTranslations } from 'next-intl/server';
 import type { ReactNode } from 'react';
 import { AppShell } from '@/components/layout/AppShell';
+import { toAccountSessions, type SessionSummaryDto } from '@/lib/account';
 import { apiGet } from '@/lib/api';
 import type { AuthenticatedUserDto } from '@/lib/api-url';
 import { loadGuilds, resolveGuild } from '@/lib/guild-access';
 import { toSessionUser } from '@/lib/guild-presentation';
 import { readLocale } from '@/lib/locale-server';
-import {
-	mockAccountPreferences,
-	mockAccountSessions,
-	mockBotOnline,
-	mockPlan,
-	mockUser
-} from '@/lib/mock';
+import { mockAccountPreferences, mockBotOnline, mockPlan, mockUser } from '@/lib/mock';
 
 export default async function GuildLayout({
 	children,
@@ -21,11 +17,13 @@ export default async function GuildLayout({
 	params: Promise<{ guildId: string }>;
 }) {
 	const { guildId } = await params;
-	const [guild, directory, meResult, locale] = await Promise.all([
+	const [guild, directory, meResult, locale, sessions, common] = await Promise.all([
 		resolveGuild(guildId),
 		loadGuilds(),
 		apiGet<AuthenticatedUserDto>('/auth/me'),
-		readLocale()
+		readLocale(),
+		apiGet<SessionSummaryDto[]>('/auth/sessions'),
+		getTranslations('common')
 	]);
 
 	return (
@@ -36,7 +34,8 @@ export default async function GuildLayout({
 			plan={mockPlan}
 			botOnline={mockBotOnline}
 			preferences={{ ...mockAccountPreferences, locale }}
-			sessions={mockAccountSessions}
+			sessions={sessions.status === 'ok' ? toAccountSessions(sessions.data, common('unknown')) : []}
+			now={new Date().toISOString()}
 		>
 			{children}
 		</AppShell>

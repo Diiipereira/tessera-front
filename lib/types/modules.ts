@@ -1,25 +1,30 @@
-export type ModuleId =
-	| 'welcome'
-	| 'moderation'
-	| 'automod'
-	| 'logging'
-	| 'levels'
-	| 'economy'
-	| 'tickets'
-	| 'reaction-roles'
-	| 'giveaways'
-	| 'custom-commands'
-	| 'scheduled';
+export const MODULE_IDS = [
+	'welcome',
+	'moderation',
+	'automod',
+	'logging',
+	'levels',
+	'economy',
+	'tickets',
+	'reaction-roles',
+	'giveaways',
+	'custom-commands',
+	'scheduled'
+] as const;
+
+export type ModuleId = (typeof MODULE_IDS)[number];
 
 export type ModuleStatus = 'active' | 'off' | 'needs-setup';
 
-export type ModuleCategory = 'Engagement' | 'Safety' | 'Community' | 'Utility';
+export const MODULE_CATEGORIES = ['engagement', 'safety', 'community', 'utility'] as const;
+
+export type ModuleCategory = (typeof MODULE_CATEGORIES)[number];
 
 export type ModuleSummary = {
 	id: ModuleId;
 	category: ModuleCategory;
 	status: ModuleStatus;
-	premium: boolean;
+	version: number;
 };
 
 export type EmbedField = {

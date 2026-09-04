@@ -9,7 +9,8 @@
 		"search": "Buscar…",
 		"select": "Selecione…",
 		"justNow": "agora mesmo",
-		"unknownTime": "desconhecido"
+		"unknownTime": "desconhecido",
+		"unknown": "Desconhecido"
 	},
 	"channelSwitch": {
 		"first": "A partir de salvar, #{to} recebe a mensagem de boas-vindas.",
@@ -161,7 +162,8 @@
 			"signedOutOthers": "Você saiu de todos os outros lugares",
 			"thisDevice": "Este aparelho",
 			"revoke": "Revogar",
-			"revoked": "Você saiu de {device}"
+			"revoked": "Você saiu de {device}",
+			"revokeFailed": "Não deu para encerrar essa sessão"
 		},
 		"data": {
 			"title": "Seus dados",
@@ -560,14 +562,13 @@
 	},
 	"catalog": {
 		"enable": "Ligar {name}",
-		"upgrade": "Fazer upgrade",
 		"configure": "Configurar",
 		"categories": {
-			"All": "Todos",
-			"Engagement": "Engajamento",
-			"Safety": "Segurança",
-			"Community": "Comunidade",
-			"Utility": "Utilidades"
+			"all": "Todos",
+			"engagement": "Engajamento",
+			"safety": "Segurança",
+			"community": "Comunidade",
+			"utility": "Utilidades"
 		},
 		"status": {
 			"active": "Ativo",
@@ -760,7 +761,10 @@
 		"searchLabel": "Buscar módulos",
 		"filter": "Filtrar por categoria",
 		"emptyTitle": "Nenhum módulo corresponde",
-		"emptyBody": "Nada na {brand} atende a isso. Tente outra palavra, ou limpe o filtro de categoria."
+		"emptyBody": "Nada na {brand} atende a isso. Tente outra palavra, ou limpe o filtro de categoria.",
+		"turnedOn": "{name} ligado.",
+		"turnedOff": "{name} desligado.",
+		"movedElsewhere": "{name} já tinha mudado em outro lugar. Este é o estado atual."
 	},
 	"durations": {
 		"60s": "60 segundos",
@@ -2114,7 +2118,7 @@
 		"steps": {
 			"basics": "Básico",
 			"modules": "Módulos",
-			"staff": "Equipe",
+			"channels": "Canais",
 			"done": "Pronto"
 		},
 		"basics": {
@@ -2123,34 +2127,44 @@
 			"language": "Idioma do servidor",
 			"languageHint": "As respostas dos comandos usam este idioma.",
 			"timezone": "Fuso horário",
-			"timezoneHint": "Agendamentos e horários de log seguem ele."
+			"timezoneHint": "Mensagens agendadas e horários de log seguem ele.",
+			"timezonePlaceholder": "Escolha um fuso horário",
+			"timezoneSearch": "Buscar fusos horários",
+			"timezoneEmpty": "Nenhum fuso horário corresponde"
 		},
 		"modules": {
 			"title": "O que a {brand} deve fazer?",
 			"body": "Ligue o que você precisa agora — o resto está a um clique depois."
 		},
-		"staff": {
-			"title": "Quem é da equipe, e onde vão os registros?",
-			"body": "Os dois podem mudar depois. Canais onde a {brand} não consegue publicar ficam bloqueados aqui.",
-			"logChannel": "Canal de registros",
-			"logChannelHint": "Moderação e eventos do servidor são escritos aqui.",
-			"roles": "Cargos de moderação",
-			"rolesHint": "Estes cargos podem usar os comandos de moderação."
+		"channels": {
+			"title": "Onde a {brand} escreve, e quem ela nunca toca",
+			"body": "Tudo isto pode mudar depois. Canais onde a {brand} não consegue publicar ficam bloqueados aqui.",
+			"welcomeChannel": "Canal de boas-vindas",
+			"welcomeChannelHint": "Quem entra é recebido aqui.",
+			"welcomeChannelMissing": "As boas-vindas não podem ser ligadas sem um canal.",
+			"logChannel": "Canal de registros da moderação",
+			"logChannelHint": "Advertências, timeouts e banimentos são escritos aqui.",
+			"protectedRoles": "Cargos protegidos",
+			"protectedRolesHint": "A {brand} nunca pune quem tem estes cargos."
 		},
 		"done": {
-			"title": "Está pronto",
-			"body": "A {brand} está no ar em {guild}. Foi isto que você escolheu.",
+			"title": "Pronto para salvar",
+			"body": "É isto que a {brand} vai configurar em {guild}.",
 			"language": "Idioma",
 			"timezone": "Fuso horário",
 			"modulesOn": "Módulos ligados",
 			"noneYet": "Nenhum ainda",
-			"logChannel": "Canal de registros",
+			"welcomeChannel": "Canal de boas-vindas",
+			"logChannel": "Canal de registros da moderação",
 			"notSet": "Não definido",
-			"roles": "Cargos de moderação"
+			"protectedRoles": "Cargos protegidos"
 		},
 		"back": "Voltar",
 		"next": "Avançar",
-		"dashboard": "Ir para o painel",
+		"finish": "Salvar e abrir o painel",
+		"saving": "Salvando…",
+		"saved": "A {brand} está configurada.",
+		"failed": "Nada foi salvo",
 		"skip": "Pular a configuração"
 	},
 	"capabilities": {

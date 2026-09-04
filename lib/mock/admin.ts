@@ -6,9 +6,8 @@ import type {
 	TenantStaffMember,
 	TenantSummary
 } from '@/lib/types/admin';
-import type { ModuleId } from '@/lib/types/modules';
+import { MODULE_IDS, type ModuleId } from '@/lib/types/modules';
 import { MOCK_NOW } from '@/lib/time';
-import { mockModules } from './modules';
 
 export const mockTenants: TenantSummary[] = [
 	{
@@ -139,7 +138,7 @@ export const mockTenants: TenantSummary[] = [
 	}
 ];
 
-const MODULE_KEYS: ModuleId[] = mockModules.map((module) => module.id);
+const MODULE_KEYS: readonly ModuleId[] = MODULE_IDS;
 
 function seedOf(id: string): number {
 	let seed = 0;

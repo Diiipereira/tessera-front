@@ -29,6 +29,7 @@ const BOB = '222222222222222222';
 
 const state = (config: Record<string, unknown> = {}, enabled = true): GuildModuleStateDto => ({
 	key: 'tickets',
+	configured: true,
 	enabled,
 	config,
 	version: 4

@@ -177,3 +177,7 @@ export type GuildSettings = {
 	embedColor: string;
 	botNickname: string;
 };
+
+export type GuildSettingsDto = GuildSettings & {
+	setupCompleted: boolean;
+};

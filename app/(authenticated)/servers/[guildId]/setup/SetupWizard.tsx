@@ -1,67 +1,39 @@
 'use client';
 
-import {
-	ArrowLeft,
-	ArrowRight,
-	Check,
-	DoorOpen,
-	Gift,
-	PartyPopper,
-	ScrollText,
-	Shield,
-	ShieldAlert,
-	Ticket,
-	TrendingUp,
-	type LucideIcon
-} from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, PartyPopper } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useMemo, useState } from 'react';
+import { toast } from 'sonner';
 import { BrandMark } from '@/components/auth/BrandMark';
 import { ChannelPicker } from '@/components/discord/ChannelPicker';
 import { RolePicker } from '@/components/discord/RolePicker';
 import { Button } from '@/components/ui/Button';
 import { Checkbox } from '@/components/ui/Checkbox';
+import { Combobox } from '@/components/ui/Combobox';
 import { Field } from '@/components/ui/Field';
 import { Select } from '@/components/ui/Select';
 import { BRAND } from '@/lib/brand';
-import { SUPPORTED_LOCALES, DEFAULT_LOCALE } from '@/lib/locale';
+import { SUPPORTED_LOCALES } from '@/lib/locale';
+import { moduleIcons } from '@/lib/module-icons';
+import { patchModule } from '@/lib/module-client';
 import { guildHref } from '@/lib/navigation';
-import { zoneLabel } from '@/lib/timezones';
+import { patchSettings } from '@/lib/settings-client';
+import {
+	needsWelcomeChannel,
+	startingDraft,
+	toSetupWrites,
+	type SetupDraft,
+	type SetupModule
+} from '@/lib/setup';
+import { timezoneOptions, zoneLabel } from '@/lib/timezones';
 import type { Channel, Role } from '@/lib/types/discord';
 import type { Guild } from '@/lib/types/guild';
+import type { GuildSettings } from '@/lib/types/management';
+import type { ModuleId } from '@/lib/types/modules';
 import { cn } from '@/lib/utils/cn';
 
-const STEPS = ['basics', 'modules', 'staff', 'done'] as const;
-
-const MODULES: { id: string; icon: LucideIcon }[] = [
-	{
-		id: 'welcome',
-		icon: DoorOpen
-	},
-	{
-		id: 'moderation',
-		icon: Shield
-	},
-	{
-		id: 'automod',
-		icon: ShieldAlert
-	},
-	{
-		id: 'logging',
-		icon: ScrollText
-	},
-	{ id: 'levels', icon: TrendingUp },
-	{
-		id: 'tickets',
-		icon: Ticket
-	},
-	{
-		id: 'giveaways',
-		icon: Gift
-	}
-];
-
-const TIMEZONES = ['UTC', 'America/Sao_Paulo', 'Europe/Lisbon', 'America/New_York'];
+const STEPS = ['basics', 'modules', 'channels', 'done'] as const;
 
 function SummaryRow({ label, value }: { label: string; value: string }) {
 	return (
@@ -74,33 +46,84 @@ function SummaryRow({ label, value }: { label: string; value: string }) {
 
 type SetupWizardProps = {
 	guild: Guild;
+	settings: GuildSettings;
+	modules: SetupModule[];
 	channels: Channel[];
 	roles: Role[];
 };
 
-export function SetupWizard({ guild, channels, roles }: SetupWizardProps) {
+export function SetupWizard({ guild, settings, modules, channels, roles }: SetupWizardProps) {
 	const t = useTranslations('setup');
 	const catalog = useTranslations('catalog');
 	const names = useTranslations('nav');
 	const localeNames = useTranslations('locales');
+	const router = useRouter();
 	const languageOptions = SUPPORTED_LOCALES.map((value) => ({ value, label: localeNames(value) }));
-	const timezoneOptions = TIMEZONES.map((value) => ({ value, label: zoneLabel(value) }));
+	const timezones = useMemo(() => timezoneOptions(), []);
 	const [step, setStep] = useState(0);
-	const [language, setLanguage] = useState<string>(DEFAULT_LOCALE);
-	const [timezone, setTimezone] = useState('UTC');
-	const [enabled, setEnabled] = useState<string[]>(['welcome', 'moderation', 'logging']);
-	const [logChannel, setLogChannel] = useState<string | null>(null);
-	const [modRoles, setModRoles] = useState<string[]>([]);
+	const [saving, setSaving] = useState(false);
+	const [draft, setDraft] = useState<SetupDraft>(() => startingDraft(settings, modules));
 
 	const dashboardHref = guildHref(guild.id, '');
 	const isLast = step === STEPS.length - 1;
+	const missingWelcomeChannel = needsWelcomeChannel(draft);
+	const blocked = step === 2 && missingWelcomeChannel;
 
-	const selectedModules = MODULES.filter((module) => enabled.includes(module.id));
-	const selectedChannel = channels.find((channel) => channel.id === logChannel);
-	const selectedRoles = roles.filter((role) => modRoles.includes(role.id));
+	const chosenModules = modules.filter((module) => draft.wanted.includes(module.id));
+	const logChannel = channels.find((channel) => channel.id === draft.logChannelId);
+	const welcomeChannel = channels.find((channel) => channel.id === draft.welcomeChannelId);
+	const selectedRoles = roles.filter((role) => draft.protectedRoleIds.includes(role.id));
 
-	function toggleModule(id: string, checked: boolean) {
-		setEnabled((current) => (checked ? [...current, id] : current.filter((entry) => entry !== id)));
+	function set<K extends keyof SetupDraft>(key: K, value: SetupDraft[K]) {
+		setDraft((current) => ({ ...current, [key]: value }));
+	}
+
+	function toggleModule(id: ModuleId, checked: boolean) {
+		setDraft((current) => ({
+			...current,
+			wanted: checked ? [...current.wanted, id] : current.wanted.filter((entry) => entry !== id)
+		}));
+	}
+
+	async function finish() {
+		setSaving(true);
+
+		const written = await patchSettings(guild.id, {
+			locale: draft.locale,
+			timezone: draft.timezone
+		});
+
+		if (written.status === 'error') {
+			setSaving(false);
+			toast.error(t('failed'), { description: written.message });
+			return;
+		}
+
+		for (const write of toSetupWrites(modules, draft)) {
+			const result = await patchModule(guild.id, write.id, {
+				version: write.version,
+				enabled: write.enabled,
+				config: write.config
+			});
+
+			if (result.status === 'error') {
+				setSaving(false);
+				toast.error(t('failed'), { description: `${names(write.id)}: ${result.message}` });
+				return;
+			}
+		}
+
+		const done = await patchSettings(guild.id, { setupCompleted: true });
+
+		setSaving(false);
+
+		if (done.status === 'error') {
+			toast.error(t('failed'), { description: done.message });
+			return;
+		}
+
+		toast.success(t('saved', { brand: BRAND.name }));
+		router.push(dashboardHref);
 	}
 
 	return (
@@ -156,10 +179,25 @@ export function SetupWizard({ guild, channels, roles }: SetupWizardProps) {
 							<p className="text-body text-text-muted">{t('basics.body', { brand: BRAND.name })}</p>
 						</div>
 						<Field label={t('basics.language')} hint={t('basics.languageHint')}>
-							<Select options={languageOptions} value={language} onValueChange={setLanguage} />
+							<Select
+								options={languageOptions}
+								value={draft.locale}
+								onValueChange={(next) => {
+									set('locale', next);
+								}}
+							/>
 						</Field>
 						<Field label={t('basics.timezone')} hint={t('basics.timezoneHint')}>
-							<Select options={timezoneOptions} value={timezone} onValueChange={setTimezone} />
+							<Combobox
+								options={timezones}
+								value={draft.timezone}
+								onValueChange={(next) => {
+									set('timezone', next);
+								}}
+								placeholder={t('basics.timezonePlaceholder')}
+								searchPlaceholder={t('basics.timezoneSearch')}
+								emptyLabel={t('basics.timezoneEmpty')}
+							/>
 						</Field>
 					</section>
 				) : step === 1 ? (
@@ -169,9 +207,10 @@ export function SetupWizard({ guild, channels, roles }: SetupWizardProps) {
 							<p className="text-body text-text-muted">{t('modules.body')}</p>
 						</div>
 						<div className="grid gap-3 sm:grid-cols-2">
-							{MODULES.map((module) => {
-								const checked = enabled.includes(module.id);
-								const Icon = module.icon;
+							{modules.map((module) => {
+								const checked = draft.wanted.includes(module.id);
+								const Icon = moduleIcons[module.id];
+
 								return (
 									<label
 										key={module.id}
@@ -211,14 +250,49 @@ export function SetupWizard({ guild, channels, roles }: SetupWizardProps) {
 				) : step === 2 ? (
 					<section className="flex flex-col gap-5">
 						<div>
-							<h1 className="text-h2">{t('staff.title')}</h1>
-							<p className="text-body text-text-muted">{t('staff.body', { brand: BRAND.name })}</p>
+							<h1 className="text-h2">{t('channels.title', { brand: BRAND.name })}</h1>
+							<p className="text-body text-text-muted">
+								{t('channels.body', { brand: BRAND.name })}
+							</p>
 						</div>
-						<Field label={t('staff.logChannel')} hint={t('staff.logChannelHint')}>
-							<ChannelPicker channels={channels} value={logChannel} onValueChange={setLogChannel} />
+						{draft.wanted.includes('welcome') ? (
+							<Field
+								label={t('channels.welcomeChannel')}
+								hint={
+									missingWelcomeChannel
+										? t('channels.welcomeChannelMissing')
+										: t('channels.welcomeChannelHint')
+								}
+							>
+								<ChannelPicker
+									channels={channels}
+									value={draft.welcomeChannelId}
+									onValueChange={(next) => {
+										set('welcomeChannelId', next);
+									}}
+								/>
+							</Field>
+						) : null}
+						<Field label={t('channels.logChannel')} hint={t('channels.logChannelHint')}>
+							<ChannelPicker
+								channels={channels}
+								value={draft.logChannelId}
+								onValueChange={(next) => {
+									set('logChannelId', next);
+								}}
+							/>
 						</Field>
-						<Field label={t('staff.roles')} hint={t('staff.rolesHint')}>
-							<RolePicker roles={roles} value={modRoles} onValueChange={setModRoles} />
+						<Field
+							label={t('channels.protectedRoles')}
+							hint={t('channels.protectedRolesHint', { brand: BRAND.name })}
+						>
+							<RolePicker
+								roles={roles}
+								value={[...draft.protectedRoleIds]}
+								onValueChange={(next) => {
+									set('protectedRoleIds', next);
+								}}
+							/>
 						</Field>
 					</section>
 				) : (
@@ -236,22 +310,25 @@ export function SetupWizard({ guild, channels, roles }: SetupWizardProps) {
 						</div>
 
 						<div className="rounded-lg border border-border bg-surface px-4 shadow-1">
-							<SummaryRow label={t('done.language')} value={localeNames(language)} />
-							<SummaryRow label={t('done.timezone')} value={zoneLabel(timezone)} />
+							<SummaryRow label={t('done.language')} value={localeNames(draft.locale)} />
+							<SummaryRow label={t('done.timezone')} value={zoneLabel(draft.timezone)} />
 							<SummaryRow
 								label={t('done.modulesOn')}
 								value={
-									selectedModules.length > 0
-										? selectedModules.map((module) => names(module.id)).join(', ')
+									chosenModules.length > 0
+										? chosenModules.map((module) => names(module.id)).join(', ')
 										: t('done.noneYet')
 								}
 							/>
+							{welcomeChannel ? (
+								<SummaryRow label={t('done.welcomeChannel')} value={`#${welcomeChannel.name}`} />
+							) : null}
 							<SummaryRow
 								label={t('done.logChannel')}
-								value={selectedChannel ? `#${selectedChannel.name}` : t('done.notSet')}
+								value={logChannel ? `#${logChannel.name}` : t('done.notSet')}
 							/>
 							<SummaryRow
-								label={t('done.roles')}
+								label={t('done.protectedRoles')}
 								value={
 									selectedRoles.length > 0
 										? selectedRoles.map((role) => role.name).join(', ')
@@ -266,7 +343,7 @@ export function SetupWizard({ guild, channels, roles }: SetupWizardProps) {
 			<footer className="sticky bottom-0 flex items-center gap-3 border-t border-border bg-surface-raised px-6 py-4 sm:px-8">
 				<Button
 					variant="ghost"
-					disabled={step === 0}
+					disabled={step === 0 || saving}
 					onClick={() => {
 						setStep((current) => current - 1);
 					}}
@@ -276,12 +353,18 @@ export function SetupWizard({ guild, channels, roles }: SetupWizardProps) {
 				</Button>
 				<div className="flex-1" />
 				{isLast ? (
-					<Button href={dashboardHref}>
-						{t('dashboard')}
+					<Button
+						disabled={saving}
+						onClick={() => {
+							void finish();
+						}}
+					>
+						{saving ? t('saving') : t('finish')}
 						<ArrowRight aria-hidden="true" />
 					</Button>
 				) : (
 					<Button
+						disabled={blocked}
 						onClick={() => {
 							setStep((current) => current + 1);
 						}}

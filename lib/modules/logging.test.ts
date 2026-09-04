@@ -17,6 +17,7 @@ const ROLE = '901234567890123010';
 
 const stateOf = (config: Record<string, unknown> = {}): GuildModuleStateDto => ({
 	key: 'logging',
+	configured: true,
 	enabled: true,
 	version: 3,
 	config
