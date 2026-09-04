@@ -1,0 +1,35 @@
+---
+title: Your first module
+summary: Turning on Welcome, end to end, including the part people get wrong.
+---
+
+Welcome is the usual first module because the result is immediately visible. This walks the
+whole thing, from off to a greeting members actually see.
+
+<Steps>
+	<Step title="Open the module">
+		Dashboard → **Modules** → Welcome. Every module page looks like this one, so learning it once is
+		enough.
+	</Step>
+	<Step title="Turn it on">
+		The switch at the top right. Everything below it stays editable while it is off, so you can set
+		it up before it goes live.
+	</Step>
+	<Step title="Pick the channel">
+		Where the greeting goes. The module cannot be turned on without one, so this is the field that
+		decides whether the switch works.
+	</Step>
+	<Step title="Write the message">
+		Use `{user}` for the member who joined and `{server}` for the server name. The preview updates
+		as you type.
+	</Step>
+	<Step title="Check it with a real join">
+		Invite a second account, or ask someone to rejoin. The preview shows the layout, but only a real
+		join proves the bot has the permissions it needs in that channel.
+	</Step>
+</Steps>
+
+<Callout tone="info" title="The same thing from Discord">
+	Every step above has a slash command. `/config welcome channel-id:#general` does the third one,
+	and the dashboard shows it the moment you run it.
+</Callout>

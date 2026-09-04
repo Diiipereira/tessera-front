@@ -1,0 +1,33 @@
+---
+title: AutoMod
+summary: Regras que agem antes de um humano precisar. Toda ocorrência vai para o log de casos.
+---
+
+O AutoMod observa as mensagens conforme elas chegam e age nas que casam com uma regra que você escreveu. Ele roda antes de qualquer moderador ver a mensagem, e é esse o ponto — o pior conteúdo é o que ninguém precisou ler.
+
+**Permissões:** `Gerenciar Mensagens`, `Moderar Membros`, `Ver Registro de Auditoria`
+
+## Configurando
+
+<Steps>
+	<Step title="Crie uma regra">
+		Escolha o que ela observa — palavras bloqueadas, convites, links, menções, texto repetido ou
+		caixa alta — e o que acontece quando ela dispara.
+	</Step>
+	<Step title="Ordene as regras">
+		As regras são conferidas de cima para baixo e **a primeira que dispara vence**. Ponha as
+		específicas acima das amplas.
+	</Step>
+	<Step title="Teste antes de confiar">
+		Cole no campo de exemplo algo que um membro poderia mandar e o painel mostra quais regras
+		pegariam, em ordem.
+	</Step>
+</Steps>
+
+## Opções
+
+<Fields module="automod" />
+
+## Comandos
+
+<Commands module="automod" />

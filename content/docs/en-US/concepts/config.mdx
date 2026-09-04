@@ -1,0 +1,43 @@
+---
+title: How config is stored
+summary: One writer, two doors — and why that shapes everything else.
+---
+
+A configuration field in Tessera is declared **once**. That single declaration produces the
+slash command option, the dashboard form control, the validation the API runs, and the shape it
+is stored in. Nothing is written twice, which is the only reliable way to stop the two doors
+from disagreeing.
+
+## What follows from that
+
+- A slash command and the dashboard can never accept different values for the same field,
+  because the validation is the same object.
+- A field added to a module appears in both places at once, or in neither.
+- The option tables in this documentation are read from that declaration too, so they cannot
+  describe a setting the bot does not have.
+- There is no import, export or sync step anywhere in the product.
+
+## What happens when you save
+
+<Steps>
+	<Step title="The write is validated">Against the same rules the slash command uses.</Step>
+	<Step title="The version is checked">
+		If someone else saved the same module while you had the page open, your save is refused rather
+		than silently overwriting theirs.
+	</Step>
+	<Step title="The bot is told">
+		The gateway process drops its cached copy immediately, so the next message is handled with the
+		new config — not on a timer.
+	</Step>
+</Steps>
+
+<Callout tone="warning" title="Two people editing one module">
+	The second save is refused with a message saying so. Reload, look at what changed, and save again.
+	Nothing is lost, but nothing is merged for you either.
+</Callout>
+
+## Everything is written down
+
+Every write is recorded with who made it, which door they came through, and the exact before
+and after of each field. The audit log in the dashboard is that record, and it is the same
+record whether the change came from a slash command, the dashboard or the API.

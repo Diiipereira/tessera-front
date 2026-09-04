@@ -1,0 +1,32 @@
+---
+title: Levels
+summary: XP for talking, ranks to show for it, and roles handed out along the way.
+---
+
+Levels gives a random amount of XP per message, at most once per cooldown, and hands out roles when a member crosses a level you picked. The randomness and the cooldown together are what stop it from rewarding spam.
+
+**Permissions:** `View Channel`, `Send Messages`, `Manage Roles`
+
+## Setting it up
+
+<Steps>
+	<Step title="Set the XP range">
+		A random amount between the minimum and maximum is granted per message, at most once per
+		cooldown.
+	</Step>
+	<Step title="Choose a curve">
+		The curve is how much harder each level is than the one before it. The chart on the module page
+		shows what the first levels cost.
+	</Step>
+	<Step title="Add role rewards">
+		Given when a member reaches the level. Roles above the bot in the list cannot be granted.
+	</Step>
+</Steps>
+
+## Options
+
+<Fields module="levels" />
+
+## Commands
+
+<Commands module="levels" />

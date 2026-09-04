@@ -1,46 +1,58 @@
-import type { ModuleId } from '@/lib/types/modules';
+import type { DocGroupId } from '@/content/docs/nav';
 
-export type DocCalloutTone = 'info' | 'success' | 'warning' | 'danger';
+export type { DocGroupId };
 
-export type DocOption = {
-	name: string;
-	type: string;
-	fallback: string;
-	text: string;
-};
-
-export type DocStep = {
-	title: string;
-	text: string;
-};
-
-export type DocBlock =
-	| { kind: 'paragraph'; text: string }
-	| { kind: 'heading'; id: string; text: string }
-	| { kind: 'list'; ordered?: boolean; items: string[] }
-	| { kind: 'steps'; items: DocStep[] }
-	| { kind: 'code'; language: string; filename?: string; code: string }
-	| { kind: 'callout'; tone: DocCalloutTone; title: string; text: string }
-	| { kind: 'options'; rows: DocOption[] }
-	| { kind: 'commands'; module: ModuleId }
-	| { kind: 'table'; head: string[]; rows: string[][] };
+export type DocHeading = { id: string; text: string };
 
 export type DocPage = {
 	slug: string;
 	title: string;
 	summary: string;
-	blocks: DocBlock[];
+	group: DocGroupId;
+	headings: DocHeading[];
+	keywords: string;
 };
 
-export type DocGroupId = 'start' | 'concepts' | 'modules' | 'reference';
+export type DocNavPage = { slug: string; title: string };
 
-export type DocGroup = {
-	id: DocGroupId;
-	pages: DocPage[];
+export type DocNavGroup = { id: DocGroupId; pages: DocNavPage[] };
+
+export type DocSearchEntry = {
+	slug: string;
+	title: string;
+	group: DocGroupId;
+	summary: string;
+	keywords: string;
 };
+
+export type DocNeighbours = { previous: DocPage | null; next: DocPage | null };
 
 export type DocsHref = '/docs' | `/docs/${string}`;
 
 export function docsHref(slug: string): DocsHref {
 	return slug === '' ? '/docs' : `/docs/${slug}`;
+}
+
+export function searchDocs(entries: DocSearchEntry[], query: string): DocSearchEntry[] {
+	const terms = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
+	if (terms.length === 0) return [];
+
+	return entries
+		.map((entry) => {
+			const title = entry.title.toLowerCase();
+			let score = 0;
+
+			for (const term of terms) {
+				if (title.startsWith(term)) score += 6;
+				else if (title.includes(term)) score += 4;
+				else if (entry.summary.toLowerCase().includes(term)) score += 2;
+				else if (entry.keywords.includes(term)) score += 1;
+				else return { entry, score: -1 };
+			}
+
+			return { entry, score };
+		})
+		.filter((result) => result.score > 0)
+		.sort((a, b) => b.score - a.score)
+		.map((result) => result.entry);
 }

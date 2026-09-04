@@ -1,0 +1,42 @@
+---
+title: Permissões
+summary: Para que serve cada permissão, e qual módulo para de funcionar sem ela.
+---
+
+A Tessera pede a união do que os módulos dela precisam, e nada além. Esta página existe para
+você entregar a quem tem que aprovar o convite.
+
+| Permissão                   | Usada por                                        | Sem ela                                           |
+| --------------------------- | ------------------------------------------------ | ------------------------------------------------- |
+| `Ver Canal`                 | Todo módulo                                      | O bot não lê nem publica em lugar nenhum          |
+| `Enviar Mensagens`          | Todo módulo                                      | Nada é publicado                                  |
+| `Inserir Links`             | Boas-vindas, Registros, Sorteios                 | As mensagens caem para texto puro                 |
+| `Gerenciar Cargos`          | Boas-vindas, Níveis, Cargos por reação, Economia | Nenhum cargo é entregue                           |
+| `Moderar Membros`           | Moderação, AutoMod                               | Os castigos falham                                |
+| `Expulsar Membros`          | Moderação                                        | O comando de expulsar é recusado                  |
+| `Banir Membros`             | Moderação                                        | O comando de banir é recusado                     |
+| `Gerenciar Mensagens`       | AutoMod                                          | As regras avisam e registram, mas nunca apagam    |
+| `Gerenciar Canais`          | Tickets                                          | Nenhum canal de ticket pode ser criado            |
+| `Anexar Arquivos`           | Tickets                                          | Os históricos não são guardados                   |
+| `Ver Registro de Auditoria` | Registros                                        | Os eventos não podem ser ligados a quem os causou |
+| `Adicionar Reações`         | Cargos por reação, Sorteios                      | Os painéis por reação não funcionam               |
+
+## Hierarquia de cargos
+
+As permissões do Discord são só metade da história. Um bot nunca age sobre um membro, nem
+entrega um cargo, que esteja **acima do cargo mais alto dele** — nenhuma permissão passa por
+cima disso. A maioria dos relatos de "o bot ignora meus moderadores" é isto.
+
+```text
+Dono
+Admin
+Tessera          ← tudo abaixo desta linha pode ser gerenciado e entregue
+Moderador
+Membro
+Silenciado
+```
+
+<Callout tone="danger" title="Administrador não é atalho">
+	Dar Administrador não levanta a regra da hierarquia, e concede muito mais do que qualquer módulo
+	usa. Posicione o cargo em vez disso.
+</Callout>

@@ -389,7 +389,8 @@
 			"default": "Padrão",
 			"whatItDoes": "O que faz",
 			"command": "Comando",
-			"cooldown": "Tempo de espera"
+			"cooldown": "Tempo de espera",
+			"module": "Módulo"
 		},
 		"search": {
 			"label": "Buscar na documentação",
@@ -399,7 +400,27 @@
 			"escape": "esc",
 			"empty": "Digite para buscar em {count} páginas.",
 			"noMatch": "Nada corresponde a “{query}”."
-		}
+		},
+		"types": {
+			"string": "Texto",
+			"number": "Número",
+			"bool": "Liga ou desliga",
+			"channel": "Canal",
+			"role": "Cargo",
+			"enum": "Escolha",
+			"multi-enum": "Escolhas",
+			"list": "Lista",
+			"duration": "Duração",
+			"embed": "Embed"
+		},
+		"required": "Obrigatório",
+		"noDefault": "nenhum",
+		"defaultOn": "ligado",
+		"defaultOff": "desligado",
+		"noFields": "Este módulo não tem nada para configurar — ele liga ou desliga.",
+		"noCommandsForModule": "Este módulo não tem comandos de barra próprios.",
+		"catalogUnavailable": "Não deu para carregar a referência. Recarregue a página daqui a pouco.",
+		"noModule": "Todo servidor"
 	},
 	"auth": {
 		"signIn": "Entrar",
@@ -2249,6 +2270,379 @@
 			"remove": {
 				"label": "Remover a Tessera",
 				"description": "Tirar o bot deste servidor."
+			}
+		}
+	},
+	"registry": {
+		"commands": {
+			"balance": {
+				"description": "Veja o que um membro tem na carteira"
+			},
+			"ban": {
+				"description": "Bane um membro do servidor e registra o caso"
+			},
+			"case": {
+				"description": "Trabalha sobre um caso já registrado"
+			},
+			"config": {
+				"description": "Configure a Tessera neste servidor"
+			},
+			"daily": {
+				"description": "Pega o que o servidor paga todo dia"
+			},
+			"eco": {
+				"description": "Muda o que um membro tem na carteira"
+			},
+			"escalation": {
+				"description": "A escada que pune reincidente sozinha"
+			},
+			"giveaway": {
+				"description": "Faça um sorteio neste servidor"
+			},
+			"history": {
+				"description": "Vê os casos registrados contra um membro"
+			},
+			"inventory": {
+				"description": "Veja o que um membro comprou"
+			},
+			"kick": {
+				"description": "Remove um membro do servidor e registra o caso"
+			},
+			"leaderboard": {
+				"description": "Veja quem subiu mais neste servidor"
+			},
+			"logging": {
+				"description": "Escolhe onde cada tipo de evento é publicado"
+			},
+			"mute": {
+				"description": "Entrega o cargo de mudo até alguém retirar"
+			},
+			"note": {
+				"description": "Registra algo sobre um membro que só a equipe vê"
+			},
+			"pay": {
+				"description": "Mande parte do seu dinheiro para outro membro"
+			},
+			"rank": {
+				"description": "Veja o quanto um membro subiu"
+			},
+			"richest": {
+				"description": "Veja quem tem mais neste servidor"
+			},
+			"shop": {
+				"description": "Veja o que o servidor vende e compre"
+			},
+			"softban": {
+				"description": "Remove um membro, apaga as mensagens recentes e deixa ele voltar"
+			},
+			"ticket": {
+				"description": "Mexe no ticket que este canal guarda"
+			},
+			"timeout": {
+				"description": "Impede um membro de falar por um tempo e registra o caso"
+			},
+			"unban": {
+				"description": "Revoga um banimento e registra o caso"
+			},
+			"unmute": {
+				"description": "Devolve a fala a um membro e registra o caso"
+			},
+			"untimeout": {
+				"description": "Revoga um silenciamento e registra o caso"
+			},
+			"warn": {
+				"description": "Adverte um membro e registra o caso"
+			},
+			"work": {
+				"description": "Bate um turno e receba por isso"
+			},
+			"xp": {
+				"description": "Muda o xp que um membro tem"
+			}
+		},
+		"durations": {
+			"10m": "10 minutos",
+			"1d": "1 dia",
+			"1h": "1 hora",
+			"1w": "1 semana",
+			"28d": "28 dias",
+			"2w": "2 semanas",
+			"5m": "5 minutos",
+			"60s": "60 segundos"
+		},
+		"moderation": {
+			"label": {
+				"ban": "Banimento",
+				"kick": "Expulsão",
+				"mute": "Mute",
+				"softban": "Softban",
+				"timeout": "Silenciamento",
+				"warn": "Advertência"
+			}
+		},
+		"modules": {
+			"automod": {
+				"description": "Pega o que quebra as regras antes de um moderador ver",
+				"label": "AutoMod"
+			},
+			"economy": {
+				"description": "Uma moeda que os membros ganham, mandam e gastam",
+				"fields": {
+					"currencyName": {
+						"description": "Como o dinheiro se chama, tipo Fragmentos",
+						"label": "Nome da moeda"
+					},
+					"currencySymbol": {
+						"description": "Aparece ao lado de todo valor",
+						"label": "Símbolo da moeda"
+					},
+					"dailyAmount": {
+						"description": "Quanto o /daily paga",
+						"label": "Valor do diário"
+					},
+					"dailyCooldownHours": {
+						"description": "Quanto tempo entre um diário e o outro",
+						"label": "Intervalo do diário em horas"
+					},
+					"startingBalance": {
+						"description": "O que o membro tem na primeira vez que ganha",
+						"label": "Saldo inicial"
+					},
+					"streakBonus": {
+						"description": "Somado por dia já mantido. Zero paga igual todo dia",
+						"label": "Bônus de sequência"
+					},
+					"transferTaxPercent": {
+						"description": "A porcentagem queimada em todo pagamento entre membros",
+						"label": "Taxa de transferência"
+					},
+					"workAmount": {
+						"description": "Quanto o /work paga",
+						"label": "Valor do trabalho"
+					},
+					"workCooldownMinutes": {
+						"description": "Quanto tempo entre um turno e o outro",
+						"label": "Intervalo do trabalho em minutos"
+					}
+				},
+				"label": "Economia"
+			},
+			"giveaways": {
+				"description": "Prêmios em que os membros entram por um botão",
+				"fields": {
+					"defaultWinners": {
+						"description": "Quantas pessoas ganham quando o comando não diz",
+						"label": "Ganhadores por padrão"
+					},
+					"dmWinners": {
+						"description": "Mandar uma mensagem direta a quem ganhar, com o link do sorteio",
+						"label": "Avisar quem ganhou"
+					}
+				},
+				"label": "Sorteios"
+			},
+			"levels": {
+				"description": "Dá xp por participar, e cargos por subir",
+				"fields": {
+					"announce": {
+						"description": "Fala alguma coisa quando alguém alcança um nível novo",
+						"label": "Anunciar quem sobe"
+					},
+					"announceChannelId": {
+						"description": "Onde os níveis são anunciados",
+						"label": "Canal do anúncio"
+					},
+					"announceEmbed": {
+						"description": "O embed enviado quando alguém sobe de nível",
+						"label": "Card do anúncio"
+					},
+					"announceInPlace": {
+						"description": "Responde no canal em que o membro estava conversando",
+						"label": "Anunciar onde falou"
+					},
+					"announceMessage": {
+						"description": "Use {user}, {user.mention}, {level} e {server}",
+						"label": "Anúncio"
+					},
+					"announceUseEmbed": {
+						"description": "Manda um embed no lugar do texto puro",
+						"label": "Anunciar com card"
+					},
+					"cooldownSeconds": {
+						"description": "Quanto o membro espera até uma mensagem valer de novo",
+						"label": "Intervalo"
+					},
+					"curve": {
+						"description": "Quanto xp cada nível pede. Maior sobe mais devagar",
+						"label": "Dificuldade"
+					},
+					"noXpChannelIds": {
+						"description": "Nada dito nesses canais dá xp",
+						"label": "Canais sem xp"
+					},
+					"noXpRoleIds": {
+						"description": "Quem tem esses cargos não ganha xp",
+						"label": "Cargos sem xp"
+					},
+					"voiceXpPerMinute": {
+						"description": "Quanto vale um minuto em call. Zero desliga a voz",
+						"label": "XP de voz por minuto"
+					},
+					"xpMax": {
+						"description": "O teto do que uma mensagem vale",
+						"label": "XP máximo por mensagem"
+					},
+					"xpMin": {
+						"description": "O piso do que uma mensagem vale",
+						"label": "XP mínimo por mensagem"
+					}
+				},
+				"label": "Níveis"
+			},
+			"logging": {
+				"description": "Publica o que acontece no servidor",
+				"fields": {
+					"ignoredChannelIds": {
+						"description": "Nada que acontece nestes canais é registrado",
+						"label": "Canais ignorados"
+					},
+					"ignoredRoleIds": {
+						"description": "Nada feito por quem tem estes cargos é registrado",
+						"label": "Cargos ignorados"
+					}
+				},
+				"label": "Registro"
+			},
+			"moderation": {
+				"description": "Registra advertências e punições com número de caso",
+				"fields": {
+					"appealUrl": {
+						"description": "Link de recurso enviado na mensagem direta. Vazio não envia",
+						"label": "Link de recurso"
+					},
+					"banPurgeDays": {
+						"description": "Dias de mensagens apagados ao banir, 0 a 7. Padrão 0",
+						"label": "Dias de mensagem que o ban apaga"
+					},
+					"dmExtra": {
+						"description": "Seu texto no fim da mensagem direta da punição",
+						"label": "Texto extra na mensagem direta"
+					},
+					"dmOnAction": {
+						"description": "Avisa o membro sobre o que aconteceu com ele",
+						"label": "Avisar por mensagem direta"
+					},
+					"escalationAutoActions": {
+						"description": "O que ficar de fora vira chamado da staff",
+						"label": "O que o motor faz sozinho"
+					},
+					"escalationChannelId": {
+						"description": "Onde o escalonamento pede decisão humana",
+						"label": "Canal do chamado da staff"
+					},
+					"escalationPingRoleIds": {
+						"description": "Ninguém é mencionado se ficar vazio",
+						"label": "Cargos que o chamado menciona"
+					},
+					"escalationWindowDays": {
+						"description": "Dias em que uma infração ainda soma pontos. Padrão 30",
+						"label": "Dias em que os pontos contam"
+					},
+					"logChannelId": {
+						"description": "Onde cada caso é publicado",
+						"label": "Canal de registro"
+					},
+					"mutedRoleId": {
+						"description": "O cargo que o /mute entrega",
+						"label": "Cargo de mudo"
+					},
+					"protectedRoleIds": {
+						"description": "Remova o cargo antes de punir a pessoa",
+						"label": "Cargos protegidos"
+					},
+					"requireReason": {
+						"description": "Recusa punição enviada sem motivo",
+						"label": "Exigir motivo"
+					},
+					"softbanPurgeDays": {
+						"description": "Dias de mensagens apagados no softban, 0 a 7. Padrão 1",
+						"label": "Dias de mensagem que o softban apaga"
+					},
+					"timeoutDefault": {
+						"description": "Duração usada quando o /timeout não diz nenhuma",
+						"label": "Timeout padrão"
+					}
+				},
+				"label": "Moderação"
+			},
+			"reaction-roles": {
+				"description": "Botões que o membro aperta para pegar um cargo sozinho",
+				"label": "Cargos por botão"
+			},
+			"scheduled": {
+				"description": "Mensagens que o bot publica na hora que você marcar",
+				"label": "Mensagens agendadas"
+			},
+			"tickets": {
+				"description": "Canais privados que o membro abre para falar com a equipe",
+				"fields": {
+					"askForRating": {
+						"description": "Pede uma nota ao membro antes de o canal sumir",
+						"label": "Perguntar como foi"
+					},
+					"autoCloseHours": {
+						"description": "Horas sem mensagem até o ticket se fechar sozinho. Zero nunca fecha",
+						"label": "Fechar por silêncio"
+					},
+					"closeDelaySeconds": {
+						"description": "Segundos entre fechar o ticket e remover o canal",
+						"label": "Espera antes de apagar"
+					},
+					"transcriptChannelId": {
+						"description": "Onde a conversa é arquivada quando o ticket fecha. Vazio não guarda nada",
+						"label": "Canal do histórico"
+					}
+				},
+				"label": "Tickets"
+			},
+			"welcome": {
+				"description": "Recebe quem entra e entrega os primeiros cargos",
+				"fields": {
+					"autoRoles": {
+						"description": "Cargos entregues a todo mundo que entra",
+						"label": "Cargos automáticos"
+					},
+					"channelId": {
+						"description": "Onde a mensagem de boas-vindas é publicada",
+						"label": "Canal"
+					},
+					"deleteAfter": {
+						"description": "Segundos até apagar a mensagem. Deixe vazio para manter",
+						"label": "Apagar depois de"
+					},
+					"embed": {
+						"description": "O layout do embed, editado no painel",
+						"label": "Embed"
+					},
+					"message": {
+						"description": "Texto enviado na entrada. Use {user} e {server} como marcadores",
+						"label": "Mensagem"
+					},
+					"pingMode": {
+						"description": "Como o novo membro é mencionado",
+						"label": "Menção",
+						"options": {
+							"ghost": "Mencionar e apagar em seguida",
+							"inline": "Mencionar na mensagem",
+							"none": "Não mencionar"
+						}
+					},
+					"useEmbed": {
+						"description": "Envia as boas-vindas como embed em vez de texto simples",
+						"label": "Usar embed"
+					}
+				},
+				"label": "Boas-vindas"
 			}
 		}
 	}

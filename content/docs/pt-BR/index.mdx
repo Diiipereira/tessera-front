@@ -1,0 +1,49 @@
+---
+title: Introdução
+summary: O que é a Tessera, e a única ideia sobre a qual o resto da documentação se apoia.
+---
+
+A Tessera é um bot do Discord com dez módulos e um painel para configurá-los. Tudo que o bot faz
+começa desligado até você ligar, e cada módulo tem a própria página aqui.
+
+<Callout tone="info" title="As tabelas de referência são geradas">
+	Toda tabela de opções e toda lista de comandos destas páginas é lida do config registry do próprio
+	bot quando a página carrega. Elas não conseguem descrever uma configuração que o bot não tem, nem
+	ficar para trás de uma que ele ganhou.
+</Callout>
+
+## Duas portas, uma sala
+
+Uma configuração mudada por comando de barra e a mesma configuração mudada no painel são **a
+mesma configuração**. Não existe sincronizar, não existe importar, não existe botão de "enviar
+para o Discord" — as duas são portas para uma config só, e a que você usou por último é o que o
+bot está fazendo agora.
+
+Isso parece óbvio e é a coisa mais difícil de construir no produto. É também por isso que você
+pode entregar o painel para quem nunca usou um comando de barra, entregar os comandos de barra
+para quem nunca abre um navegador, e os dois estarem certos.
+
+## Por onde começar
+
+<Steps>
+	<Step title="Adicione o bot">
+		Uma tela de OAuth. Você precisa de **Gerenciar Servidor** no servidor do Discord onde vai
+		adicioná-lo.
+	</Step>
+	<Step title="Ligue um módulo">
+		Boas-vindas costuma ser o primeiro, porque é o que os membros percebem.
+	</Step>
+	<Step title="Volte para o resto">
+		Cada módulo funciona sozinho. Nada aqui precisa de outra coisa daqui para ser útil.
+	</Step>
+</Steps>
+
+## Convenções destas páginas
+
+| Você vê           | Quer dizer                                                         |
+| ----------------- | ------------------------------------------------------------------ |
+| `código`          | Um valor literal, o nome de uma permissão, ou algo que você digita |
+| **negrito**       | Algo com uma consequência que vale ler duas vezes                  |
+| Um aviso azul     | Contexto que você provavelmente quer                               |
+| Um aviso amarelo  | Um limite ou uma exigência de plano                                |
+| Um aviso vermelho | Algo que vai te morder                                             |

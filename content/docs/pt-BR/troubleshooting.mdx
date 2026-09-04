@@ -1,0 +1,44 @@
+---
+title: Resolvendo problemas
+summary: As falhas que mais aparecem, e o que de fato as causa.
+---
+
+Quase todo relato cai em uma destas. Estão em ordem de quantas vezes acabam sendo a resposta.
+
+## O bot não faz nada
+
+1. O módulo está desligado. Todo módulo nasce desligado e continua assim até você ligar.
+2. O bot não enxerga o canal. Um canal que o bot não vê fica travado em todo seletor — se o seu
+   dá para escolher, não é isto.
+3. O cargo da Tessera está abaixo do membro sobre quem você está agindo. Posição vence
+   permissão, sempre.
+4. O comando está escondido daquele membro. O `/config` e os comandos administrativos são
+   restringidos pelo próprio Discord, em Configurações do Servidor → Integrações.
+
+## Os cargos não estão sendo entregues
+
+Um bot só entrega cargos **abaixo do cargo mais alto dele**. Cargos acima ficam travados no
+seletor exatamente por isso, então se o cargo dava para escolher e mesmo assim não é entregue,
+confira se ele mudou de lugar depois.
+
+## Um comando de barra não aparece no Discord
+
+Nomes de comando recém-registrados podem levar um minuto para se espalhar, e o Discord guarda
+isso em cache por cliente. Reconectar o cliente do Discord é mais rápido que esperar.
+
+## Uma gravação foi recusada
+
+Outra pessoa salvou o mesmo módulo enquanto sua página estava aberta. Recarregue e olhe o log de
+auditoria — ele mostra quem, quando e o que mudou — e refaça sua alteração por cima da dela.
+
+## Um comando rodou e a resposta foi uma recusa
+
+Isso é o bot funcionando. Uma recusa — hierarquia de cargo, cargo protegido, um bot como alvo —
+é respondida com uma mensagem legível e conta como execução bem-sucedida na tela de
+**Comandos**. O que aquela tela conta como falha é o bot ter quebrado, não um moderador ter
+ouvido não.
+
+<Callout tone="info" title="Ainda travado">
+	O servidor de suporte é o caminho mais rápido, e o registro de auditoria da mudança costuma
+	responder a pergunta antes de alguém precisar.
+</Callout>

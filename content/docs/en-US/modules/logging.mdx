@@ -1,0 +1,29 @@
+---
+title: Logging
+summary: Write server events to a channel. Turn on only what you will actually read.
+---
+
+Logging writes what happened to a channel you choose. The temptation is to turn everything on; the advice is not to, because a log nobody reads is worse than no log — it looks like coverage.
+
+**Permissions:** `View Channel`, `Send Messages`, `Embed Links`, `View Audit Log`
+
+## Setting it up
+
+<Steps>
+	<Step title="Pick the channel">Make it staff-only. Deleted message content ends up here.</Step>
+	<Step title="Choose the events">
+		Start with joins, leaves, deletes and moderation actions. Add more when you find yourself
+		wishing you had them.
+	</Step>
+	<Step title="Exclude the noise">
+		Ignored channels are absolute — nothing from them is ever logged, whatever the events say.
+	</Step>
+</Steps>
+
+## Options
+
+<Fields module="logging" />
+
+## Commands
+
+<Commands module="logging" />

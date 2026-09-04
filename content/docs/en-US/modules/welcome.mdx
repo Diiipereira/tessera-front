@@ -1,0 +1,54 @@
+---
+title: Welcome
+summary: Greet new members and give them their first roles.
+---
+
+Welcome posts a message the moment someone joins and can hand them a role on the way in. It is
+the module most servers turn on first, because it is the one members notice.
+
+**Permissions:** `View Channel`, `Send Messages`, `Embed Links`, `Manage Roles`
+
+## Setting it up
+
+<Steps>
+	<Step title="Pick the channel">
+		Where the greeting is posted. The bot needs **Send Messages** there, and **Embed Links** as well
+		if you send an embed.
+	</Step>
+	<Step title="Write the message">
+		Plain text or an embed. Both accept the same variables — `{user}` and `{server}`.
+	</Step>
+	<Step title="Turn it on">
+		The module stays off until you enable it, and it cannot be enabled without a channel. Nothing is
+		posted while it is off.
+	</Step>
+</Steps>
+
+## Options
+
+<Fields module="welcome" />
+
+## Variables
+
+Every message field in this module accepts the same two. That includes each part of an embed —
+its title, its description and its fields. Anything the bot cannot resolve is left as written
+rather than blanked, so a typo is visible instead of invisible.
+
+| Variable   | Becomes               |
+| ---------- | --------------------- |
+| `{user}`   | The member who joined |
+| `{server}` | The server name       |
+
+Whether `{user}` becomes a real ping or just a name is decided by the module's mention setting,
+not by the variable.
+
+<Callout tone="info" title="Ghost mentions are a separate message">
+	With the mention set to *ghost*, the bot posts the ping on its own and deletes it a moment later,
+	so the member is notified without the greeting carrying a mention. In that mode `{user}` in your
+	text becomes the name, not a ping — otherwise the member would be pinged twice and only one of
+	them would disappear.
+</Callout>
+
+## Commands
+
+<Commands module="welcome" />

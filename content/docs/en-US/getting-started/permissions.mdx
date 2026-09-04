@@ -1,0 +1,42 @@
+---
+title: Permissions
+summary: What each permission is for, and which module stops working without it.
+---
+
+Tessera asks for the union of what its modules need, and nothing beyond it. This page exists so
+you can hand it to whoever has to approve the invite.
+
+| Permission         | Used by                                  | Without it                                     |
+| ------------------ | ---------------------------------------- | ---------------------------------------------- |
+| `View Channel`     | Every module                             | The bot cannot read or post anywhere           |
+| `Send Messages`    | Every module                             | Nothing is ever posted                         |
+| `Embed Links`      | Welcome, Logging, Giveaways              | Messages fall back to plain text               |
+| `Manage Roles`     | Welcome, Levels, Reaction roles, Economy | Roles are never granted                        |
+| `Moderate Members` | Moderation, AutoMod                      | Timeouts fail                                  |
+| `Kick Members`     | Moderation                               | The kick command is refused                    |
+| `Ban Members`      | Moderation                               | The ban command is refused                     |
+| `Manage Messages`  | AutoMod                                  | Rules can warn and log but never delete        |
+| `Manage Channels`  | Tickets                                  | No ticket channel can be created               |
+| `Attach Files`     | Tickets                                  | Transcripts are not saved                      |
+| `View Audit Log`   | Logging                                  | Events cannot be attributed to who caused them |
+| `Add Reactions`    | Reaction roles, Giveaways                | Reaction-based panels do not work              |
+
+## Role hierarchy
+
+Discord permissions are only half of it. A bot can never act on a member, or grant a role, that
+sits **above its own highest role** — no permission overrides that. Most "the bot ignores my
+moderators" reports are this.
+
+```text
+Owner
+Admin
+Tessera          ← everything below this line can be actioned and granted
+Moderator
+Member
+Muted
+```
+
+<Callout tone="danger" title="Administrator is not a shortcut">
+	Granting Administrator does not lift the hierarchy rule, and it grants far more than any module
+	uses. Position the role instead.
+</Callout>

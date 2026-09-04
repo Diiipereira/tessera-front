@@ -1,0 +1,38 @@
+---
+title: Referência de comandos
+summary: Todo comando de barra que o bot publica, e o módulo a que pertence.
+---
+
+A lista abaixo é lida do catálogo do próprio bot, que é fixado contra o payload enviado ao
+Discord. Um comando não aparece aqui sem ser publicado, e não é publicado sem aparecer aqui.
+
+Um comando só funciona com o módulo dele ligado. O `/config` é a exceção — é por ele que os
+módulos são ligados, então ele funciona com todo o resto desligado.
+
+<Commands />
+
+## Quem pode rodar o quê
+
+O `/config` e os comandos administrativos são publicados com uma permissão exigida, então o
+Discord os esconde de quem não a tem.
+
+<Callout tone="info" title="A permissão mora no Discord, não aqui">
+	Para mudar quem pode rodar um comando, abra Configurações do Servidor → Integrações → Tessera no
+	cliente do Discord. A Tessera não guarda uma segunda cópia dessa configuração, então não há o que
+	sincronizar nem o que discordar.
+</Callout>
+
+## Subcomandos
+
+Vários comandos são uma família, não um verbo só. O `/config` tem um subcomando por módulo, o
+`/case` tem `revoke`, o `/shop` tem `view` e `buy`. A tela de **Comandos** do painel abre o uso
+de cada comando por subcomando, então dá para ver qual parte da família é realmente usada.
+
+## De onde vêm as contagens
+
+Toda execução é registrada com o nome do comando, se o bot respondeu, e quanto tempo levou. O
+painel mostra isso por servidor em 7, 30 ou 90 dias inteiros em UTC — a mesma janela do gráfico
+da visão geral, então os dois nunca discordam sobre o mesmo período.
+
+Uma recusa não é uma falha. Quando o bot responde _você não pode fazer isso com um bot_, o
+comando fez o trabalho dele e conta como sucesso. A coluna de falhas conta o bot ter quebrado.

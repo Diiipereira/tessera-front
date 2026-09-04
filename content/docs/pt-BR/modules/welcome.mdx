@@ -1,0 +1,54 @@
+---
+title: Boas-vindas
+summary: Receba os membros novos e dê a eles os primeiros cargos.
+---
+
+O Boas-vindas publica uma mensagem no instante em que alguém entra, e pode entregar um cargo já
+na porta. É o módulo que a maioria dos servidores liga primeiro, porque é o que os membros
+percebem.
+
+**Permissões:** `Ver Canal`, `Enviar Mensagens`, `Inserir Links`, `Gerenciar Cargos`
+
+## Configurando
+
+<Steps>
+	<Step title="Escolha o canal">
+		Onde a saudação é publicada. O bot precisa de **Enviar Mensagens** ali, e de **Inserir Links**
+		também se a mensagem for um embed.
+	</Step>
+	<Step title="Escreva a mensagem">
+		Texto puro ou embed. Os dois aceitam as mesmas variáveis — `{user}` e `{server}`.
+	</Step>
+	<Step title="Ligue">
+		O módulo fica desligado até você ligar, e não pode ser ligado sem um canal. Nada é publicado
+		enquanto ele está desligado.
+	</Step>
+</Steps>
+
+## Opções
+
+<Fields module="welcome" />
+
+## Variáveis
+
+Todo campo de mensagem deste módulo aceita as mesmas duas. Isso inclui cada parte de um embed —
+título, descrição e campos. O que o bot não conseguir resolver fica como foi escrito em vez de
+sumir, então um erro de digitação aparece em vez de ficar invisível.
+
+| Variável   | Vira                |
+| ---------- | ------------------- |
+| `{user}`   | O membro que entrou |
+| `{server}` | O nome do servidor  |
+
+Se `{user}` vira uma menção de verdade ou só o nome é decidido pela configuração de menção do
+módulo, não pela variável.
+
+<Callout tone="info" title="A menção fantasma é uma mensagem separada">
+	Com a menção em *fantasma*, o bot publica o ping sozinho e o apaga logo depois, então o membro é
+	notificado sem a saudação carregar uma menção. Nesse modo o `{user}` do seu texto vira o nome, não
+	um ping — senão o membro seria mencionado duas vezes e só uma delas sumiria.
+</Callout>
+
+## Comandos
+
+<Commands module="welcome" />

@@ -1,0 +1,41 @@
+---
+title: Adicionando o bot
+summary: A tela de OAuth, o que ela pede, e o que fazer quando o bot fica quieto.
+---
+
+Adicionar a Tessera é uma tela de OAuth. O Discord pergunta em qual servidor e quais permissões
+conceder; a Tessera não pede mais nada.
+
+<Callout tone="info" title="Você precisa de Gerenciar Servidor">
+	O Discord só lista servidores onde você tem **Gerenciar Servidor**. Se um servidor não aparece no
+	seletor, é por causa dessa permissão.
+</Callout>
+
+## Os passos
+
+<Steps>
+	<Step title="Aperte Adicionar ao Discord">
+		Na página inicial, ou pelo seletor de servidores dentro do painel.
+	</Step>
+	<Step title="Escolha o servidor">
+		Só aparecem os servidores onde você tem Gerenciar Servidor.
+	</Step>
+	<Step title="Não mexa nas permissões">
+		Os padrões são a união do que os módulos precisam. Tirar uma aqui não quebra o bot — o módulo
+		que precisa dela simplesmente recusa a salvar, e diz qual permissão está faltando.
+	</Step>
+	<Step title="Abra o painel">
+		O servidor aparece no seletor poucos segundos depois de o bot entrar.
+	</Step>
+</Steps>
+
+## O bot entrou e não faz nada
+
+Isso é o esperado. Todo módulo começa desligado até você ligar. Um bot recém-adicionado fica na
+lista de membros e espera.
+
+<Callout tone="warning" title="A posição do cargo pesa mais que a permissão">
+	Um bot não age sobre um membro cujo cargo mais alto está acima do dele, tenha a permissão que
+	tiver. Se os comandos funcionam com membros comuns e falham com moderadores, arraste o cargo da
+	Tessera para cima.
+</Callout>

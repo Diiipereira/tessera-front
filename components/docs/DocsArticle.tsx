@@ -1,17 +1,26 @@
 import { ChevronRight } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
-import { adjacentPages, docHeadings, groupOf } from '@/lib/docs';
+import type { ReactNode } from 'react';
+import { adjacentPages } from '@/lib/docs/content';
 import type { DocPage } from '@/lib/docs/types';
-import { DocBody } from './DocBody';
+import type { SupportedLocale } from '@/lib/locale';
 import { DocsPager } from './DocsPager';
 import { DocsToc } from './DocsToc';
 
-export function DocsArticle({ page }: { page: DocPage }) {
-	const t = useTranslations('docs');
-	const headings = docHeadings(page);
-	const neighbours = adjacentPages(page.slug);
-	const group = groupOf(page.slug);
+export async function DocsArticle({
+	locale,
+	page,
+	children
+}: {
+	locale: SupportedLocale;
+	page: DocPage;
+	children: ReactNode;
+}) {
+	const [t, neighbours] = await Promise.all([
+		getTranslations('docs'),
+		adjacentPages(locale, page.slug)
+	]);
 
 	return (
 		<>
@@ -23,12 +32,8 @@ export function DocsArticle({ page }: { page: DocPage }) {
 					<Link href="/docs" className="no-underline hover:text-text hover:no-underline">
 						{t('root')}
 					</Link>
-					{group ? (
-						<>
-							<ChevronRight className="size-3.5 shrink-0 text-text-subtle" aria-hidden="true" />
-							<span>{t(`groups.${group.id}`)}</span>
-						</>
-					) : null}
+					<ChevronRight className="size-3.5 shrink-0 text-text-subtle" aria-hidden="true" />
+					<span>{t(`groups.${page.group}`)}</span>
 					<ChevronRight className="size-3.5 shrink-0 text-text-subtle" aria-hidden="true" />
 					<span className="truncate text-text">{page.title}</span>
 				</nav>
@@ -38,12 +43,13 @@ export function DocsArticle({ page }: { page: DocPage }) {
 					<p className="mt-2 text-body-lg text-pretty text-text-muted">{page.summary}</p>
 				</header>
 
-				<DocBody blocks={page.blocks} />
+				<div className="flex flex-col gap-4">{children}</div>
+
 				<DocsPager previous={neighbours.previous} next={neighbours.next} />
 			</main>
 
 			<aside className="sticky top-24 hidden w-52 shrink-0 xl:block">
-				<DocsToc headings={headings} />
+				<DocsToc headings={page.headings} />
 			</aside>
 		</>
 	);

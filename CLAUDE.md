@@ -272,8 +272,55 @@ section that sets its own padding will drift out of step with the others.
 
 ## Documentation
 
-`/docs` is nineteen pages in four groups, under `app/(public)/docs/`. The content lives in
-`lib/docs/pages/` as typed data and the chrome in `components/docs/`.
+`/docs` is eighteen pages in four groups, under `app/(public)/docs/`. The content lives in
+`content/docs/<locale>/**.mdx` and the chrome in `components/docs/`.
+
+**A documentação virou MDX bilíngue em 04/09, e não virou Docusaurus.** O Docusaurus resolveria
+o formato de autoria e cobraria um app inteiro por isso: build próprio, Infima no lugar do
+Tailwind, deploy separado, e os links com o painel (`docsHref` do `ModulePage`, o botão Painel
+que lê o último servidor do `localStorage`) virando encanamento entre apps. E não tocaria no
+defeito real, que era **a fonte das tabelas**, não o gerador. O `@next/mdx` 16.3.4 dá a autoria
+em Markdown mantendo design system, busca, deploy e os links.
+
+**O conteúdo era objeto TypeScript e as tabelas eram mock.** O `commands.ts` das docs montava a
+referência a partir do `mockCommands`; o registry declara **51 campos em 10 módulos** e as
+páginas escreviam **11 à mão**. `custom-commands` tinha página inteira sem backend, e a prosa
+prometia ligar/desligar comando, restringir por cargo e cooldown — nada disso existe. Agora
+`<Fields module="…" />` e `<Commands />` leem os catálogos da API; o que a doc mostra não
+consegue divergir do que o bot aceita.
+
+**Os catálogos globais viraram públicos, e é isso que permite a doc lê-los sem sessão.**
+`GET /modules` e o novo `GET /commands` ganharam `@Public()` no bot-api — eles são a declaração
+global, sem dado de tenant. O smoke test prende as duas coisas: o par global responde 200 sem
+cookie, e o par por guild continua 401.
+
+**As 167 strings de referência vieram do dicionário do bot, prontas nos dois idiomas.** O
+registry emite chave de i18n, não prosa (`modules.welcome.fields.channelId.label`), e o
+`apps/bot/src/i18n/messages.ts` já resolvia todas em en-US e pt-BR para o payload do Discord.
+Elas foram extraídas **rodando**, não parseando, e entraram no namespace `registry` dos dois
+dicionários do dashboard. **Isso é duplicação entre repositórios, deliberada e temporária:** a
+alternativa era a API mandar prosa numa rota de dados, que é a regra mais forte. A mudança do
+i18n do bot para `libs/shared`, já combinada, dissolve a cópia.
+
+**O locale vem do cookie, então a rota é dinâmica e a URL é uma só.** `/docs/modules/welcome`
+serve as duas línguas conforme quem abre — não há prefixo de idioma nem `hreflang`, que é a
+mesma decisão que o resto do produto já tinha tomado. O `import()` dinâmico com duas variáveis
+(`@/content/docs/${locale}/${slug}.mdx`) é o padrão documentado do Next e compila.
+
+**O índice lê os arquivos; a ordem vem de um manifesto.** `content/docs/nav.ts` lista os slugs
+por grupo, e `lib/docs/content.ts` lê frontmatter e cabeçalhos `##` com `gray-matter`. O
+manifesto é único para as duas línguas, então **um teste falha se uma página existir em um
+idioma e não no outro** — é o que o Docusaurus daria de graça e aqui é explícito. Outro teste
+recusa um `.mdx` fora do manifesto, porque página órfã não é alcançável.
+
+**Os ids de âncora não vêm de `rehype-slug`.** O `headingSlug` do `lib/docs/slug.ts` é usado nos
+dois lugares — no índice, que monta o sumário, e no `mdx-map`, que renderiza o `h2`. Uma função
+só, então a âncora do sumário e o id da seção não têm como divergir; com o plugin seriam duas
+implementações que precisariam concordar.
+
+**A página de planos saiu.** Ela listava limites por plano (5/20/ilimitado, "Economia — Pro")
+que nada aplica, e o selo Pro já tinha sido removido dos cards pelo mesmo motivo. Quando o
+billing entrar ela volta, com números que alguém cobra.
 
 **Docs get their own header, and the sidebar is pinned to the viewport edge.** The first pass
 reused `PublicHeader` and centred everything in the marketing 1200px container, which put two

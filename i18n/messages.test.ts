@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import enUS from '@/messages/en-US.json';
 import ptBR from '@/messages/pt-BR.json';
 import { SUPPORTED_LOCALES } from '@/lib/locale';
-import { DOC_GROUPS } from '@/lib/docs';
+import { DOC_GROUP_IDS } from '@/content/docs/nav';
 import { MODULE_IDS } from '@/lib/types/modules';
 
 type Tree = { [key: string]: string | Tree };
@@ -80,10 +80,10 @@ describe('message dictionaries', () => {
 	});
 
 	it('names every documentation group, which the nav resolves by id', () => {
-		const missing = DOC_GROUPS.flatMap((group) =>
+		const missing = DOC_GROUP_IDS.flatMap((id) =>
 			[...Object.entries(DICTIONARIES)]
-				.filter(([, tree]) => flatten(tree).get(`docs.groups.${group.id}`) === undefined)
-				.map(([locale]) => `${locale}: docs.groups.${group.id}`)
+				.filter(([, tree]) => flatten(tree).get(`docs.groups.${id}`) === undefined)
+				.map(([locale]) => `${locale}: docs.groups.${id}`)
 		);
 
 		expect(missing).toEqual([]);

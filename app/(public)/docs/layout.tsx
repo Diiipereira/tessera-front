@@ -1,12 +1,14 @@
+import { getLocale } from 'next-intl/server';
 import type { ReactNode } from 'react';
 import { DocsHeader } from '@/components/docs/DocsHeader';
 import { DocsNavTree } from '@/components/docs/DocsNavTree';
 import { PublicFooter } from '@/components/marketing/PublicFooter';
-import { docNav, docSearchIndex } from '@/lib/docs';
+import { docNav, docSearchIndex } from '@/lib/docs/content';
+import { toLocale } from '@/lib/locale';
 
-export default function DocsLayout({ children }: { children: ReactNode }) {
-	const groups = docNav();
-	const entries = docSearchIndex();
+export default async function DocsLayout({ children }: { children: ReactNode }) {
+	const locale = toLocale(await getLocale());
+	const [groups, entries] = await Promise.all([docNav(locale), docSearchIndex(locale)]);
 
 	return (
 		<div className="flex min-h-svh flex-col lg:h-svh lg:min-h-0 lg:overflow-hidden">

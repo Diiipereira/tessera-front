@@ -1,0 +1,38 @@
+---
+title: Adding the bot
+summary: The OAuth screen, what it asks for, and what to do when the bot is quiet.
+---
+
+Adding Tessera is one OAuth screen. Discord asks you which server, and which permissions to
+grant; Tessera asks for nothing else.
+
+<Callout tone="info" title="You need Manage Server">
+	Discord only lists servers where you hold **Manage Server**. If a server is missing from the
+	picker, that permission is why.
+</Callout>
+
+## The steps
+
+<Steps>
+	<Step title="Press Add to Discord">
+		From the landing page, or from the server picker in the dashboard.
+	</Step>
+	<Step title="Choose the server">Only servers where you have Manage Server appear.</Step>
+	<Step title="Leave the permissions alone">
+		The defaults are the union of what the modules need. Removing one here does not break the bot —
+		the module that needs it simply refuses to save, and says which permission is missing.
+	</Step>
+	<Step title="Open the dashboard">
+		The server appears in the picker within a few seconds of the bot joining.
+	</Step>
+</Steps>
+
+## The bot joined but does nothing
+
+That is expected. Every module is off until you turn it on. A freshly added bot sits in the
+member list and waits.
+
+<Callout tone="warning" title="Role position matters more than permissions">
+	A bot cannot act on a member whose highest role sits above its own, whatever permissions it has.
+	If commands work on regular members and fail on moderators, drag the Tessera role up.
+</Callout>

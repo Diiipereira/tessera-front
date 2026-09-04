@@ -1,0 +1,28 @@
+---
+title: Scheduled messages
+summary: Post on a timer, without anyone having to remember.
+---
+
+A schedule is a message, a channel and a time. Every schedule runs in the server timezone, which is set once in Settings rather than per message.
+
+**Permissions:** `View Channel`, `Send Messages`, `Embed Links`
+
+## Setting it up
+
+<Steps>
+	<Step title="Write the message">Text or an embed, the same composer the other modules use.</Step>
+	<Step title="Pick the days and the time">
+		Days of the week plus one time of day. The server timezone decides what that time means.
+	</Step>
+	<Step title="Leave it running">
+		A message that missed its slot by more than an hour is skipped rather than posted late.
+	</Step>
+</Steps>
+
+## Options
+
+<Fields module="scheduled" />
+
+## Commands
+
+<Commands module="scheduled" />

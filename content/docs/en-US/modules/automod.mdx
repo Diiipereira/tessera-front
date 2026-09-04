@@ -1,0 +1,33 @@
+---
+title: AutoMod
+summary: Rules that act before a human has to. Every hit is written to the case log.
+---
+
+AutoMod watches messages as they arrive and acts on the ones that match a rule you wrote. It runs before any moderator sees the message, which is the point — the worst content is the content nobody had to read.
+
+**Permissions:** `Manage Messages`, `Moderate Members`, `View Audit Log`
+
+## Setting it up
+
+<Steps>
+	<Step title="Add a rule">
+		Pick what it watches for — blocked words, invites, links, mentions, repeated text or caps — then
+		what happens when it fires.
+	</Step>
+	<Step title="Order the rules">
+		Rules are checked top to bottom and **the first rule that fires wins**. Put the narrow ones
+		above the broad ones.
+	</Step>
+	<Step title="Test it before you trust it">
+		Paste something a member might send into the sample box and the dashboard shows which rules
+		would catch it, in order.
+	</Step>
+</Steps>
+
+## Options
+
+<Fields module="automod" />
+
+## Commands
+
+<Commands module="automod" />

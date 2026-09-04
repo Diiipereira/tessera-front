@@ -1,0 +1,43 @@
+---
+title: Como a config é guardada
+summary: Um escritor, duas portas — e por que isso molda todo o resto.
+---
+
+Um campo de configuração na Tessera é declarado **uma vez**. Essa declaração única produz a
+opção do comando de barra, o controle do formulário no painel, a validação que a API roda e o
+formato em que ele é guardado. Nada é escrito duas vezes, que é o único jeito confiável de
+impedir as duas portas de discordarem.
+
+## O que decorre disso
+
+- Um comando de barra e o painel nunca aceitam valores diferentes para o mesmo campo, porque a
+  validação é o mesmo objeto.
+- Um campo acrescentado a um módulo aparece nos dois lugares de uma vez, ou em nenhum.
+- As tabelas de opções desta documentação também são lidas dessa declaração, então elas não
+  conseguem descrever uma configuração que o bot não tem.
+- Não existe passo de importar, exportar ou sincronizar em lugar nenhum do produto.
+
+## O que acontece quando você salva
+
+<Steps>
+	<Step title="A escrita é validada">Pelas mesmas regras que o comando de barra usa.</Step>
+	<Step title="A versão é conferida">
+		Se outra pessoa salvou o mesmo módulo enquanto sua página estava aberta, sua gravação é recusada
+		em vez de sobrescrever a dela em silêncio.
+	</Step>
+	<Step title="O bot é avisado">
+		O processo do gateway larga a cópia em cache na hora, então a próxima mensagem já é tratada com
+		a config nova — não por temporizador.
+	</Step>
+</Steps>
+
+<Callout tone="warning" title="Duas pessoas editando um módulo">
+	A segunda gravação é recusada com uma mensagem dizendo isso. Recarregue, veja o que mudou e salve
+	de novo. Nada se perde, mas nada é mesclado por você também.
+</Callout>
+
+## Tudo fica anotado
+
+Toda gravação é registrada com quem fez, por qual porta entrou, e o antes e o depois exatos de
+cada campo. O log de auditoria do painel é esse registro, e é o mesmo registro venha a mudança
+de um comando de barra, do painel ou da API.

@@ -1,0 +1,40 @@
+---
+title: Command reference
+summary: Every slash command the bot publishes, and the module it belongs to.
+---
+
+The list below is read from the bot's own catalogue, which is pinned against the payload sent
+to Discord. A command cannot appear here without being published, and cannot be published
+without appearing here.
+
+A command only works when its module is on. `/config` is the exception — it is how you turn the
+modules on, so it works whatever else is off.
+
+<Commands />
+
+## Who can run what
+
+`/config` and the administrative commands are published with a required permission, so Discord
+hides them from members who do not hold it.
+
+<Callout tone="info" title="Permissions live in Discord, not here">
+	To change who may run a command, open Server Settings → Integrations → Tessera in the Discord
+	client. Tessera does not keep a second copy of that setting, so there is nothing to keep in sync
+	and nothing that can disagree.
+</Callout>
+
+## Subcommands
+
+Several commands are a family rather than a single verb. `/config` takes one subcommand per
+module, `/case` takes `revoke`, `/shop` takes `view` and `buy`. The **Commands** page in the
+dashboard breaks each command's use down by subcommand, so you can see which part of a family
+is actually being used.
+
+## Where the counts come from
+
+Every run is recorded with the command name, whether the bot answered, and how long it took.
+The dashboard shows that per server over 7, 30 or 90 whole days in UTC — the same window the
+overview chart uses, so the two never disagree about the same period.
+
+A refusal is not a failure. When the bot answers _you cannot do that to a bot_, the command did
+its job and is counted as a success. The failure column counts the bot breaking.

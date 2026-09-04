@@ -389,7 +389,8 @@
 			"default": "Default",
 			"whatItDoes": "What it does",
 			"command": "Command",
-			"cooldown": "Cooldown"
+			"cooldown": "Cooldown",
+			"module": "Module"
 		},
 		"search": {
 			"label": "Search the documentation",
@@ -399,7 +400,27 @@
 			"escape": "esc",
 			"empty": "Type to search {count} pages.",
 			"noMatch": "Nothing matches “{query}”."
-		}
+		},
+		"types": {
+			"string": "Text",
+			"number": "Number",
+			"bool": "On or off",
+			"channel": "Channel",
+			"role": "Role",
+			"enum": "Choice",
+			"multi-enum": "Choices",
+			"list": "List",
+			"duration": "Duration",
+			"embed": "Embed"
+		},
+		"required": "Required",
+		"noDefault": "none",
+		"defaultOn": "on",
+		"defaultOff": "off",
+		"noFields": "This module has nothing to configure — it is on or off.",
+		"noCommandsForModule": "This module has no slash commands of its own.",
+		"catalogUnavailable": "The reference could not be loaded. Reload the page in a moment.",
+		"noModule": "Every server"
 	},
 	"auth": {
 		"signIn": "Sign in",
@@ -2249,6 +2270,379 @@
 			"remove": {
 				"label": "Remove Tessera",
 				"description": "Take the bot out of this server."
+			}
+		}
+	},
+	"registry": {
+		"commands": {
+			"balance": {
+				"description": "See what a member has in their wallet"
+			},
+			"ban": {
+				"description": "Ban a member from the server and record the case"
+			},
+			"case": {
+				"description": "Work on a case that was already recorded"
+			},
+			"config": {
+				"description": "Configure Tessera for this server"
+			},
+			"daily": {
+				"description": "Claim what the server pays every day"
+			},
+			"eco": {
+				"description": "Change what a member has in their wallet"
+			},
+			"escalation": {
+				"description": "The ladder that punishes a repeat offender on its own"
+			},
+			"giveaway": {
+				"description": "Run a giveaway in this server"
+			},
+			"history": {
+				"description": "See the cases recorded against a member"
+			},
+			"inventory": {
+				"description": "See what a member has bought"
+			},
+			"kick": {
+				"description": "Remove a member from the server and record the case"
+			},
+			"leaderboard": {
+				"description": "See who has climbed the furthest in this server"
+			},
+			"logging": {
+				"description": "Choose where each kind of event is posted"
+			},
+			"mute": {
+				"description": "Give a member the muted role until someone lifts it"
+			},
+			"note": {
+				"description": "Record something about a member that only the staff sees"
+			},
+			"pay": {
+				"description": "Send some of your money to another member"
+			},
+			"rank": {
+				"description": "See how far a member has climbed"
+			},
+			"richest": {
+				"description": "See who holds the most in this server"
+			},
+			"shop": {
+				"description": "Look at what the server sells and buy it"
+			},
+			"softban": {
+				"description": "Remove a member, delete their recent messages and let them rejoin"
+			},
+			"ticket": {
+				"description": "Work on the ticket this channel holds"
+			},
+			"timeout": {
+				"description": "Stop a member from talking for a while and record the case"
+			},
+			"unban": {
+				"description": "Lift a ban and record the case"
+			},
+			"unmute": {
+				"description": "Let a member talk again and record the case"
+			},
+			"untimeout": {
+				"description": "Lift a timeout and record the case"
+			},
+			"warn": {
+				"description": "Warn a member and record the case"
+			},
+			"work": {
+				"description": "Put in a shift and get paid"
+			},
+			"xp": {
+				"description": "Change the xp a member has"
+			}
+		},
+		"durations": {
+			"10m": "10 minutes",
+			"1d": "1 day",
+			"1h": "1 hour",
+			"1w": "1 week",
+			"28d": "28 days",
+			"2w": "2 weeks",
+			"5m": "5 minutes",
+			"60s": "60 seconds"
+		},
+		"moderation": {
+			"label": {
+				"ban": "Ban",
+				"kick": "Kick",
+				"mute": "Mute",
+				"softban": "Softban",
+				"timeout": "Timeout",
+				"warn": "Warn"
+			}
+		},
+		"modules": {
+			"automod": {
+				"description": "Catch what breaks the rules before a moderator sees it",
+				"label": "AutoMod"
+			},
+			"economy": {
+				"description": "A currency members earn, send and spend",
+				"fields": {
+					"currencyName": {
+						"description": "What the money is called, such as Shards",
+						"label": "Currency name"
+					},
+					"currencySymbol": {
+						"description": "Shown next to every amount",
+						"label": "Currency symbol"
+					},
+					"dailyAmount": {
+						"description": "What /daily pays",
+						"label": "Daily amount"
+					},
+					"dailyCooldownHours": {
+						"description": "How long between one daily and the next",
+						"label": "Daily cooldown in hours"
+					},
+					"startingBalance": {
+						"description": "What a member has the first time they earn",
+						"label": "Starting balance"
+					},
+					"streakBonus": {
+						"description": "Added for each day already kept. Zero pays the same every day",
+						"label": "Streak bonus"
+					},
+					"transferTaxPercent": {
+						"description": "The percentage burned on every payment between members",
+						"label": "Transfer tax"
+					},
+					"workAmount": {
+						"description": "What /work pays",
+						"label": "Work amount"
+					},
+					"workCooldownMinutes": {
+						"description": "How long between one shift and the next",
+						"label": "Work cooldown in minutes"
+					}
+				},
+				"label": "Economy"
+			},
+			"giveaways": {
+				"description": "Prizes members enter for with a button",
+				"fields": {
+					"defaultWinners": {
+						"description": "How many people win when the command does not say",
+						"label": "Winners by default"
+					},
+					"dmWinners": {
+						"description": "Send whoever wins a direct message with a link to the giveaway",
+						"label": "Tell the winners"
+					}
+				},
+				"label": "Giveaways"
+			},
+			"levels": {
+				"description": "Give xp for taking part, and roles for climbing",
+				"fields": {
+					"announce": {
+						"description": "Say something when a member reaches a new level",
+						"label": "Announce level ups"
+					},
+					"announceChannelId": {
+						"description": "Where level ups are announced",
+						"label": "Announcement channel"
+					},
+					"announceEmbed": {
+						"description": "The embed sent when a member levels up",
+						"label": "Announcement card"
+					},
+					"announceInPlace": {
+						"description": "Answer in the channel the member was talking in",
+						"label": "Announce where they spoke"
+					},
+					"announceMessage": {
+						"description": "Use {user}, {user.mention}, {level} and {server}",
+						"label": "Announcement"
+					},
+					"announceUseEmbed": {
+						"description": "Send an embed instead of plain text",
+						"label": "Announce with a card"
+					},
+					"cooldownSeconds": {
+						"description": "How long a member waits before a message earns again",
+						"label": "Cooldown"
+					},
+					"curve": {
+						"description": "How much xp each level asks for. Higher climbs slower",
+						"label": "Difficulty"
+					},
+					"noXpChannelIds": {
+						"description": "Nothing said in these channels earns xp",
+						"label": "Channels without xp"
+					},
+					"noXpRoleIds": {
+						"description": "Members holding these roles earn no xp",
+						"label": "Roles without xp"
+					},
+					"voiceXpPerMinute": {
+						"description": "What a minute in a voice channel is worth. Zero turns voice off",
+						"label": "Voice xp per minute"
+					},
+					"xpMax": {
+						"description": "The ceiling of the range a message is worth",
+						"label": "Most xp per message"
+					},
+					"xpMin": {
+						"description": "The floor of the range a message is worth",
+						"label": "Least xp per message"
+					}
+				},
+				"label": "Levels"
+			},
+			"logging": {
+				"description": "Post a record of what happens in the server",
+				"fields": {
+					"ignoredChannelIds": {
+						"description": "Nothing that happens in these channels is logged",
+						"label": "Ignored channels"
+					},
+					"ignoredRoleIds": {
+						"description": "Nothing done by someone with these roles is logged",
+						"label": "Ignored roles"
+					}
+				},
+				"label": "Logging"
+			},
+			"moderation": {
+				"description": "Record warnings and punishments with a case number",
+				"fields": {
+					"appealUrl": {
+						"description": "Appeal link sent in the direct message. Empty sends none",
+						"label": "Appeal link"
+					},
+					"banPurgeDays": {
+						"description": "Days of messages deleted on a ban, 0 to 7. Default 0",
+						"label": "Days of messages a ban deletes"
+					},
+					"dmExtra": {
+						"description": "Your own text at the end of the punishment direct message",
+						"label": "Extra text in the direct message"
+					},
+					"dmOnAction": {
+						"description": "Tell the member what happened to them",
+						"label": "Notify by direct message"
+					},
+					"escalationAutoActions": {
+						"description": "Anything left out becomes a staff call",
+						"label": "What the engine does on its own"
+					},
+					"escalationChannelId": {
+						"description": "Where escalation asks a human to decide",
+						"label": "Staff call channel"
+					},
+					"escalationPingRoleIds": {
+						"description": "Nobody is mentioned if left empty",
+						"label": "Roles the staff call mentions"
+					},
+					"escalationWindowDays": {
+						"description": "Days an infraction still adds points. Default 30",
+						"label": "Days the points keep counting"
+					},
+					"logChannelId": {
+						"description": "Where each case is posted",
+						"label": "Log channel"
+					},
+					"mutedRoleId": {
+						"description": "The role /mute hands out",
+						"label": "Muted role"
+					},
+					"protectedRoleIds": {
+						"description": "Remove the role before anyone can be punished",
+						"label": "Protected roles"
+					},
+					"requireReason": {
+						"description": "Refuses a punishment sent with no reason",
+						"label": "Require a reason"
+					},
+					"softbanPurgeDays": {
+						"description": "Days of messages deleted on a softban, 0 to 7. Default 1",
+						"label": "Days of messages a softban deletes"
+					},
+					"timeoutDefault": {
+						"description": "The duration used when /timeout names none",
+						"label": "Default timeout"
+					}
+				},
+				"label": "Moderation"
+			},
+			"reaction-roles": {
+				"description": "Buttons a member presses to give themselves a role",
+				"label": "Reaction roles"
+			},
+			"scheduled": {
+				"description": "Messages the bot posts on a clock you set",
+				"label": "Scheduled messages"
+			},
+			"tickets": {
+				"description": "Private channels members open to reach the staff",
+				"fields": {
+					"askForRating": {
+						"description": "Ask the member to rate the help before the channel goes",
+						"label": "Ask how it went"
+					},
+					"autoCloseHours": {
+						"description": "Hours without a message before a ticket closes itself. Zero never closes",
+						"label": "Close after silence"
+					},
+					"closeDelaySeconds": {
+						"description": "Seconds between closing a ticket and removing the channel",
+						"label": "Delay before deleting"
+					},
+					"transcriptChannelId": {
+						"description": "Where the conversation is filed when a ticket closes. Empty keeps no transcript",
+						"label": "Transcript channel"
+					}
+				},
+				"label": "Tickets"
+			},
+			"welcome": {
+				"description": "Greet new members and hand them their first roles",
+				"fields": {
+					"autoRoles": {
+						"description": "Roles given to every member who joins",
+						"label": "Automatic roles"
+					},
+					"channelId": {
+						"description": "Where the welcome message is posted",
+						"label": "Channel"
+					},
+					"deleteAfter": {
+						"description": "Seconds before the welcome is deleted. Leave empty to keep it",
+						"label": "Delete after"
+					},
+					"embed": {
+						"description": "The embed layout, edited on the dashboard",
+						"label": "Embed"
+					},
+					"message": {
+						"description": "Text sent on join. Use {user} and {server} as placeholders",
+						"label": "Message"
+					},
+					"pingMode": {
+						"description": "How the new member is mentioned",
+						"label": "Mention",
+						"options": {
+							"ghost": "Mention and delete right after",
+							"inline": "Mention in the message",
+							"none": "Do not mention"
+						}
+					},
+					"useEmbed": {
+						"description": "Send the welcome as an embed instead of plain text",
+						"label": "Use an embed"
+					}
+				},
+				"label": "Welcome"
 			}
 		}
 	}

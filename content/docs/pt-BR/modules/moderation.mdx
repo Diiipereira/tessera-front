@@ -1,0 +1,32 @@
+---
+title: Moderação
+summary: Advertências, castigos, silenciamentos e banimentos — todos escritos no log de casos.
+---
+
+A Moderação é o log de casos mais os comandos que escrevem nele. Toda punição abre um caso, venha ela de um comando de barra, do painel, ou de uma regra de escalonamento disparando sozinha.
+
+**Permissões:** `Expulsar Membros`, `Banir Membros`, `Moderar Membros`, `Gerenciar Cargos`
+
+## Configurando
+
+<Steps>
+	<Step title="Proteja os cargos que importam">
+		Um cargo protegido não pode ser alcançado pelo bot, então um moderador não bane um admin por
+		engano.
+	</Step>
+	<Step title="Decida o que o membro ouve">
+		A DM sai **antes** de a punição cair, então um banimento ainda chega até ele.
+	</Step>
+	<Step title="Monte a escada de escalonamento">
+		Os pontos somam por advertência, e um limiar aplica a punição que você escolheu. Só advertência,
+		castigo e silenciamento contam.
+	</Step>
+</Steps>
+
+## Opções
+
+<Fields module="moderation" />
+
+## Comandos
+
+<Commands module="moderation" />

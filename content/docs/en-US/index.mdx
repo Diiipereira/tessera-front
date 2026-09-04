@@ -1,0 +1,47 @@
+---
+title: Introduction
+summary: What Tessera is, and the one idea the rest of the documentation rests on.
+---
+
+Tessera is a Discord bot with ten modules and a dashboard for configuring them. Everything the
+bot does is off until you turn it on, and every module has its own page here.
+
+<Callout tone="info" title="The reference tables are generated">
+	Every option table and command list on these pages is read from the bot's own config registry when
+	the page loads. They cannot describe a setting the bot does not have, and they cannot fall behind
+	a setting it gained.
+</Callout>
+
+## Two doors, one room
+
+A setting changed with a slash command and the same setting changed in the dashboard are **the
+same setting**. There is no sync, no import, no "push to Discord" button — both are doors into
+one stored config, and whichever you used last is what the bot is doing right now.
+
+That sounds obvious and it is the hardest thing in the product to build. It is also why you can
+hand the dashboard to someone who has never used a slash command, and hand slash commands to
+someone who never opens a browser, and have them both be right.
+
+## Where to start
+
+<Steps>
+	<Step title="Add the bot">
+		One OAuth screen. You need **Manage Server** on the Discord server you are adding it to.
+	</Step>
+	<Step title="Turn on one module">
+		Welcome is the usual first one, because it is the one members notice.
+	</Step>
+	<Step title="Come back for the rest">
+		Every module works on its own. Nothing here needs anything else here to be useful.
+	</Step>
+</Steps>
+
+## Conventions in these pages
+
+| You see       | It means                                                  |
+| ------------- | --------------------------------------------------------- |
+| `code`        | A literal value, a permission name, or something you type |
+| **bold**      | Something with a consequence worth reading twice          |
+| A blue note   | Context you probably want                                 |
+| A yellow note | A limit or a plan requirement                             |
+| A red note    | Something that will bite you                              |

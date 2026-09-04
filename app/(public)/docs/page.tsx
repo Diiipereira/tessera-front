@@ -1,9 +1,11 @@
+import type { MDXContent } from 'mdx/types';
 import type { Metadata } from 'next';
-import { getTranslations } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { DocsArticle } from '@/components/docs/DocsArticle';
 import { DocsSkeleton } from '@/components/skeletons/DocsSkeleton';
-import { findDocPage } from '@/lib/docs';
+import { findDocPage } from '@/lib/docs/content';
+import { toLocale } from '@/lib/locale';
 
 export async function generateMetadata(): Promise<Metadata> {
 	const t = await getTranslations('docs');
@@ -16,10 +18,20 @@ export default async function Page({
 }: {
 	searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-	const query = await searchParams;
-	const page = findDocPage('');
-	if (!page) notFound();
+	const [query, raw] = await Promise.all([searchParams, getLocale()]);
+	const locale = toLocale(raw);
+	const page = await findDocPage(locale, '');
+
+	if (page === undefined) notFound();
 	if (query.state === 'loading') return <DocsSkeleton />;
 
-	return <DocsArticle page={page} />;
+	const { default: Body } = (await import(`@/content/docs/${locale}/index.mdx`)) as {
+		default: MDXContent;
+	};
+
+	return (
+		<DocsArticle locale={locale} page={page}>
+			<Body />
+		</DocsArticle>
+	);
 }

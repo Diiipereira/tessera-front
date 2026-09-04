@@ -1,0 +1,31 @@
+---
+title: Moderation
+summary: Warns, timeouts, mutes and bans — every one of them written to the case log.
+---
+
+Moderation is the case log plus the commands that write to it. Every punishment opens a case, whether it came from a slash command, the dashboard, or an escalation rule firing on its own.
+
+**Permissions:** `Kick Members`, `Ban Members`, `Moderate Members`, `Manage Roles`
+
+## Setting it up
+
+<Steps>
+	<Step title="Protect the roles that matter">
+		A protected role cannot be actioned by the bot, so a moderator cannot ban an admin by mistake.
+	</Step>
+	<Step title="Decide what the member is told">
+		The DM is sent **before** the punishment lands, so a ban still reaches them.
+	</Step>
+	<Step title="Set the escalation ladder">
+		Points build up per warning, and a threshold applies the punishment you chose. Only warns,
+		timeouts and mutes count towards it.
+	</Step>
+</Steps>
+
+## Options
+
+<Fields module="moderation" />
+
+## Commands
+
+<Commands module="moderation" />
