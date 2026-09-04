@@ -23,7 +23,7 @@ export type AutoModConfig = {
 	rules: AutoModRule[];
 };
 
-export type LogGroup = 'Messages' | 'Members' | 'Moderation' | 'Server' | 'Voice';
+export type LogGroup = string;
 
 export type LogEvent = {
 	id: string;

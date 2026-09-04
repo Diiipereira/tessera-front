@@ -2,7 +2,7 @@
 
 import { ScrollText } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { ChannelPicker } from '@/components/discord/ChannelPicker';
 import { RolePicker } from '@/components/discord/RolePicker';
@@ -13,22 +13,66 @@ import { Button } from '@/components/ui/Button';
 import { Field } from '@/components/ui/Field';
 import { Popover } from '@/components/ui/Popover';
 import { Switch } from '@/components/ui/Switch';
-import { useConfigDraft } from '@/lib/hooks/useConfigDraft';
+import { useConfigDraft, type SaveOutcome } from '@/lib/hooks/useConfigDraft';
+import { loadRoutes, saveRoutes } from '@/lib/logging-client';
+import { patchModule } from '@/lib/module-client';
+import {
+	groupsInOrder,
+	missingChannel,
+	toLoggingConfig,
+	toLoggingPatch,
+	toRoutePayload
+} from '@/lib/modules/logging';
 import type { Channel, Role } from '@/lib/types/discord';
 import type { LogEvent, LogGroup, LoggingConfig } from '@/lib/types/module-configs';
 
-const GROUPS: LogGroup[] = ['Messages', 'Members', 'Moderation', 'Server', 'Voice'];
-
 type LoggingScreenProps = {
+	guildId: string;
 	config: LoggingConfig;
+	version: number;
 	channels: Channel[];
 	roles: Role[];
 };
 
-export function LoggingScreen({ config, channels, roles }: LoggingScreenProps) {
+export function LoggingScreen({ guildId, config, version, channels, roles }: LoggingScreenProps) {
 	const t = useTranslations('modules.logging');
-	const form = useConfigDraft<LoggingConfig>(config);
+	const versionRef = useRef(version);
+
+	const save = useCallback(
+		async (next: LoggingConfig): Promise<SaveOutcome<LoggingConfig>> => {
+			const patched = await patchModule(guildId, 'logging', {
+				version: versionRef.current,
+				enabled: next.enabled,
+				config: toLoggingPatch(next)
+			});
+
+			if (patched.status === 'error') return patched;
+
+			versionRef.current = patched.state.version;
+
+			if (patched.status === 'conflict') {
+				const stored = await loadRoutes(guildId);
+
+				if (stored.status === 'error') return stored;
+
+				return {
+					status: 'conflict',
+					current: toLoggingConfig(patched.state, stored.events)
+				};
+			}
+
+			const written = await saveRoutes(guildId, toRoutePayload(next.events));
+
+			if (written.status === 'error') return written;
+
+			return { status: 'saved', saved: toLoggingConfig(patched.state, written.events) };
+		},
+		[guildId]
+	);
+
+	const form = useConfigDraft<LoggingConfig>(config, { save });
 	const draft = form.draft;
+	const groups = groupsInOrder(draft.events);
 
 	function updateEvent(id: string, patch: Partial<LogEvent>) {
 		form.set(
@@ -45,7 +89,7 @@ export function LoggingScreen({ config, channels, roles }: LoggingScreenProps) {
 	}
 
 	const enabledCount = draft.events.filter((event) => event.enabled).length;
-	const missingChannel = draft.events.filter((event) => event.enabled && event.channelId === null);
+	const missing = missingChannel(draft.events);
 
 	return (
 		<ModulePage
@@ -79,14 +123,14 @@ export function LoggingScreen({ config, channels, roles }: LoggingScreenProps) {
 					total: draft.events.length
 				})}
 			>
-				{missingChannel.length > 0 ? (
+				{missing.length > 0 ? (
 					<p className="rounded-md border border-warning bg-warning-subtle px-3 py-2 text-body-sm text-warning-fg">
-						{t('events.missing', { count: missingChannel.length })}
+						{t('events.missing', { count: missing.length })}
 					</p>
 				) : null}
 
 				<div className="flex flex-col gap-6">
-					{GROUPS.map((group) => {
+					{groups.map((group) => {
 						const events = draft.events.filter((event) => event.group === group);
 						if (events.length === 0) return null;
 
