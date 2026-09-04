@@ -1,5 +1,4 @@
-import type { Channel, Role } from '@/lib/types/discord';
-import type { BotCommand, CommandCategory } from '@/lib/types/management';
+import type { CommandCategory } from '@/lib/types/management';
 
 export const COMMAND_CATEGORIES: CommandCategory[] = [
 	'Moderation',
@@ -19,65 +18,6 @@ export function cooldownLabel(seconds: number): string {
 	}
 	const hours = seconds / 3600;
 	return Number.isInteger(hours) ? `${String(hours)}h` : `${hours.toFixed(1)}h`;
-}
-
-export type Restriction =
-	{ kind: 'open' } | { kind: 'scoped'; role: string | null; roles: number; channels: number };
-
-export function readRestriction(
-	command: BotCommand,
-	roles: Role[],
-	channels: Channel[]
-): Restriction {
-	const allowed = command.allowedRoleIds
-		.map((id) => roles.find((role) => role.id === id)?.name)
-		.filter((name): name is string => name !== undefined);
-
-	const denied = command.deniedChannelIds
-		.map((id) => channels.find((channel) => channel.id === id)?.name)
-		.filter((name): name is string => name !== undefined);
-
-	if (allowed.length === 0 && denied.length === 0) return { kind: 'open' };
-
-	return {
-		kind: 'scoped',
-		role: allowed.length === 1 ? (allowed[0] ?? null) : null,
-		roles: allowed.length,
-		channels: denied.length
-	};
-}
-
-export type CommandFilters = {
-	query: string;
-	category: CommandCategory | 'all';
-	onlyDisabled: boolean;
-};
-
-export function filterCommands(commands: BotCommand[], filters: CommandFilters): BotCommand[] {
-	const term = filters.query.trim().toLowerCase().replace(/^\//, '');
-
-	return commands.filter((command) => {
-		if (filters.category !== 'all' && command.category !== filters.category) return false;
-		if (filters.onlyDisabled && command.enabled) return false;
-		if (term === '') return true;
-		return (
-			command.name.toLowerCase().includes(term) || command.description.toLowerCase().includes(term)
-		);
-	});
-}
-
-export function categoryCounts(commands: BotCommand[]): Record<CommandCategory, number> {
-	const counts = {
-		Moderation: 0,
-		Levels: 0,
-		Economy: 0,
-		Tickets: 0,
-		Community: 0,
-		Utility: 0
-	} satisfies Record<CommandCategory, number>;
-
-	for (const command of commands) counts[command.category] += 1;
-	return counts;
 }
 
 const NAME_PATTERN = /^[a-z0-9_-]{1,32}$/;

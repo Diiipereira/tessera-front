@@ -1,20 +1,30 @@
+import { redirect } from 'next/navigation';
 import { CommandsSkeleton } from '@/components/skeletons/CommandsSkeleton';
-import { mockChannels, mockCommands, mockRoles } from '@/lib/mock';
+import { apiGet, type ApiResult } from '@/lib/api';
+import type { CommandReportDto } from '@/lib/command-report';
+import { ApiUnreachableError } from '@/lib/guild-access';
 import type { GuildPageProps } from '@/lib/types/page';
 import { CommandsScreen } from './CommandsScreen';
 
 export const metadata = { title: 'Commands' };
 
-export default async function Page({ searchParams }: Pick<GuildPageProps, 'searchParams'>) {
-	const query = await searchParams;
+function unwrap<T>(result: ApiResult<T>): T {
+	if (result.status === 'unauthenticated') redirect('/login');
+	if (result.status === 'unreachable') {
+		throw new ApiUnreachableError(result.reason, result.answered, result.code ?? null);
+	}
+
+	return result.data;
+}
+
+export default async function Page({ params, searchParams }: GuildPageProps) {
+	const [{ guildId }, query] = await Promise.all([params, searchParams]);
+
 	if (query.state === 'loading') return <CommandsSkeleton />;
 
+	const report = await apiGet<CommandReportDto>(`/guilds/${guildId}/commands`);
+
 	return (
-		<CommandsScreen
-			commands={mockCommands}
-			roles={mockRoles}
-			channels={mockChannels}
-			lastSyncedAt="2026-08-25T09:02:00.000Z"
-		/>
+		<CommandsScreen guildId={guildId} report={unwrap(report)} now={new Date().toISOString()} />
 	);
 }
