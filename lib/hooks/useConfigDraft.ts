@@ -53,8 +53,6 @@ export function deepEqual(a: unknown, b: unknown): boolean {
 	return keys.every((key) => Object.hasOwn(right, key) && deepEqual(left[key], right[key]));
 }
 
-const SAVE_LATENCY_MS = 700;
-
 export function useConfigDraft<T extends object>(
 	initial: T,
 	options: ConfigDraftOptions<T> = {}
@@ -89,8 +87,6 @@ export function useConfigDraft<T extends object>(
 		setState('saving');
 
 		if (write === undefined) {
-			await new Promise((resolve) => setTimeout(resolve, SAVE_LATENCY_MS));
-
 			if (conflictArmed.current) {
 				conflictArmed.current = false;
 				setState('conflict');

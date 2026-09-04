@@ -1,6 +1,6 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { deepEqual, useConfigDraft, type SaveState } from './useConfigDraft';
+import { deepEqual, useConfigDraft, type SaveOutcome, type SaveState } from './useConfigDraft';
 
 type Config = {
 	enabled: boolean;
@@ -141,8 +141,15 @@ describe('useConfigDraft', () => {
 		expect(result.current.saved.channelId).toBe('c2');
 	});
 
-	it('reports saving while the write is in flight', async () => {
-		const { result } = renderHook(() => useConfigDraft(initial));
+	it('reports saving for exactly as long as the write takes', async () => {
+		let release: (outcome: SaveOutcome<Config>) => void = () => undefined;
+
+		const save = (): Promise<SaveOutcome<Config>> =>
+			new Promise<SaveOutcome<Config>>((resolve) => {
+				release = resolve;
+			});
+
+		const { result } = renderHook(() => useConfigDraft(initial, { save }));
 
 		act(() => {
 			result.current.set('channelId', 'c2');
@@ -158,8 +165,10 @@ describe('useConfigDraft', () => {
 		});
 
 		await act(async () => {
+			release({ status: 'saved', saved: { ...initial, channelId: 'c2' } });
 			await pending;
 		});
+
 		expect(result.current.state).toBe('idle');
 	});
 
