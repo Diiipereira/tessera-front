@@ -2,7 +2,7 @@
 
 import { Plus, Ticket, Trash2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { ChannelPicker } from '@/components/discord/ChannelPicker';
 import { RolePicker } from '@/components/discord/RolePicker';
@@ -20,7 +20,28 @@ import { NumberInput } from '@/components/ui/NumberInput';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
 import { Switch } from '@/components/ui/Switch';
 import { EMBED_SWATCHES } from '@/lib/discord-colors';
-import { useConfigDraft } from '@/lib/hooks/useConfigDraft';
+import { useConfigDraft, type SaveOutcome } from '@/lib/hooks/useConfigDraft';
+import { useRelativeTime } from '@/lib/hooks/useRelativeTime';
+import { patchModule } from '@/lib/module-client';
+import {
+	CATEGORY_KINDS,
+	DEFAULT_NAMING_PATTERN,
+	MAX_AUTO_CLOSE_HOURS,
+	MAX_BUTTON_LABEL_LENGTH,
+	MAX_CLOSE_DELAY_SECONDS,
+	MAX_NAMING_PATTERN_LENGTH,
+	MAX_OPEN_PER_USER,
+	MAX_PANEL_NAME_LENGTH,
+	MAX_PANELS,
+	MAX_STAFF_ROLES,
+	PANEL_CHANNEL_KINDS,
+	TRANSCRIPT_CHANNEL_KINDS,
+	nameless,
+	toPanelPayload,
+	toTicketsConfig,
+	toTicketsPatch
+} from '@/lib/modules/tickets';
+import { loadPanels, savePanels } from '@/lib/tickets-client';
 import type { Channel, Role } from '@/lib/types/discord';
 import type {
 	OpenTicket,
@@ -36,18 +57,22 @@ const TICKET_COLUMNS = ['number', 'subject', 'openedBy', 'claimedBy', 'age', 'st
 const STATUS_VARIANTS: Record<TicketStatus, BadgeVariant> = {
 	open: 'warning',
 	claimed: 'info',
-	closed: 'neutral'
+	closed: 'neutral',
+	archived: 'neutral'
 };
 
 function blankPanel(buttonLabel: string, text: string): TicketPanel {
 	return {
 		id: newId('panel'),
 		name: '',
+		channelId: null,
 		categoryId: null,
 		staffRoleIds: [],
-		namingPattern: 'ticket-{number}',
+		namingPattern: DEFAULT_NAMING_PATTERN,
 		maxOpenPerUser: 1,
 		buttonLabel,
+		buttonEmoji: null,
+		enabled: true,
 		message: {
 			mode: 'text',
 			text,
@@ -67,29 +92,77 @@ function blankPanel(buttonLabel: string, text: string): TicketPanel {
 }
 
 type TicketsScreenProps = {
+	guildId: string;
 	config: TicketsConfig;
+	defaultColor: string;
+	version: number;
 	channels: Channel[];
 	roles: Role[];
 	variables: MessageVariable[];
 	openTickets: OpenTicket[];
+	now: string;
 };
 
 export function TicketsScreen({
+	guildId,
 	config,
+	defaultColor,
+	version,
 	channels,
 	roles,
 	variables,
-	openTickets
+	openTickets,
+	now
 }: TicketsScreenProps) {
 	const t = useTranslations('modules.tickets');
 	const preview = useTranslations('modules.preview');
-	const form = useConfigDraft<TicketsConfig>(config);
+	const relativeTime = useRelativeTime();
+	const rightNow = new Date(now);
+	const versionRef = useRef(version);
+
+	const save = useCallback(
+		async (next: TicketsConfig): Promise<SaveOutcome<TicketsConfig>> => {
+			const patched = await patchModule(guildId, 'tickets', {
+				version: versionRef.current,
+				enabled: next.enabled,
+				config: toTicketsPatch(next)
+			});
+
+			if (patched.status === 'error') return patched;
+
+			versionRef.current = patched.state.version;
+
+			if (patched.status === 'conflict') {
+				const stored = await loadPanels(guildId);
+
+				if (stored.status === 'error') return stored;
+
+				return {
+					status: 'conflict',
+					current: toTicketsConfig(patched.state, stored.panels, defaultColor)
+				};
+			}
+
+			const written = await savePanels(guildId, toPanelPayload(next.panels));
+
+			if (written.status === 'error') return written;
+
+			return {
+				status: 'saved',
+				saved: toTicketsConfig(patched.state, written.panels, defaultColor)
+			};
+		},
+		[guildId, defaultColor]
+	);
+
+	const form = useConfigDraft<TicketsConfig>(config, { save });
 	const draft = form.draft;
 
 	const [tab, setTab] = useState<'panels' | 'open'>('panels');
 	const [selectedId, setSelectedId] = useState(draft.panels[0]?.id ?? null);
 
 	const selected = draft.panels.find((panel) => panel.id === selectedId) ?? null;
+	const unnamed = nameless(draft.panels);
 
 	function updatePanel(id: string, patch: Partial<TicketPanel>) {
 		form.set(
@@ -184,7 +257,9 @@ export function TicketsScreen({
 											<td className="tabular py-3 pr-3 font-mono text-body-sm text-text-muted">
 												{ticket.number}
 											</td>
-											<td className="py-3 pr-3 text-body">{ticket.subject}</td>
+											<td className="py-3 pr-3 text-body">
+												{ticket.subject === '' ? '—' : ticket.subject}
+											</td>
 											<td className="py-3 pr-3">
 												<span className="flex items-center gap-2">
 													<Avatar
@@ -199,7 +274,9 @@ export function TicketsScreen({
 											<td className="py-3 pr-3 text-body-sm text-text-muted">
 												{ticket.claimedBy ?? '—'}
 											</td>
-											<td className="py-3 pr-3 text-body-sm text-text-muted">{ticket.age}</td>
+											<td className="py-3 pr-3 text-body-sm text-text-muted">
+												{relativeTime(ticket.openedAt, rightNow)}
+											</td>
 											<td className="py-3">
 												<Badge variant={STATUS_VARIANTS[ticket.status]} dot>
 													{t(`status.${ticket.status}`)}
@@ -221,6 +298,7 @@ export function TicketsScreen({
 							<Button
 								variant="outline"
 								size="sm"
+								disabled={draft.panels.length >= MAX_PANELS}
 								onClick={() => {
 									const panel = blankPanel(t('panels.seedButton'), t('panels.seedMessage'));
 									form.set('panels', [...draft.panels, panel]);
@@ -255,6 +333,12 @@ export function TicketsScreen({
 								))}
 							</div>
 						)}
+
+						{unnamed > 0 ? (
+							<p className="rounded-md border border-warning bg-warning-subtle px-3 py-2 text-body-sm text-warning-fg">
+								{t('panels.unnamed', { count: unnamed })}
+							</p>
+						) : null}
 					</SettingsSection>
 
 					{selected ? (
@@ -282,6 +366,7 @@ export function TicketsScreen({
 								<Field label={t('panels.name')} hint={t('panels.nameHint')}>
 									<Input
 										value={selected.name}
+										maxLength={MAX_PANEL_NAME_LENGTH}
 										onChange={(event) => {
 											updatePanel(selected.id, { name: event.target.value });
 										}}
@@ -289,9 +374,21 @@ export function TicketsScreen({
 									/>
 								</Field>
 
+								<Field label={t('panels.channel')} hint={t('panels.channelHint')}>
+									<ChannelPicker
+										channels={channels}
+										kinds={PANEL_CHANNEL_KINDS}
+										value={selected.channelId}
+										onValueChange={(next) => {
+											updatePanel(selected.id, { channelId: next });
+										}}
+									/>
+								</Field>
+
 								<Field label={t('panels.category')} hint={t('panels.categoryHint')}>
 									<ChannelPicker
 										channels={channels}
+										kinds={CATEGORY_KINDS}
 										value={selected.categoryId}
 										onValueChange={(next) => {
 											updatePanel(selected.id, { categoryId: next });
@@ -304,7 +401,7 @@ export function TicketsScreen({
 										roles={roles}
 										value={selected.staffRoleIds}
 										onValueChange={(next) => {
-											updatePanel(selected.id, { staffRoleIds: next });
+											updatePanel(selected.id, { staffRoleIds: next.slice(0, MAX_STAFF_ROLES) });
 										}}
 									/>
 								</Field>
@@ -317,6 +414,7 @@ export function TicketsScreen({
 									>
 										<Input
 											value={selected.namingPattern}
+											maxLength={MAX_NAMING_PATTERN_LENGTH}
 											onChange={(event) => {
 												updatePanel(selected.id, { namingPattern: event.target.value });
 											}}
@@ -326,7 +424,7 @@ export function TicketsScreen({
 									<Field label={t('panels.maxOpen')} className="w-44">
 										<NumberInput
 											min={1}
-											max={20}
+											max={MAX_OPEN_PER_USER}
 											value={selected.maxOpenPerUser}
 											onValueChange={(next) => {
 												updatePanel(selected.id, { maxOpenPerUser: next });
@@ -341,9 +439,18 @@ export function TicketsScreen({
 										onChange={(event) => {
 											updatePanel(selected.id, { buttonLabel: event.target.value });
 										}}
-										maxLength={80}
+										maxLength={MAX_BUTTON_LABEL_LENGTH}
 									/>
 								</Field>
+
+								<Switch
+									checked={selected.enabled}
+									onCheckedChange={(next) => {
+										updatePanel(selected.id, { enabled: next });
+									}}
+									label={t('panels.enabled')}
+									description={t('panels.enabledHint')}
+								/>
 							</SettingsSection>
 
 							<SettingsSection
@@ -362,14 +469,16 @@ export function TicketsScreen({
 					) : null}
 
 					<SettingsSection title={t('behaviour.title')} description={t('behaviour.description')}>
-						<Switch
-							checked={draft.transcripts}
-							onCheckedChange={(next) => {
-								form.set('transcripts', next);
-							}}
-							label={t('behaviour.transcript')}
-							description={t('behaviour.transcriptHint')}
-						/>
+						<Field label={t('behaviour.transcript')} hint={t('behaviour.transcriptHint')}>
+							<ChannelPicker
+								channels={channels}
+								kinds={TRANSCRIPT_CHANNEL_KINDS}
+								value={draft.transcriptChannelId}
+								onValueChange={(next) => {
+									form.set('transcriptChannelId', next);
+								}}
+							/>
+						</Field>
 
 						<Switch
 							checked={draft.askForRating}
@@ -377,22 +486,40 @@ export function TicketsScreen({
 								form.set('askForRating', next);
 							}}
 							label={t('behaviour.rating')}
+							description={t('behaviour.ratingHint')}
 						/>
 
-						<Field
-							label={t('behaviour.autoClose')}
-							hint={t('behaviour.autoCloseHint')}
-							className="w-56"
-						>
-							<NumberInput
-								min={0}
-								max={720}
-								value={draft.autoCloseHours}
-								onValueChange={(next) => {
-									form.set('autoCloseHours', next);
-								}}
-							/>
-						</Field>
+						<div className="flex flex-wrap items-end gap-4">
+							<Field
+								label={t('behaviour.autoClose')}
+								hint={t('behaviour.autoCloseHint')}
+								className="w-56"
+							>
+								<NumberInput
+									min={0}
+									max={MAX_AUTO_CLOSE_HOURS}
+									value={draft.autoCloseHours}
+									onValueChange={(next) => {
+										form.set('autoCloseHours', next);
+									}}
+								/>
+							</Field>
+
+							<Field
+								label={t('behaviour.closeDelay')}
+								hint={t('behaviour.closeDelayHint')}
+								className="w-56"
+							>
+								<NumberInput
+									min={0}
+									max={MAX_CLOSE_DELAY_SECONDS}
+									value={draft.closeDelaySeconds}
+									onValueChange={(next) => {
+										form.set('closeDelaySeconds', next);
+									}}
+								/>
+							</Field>
+						</div>
 					</SettingsSection>
 				</>
 			)}

@@ -289,28 +289,35 @@ export const mockTransactions: Transaction[] = [
 
 export const mockTicketsConfig: TicketsConfig = {
 	enabled: true,
-	transcripts: true,
+	transcriptChannelId: '901234567890123002',
 	autoCloseHours: 48,
 	askForRating: true,
+	closeDelaySeconds: 10,
 	panels: [
 		{
 			id: 'p1',
 			name: 'General support',
+			channelId: '901234567890123001',
 			categoryId: '901234567890123006',
 			staffRoleIds: ['801234567890123011'],
 			namingPattern: 'ticket-{number}',
 			maxOpenPerUser: 1,
 			buttonLabel: 'Open a ticket',
+			buttonEmoji: null,
+			enabled: true,
 			message: text('Need a hand? Press the button and a staff member will pick it up.')
 		},
 		{
 			id: 'p2',
 			name: 'Report a member',
+			channelId: '901234567890123001',
 			categoryId: '901234567890123006',
 			staffRoleIds: ['801234567890123011', '801234567890123012'],
 			namingPattern: 'report-{user}',
 			maxOpenPerUser: 2,
 			buttonLabel: 'Report',
+			buttonEmoji: null,
+			enabled: true,
 			message: text('Something happened? Tell us here, privately.')
 		}
 	]
@@ -325,7 +332,7 @@ export const mockOpenTickets: OpenTicket[] = [
 		openerInitials: 'VE',
 		openerColor: '#fee75c',
 		claimedBy: 'ferro',
-		age: '12 minutes',
+		openedAt: '2026-09-04T11:48:00.000Z',
 		status: 'claimed'
 	},
 	{
@@ -336,7 +343,7 @@ export const mockOpenTickets: OpenTicket[] = [
 		openerInitials: 'NU',
 		openerColor: '#3ba55d',
 		claimedBy: null,
-		age: '48 minutes',
+		openedAt: '2026-09-04T11:12:00.000Z',
 		status: 'open'
 	},
 	{
@@ -347,7 +354,7 @@ export const mockOpenTickets: OpenTicket[] = [
 		openerInitials: 'TI',
 		openerColor: '#f47fff',
 		claimedBy: 'mora',
-		age: '3 hours',
+		openedAt: '2026-09-04T09:00:00.000Z',
 		status: 'claimed'
 	},
 	{
@@ -358,7 +365,7 @@ export const mockOpenTickets: OpenTicket[] = [
 		openerInitials: 'ZI',
 		openerColor: '#ed4245',
 		claimedBy: null,
-		age: '5 hours',
+		openedAt: '2026-09-04T07:00:00.000Z',
 		status: 'open'
 	}
 ];

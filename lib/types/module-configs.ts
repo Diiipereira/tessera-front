@@ -111,15 +111,18 @@ export type EconomyConfig = {
 export type TicketPanel = {
 	id: string;
 	name: string;
+	channelId: string | null;
 	categoryId: string | null;
 	staffRoleIds: string[];
 	namingPattern: string;
 	maxOpenPerUser: number;
 	buttonLabel: string;
+	buttonEmoji: string | null;
+	enabled: boolean;
 	message: MessageDraft;
 };
 
-export type TicketStatus = 'open' | 'claimed' | 'closed';
+export type TicketStatus = 'open' | 'claimed' | 'closed' | 'archived';
 
 export type OpenTicket = {
 	id: string;
@@ -129,16 +132,17 @@ export type OpenTicket = {
 	openerInitials: string;
 	openerColor: string;
 	claimedBy: string | null;
-	age: string;
+	openedAt: string;
 	status: TicketStatus;
 };
 
 export type TicketsConfig = {
 	enabled: boolean;
 	panels: TicketPanel[];
-	transcripts: boolean;
+	transcriptChannelId: string | null;
 	autoCloseHours: number;
 	askForRating: boolean;
+	closeDelaySeconds: number;
 };
 
 export type ReactionMode = 'toggle' | 'unique' | 'verify' | 'drop';

@@ -3,6 +3,7 @@
 import {
 	Check,
 	ChevronsUpDown,
+	Folder,
 	Hash,
 	Lock,
 	Megaphone,
@@ -23,8 +24,11 @@ const ICONS: Record<ChannelKind, LucideIcon> = {
 	text: Hash,
 	voice: Volume2,
 	announcement: Megaphone,
-	forum: MessagesSquare
+	forum: MessagesSquare,
+	category: Folder
 };
+
+const SPOKEN_IN: readonly ChannelKind[] = ['text', 'voice', 'announcement', 'forum'];
 
 const row =
 	'flex h-8 w-full items-center gap-2 rounded-sm px-2 text-body transition-colors duration-120 ease-out';
@@ -62,8 +66,7 @@ export function ChannelPicker(props: ChannelPickerProps) {
 	const chosen =
 		props.multiple === true ? (props.value ?? []) : props.value == null ? [] : [props.value];
 
-	const offered =
-		kinds === undefined ? channels : channels.filter((channel) => kinds.includes(channel.kind));
+	const offered = channels.filter((channel) => (kinds ?? SPOKEN_IN).includes(channel.kind));
 
 	const selected = offered.filter((channel) => chosen.includes(channel.id));
 

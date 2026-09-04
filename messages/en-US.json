@@ -1139,19 +1139,20 @@
 			},
 			"open": {
 				"title": "Open tickets",
-				"description": "Read-only here. Claiming and closing happen in Discord.",
+				"description": "Read only here. Taking and closing happens on Discord.",
 				"empty": "Nothing open. Quiet day.",
 				"number": "#",
 				"subject": "Subject",
 				"openedBy": "Opened by",
 				"claimedBy": "Claimed by",
-				"age": "Age",
+				"age": "Opened",
 				"status": "Status"
 			},
 			"status": {
 				"open": "open",
 				"claimed": "claimed",
-				"closed": "closed"
+				"closed": "closed",
+				"archived": "archived"
 			},
 			"panels": {
 				"title": "Panels",
@@ -1173,16 +1174,24 @@
 				"messageDescription": "What sits above the button in the channel.",
 				"empty": "No panels yet. Members have no way to open a ticket.",
 				"seedButton": "Open a ticket",
-				"seedMessage": "Need a hand? Press the button below."
+				"seedMessage": "Need a hand? Press the button below.",
+				"channel": "Panel channel",
+				"channelHint": "Where the message with the button is posted.",
+				"unnamed": "{count, plural, one {# panel with no name will not be saved} other {# panels with no name will not be saved}}.",
+				"enabled": "Panel on",
+				"enabledHint": "Switched off, the message stops taking clicks."
 			},
 			"behaviour": {
 				"title": "Behaviour",
 				"description": "Applies to every panel.",
-				"transcript": "Save a transcript when a ticket closes",
-				"transcriptHint": "Posted in the log channel and sent to the member.",
+				"transcript": "Transcript channel",
+				"transcriptHint": "Where the conversation is filed when a ticket closes. Empty keeps no transcript.",
 				"rating": "Ask for a rating after closing",
-				"autoClose": "Auto-close after (hours of silence)",
-				"autoCloseHint": "Set to 0 to never close automatically."
+				"autoClose": "Close itself after (hours of silence)",
+				"autoCloseHint": "Set 0 to never close by itself.",
+				"ratingHint": "The question goes by DM, because the channel is gone.",
+				"closeDelay": "Delete the channel after (seconds)",
+				"closeDelayHint": "The time between closing the ticket and the channel going."
 			}
 		},
 		"giveaways": {

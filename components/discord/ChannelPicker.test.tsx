@@ -51,6 +51,29 @@ describe('ChannelPicker', () => {
 		expect(screen.getByRole('button', { name: 'avisos' })).toBeDefined();
 	});
 
+	it('leaves the categories out of a picker that did not ask for them', async () => {
+		await open([
+			channel({ id: '1', name: 'geral', kind: 'text' }),
+			channel({ id: '2', name: 'Informações', kind: 'category' })
+		]);
+
+		expect(screen.getByRole('button', { name: 'geral' })).toBeDefined();
+		expect(screen.queryByRole('button', { name: 'Informações' })).toBeNull();
+	});
+
+	it('offers the categories to a picker that asks for nothing else', async () => {
+		await open(
+			[
+				channel({ id: '1', name: 'geral', kind: 'text' }),
+				channel({ id: '2', name: 'Suporte', kind: 'category' })
+			],
+			['category']
+		);
+
+		expect(screen.getByRole('button', { name: 'Suporte' })).toBeDefined();
+		expect(screen.queryByRole('button', { name: 'geral' })).toBeNull();
+	});
+
 	it('offers only the kinds the caller can post to', async () => {
 		await open(
 			[

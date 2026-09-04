@@ -1145,13 +1145,14 @@
 				"subject": "Assunto",
 				"openedBy": "Aberto por",
 				"claimedBy": "Assumido por",
-				"age": "Idade",
+				"age": "Aberto",
 				"status": "Estado"
 			},
 			"status": {
 				"open": "aberto",
 				"claimed": "assumido",
-				"closed": "fechado"
+				"closed": "fechado",
+				"archived": "arquivado"
 			},
 			"panels": {
 				"title": "Painéis",
@@ -1173,16 +1174,24 @@
 				"messageDescription": "O que fica acima do botão no canal.",
 				"empty": "Nenhum painel ainda. Os membros não têm como abrir um ticket.",
 				"seedButton": "Abrir um ticket",
-				"seedMessage": "Precisa de ajuda? Aperte o botão abaixo."
+				"seedMessage": "Precisa de ajuda? Aperte o botão abaixo.",
+				"channel": "Canal do painel",
+				"channelHint": "Onde a mensagem com o botão é publicada.",
+				"unnamed": "{count, plural, one {# painel sem nome não será salvo} other {# painéis sem nome não serão salvos}}.",
+				"enabled": "Painel ligado",
+				"enabledHint": "Desligado, a mensagem para de aceitar cliques."
 			},
 			"behaviour": {
 				"title": "Comportamento",
 				"description": "Vale para todo painel.",
-				"transcript": "Guardar uma transcrição quando um ticket fecha",
-				"transcriptHint": "Publicada no canal de log e enviada ao membro.",
+				"transcript": "Canal do histórico",
+				"transcriptHint": "Onde a conversa é arquivada quando um ticket fecha. Vazio não guarda nada.",
 				"rating": "Pedir uma avaliação depois de fechar",
 				"autoClose": "Fechar sozinho depois de (horas de silêncio)",
-				"autoCloseHint": "Coloque 0 para nunca fechar sozinho."
+				"autoCloseHint": "Coloque 0 para nunca fechar sozinho.",
+				"ratingHint": "A pergunta vai por DM, porque o canal já foi.",
+				"closeDelay": "Apagar o canal depois de (segundos)",
+				"closeDelayHint": "O tempo entre fechar o ticket e o canal sumir."
 			}
 		},
 		"giveaways": {

@@ -1,4 +1,4 @@
-export type ChannelKind = 'text' | 'voice' | 'announcement' | 'forum';
+export type ChannelKind = 'text' | 'voice' | 'announcement' | 'forum' | 'category';
 
 export type Channel = {
 	id: string;

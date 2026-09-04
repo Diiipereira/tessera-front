@@ -12,6 +12,7 @@ export const UNCATEGORISED = 'No category';
 const KINDS: Record<number, ChannelKind> = {
 	0: 'text',
 	2: 'voice',
+	4: 'category',
 	5: 'announcement',
 	15: 'forum'
 };

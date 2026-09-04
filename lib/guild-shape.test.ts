@@ -15,9 +15,13 @@ describe('toChannels', () => {
 			dto({ id: '2', type: 0, name: 'teste', parentId: '1' })
 		]);
 
-		expect(channels).toEqual([
-			{ id: '2', name: 'teste', categoryId: '1', category: 'Text channels', kind: 'text' }
-		]);
+		expect(channels.find((channel) => channel.kind === 'text')).toEqual({
+			id: '2',
+			name: 'teste',
+			categoryId: '1',
+			category: 'Text channels',
+			kind: 'text'
+		});
 	});
 
 	it('carries the category id, which is what stays unique when two share a name', () => {
@@ -28,8 +32,10 @@ describe('toChannels', () => {
 			dto({ id: '4', type: 0, name: 'avisos', parentId: '2' })
 		]);
 
-		expect(channels.map((channel) => channel.category)).toEqual(['Informações', 'Informações']);
-		expect(channels.map((channel) => channel.categoryId)).toEqual(['1', '2']);
+		const inside = channels.filter((channel) => channel.kind === 'text');
+
+		expect(inside.map((channel) => channel.category)).toEqual(['Informações', 'Informações']);
+		expect(inside.map((channel) => channel.categoryId)).toEqual(['1', '2']);
 	});
 
 	it('keeps a channel that sits outside any category', () => {
@@ -39,8 +45,16 @@ describe('toChannels', () => {
 		expect(channel?.categoryId).toBeNull();
 	});
 
-	it('does not offer the category itself as somewhere to post', () => {
-		expect(toChannels([dto({ id: '1', type: 4, name: 'Text channels' })])).toEqual([]);
+	it('keeps the category itself, since a ticket panel has to pick one', () => {
+		expect(toChannels([dto({ id: '1', type: 4, name: 'Text channels' })])).toEqual([
+			{
+				id: '1',
+				name: 'Text channels',
+				categoryId: null,
+				category: UNCATEGORISED,
+				kind: 'category'
+			}
+		]);
 	});
 
 	it('drops kinds the pickers cannot render instead of guessing an icon', () => {
