@@ -2,7 +2,7 @@
 
 import { GripVertical, Plus, Sticker, Trash2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { ChannelPicker } from '@/components/discord/ChannelPicker';
 import { RolePicker } from '@/components/discord/RolePicker';
@@ -13,7 +13,10 @@ import { Button } from '@/components/ui/Button';
 import { Field } from '@/components/ui/Field';
 import { Input } from '@/components/ui/Input';
 import { Switch } from '@/components/ui/Switch';
-import { useConfigDraft } from '@/lib/hooks/useConfigDraft';
+import { useConfigDraft, type SaveOutcome } from '@/lib/hooks/useConfigDraft';
+import { patchModule } from '@/lib/module-client';
+import { loadPanels, savePanels } from '@/lib/reaction-roles-client';
+import { toPanelPayload, toReactionRolesConfig, unfinished } from '@/lib/modules/reaction-roles';
 import type { Channel, Role } from '@/lib/types/discord';
 import type {
 	ReactionMode,
@@ -39,16 +42,58 @@ function blankPanel(): ReactionPanel {
 }
 
 type ReactionRolesScreenProps = {
+	guildId: string;
 	config: ReactionRolesConfig;
+	version: number;
 	channels: Channel[];
 	roles: Role[];
 };
 
-export function ReactionRolesScreen({ config, channels, roles }: ReactionRolesScreenProps) {
+export function ReactionRolesScreen({
+	guildId,
+	config,
+	version,
+	channels,
+	roles
+}: ReactionRolesScreenProps) {
 	const t = useTranslations('modules.reactionRoles');
 	const preview = useTranslations('modules.preview');
-	const form = useConfigDraft<ReactionRolesConfig>(config);
+	const versionRef = useRef(version);
+
+	const save = useCallback(
+		async (next: ReactionRolesConfig): Promise<SaveOutcome<ReactionRolesConfig>> => {
+			const patched = await patchModule(guildId, 'reaction-roles', {
+				version: versionRef.current,
+				enabled: next.enabled
+			});
+
+			if (patched.status === 'error') return patched;
+
+			versionRef.current = patched.state.version;
+
+			if (patched.status === 'conflict') {
+				const stored = await loadPanels(guildId);
+
+				if (stored.status === 'error') return stored;
+
+				return {
+					status: 'conflict',
+					current: toReactionRolesConfig(patched.state, stored.panels)
+				};
+			}
+
+			const written = await savePanels(guildId, toPanelPayload(next.panels));
+
+			if (written.status === 'error') return written;
+
+			return { status: 'saved', saved: toReactionRolesConfig(patched.state, written.panels) };
+		},
+		[guildId]
+	);
+
+	const form = useConfigDraft<ReactionRolesConfig>(config, { save });
 	const draft = form.draft;
+	const halfWritten = unfinished(draft.panels);
 
 	const [selectedId, setSelectedId] = useState(draft.panels[0]?.id ?? null);
 	const selected = draft.panels.find((panel) => panel.id === selectedId) ?? null;
@@ -137,14 +182,25 @@ export function ReactionRolesScreen({ config, channels, roles }: ReactionRolesSc
 					state={form.state}
 					onDiscard={form.discard}
 					onSave={() => {
-						void form.save().then(() => {
-							toast.success(t('saved'));
-						});
+						void form
+							.save()
+							.then(() => {
+								toast.success(t('saved'));
+							})
+							.catch((error: unknown) => {
+								toast.error(error instanceof Error ? error.message : t('saveFailed'));
+							});
 					}}
 					onResolveConflict={form.resolveConflict}
 				/>
 			}
 		>
+			{halfWritten > 0 ? (
+				<p className="rounded-md border border-warning bg-warning-subtle px-3 py-2 text-body-sm text-warning-fg">
+					{t('halfWritten', { count: halfWritten })}
+				</p>
+			) : null}
+
 			<SettingsSection
 				title={t('panels.title')}
 				action={

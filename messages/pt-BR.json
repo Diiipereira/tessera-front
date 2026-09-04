@@ -1279,7 +1279,9 @@
 				}
 			},
 			"noOptions": "Nenhuma opção ainda.",
-			"noPanels": "Nenhum painel ainda."
+			"noPanels": "Nenhum painel ainda.",
+			"saveFailed": "Não consegui salvar os painéis de cargos",
+			"halfWritten": "{count, plural, =1 {Um painel está} other {# painéis estão}} sem nome ou sem cargo, então o que falta não vai ser salvo."
 		},
 		"levels": {
 			"title": "Níveis",

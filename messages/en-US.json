@@ -1279,7 +1279,9 @@
 				}
 			},
 			"noOptions": "No options yet.",
-			"noPanels": "No panels yet."
+			"noPanels": "No panels yet.",
+			"saveFailed": "Reaction role panels could not be saved",
+			"halfWritten": "{count, plural, =1 {One panel is} other {# panels are}} missing a name or a role, so what is missing will not be saved."
 		},
 		"levels": {
 			"title": "Levels",
