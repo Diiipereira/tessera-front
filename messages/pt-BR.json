@@ -1292,7 +1292,8 @@
 				"title": "Ranking",
 				"body": "Top 10 agora.",
 				"rank": "Posição {rank}",
-				"level": "nv {level}"
+				"level": "nv {level}",
+				"empty": "Ninguém ganhou XP aqui ainda."
 			},
 			"xp": {
 				"title": "Ganho de XP",
@@ -1332,7 +1333,8 @@
 				"remove": "Remover",
 				"levelLabel": "Nível da recompensa",
 				"replaceLabel": "Substituir o cargo de recompensa anterior no nível {level}",
-				"removeLabel": "Remover a recompensa do nível {level}"
+				"removeLabel": "Remover a recompensa do nível {level}",
+				"roleless": "{count, plural, one {# recompensa está sem cargo e não será salva} other {# recompensas estão sem cargo e não serão salvas}}"
 			},
 			"noXp": {
 				"title": "Sem XP aqui",
@@ -1340,14 +1342,18 @@
 				"channel": "Canal",
 				"channelPlaceholder": "XP em todo lugar…",
 				"roles": "Cargos",
-				"rolesPlaceholder": "Todos ganham XP…"
+				"rolesPlaceholder": "Todos ganham XP…",
+				"channels": "Canais"
 			},
 			"danger": {
 				"title": "Zona de perigo",
 				"description": "Isto não tem desfazer.",
 				"reset": "Zerar todo o XP",
-				"resetPending": "Ligado à API quando ela existir. Nada foi apagado.",
-				"resetBody": "Todo membro cai para o nível 0. Os cargos de recompensa já entregues ficam."
+				"resetBody": "Todo membro cai para o nível 0. Os cargos de recompensa já entregues ficam.",
+				"confirm": "Zerar todo o XP",
+				"confirmBody": "Todo membro cai para o nível 0 e o ranking recomeça. Os cargos de recompensa já entregues continuam com quem os tem.",
+				"cancel": "Cancelar",
+				"cleared": "{members, plural, one {# membro foi zerado} other {# membros foram zerados}}"
 			},
 			"chart": {
 				"level": "Nível",

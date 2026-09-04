@@ -3,6 +3,7 @@
 import { Medal, Plus, RotateCcw, Trash2, TrendingUp, TriangleAlert } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
+import { useCallback, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { ChannelPicker } from '@/components/discord/ChannelPicker';
 import { RolePicker } from '@/components/discord/RolePicker';
@@ -17,7 +18,21 @@ import { NumberInput } from '@/components/ui/NumberInput';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Switch } from '@/components/ui/Switch';
 import { effortToLevel, totalXpForLevel } from '@/lib/levels';
-import { useConfigDraft } from '@/lib/hooks/useConfigDraft';
+import { clearLevels, loadRewards, saveRewards } from '@/lib/levels-client';
+import { useConfigDraft, type SaveOutcome } from '@/lib/hooks/useConfigDraft';
+import { patchModule } from '@/lib/module-client';
+import {
+	ANNOUNCE_CHANNEL_KINDS,
+	MAX_CURVE,
+	MAX_REWARD_LEVEL,
+	MIN_CURVE,
+	MIN_REWARD_LEVEL,
+	roleless,
+	toLevelsConfig,
+	toLevelsPatch,
+	toRewardPayload
+} from '@/lib/modules/levels';
+import { Dialog } from '@/components/ui/Dialog';
 import type { Channel, Role } from '@/lib/types/discord';
 import type { LeaderboardEntry, LevelsConfig, RoleReward } from '@/lib/types/module-configs';
 import type { MessageVariable } from '@/lib/types/modules';
@@ -35,7 +50,10 @@ const REWARD_COLUMNS = ['level', 'role', 'replace', ''];
 const MEDALS = ['text-warning', 'text-text-muted', 'text-text-muted'];
 
 type LevelsScreenProps = {
+	guildId: string;
 	config: LevelsConfig;
+	defaultColor: string;
+	version: number;
 	channels: Channel[];
 	roles: Role[];
 	variables: MessageVariable[];
@@ -43,14 +61,55 @@ type LevelsScreenProps = {
 };
 
 export function LevelsScreen({
+	guildId,
 	config,
+	defaultColor,
+	version,
 	channels,
 	roles,
 	variables,
 	leaderboard
 }: LevelsScreenProps) {
 	const t = useTranslations('modules.levels');
-	const form = useConfigDraft<LevelsConfig>(config);
+	const versionRef = useRef(version);
+	const [clearing, setClearing] = useState(false);
+
+	const save = useCallback(
+		async (next: LevelsConfig): Promise<SaveOutcome<LevelsConfig>> => {
+			const patched = await patchModule(guildId, 'levels', {
+				version: versionRef.current,
+				enabled: next.enabled,
+				config: toLevelsPatch(next)
+			});
+
+			if (patched.status === 'error') return patched;
+
+			versionRef.current = patched.state.version;
+
+			if (patched.status === 'conflict') {
+				const stored = await loadRewards(guildId);
+
+				if (stored.status === 'error') return stored;
+
+				return {
+					status: 'conflict',
+					current: toLevelsConfig(patched.state, stored.rewards, defaultColor)
+				};
+			}
+
+			const written = await saveRewards(guildId, toRewardPayload(next.rewards));
+
+			if (written.status === 'error') return written;
+
+			return {
+				status: 'saved',
+				saved: toLevelsConfig(patched.state, written.rewards, defaultColor)
+			};
+		},
+		[guildId, defaultColor]
+	);
+
+	const form = useConfigDraft<LevelsConfig>(config, { save });
 	const draft = form.draft;
 
 	const invertedRange = draft.xpMin > draft.xpMax;
@@ -75,6 +134,7 @@ export function LevelsScreen({
 	}
 
 	const sortedRewards = [...draft.rewards].sort((a, b) => a.level - b.level);
+	const unfinished = roleless(draft.rewards);
 
 	const aside = (
 		<section
@@ -85,6 +145,10 @@ export function LevelsScreen({
 				<h2 className="text-h4">{t('leaderboard.title')}</h2>
 				<p className="text-caption font-normal text-text-muted">{t('leaderboard.body')}</p>
 			</div>
+
+			{leaderboard.length === 0 ? (
+				<p className="text-body-sm text-text-muted">{t('leaderboard.empty')}</p>
+			) : null}
 
 			<ol className="flex flex-col">
 				{leaderboard.map((entry) => (
@@ -194,8 +258,8 @@ export function LevelsScreen({
 			<SettingsSection title={t('curve.title')} description={t('curve.description')}>
 				<Field label={t('curve.difficulty')} hint={t('curve.difficultyHint')}>
 					<NumberInput
-						min={10}
-						max={500}
+						min={MIN_CURVE}
+						max={MAX_CURVE}
 						value={draft.curve}
 						onValueChange={(next) => {
 							form.set('curve', next);
@@ -245,6 +309,7 @@ export function LevelsScreen({
 							<Field label={t('announce.channel')}>
 								<ChannelPicker
 									channels={channels}
+									kinds={ANNOUNCE_CHANNEL_KINDS}
 									value={draft.announceChannelId}
 									onValueChange={(next) => {
 										form.set('announceChannelId', next);
@@ -289,6 +354,13 @@ export function LevelsScreen({
 					</Button>
 				}
 			>
+				{unfinished > 0 ? (
+					<p className="flex items-center gap-1.5 text-caption font-normal text-warning">
+						<TriangleAlert className="size-3.5 shrink-0" aria-hidden="true" />
+						{t('rewards.roleless', { count: unfinished })}
+					</p>
+				) : null}
+
 				{sortedRewards.length === 0 ? (
 					<p className="text-body-sm text-text-muted">{t('rewards.empty')}</p>
 				) : (
@@ -315,8 +387,8 @@ export function LevelsScreen({
 									<tr key={reward.id} className="border-b border-border last:border-0">
 										<td className="py-2 pr-3 align-top">
 											<NumberInput
-												min={1}
-												max={999}
+												min={MIN_REWARD_LEVEL}
+												max={MAX_REWARD_LEVEL}
 												value={reward.level}
 												onValueChange={(next) => {
 													updateReward(reward.id, { level: next });
@@ -368,12 +440,13 @@ export function LevelsScreen({
 			</SettingsSection>
 
 			<SettingsSection title={t('noXp.title')} description={t('noXp.description')}>
-				<Field label={t('announce.channel')}>
+				<Field label={t('noXp.channels')}>
 					<ChannelPicker
+						multiple
 						channels={channels}
-						value={draft.noXpChannelIds[0] ?? null}
+						value={draft.noXpChannelIds}
 						onValueChange={(next) => {
-							form.set('noXpChannelIds', [next]);
+							form.set('noXpChannelIds', next);
 						}}
 						placeholder={t('noXp.channelPlaceholder')}
 					/>
@@ -393,17 +466,51 @@ export function LevelsScreen({
 
 			<SettingsSection title={t('danger.title')} description={t('danger.description')} danger>
 				<div className="flex flex-wrap items-center gap-3">
-					<Button
-						variant="danger"
-						onClick={() => {
-							toast.error(t('danger.reset'), {
-								description: t('danger.resetPending')
-							});
-						}}
+					<Dialog
+						open={clearing}
+						onOpenChange={setClearing}
+						title={t('danger.reset')}
+						description={t('danger.confirm')}
+						danger
+						triggerAsChild
+						trigger={
+							<Button variant="danger">
+								<RotateCcw aria-hidden="true" />
+								{t('danger.reset')}
+							</Button>
+						}
+						footer={
+							<>
+								<Button
+									variant="ghost"
+									onClick={() => {
+										setClearing(false);
+									}}
+								>
+									{t('danger.cancel')}
+								</Button>
+								<Button
+									variant="danger"
+									onClick={() => {
+										void clearLevels(guildId).then((result) => {
+											setClearing(false);
+
+											if (result.status === 'error') {
+												toast.error(result.message);
+												return;
+											}
+
+											toast.success(t('danger.cleared', { members: result.cleared }));
+										});
+									}}
+								>
+									{t('danger.reset')}
+								</Button>
+							</>
+						}
 					>
-						<RotateCcw aria-hidden="true" />
-						{t('danger.reset')}
-					</Button>
+						<p className="text-body-sm text-text-muted">{t('danger.confirmBody')}</p>
+					</Dialog>
 					<p className="text-body-sm text-text-muted">{t('danger.resetBody')}</p>
 				</div>
 			</SettingsSection>

@@ -1,6 +1,25 @@
 import { describe, expect, it } from 'vitest';
 import { buildCurve, effortToLevel, messagesToReach, totalXpForLevel } from './levels';
 
+const CONTRACT: readonly { curve: number; level: number; totalXp: number }[] = [
+	{ curve: 100, level: 1, totalXp: 100 },
+	{ curve: 100, level: 5, totalXp: 2500 },
+	{ curve: 100, level: 20, totalXp: 40_000 },
+	{ curve: 100, level: 50, totalXp: 250_000 },
+	{ curve: 10, level: 30, totalXp: 9000 },
+	{ curve: 55, level: 7, totalXp: 2695 },
+	{ curve: 500, level: 12, totalXp: 72_000 }
+];
+
+describe('the curve the bot also runs', () => {
+	it.each(CONTRACT)(
+		'puts level $level of curve $curve at $totalXp xp',
+		({ curve, level, totalXp }) => {
+			expect(totalXpForLevel(level, curve)).toBe(totalXp);
+		}
+	);
+});
+
 describe('totalXpForLevel', () => {
 	it('costs nothing to be level 0', () => {
 		expect(totalXpForLevel(0, 100)).toBe(0);

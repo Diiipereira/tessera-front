@@ -1292,7 +1292,8 @@
 				"title": "Leaderboard",
 				"body": "Top 10 right now.",
 				"rank": "Rank {rank}",
-				"level": "lvl {level}"
+				"level": "lvl {level}",
+				"empty": "Nobody has earned XP here yet."
 			},
 			"xp": {
 				"title": "Earning XP",
@@ -1332,7 +1333,8 @@
 				"remove": "Remove",
 				"levelLabel": "Reward level",
 				"replaceLabel": "Replace the previous reward role at level {level}",
-				"removeLabel": "Remove the reward at level {level}"
+				"removeLabel": "Remove the reward at level {level}",
+				"roleless": "{count, plural, one {# reward has no role and will not be saved} other {# rewards have no role and will not be saved}}"
 			},
 			"noXp": {
 				"title": "No XP here",
@@ -1340,14 +1342,18 @@
 				"channel": "Channel",
 				"channelPlaceholder": "XP everywhere…",
 				"roles": "Roles",
-				"rolesPlaceholder": "Everyone earns XP…"
+				"rolesPlaceholder": "Everyone earns XP…",
+				"channels": "Channels"
 			},
 			"danger": {
 				"title": "Danger zone",
 				"description": "There is no undo for this.",
 				"reset": "Reset all XP",
-				"resetPending": "Wired to the API once it exists. Nothing was deleted.",
-				"resetBody": "Every member drops to level 0. Role rewards already given stay."
+				"resetBody": "Every member drops to level 0. Role rewards already given stay.",
+				"confirm": "Reset all XP",
+				"confirmBody": "Every member drops to level 0 and the leaderboard starts over. Role rewards already given stay on the members who have them.",
+				"cancel": "Cancel",
+				"cleared": "{members, plural, one {# member was reset} other {# members were reset}}"
 			},
 			"chart": {
 				"level": "Level",

@@ -31,32 +31,41 @@ const row =
 
 const UNCATEGORISED_GROUP = 'uncategorised';
 
-type ChannelPickerProps = {
+type SharedProps = {
 	channels: Channel[];
 	kinds?: readonly ChannelKind[];
-	value?: string | null;
-	onValueChange?: (value: string) => void;
 	placeholder?: string;
 	id?: string;
 };
 
-export function ChannelPicker({
-	channels,
-	kinds,
-	value = null,
-	onValueChange,
-	placeholder,
-	id
-}: ChannelPickerProps) {
+type SingleProps = SharedProps & {
+	multiple?: false;
+	value?: string | null;
+	onValueChange?: (value: string) => void;
+};
+
+type MultipleProps = SharedProps & {
+	multiple: true;
+	value?: string[];
+	onValueChange?: (value: string[]) => void;
+};
+
+type ChannelPickerProps = SingleProps | MultipleProps;
+
+export function ChannelPicker(props: ChannelPickerProps) {
+	const { channels, kinds, placeholder, id } = props;
 	const t = useTranslations('pickers');
 	const field = useFieldState();
 	const [open, setOpen] = useState(false);
 	const [query, setQuery] = useState('');
 
+	const chosen =
+		props.multiple === true ? (props.value ?? []) : props.value == null ? [] : [props.value];
+
 	const offered =
 		kinds === undefined ? channels : channels.filter((channel) => kinds.includes(channel.kind));
 
-	const selected = offered.find((channel) => channel.id === value);
+	const selected = offered.filter((channel) => chosen.includes(channel.id));
 
 	const matches = offered.filter((channel) => channel.name.includes(query.trim().toLowerCase()));
 
@@ -75,35 +84,57 @@ export function ChannelPicker({
 
 	function pick(channel: Channel) {
 		if (channel.lockedReason) return;
-		onValueChange?.(channel.id);
+
+		if (props.multiple === true) {
+			props.onValueChange?.(
+				chosen.includes(channel.id)
+					? chosen.filter((entry) => entry !== channel.id)
+					: [...chosen, channel.id]
+			);
+			return;
+		}
+
+		props.onValueChange?.(channel.id);
 		setOpen(false);
 		setQuery('');
 	}
 
+	const label = (
+		<span
+			id={id ?? field?.controlId}
+			className={cn(
+				'min-w-0 flex-1 truncate text-left',
+				selected.length === 0 && 'text-text-muted'
+			)}
+		>
+			{selected[0] === undefined
+				? (placeholder ?? t('channel'))
+				: `#${selected.map((channel) => channel.name).join(' #')}`}
+		</span>
+	);
+
 	const trigger = (
 		<>
 			<Hash className="size-4 shrink-0 text-text-subtle" aria-hidden="true" />
-			<span
-				id={id ?? field?.controlId}
-				className={cn('min-w-0 flex-1 truncate text-left', !selected && 'text-text-muted')}
-			>
-				{selected ? `#${selected.name}` : (placeholder ?? t('channel'))}
-			</span>
+			{label}
 			<ChevronsUpDown className="size-4 shrink-0 text-text-subtle" aria-hidden="true" />
 		</>
 	);
 
 	function optionButton(channel: Channel): ReactElement {
 		const Icon = ICONS[channel.kind];
+		const isSelected = chosen.includes(channel.id);
+
 		return (
 			<button
 				type="button"
+				aria-pressed={props.multiple === true ? isSelected : undefined}
 				aria-disabled={channel.lockedReason ? true : undefined}
 				className={cn(
 					row,
 					channel.lockedReason
 						? 'cursor-not-allowed text-text-muted opacity-50'
-						: channel.id === value
+						: isSelected
 							? 'bg-primary-subtle text-text'
 							: 'text-text hover:bg-surface-hover'
 				)}
@@ -115,7 +146,7 @@ export function ChannelPicker({
 				<span className="min-w-0 flex-1 truncate text-left">{channel.name}</span>
 				{channel.lockedReason ? (
 					<Lock className="size-3.5 shrink-0 text-warning" aria-hidden="true" />
-				) : channel.id === value ? (
+				) : isSelected ? (
 					<Check className="size-4 shrink-0 text-primary" aria-hidden="true" />
 				) : null}
 			</button>
