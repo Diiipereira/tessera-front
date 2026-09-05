@@ -1,7 +1,6 @@
 import { Sparkles } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
-import { BRAND } from '@/lib/brand';
 import { TRUST_STATS } from '@/lib/marketing';
 import { cn } from '@/lib/utils/cn';
 import { HeroActions } from './HeroActions';
@@ -83,9 +82,7 @@ export function Hero({ card, cardFirst = false }: HeroProps) {
 
 					<h1 className="max-w-[20ch] text-display-sm text-pretty lg:text-display">{t('title')}</h1>
 
-					<p className="mt-5 max-w-[56ch] text-body-lg text-pretty text-text-muted">
-						{t('lead', { brand: BRAND.name })}
-					</p>
+					<p className="mt-5 max-w-[56ch] text-body-lg text-pretty text-text-muted">{t('lead')}</p>
 
 					<HeroActions />
 

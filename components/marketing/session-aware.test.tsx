@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { SessionContext, type SessionState } from '@/components/providers/session-context';
+import { BRAND } from '@/lib/brand';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import { Translated } from '@/tests/i18n';
 import type { SessionUser } from '@/lib/types/session';
@@ -55,14 +56,18 @@ describe('HeroActions', () => {
 	it('offers only the invite to a visitor with no session', () => {
 		withSession(anonymous, <HeroActions />);
 
-		expect(screen.getByRole('link', { name: /Add Tessera to Discord/ })).toBeInTheDocument();
+		expect(
+			screen.getByRole('link', { name: new RegExp(`Add ${BRAND.name} to Discord`) })
+		).toBeInTheDocument();
 		expect(screen.queryByRole('link', { name: /Open dashboard/ })).not.toBeInTheDocument();
 	});
 
 	it('keeps the invite as the primary action once signed in', () => {
 		withSession(signedIn, <HeroActions />);
 
-		expect(screen.getByRole('link', { name: /Add Tessera to Discord/ })).toBeInTheDocument();
+		expect(
+			screen.getByRole('link', { name: new RegExp(`Add ${BRAND.name} to Discord`) })
+		).toBeInTheDocument();
 	});
 
 	it('adds the dashboard shortcut once signed in', () => {
@@ -89,7 +94,9 @@ describe('HeroActions', () => {
 	it('points the invite at a real authorize URL, not a placeholder', () => {
 		withSession(anonymous, <HeroActions />);
 
-		const href = screen.getByRole('link', { name: /Add Tessera to Discord/ }).getAttribute('href');
+		const href = screen
+			.getByRole('link', { name: new RegExp(`Add ${BRAND.name} to Discord`) })
+			.getAttribute('href');
 
 		expect(href).toContain('https://discord.com/oauth2/authorize');
 		expect(href).not.toContain('PLACEHOLDER');

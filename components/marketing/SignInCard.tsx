@@ -80,10 +80,13 @@ export function SignInCard({ error, user }: SignInCardProps) {
 				) : null}
 
 				{signedIn ? (
-					<Button variant="ghost" href="/logout">
-						<LogOut aria-hidden="true" />
-						{t('otherAccount')}
-					</Button>
+					<div className="flex flex-col gap-1.5">
+						<Button variant="ghost" href="/logout">
+							<LogOut aria-hidden="true" />
+							{t('otherAccount')}
+						</Button>
+						<p className="text-center text-caption text-text-muted">{t('otherAccountHint')}</p>
+					</div>
 				) : (
 					<div className="flex gap-2.5 rounded-lg border border-border bg-surface-sunken p-3">
 						<Lock className="mt-0.5 size-4 shrink-0 text-text-muted" aria-hidden="true" />

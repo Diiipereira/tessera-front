@@ -2,6 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createTranslator } from 'next-intl';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { BRAND } from '@/lib/brand';
 import type { GuildSettings } from '@/lib/types/management';
 import enUS from '@/messages/en-US.json';
 import ptBR from '@/messages/pt-BR.json';
@@ -200,7 +201,7 @@ describe('SettingsScreen', () => {
 
 			await waitFor(() => {
 				expect(toastSuccess).toHaveBeenCalledWith(
-					t('settings.danger.left', { brand: 'Tessera', guild: GUILD_NAME }),
+					t('settings.danger.left', { brand: BRAND.name, guild: GUILD_NAME }),
 					{ description: copy.danger.leftHint }
 				);
 			});

@@ -161,9 +161,7 @@ export function AccountPanel({
 					<header className="flex shrink-0 items-center gap-3 border-b border-border px-5 py-4">
 						<div className="min-w-0 flex-1">
 							<DialogPrimitive.Title className="text-h3">{t('title')}</DialogPrimitive.Title>
-							<p className="mt-0.5 truncate text-body-sm text-text-muted">
-								{t('subtitle', { brand: BRAND.name })}
-							</p>
+							<p className="mt-0.5 truncate text-body-sm text-text-muted">{t('subtitle')}</p>
 						</div>
 						<DialogPrimitive.Close
 							aria-label={t('close')}

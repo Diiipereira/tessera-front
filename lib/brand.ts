@@ -1,7 +1,7 @@
 export const BRAND = {
-	name: 'Tessera',
+	name: 'Tessera Bot',
 	tagline: 'Configure your Discord bot from anywhere',
-	botName: 'Tessera'
+	botName: 'Tessera Bot'
 } as const;
 
 export const STORAGE_PREFIX = 'tessera:';

@@ -9,7 +9,7 @@ const MOCK = {
 	dashboardPath: '/modules/welcome',
 	staffChannel: '#staff',
 	channelName: 'welcome',
-	command: '/welcome channel',
+	command: '/config welcome channel-id:',
 	channelMention: '#welcome',
 	author: 'lia',
 	initial: 'L'
@@ -124,7 +124,7 @@ export function MirrorSplit() {
 									<span className="text-caption font-normal text-text-muted">{t('timestamp')}</span>
 								</div>
 								<p className="mt-0.5 font-mono text-body-sm">
-									<span className="text-primary">{MOCK.command}</span>{' '}
+									<span className="text-primary">{MOCK.command}</span>
 									<span className="text-text-muted">{MOCK.channelMention}</span>
 								</p>
 								<Badge variant="success" dot className="mt-2">

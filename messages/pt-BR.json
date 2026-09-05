@@ -85,8 +85,8 @@
 		"expandSidebar": "Expandir a barra lateral",
 		"collapseSidebar": "Recolher a barra lateral",
 		"managePlan": "Gerenciar",
-		"offline": "A {bot} está offline",
-		"offlineHint": "— as mudanças valem quando ela reconectar.",
+		"offline": "O {bot} está offline",
+		"offlineHint": "— as mudanças valem quando ele reconectar.",
 		"statusPage": "Página de status",
 		"searchServers": "Buscar servidores",
 		"searchServersPlaceholder": "Buscar servidores…",
@@ -115,7 +115,7 @@
 	},
 	"account": {
 		"title": "Conta",
-		"subtitle": "Sua conta {brand}, os aparelhos conectados a ela, e o que sai para o seu e-mail.",
+		"subtitle": "Sua conta, os aparelhos conectados a ela, e o que sai para o seu e-mail.",
 		"close": "Fechar as configurações da conta",
 		"sections": "Seções da conta",
 		"saved": "Preferências salvas",
@@ -133,7 +133,7 @@
 			"managed": "Gerenciado pelo Discord",
 			"idLabel": "ID do Discord",
 			"idHint": "O suporte pede este número quando precisa consultar alguma coisa.",
-			"upstream": "Mude seu nome ou avatar no Discord — a {brand} pega na próxima entrada."
+			"upstream": "Mude seu nome ou avatar no Discord — o {brand} pega na próxima entrada."
 		},
 		"interface": {
 			"title": "Interface",
@@ -147,13 +147,13 @@
 			"onMention": "Quando alguém me mencionar num ticket",
 			"onMentionHint": "Só nos tickets atribuídos a você.",
 			"onCase": "Quando um caso que eu abri for editado ou revogado",
-			"onProduct": "O que há de novo na {brand}",
+			"onProduct": "O que há de novo no {brand}",
 			"onProductHint": "No máximo uma vez por mês, e nunca sobre preço."
 		},
 		"servers": {
 			"title": "Servidores",
 			"description": "{count} servidores que você pode gerenciar.",
-			"present": "A {brand} está neste servidor",
+			"present": "O {brand} está neste servidor",
 			"absent": "Ainda não adicionada",
 			"noBot": "Sem bot"
 		},
@@ -197,10 +197,10 @@
 			"signIn": "Entrar"
 		},
 		"hero": {
-			"eyebrow": "11 módulos · um painel",
-			"title": "Cuide do seu servidor do Discord sem deixar uma tela de configuração aberta.",
-			"lead": "A {brand} cuida de moderação, boas-vindas, níveis, tickets e sorteios em todos os servidores que você gerencia. Mude uma configuração aqui ou por comando de barra — os dois sempre mostram o mesmo estado.",
-			"invite": "Adicionar a {brand} ao Discord",
+			"eyebrow": "10 módulos · um painel",
+			"title": "Tudo que o seu servidor do Discord precisa, em um bot só.",
+			"lead": "Dez módulos prontos para ligar no seu servidor. Configure pelo painel ou por comando — o que mudar em um aparece no outro.",
+			"invite": "Adicionar o {brand} ao Discord",
 			"dashboard": "Abrir o painel"
 		},
 		"trust": {
@@ -211,7 +211,7 @@
 		"modules": {
 			"overline": "Módulos",
 			"title": "Ligue o que você precisa, ignore o resto",
-			"lead": "Cada módulo nasce desligado, e cada um tem a sua própria tela com uma prévia ao vivo do que a {brand} vai publicar.",
+			"lead": "Cada módulo nasce desligado, e cada um tem a sua própria tela com uma prévia ao vivo do que o {brand} vai publicar.",
 			"moderation": {
 				"title": "Moderação",
 				"body": "Advertir, silenciar, expulsar e banir com motivo anexado. O escalonamento de advertências percorre a escada de punições por você."
@@ -230,21 +230,21 @@
 			},
 			"tickets": {
 				"title": "Tickets",
-				"body": "Painéis que abrem um canal privado, com construtor de formulário, transcrições e fechamento automático."
+				"body": "Painéis que abrem um canal privado, com cargos de equipe, transcrição do atendimento e fechamento automático."
 			},
 			"giveaways": {
 				"title": "Sorteios",
-				"body": "Requisitos de entrada por cargo ou nível, entradas bônus, contagem regressiva ao vivo e resorteio com um clique."
+				"body": "Requisitos de entrada por cargo ou nível, entradas bônus, prazo que conta sozinho no Discord e resorteio com um clique."
 			}
 		},
 		"mirror": {
 			"overline": "Configure de onde quiser",
-			"title": "O painel e os comandos de barra são a mesma coisa",
-			"lead": "Seus moderadores vivem no Discord e nunca abrem um navegador. Você quer uma tela de configuração de verdade. Os dois escrevem no mesmo estado, então nenhuma das visões fica desatualizada — e se alguém mudar uma configuração com o seu formulário aberto, a {brand} avisa em vez de sobrescrever.",
+			"title": "O painel e os comandos escrevem no mesmo lugar",
+			"lead": "Configure pela tela ou por comando, como preferir. Os dois gravam a mesma configuração — e se alguém mudar alguma coisa com o seu formulário aberto, o {brand} avisa em vez de sobrescrever.",
 			"saveBar": "Nada salva sozinho. Uma barra de salvamento diz quantas configurações mudaram antes de qualquer coisa chegar ao seu servidor.",
-			"conflict": "Se um comando de barra mudar a mesma configuração com o seu formulário aberto, a barra oferece Recarregar ou Manter o meu.",
-			"audit": "Toda mudança fica no log de auditoria com o autor, o antes e depois, e se veio da Web ou do Slash.",
-			"sameState": "mesmo estado",
+			"conflict": "Se um comando de barra mudar a mesma configuração com o seu formulário aberto, a barra oferece Recarregar ou Manter as minhas.",
+			"audit": "Toda mudança fica no log de auditoria com o autor, o antes e depois, e se veio do painel ou de um comando.",
+			"sameState": "mesma configuração",
 			"dashboardPanel": "painel · {path}",
 			"discordPanel": "no Discord · {channel}",
 			"channelField": "Canal de boas-vindas",
@@ -253,12 +253,12 @@
 		},
 		"help": {
 			"overline": "Documentação e suporte",
-			"title": "Ajuda antes de você precisar, e gente de verdade quando precisar",
+			"title": "Ajuda antes de você precisar",
 			"lead": "A tela de cada módulo leva direto à página dele na documentação. Se algo estiver realmente quebrado, o servidor de suporte é o caminho mais rápido.",
 			"docs": {
 				"title": "Documentação",
 				"body": "Guias de instalação e uma página por módulo, com as permissões exatas que cada um precisa.",
-				"meta": "onze módulos, uma página cada"
+				"meta": "dez módulos, uma página cada"
 			},
 			"support": {
 				"title": "Servidor de suporte",
@@ -267,7 +267,7 @@
 			},
 			"commands": {
 				"title": "Referência de comandos",
-				"body": "Todo comando de barra com uso, permissão exigida e tempo de espera.",
+				"body": "Todo comando de barra que o bot publica, o módulo a que pertence e o que ele faz.",
 				"meta": "agrupados por categoria"
 			},
 			"status": {
@@ -280,29 +280,29 @@
 			"title": "Perguntas frequentes",
 			"free": {
 				"question": "É de graça?",
-				"answer": "Sim, em servidores ilimitados. O Pro aumenta os limites dos módulos — mais regras de AutoMod, mais comandos personalizados, retenção de auditoria mais longa — e o Ultimate adiciona o módulo de economia."
+				"answer": "Sim, em servidores ilimitados."
 			},
 			"administrator": {
 				"question": "Preciso dar Administrador para ele?",
-				"answer": "Não. A {brand} pede as permissões que cada módulo precisa, e o painel diz exatamente qual permissão está faltando no ponto em que você faz a escolha — não depois de salvar."
+				"answer": "Não. O {brand} pede só as permissões que cada módulo precisa, e o card do servidor mostra o que estiver faltando."
 			},
 			"slash": {
 				"question": "O que acontece se meus moderadores usarem comandos de barra?",
-				"answer": "Nada quebra. Os dois escrevem o mesmo estado, e toda mudança cai no log de auditoria marcada como Web ou Slash, então dá para ver de onde veio."
+				"answer": "Nada quebra. Os dois gravam a mesma configuração, e toda mudança cai no log de auditoria dizendo se veio do painel ou de um comando."
 			},
 			"export": {
 				"question": "Dá para exportar minha configuração?",
-				"answer": "Dá. As configurações saem em um único arquivo, e a importação mostra o que mudaria antes de aplicar qualquer coisa."
+				"answer": "Ainda não. A configuração vive no painel e no Discord, e toda mudança fica no log de auditoria."
 			}
 		},
 		"cta": {
-			"title": "Adicione a {brand} a um servidor em cerca de um minuto",
-			"lead": "De graça em servidores ilimitados. O assistente de instalação te guia pelo canal de log e pelos cargos de moderação, e você pode pular.",
-			"invite": "Adicionar a {brand} ao Discord",
+			"title": "Adicione o {brand} a um servidor em cerca de um minuto",
+			"lead": "De graça em servidores ilimitados. O assistente de configuração te guia pelo canal de log e pelos cargos protegidos, e você pode pular.",
+			"invite": "Adicionar o {brand} ao Discord",
 			"docs": "Ler a documentação"
 		},
 		"footer": {
-			"tagline": "Um painel de configuração para um bot do Discord que fica em sincronia com os seus comandos de barra.",
+			"tagline": "Um bot do Discord que você configura pelo painel ou por comando.",
 			"status": "Todos os sistemas operando",
 			"product": "Produto",
 			"help": "Ajuda",
@@ -320,23 +320,24 @@
 		"signIn": {
 			"titleSignedIn": "Você já está conectado",
 			"titleSignedOut": "Entrar no painel",
-			"leadSignedIn": "Continue como você mesmo, ou troque para outra conta do Discord.",
-			"leadSignedOut": "O Discord é o único login — não existe senha separada para gerenciar.",
+			"leadSignedIn": "Escolha um dos servidores que você gerencia e comece a configurar.",
+			"leadSignedOut": "Entre com a sua conta do Discord, autorize e comece a usar.",
 			"badge": "Conectado",
 			"continueAs": "Continuar como {handle}",
 			"redirecting": "Redirecionando para o Discord…",
 			"discord": "Continuar com o Discord",
 			"retry": "Tentar de novo",
 			"otherAccount": "Usar outra conta",
+			"otherAccountHint": "Trocar de conta desconecta você primeiro.",
 			"scopes": "Vamos ler seu nome de usuário, avatar e os servidores que você pode gerenciar. Nunca lemos suas mensagens.",
-			"agreement": "Ao continuar, você concorda com os <terms>Termos</terms> e com a <privacy>Política de privacidade</privacy>.",
-			"requirement": "Você precisa de <permission>Gerenciar servidor</permission> em pelo menos um servidor do Discord."
+			"agreement": "Ao continuar, você concorda com os <terms>Termos de uso</terms> e com a <privacy>Política de Privacidade</privacy>.",
+			"requirement": "Você precisa da permissão de <permission>Gerenciar Servidor</permission> em pelo menos um servidor do Discord."
 		}
 	},
 	"legal": {
 		"terms": "Termos",
 		"privacy": "Política de privacidade",
-		"body": "O texto legal da {brand} ainda não foi escrito. Esta página existe para que a tela de login nunca leve a lugar nenhum.",
+		"body": "O texto legal do {brand} ainda não foi escrito. Esta página existe para que a tela de login nunca leve a lugar nenhum.",
 		"back": "Voltar para o login"
 	},
 	"brand": {
@@ -354,7 +355,7 @@
 		"forever": "para sempre, em servidores ilimitados",
 		"perMonthYearly": "por mês, cobrado {price} por ano",
 		"perMonth": "por mês, por servidor",
-		"invite": "Adicionar a {brand} ao Discord",
+		"invite": "Adicionar o {brand} ao Discord",
 		"start": "Começar com o {plan}",
 		"limitsOverline": "Limites",
 		"limitsTitle": "O que cada plano deixa você manter",
@@ -461,19 +462,19 @@
 	},
 	"servers": {
 		"title": "Seus servidores",
-		"lead": "Escolha um servidor para configurar, ou adicione a {brand} a um que você gerencia.",
+		"lead": "Escolha um servidor para configurar, ou adicione o {brand} a um que você gerencia.",
 		"searchLabel": "Buscar servidores",
 		"searchPlaceholder": "Buscar servidores…",
 		"filterLabel": "Filtrar servidores",
 		"filters": {
 			"all": "Todos",
-			"managed": "Com a {brand}",
+			"managed": "Com o {brand}",
 			"available": "Disponíveis"
 		},
-		"managedBy": "Gerenciados pela {brand}",
-		"addBrand": "Adicionar a {brand}",
+		"managedBy": "Gerenciados pelo {brand}",
+		"addBrand": "Adicionar o {brand}",
 		"emptyTitle": "Nenhum servidor encontrado",
-		"emptyBody": "Você precisa da permissão Gerenciar servidor em um servidor do Discord para configurar a {brand}.",
+		"emptyBody": "Você precisa da permissão Gerenciar servidor em um servidor do Discord para configurar o {brand}.",
 		"recheck": "Verificar as permissões de novo",
 		"unreachableTitle": "A API não respondeu",
 		"unreachableBody": "{reason}. Suba ela com <code>{command}</code> no repositório bot-api e recarregue esta página.",
@@ -488,12 +489,12 @@
 			"seatReason": "Você está aqui por um assento no painel, não como admin do servidor"
 		},
 		"add": {
-			"metaTitle": "Adicionando a {brand}",
-			"joined": "A {brand} está em {guild}",
-			"joinedUnknown": "A {brand} entrou",
+			"metaTitle": "Adicionando o {brand}",
+			"joined": "O {brand} está em {guild}",
+			"joinedUnknown": "O {brand} entrou",
 			"toSetup": "Levando você para a configuração…",
-			"waiting": "Esperando a {brand} entrar em {guild}…",
-			"waitingUnknown": "Esperando a {brand} entrar…",
+			"waiting": "Esperando o {brand} entrar em {guild}…",
+			"waitingUnknown": "Esperando o {brand} entrar…",
 			"authorize": "Conclua a autorização na janela do Discord e recarregue esta página.",
 			"inviteTo": "Convidar para {guild}",
 			"invite": "Abrir o convite"
@@ -503,7 +504,7 @@
 		"title": "Visão geral",
 		"metaTitle": "Visão geral · {guild}",
 		"fallbackGuild": "Servidor",
-		"lead": "O que a {brand} andou fazendo em {guild} esta semana.",
+		"lead": "O que o {brand} andou fazendo em {guild} esta semana.",
 		"stats": {
 			"members": "Membros",
 			"commands": "Comandos usados · 7d",
@@ -526,7 +527,7 @@
 			"joins": "Entradas"
 		},
 		"status": {
-			"title": "Status da {brand}",
+			"title": "Status do {brand}",
 			"online": "Online",
 			"offline": "Offline",
 			"uptime": "No ar há",
@@ -534,7 +535,7 @@
 			"latencyValue": "{ms} ms",
 			"shard": "Shard",
 			"unknown": "Sem sinal",
-			"neverReported": "A {brand} ainda não se reportou. Ela avisa assim que conecta no Discord.",
+			"neverReported": "O {brand} ainda não se reportou. Ele avisa assim que conecta no Discord.",
 			"uptimeDays": "{days}d {hours}h",
 			"uptimeHours": "{hours}h {minutes}min",
 			"uptimeMinutes": "{minutes}min",
@@ -565,7 +566,7 @@
 			}
 		},
 		"setup": {
-			"title": "Faltam três coisas para a {brand} fazer trabalho de verdade",
+			"title": "{count, plural, =1 {Falta uma coisa} other {Faltam # coisas}} para o {brand} fazer trabalho de verdade",
 			"body": "Você pode pular qualquer uma delas e voltar depois.",
 			"dismiss": "Dispensar a lista de configuração",
 			"welcome": {
@@ -573,7 +574,7 @@
 				"action": "Configurar"
 			},
 			"moderation": {
-				"label": "Definir seus cargos de moderação",
+				"label": "Definir seus cargos protegidos",
 				"action": "Configurar"
 			},
 			"logging": {
@@ -626,7 +627,7 @@
 	},
 	"members": {
 		"title": "Membros",
-		"description": "{count} pessoas neste servidor. Aqui estão as que a Tessera mediu alguma coisa — busque para alcançar qualquer outra.",
+		"description": "{count} pessoas neste servidor. Aqui estão as que o Tessera mediu alguma coisa — busque para alcançar qualquer outra.",
 		"search": "Buscar por nome ou apelido…",
 		"searchLabel": "Buscar membros",
 		"searchNote": "Quem responde a busca é o Discord, então ela volta na ordem dele e para em 50 resultados.",
@@ -668,7 +669,7 @@
 			"copyId": "Copiar ID",
 			"copied": "ID copiado",
 			"copyRefused": "O navegador recusou a área de transferência",
-			"gone": "Este membro não está mais no servidor. O que a Tessera registrou continua aqui.",
+			"gone": "Este membro não está mais no servidor. O que o Tessera registrou continua aqui.",
 			"level": "Nível",
 			"earningMessages": "Msgs c/ XP",
 			"warnings": "Advertências",
@@ -797,7 +798,7 @@
 		"searchLabel": "Buscar módulos",
 		"filter": "Filtrar por categoria",
 		"emptyTitle": "Nenhum módulo corresponde",
-		"emptyBody": "Nada na {brand} atende a isso. Tente outra palavra, ou limpe o filtro de categoria.",
+		"emptyBody": "Nada no {brand} atende a isso. Tente outra palavra, ou limpe o filtro de categoria.",
 		"turnedOn": "{name} ligado.",
 		"turnedOff": "{name} desligado.",
 		"movedElsewhere": "{name} já tinha mudado em outro lugar. Este é o estado atual."
@@ -818,7 +819,7 @@
 	},
 	"settings": {
 		"title": "Configurações",
-		"description": "Como a {brand} se comporta em {guild}, e as coisas que só dá para fazer uma vez.",
+		"description": "Como o {brand} se comporta em {guild}, e as coisas que só dá para fazer uma vez.",
 		"saved": "Configurações salvas",
 		"saveFailed": "Não foi possível salvar",
 		"unknownFailure": "Falha desconhecida",
@@ -866,14 +867,14 @@
 			"resetFailed": "Não foi possível restaurar as configurações",
 			"wasReset": "Configurações restauradas",
 			"wasResetHint": "Todo módulo voltou ao padrão e está desligado.",
-			"removeTitle": "Remover a {brand} de {guild}",
+			"removeTitle": "Remover o {brand} de {guild}",
 			"removeBody": "O bot sai do servidor. Sua configuração fica guardada por 30 dias, caso você o convide de volta.",
 			"remove": "Remover o bot",
-			"confirmTitle": "Remover a {brand} de {guild}?",
+			"confirmTitle": "Remover o {brand} de {guild}?",
 			"confirmDescription": "O bot sai na hora. Nada do que ele estava executando continua.",
 			"confirmLabel": "Remover o bot",
 			"confirmBody": "Tickets abertos continuam como canais, mas deixam de ser gerenciados. Sorteios ativos nunca sorteiam. Mensagens agendadas param.",
-			"left": "A {brand} saiu de {guild}",
+			"left": "O {brand} saiu de {guild}",
 			"leftHint": "Sua configuração fica guardada por 30 dias.",
 			"removeFailed": "Não foi possível remover o bot"
 		}
@@ -1670,7 +1671,7 @@
 			},
 			"escalation": {
 				"title": "Quando o motor age sozinho",
-				"description": "A escada que pune reincidente, e o que a Tessera faz sozinha quando um degrau é alcançado.",
+				"description": "A escada que pune reincidente, e o que o Tessera faz sozinho quando um degrau é alcançado.",
 				"auto": "O que o motor faz sem perguntar",
 				"autoHint": "O que ficar de fora vira chamado da staff em vez de punição.",
 				"channel": "Canal do chamado da staff",
@@ -1927,7 +1928,7 @@
 			"seat": "Posto",
 			"grants": "Um {role} recebe {granted} de {total} permissões."
 		},
-		"discordTail": "Tire a permissão no Discord para tirar esse acesso — a {brand} não consegue passar por cima dela.",
+		"discordTail": "Tire a permissão no Discord para tirar esse acesso — o {brand} não consegue passar por cima dela.",
 		"granted": "concedida",
 		"notGranted": "não concedida"
 	},
@@ -2051,7 +2052,7 @@
 		},
 		"basics": {
 			"title": "Onde fica este servidor?",
-			"body": "A {brand} usa isto para formatar datas e escolher as respostas.",
+			"body": "O {brand} usa isto para formatar datas e escolher as respostas.",
 			"language": "Idioma do servidor",
 			"languageHint": "As respostas dos comandos usam este idioma.",
 			"timezone": "Fuso horário",
@@ -2061,23 +2062,23 @@
 			"timezoneEmpty": "Nenhum fuso horário corresponde"
 		},
 		"modules": {
-			"title": "O que a {brand} deve fazer?",
+			"title": "O que o {brand} deve fazer?",
 			"body": "Ligue o que você precisa agora — o resto está a um clique depois."
 		},
 		"channels": {
-			"title": "Onde a {brand} escreve, e quem ela nunca toca",
-			"body": "Tudo isto pode mudar depois. Canais onde a {brand} não consegue publicar ficam bloqueados aqui.",
+			"title": "Onde o {brand} escreve, e quem ele nunca toca",
+			"body": "Tudo isto pode mudar depois. Canais onde o {brand} não consegue publicar ficam bloqueados aqui.",
 			"welcomeChannel": "Canal de boas-vindas",
 			"welcomeChannelHint": "Quem entra é recebido aqui.",
 			"welcomeChannelMissing": "As boas-vindas não podem ser ligadas sem um canal.",
 			"logChannel": "Canal de registros da moderação",
 			"logChannelHint": "Advertências, timeouts e banimentos são escritos aqui.",
 			"protectedRoles": "Cargos protegidos",
-			"protectedRolesHint": "A {brand} nunca pune quem tem estes cargos."
+			"protectedRolesHint": "O {brand} nunca pune quem tem estes cargos."
 		},
 		"done": {
 			"title": "Pronto para salvar",
-			"body": "É isto que a {brand} vai configurar em {guild}.",
+			"body": "É isto que o {brand} vai configurar em {guild}.",
 			"language": "Idioma",
 			"timezone": "Fuso horário",
 			"modulesOn": "Módulos ligados",
@@ -2091,7 +2092,7 @@
 		"next": "Avançar",
 		"finish": "Salvar e abrir o painel",
 		"saving": "Salvando…",
-		"saved": "A {brand} está configurada.",
+		"saved": "O {brand} está configurado.",
 		"failed": "Nada foi salvo",
 		"skip": "Pular a configuração"
 	},
@@ -2172,7 +2173,7 @@
 		},
 		"bot": {
 			"remove": {
-				"label": "Remover a Tessera",
+				"label": "Remover o Tessera",
 				"description": "Tirar o bot deste servidor."
 			}
 		}
@@ -2189,7 +2190,7 @@
 				"description": "Trabalha sobre um caso já registrado"
 			},
 			"config": {
-				"description": "Configure a Tessera neste servidor"
+				"description": "Configure o Tessera neste servidor"
 			},
 			"daily": {
 				"description": "Pega o que o servidor paga todo dia"

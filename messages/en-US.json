@@ -115,7 +115,7 @@
 	},
 	"account": {
 		"title": "Account",
-		"subtitle": "Your {brand} account, the devices signed in to it, and what leaves your inbox.",
+		"subtitle": "Your account, the devices signed in to it, and what leaves your inbox.",
 		"close": "Close account settings",
 		"sections": "Account sections",
 		"saved": "Preferences saved",
@@ -197,9 +197,9 @@
 			"signIn": "Sign in"
 		},
 		"hero": {
-			"eyebrow": "11 modules · one dashboard",
-			"title": "Run your Discord server without leaving a settings page open.",
-			"lead": "{brand} handles moderation, welcomes, levels, tickets and giveaways across every server you manage. Change a setting here or with a slash command — both always show the same live state.",
+			"eyebrow": "10 modules · one dashboard",
+			"title": "Everything your Discord server needs, in one bot.",
+			"lead": "Ten modules ready to switch on in your server. Set them up from the dashboard or with a command — change one and the other shows it.",
 			"invite": "Add {brand} to Discord",
 			"dashboard": "Open dashboard"
 		},
@@ -230,21 +230,21 @@
 			},
 			"tickets": {
 				"title": "Tickets",
-				"body": "Panels that open a private channel, with a form builder, transcripts and auto-close."
+				"body": "Panels that open a private channel, with staff roles, a transcript of the conversation and auto-close."
 			},
 			"giveaways": {
 				"title": "Giveaways",
-				"body": "Entry requirements by role or level, bonus entries, live countdowns and a one-click reroll."
+				"body": "Entry requirements by role or level, bonus entries, a deadline Discord counts down on its own, and a one-click reroll."
 			}
 		},
 		"mirror": {
 			"overline": "Configure anywhere",
-			"title": "The dashboard and the slash commands are the same thing",
-			"lead": "Your moderators live in Discord and never open a browser. You want a real settings page. Both write to the same state, so neither view is ever stale — and if someone changes a setting while your form is open, {brand} tells you instead of overwriting it.",
+			"title": "The dashboard and the commands write to the same place",
+			"lead": "Set things up from the screen or by command, whichever you prefer. Both write the same configuration — and if someone changes something while your form is open, {brand} tells you instead of overwriting it.",
 			"saveBar": "Nothing auto-saves. A save bar names how many settings changed before anything reaches your server.",
 			"conflict": "If a slash command changes the same setting while your form is open, the bar offers Reload or Keep mine.",
-			"audit": "Every change is in the audit log with the actor, a before/after diff and whether it came from Web or Slash.",
-			"sameState": "same state",
+			"audit": "Every change is in the audit log with the actor, a before/after diff and whether it came from the dashboard or a command.",
+			"sameState": "same configuration",
 			"dashboardPanel": "dashboard · {path}",
 			"discordPanel": "in Discord · {channel}",
 			"channelField": "Welcome channel",
@@ -253,12 +253,12 @@
 		},
 		"help": {
 			"overline": "Docs & support",
-			"title": "Help before you need it, and a human when you do",
+			"title": "Help before you need it",
 			"lead": "Every module page links straight to its own docs page. If something is genuinely broken, the support server is the fastest route.",
 			"docs": {
 				"title": "Documentation",
 				"body": "Setup guides and a page per module, with the exact permissions each one needs.",
-				"meta": "eleven modules, one page each"
+				"meta": "ten modules, one page each"
 			},
 			"support": {
 				"title": "Support server",
@@ -267,7 +267,7 @@
 			},
 			"commands": {
 				"title": "Command reference",
-				"body": "Every slash command with its usage, required permission and cooldown.",
+				"body": "Every slash command the bot publishes, the module it belongs to and what it does.",
 				"meta": "grouped by category"
 			},
 			"status": {
@@ -280,29 +280,29 @@
 			"title": "Common questions",
 			"free": {
 				"question": "Is it free?",
-				"answer": "Yes, on unlimited servers. Pro raises the module limits — more AutoMod rules, more custom commands, longer audit retention — and Ultimate adds the economy module."
+				"answer": "Yes, on unlimited servers."
 			},
 			"administrator": {
 				"question": "Do I need to give it Administrator?",
-				"answer": "No. {brand} asks for the permissions each module needs, and the dashboard tells you exactly which permission is missing where you make the choice — not after you save."
+				"answer": "No. {brand} asks only for the permissions each module needs, and the server card shows anything that is missing."
 			},
 			"slash": {
 				"question": "What happens if my moderators use slash commands instead?",
-				"answer": "Nothing breaks. Both write the same state, and every change lands in the audit log tagged Web or Slash so you can see where it came from."
+				"answer": "Nothing breaks. Both write the same configuration, and every change lands in the audit log saying whether it came from the dashboard or a command."
 			},
 			"export": {
 				"question": "Can I export my configuration?",
-				"answer": "Yes. Settings export to a single file, and importing shows a diff of what would change before anything is applied."
+				"answer": "Not yet. Your configuration lives in the dashboard and in Discord, and every change stays in the audit log."
 			}
 		},
 		"cta": {
 			"title": "Add {brand} to a server in about a minute",
-			"lead": "Free on unlimited servers. The setup wizard walks you through the log channel and moderator roles, and you can skip it.",
+			"lead": "Free on unlimited servers. The setup wizard walks you through the log channel and the protected roles, and you can skip it.",
 			"invite": "Add {brand} to Discord",
 			"docs": "Read the docs"
 		},
 		"footer": {
-			"tagline": "A configuration dashboard for a Discord bot that stays in sync with your slash commands.",
+			"tagline": "A Discord bot you configure from the dashboard or by command.",
 			"status": "All systems operational",
 			"product": "Product",
 			"help": "Help",
@@ -320,17 +320,18 @@
 		"signIn": {
 			"titleSignedIn": "You're already signed in",
 			"titleSignedOut": "Sign in to the dashboard",
-			"leadSignedIn": "Continue as yourself, or switch to another Discord account.",
-			"leadSignedOut": "Discord is the only sign-in — there is no separate password to manage.",
+			"leadSignedIn": "Pick one of the servers you manage and start setting it up.",
+			"leadSignedOut": "Sign in with your Discord account, authorize access, and start using it.",
 			"badge": "Signed in",
 			"continueAs": "Continue as {handle}",
 			"redirecting": "Redirecting to Discord…",
 			"discord": "Continue with Discord",
 			"retry": "Try again",
 			"otherAccount": "Use another account",
+			"otherAccountHint": "Switching accounts signs you out first.",
 			"scopes": "We’ll read your username, avatar and the servers you can manage. We never read your messages.",
-			"agreement": "By continuing you agree to the <terms>Terms</terms> and the <privacy>Privacy policy</privacy>.",
-			"requirement": "You need <permission>Manage Server</permission> on at least one Discord server."
+			"agreement": "By continuing you agree to the <terms>Terms of Use</terms> and the <privacy>Privacy Policy</privacy>.",
+			"requirement": "You need the <permission>Manage Server</permission> permission on at least one Discord server."
 		}
 	},
 	"legal": {
@@ -565,7 +566,7 @@
 			}
 		},
 		"setup": {
-			"title": "Three things left before {brand} is doing real work",
+			"title": "{count, plural, =1 {One thing left} other {# things left}} before {brand} is doing real work",
 			"body": "You can skip any of these and come back later.",
 			"dismiss": "Dismiss setup checklist",
 			"welcome": {
@@ -573,7 +574,7 @@
 				"action": "Set up"
 			},
 			"moderation": {
-				"label": "Set your moderator roles",
+				"label": "Set your protected roles",
 				"action": "Set up"
 			},
 			"logging": {
