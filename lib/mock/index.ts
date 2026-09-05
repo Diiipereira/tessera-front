@@ -1,5 +1,4 @@
 export { mockAccountPreferences, mockAccountSessions } from './account';
-export { findTenant, mockBlacklist, mockTenants } from './admin';
 export { mockChannels, mockRoles } from './discord';
 export { mockGuilds } from './guilds';
 export { mockBotOnline, mockPlan, mockUser } from './session';
