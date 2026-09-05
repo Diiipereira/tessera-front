@@ -15,7 +15,10 @@ export function OutboundLink({
 
 	if (href === null) {
 		return (
-			<span aria-disabled="true" className={cn(className, 'pointer-events-none opacity-55')}>
+			<span
+				aria-disabled="true"
+				className={cn(className, 'pointer-events-none relative opacity-55')}
+			>
 				{children}
 				<span className="sr-only"> — {t('notAvailable')}</span>
 			</span>

@@ -28,4 +28,10 @@ describe('OutboundLink', () => {
 		expect(screen.getByText(enUS.common.notAvailable, { exact: false })).toBeInTheDocument();
 		expect(screen.getByText(/Support/)).toHaveAttribute('aria-disabled', 'true');
 	});
+
+	it('holds the hidden note inside itself, or sr-only escapes a clipped layout', () => {
+		render(<OutboundLink href={null}>Support</OutboundLink>, { wrapper: Translated });
+
+		expect(screen.getByText(/Support/)).toHaveClass('relative');
+	});
 });

@@ -229,6 +229,18 @@ um `<span>` inerte com `aria-disabled` e um sufixo `sr-only` dizendo por quê, e
 leva a lugar nenhum. No `UserMenu` quem desabilita é o `disabled` do próprio Radix, porque item de
 menu inerte precisa sair da navegação por teclado — um span apagado continuaria focável.
 
+**O `sr-only` do `OutboundLink` precisa de pai posicionado, e isso derrubou a documentação.** O
+sufixo escondido nasceu sem `relative` no `<span>` que o envolve. `sr-only` é `position: absolute`,
+e sem ancestral posicionado o bloco contêiner dele vira o documento — então ele **não é recortado**
+pelo `overflow-hidden` da coluna e estica a página. Como o rodapé da documentação carrega o link de
+suporte desabilitado, o resultado foi o layout de altura fixa (`h-svh overflow-hidden`) ganhando
+**215px** de rolagem: duas barras, e a barra lateral subindo junto com o conteúdo, que é exatamente
+o que aquele layout existe para impedir. Medido: `html.scrollHeight` 1120 contra `clientHeight` 905,
+com o culpado localizado por um `sr-only` em `top: 1119` cujo `offsetParent` era o `body`; com
+`relative` o `offsetParent` passa a ser o próprio link e o documento volta a 905, `scrollY` fixo em
+zero, coluna rolando 368px e o aside parado em 65. **Regra geral: `sr-only` dentro de um container
+recortado precisa de pai posicionado, senão ele vaza para o documento.**
+
 **No card, o selo entra no lugar da `meta`, não junto.** As duas linhas são afirmações sobre o
 serviço — _"geralmente em menos de 2 horas"_ e _"todos os sistemas operacionais"_ — e mantê-las num
 card desligado seria pior que o placeholder que acabou de sair. A cópia não foi tocada: ela volta
