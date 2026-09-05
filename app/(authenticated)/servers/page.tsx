@@ -7,6 +7,8 @@ import { apiGet } from '@/lib/api';
 import type { AuthenticatedUserDto, GuildListDto } from '@/lib/api-url';
 import { toGuild, toSessionUser } from '@/lib/guild-presentation';
 import { mockUser } from '@/lib/mock';
+import { guildHref } from '@/lib/navigation';
+import type { GuildSettingsDto } from '@/lib/types/management';
 import { ServerPicker } from './ServerPicker';
 
 const START_COMMAND = 'npm run dev:api';
@@ -59,6 +61,20 @@ export default async function Page({
 					</Alert>
 				</div>
 			</div>
+		);
+	}
+
+	const added = typeof params.added === 'string' ? params.added : null;
+	const arrived =
+		added === null ? undefined : guildsResult.data.managed.find((guild) => guild.id === added);
+
+	if (added !== null && arrived !== undefined) {
+		const settings = await apiGet<GuildSettingsDto>(`/guilds/${added}/settings`);
+
+		redirect(
+			settings.status === 'ok' && settings.data.setupCompleted
+				? guildHref(added, '')
+				: guildHref(added, '/setup')
 		);
 	}
 

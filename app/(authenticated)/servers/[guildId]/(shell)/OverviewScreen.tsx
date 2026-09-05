@@ -69,7 +69,9 @@ export function OverviewScreen({ guild, overview, audit, now }: OverviewScreenPr
 	const t = useTranslations('overview');
 	const locale = useLocale();
 	const [dismissed, setDismissed] = useState(false);
-	const showSetup = !overview.setupCompleted && !dismissed;
+	const checklist = toChecklist(overview.checklist);
+	const remaining = checklist.filter((item) => !item.done).length;
+	const showSetup = !overview.setupCompleted && remaining > 0 && !dismissed;
 
 	const activity = useMemo(() => {
 		const weekday = new Intl.DateTimeFormat(locale, { weekday: 'short', timeZone: 'UTC' });
@@ -136,7 +138,7 @@ export function OverviewScreen({ guild, overview, audit, now }: OverviewScreenPr
 			<div className="flex flex-col gap-6">
 				{showSetup ? (
 					<SetupBanner
-						items={toChecklist(overview.checklist)}
+						items={checklist}
 						guildId={guild.id}
 						onDismiss={() => {
 							setDismissed(true);

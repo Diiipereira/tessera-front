@@ -16,13 +16,16 @@ type SetupBannerProps = {
 
 export function SetupBanner({ items, guildId, onDismiss }: SetupBannerProps) {
 	const t = useTranslations('overview.setup');
+	const remaining = items.filter((item) => !item.done).length;
 
 	return (
 		<div className="flex gap-4 rounded-lg border border-primary bg-primary-subtle p-5">
 			<Zap className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden="true" />
 
 			<div className="min-w-0 flex-1">
-				<h2 className="text-h4 text-primary-subtle-fg">{t('title', { brand: BRAND.name })}</h2>
+				<h2 className="text-h4 text-primary-subtle-fg">
+					{t('title', { brand: BRAND.name, count: remaining })}
+				</h2>
 				<p className="mb-3 text-body-sm text-pretty text-primary-subtle-fg opacity-90">
 					{t('body')}
 				</p>
