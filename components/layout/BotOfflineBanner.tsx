@@ -1,6 +1,8 @@
 import { TriangleAlert } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { OutboundLink } from '@/components/ui/OutboundLink';
 import { BRAND } from '@/lib/brand';
+import { STATUS_HREF } from '@/lib/support-links';
 
 export function BotOfflineBanner() {
 	const t = useTranslations('shell');
@@ -14,13 +16,12 @@ export function BotOfflineBanner() {
 			<span className="text-body font-medium">{t('offline', { bot: BRAND.botName })}</span>
 			<span className="text-body opacity-85">{t('offlineHint')}</span>
 			<div className="flex-1" />
-			<a
-				href={BRAND.supportUrl}
-				rel="external"
+			<OutboundLink
+				href={STATUS_HREF}
 				className="text-body-sm font-medium text-danger-fg hover:underline"
 			>
 				{t('statusPage')}
-			</a>
+			</OutboundLink>
 		</div>
 	);
 }

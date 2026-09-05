@@ -7,7 +7,9 @@ import { LocaleToggle } from '@/components/layout/LocaleToggle';
 import { ThemeToggle } from '@/components/layout/ThemeToggle';
 import { UserMenu } from '@/components/layout/UserMenu';
 import { Button } from '@/components/ui/Button';
+import { OutboundLink } from '@/components/ui/OutboundLink';
 import { BRAND } from '@/lib/brand';
+import { SUPPORT_HREF } from '@/lib/support-links';
 import type { SessionUser } from '@/lib/types/session';
 
 const navLink =
@@ -27,9 +29,9 @@ export function AccountBar({ user }: { user: SessionUser | null }) {
 				<Link href="/docs" className={navLink}>
 					{t('docs')}
 				</Link>
-				<a href={BRAND.supportUrl} rel="external" className={navLink}>
+				<OutboundLink href={SUPPORT_HREF} className={navLink}>
 					{t('support')}
-				</a>
+				</OutboundLink>
 			</nav>
 
 			<div className="flex-1" />

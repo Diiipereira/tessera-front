@@ -10,7 +10,8 @@
 		"select": "Selecione…",
 		"justNow": "agora mesmo",
 		"unknownTime": "desconhecido",
-		"unknown": "Desconhecido"
+		"unknown": "Desconhecido",
+		"notAvailable": "Ainda não disponível"
 	},
 	"channelSwitch": {
 		"first": "A partir de salvar, #{to} recebe a mensagem de boas-vindas.",

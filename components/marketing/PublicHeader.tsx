@@ -1,6 +1,7 @@
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { BrandMark } from '@/components/auth/BrandMark';
+import { OutboundLink } from '@/components/ui/OutboundLink';
 import { BRAND } from '@/lib/brand';
 import { NAV_LINKS } from '@/lib/marketing';
 import { PublicHeaderActions } from './PublicHeaderActions';
@@ -22,9 +23,9 @@ export function PublicHeader() {
 				<nav aria-label={t('main')} className="hidden min-w-0 flex-1 items-center gap-1 md:flex">
 					{NAV_LINKS.map((link) =>
 						link.external ? (
-							<a key={link.id} href={link.href} rel="external" className={navLink}>
+							<OutboundLink key={link.id} href={link.href} className={navLink}>
 								{t(link.id)}
-							</a>
+							</OutboundLink>
 						) : (
 							<Link key={link.id} href={link.href} className={navLink}>
 								{t(link.id)}

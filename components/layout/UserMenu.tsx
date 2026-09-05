@@ -15,7 +15,7 @@ import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import type { RefObject } from 'react';
 import { useTheme, type ThemeMode } from '@/components/providers/theme-context';
-import { BRAND } from '@/lib/brand';
+import { SUPPORT_HREF } from '@/lib/support-links';
 import type { SessionUser } from '@/lib/types/session';
 import { cn } from '@/lib/utils/cn';
 import { Avatar } from './Avatar';
@@ -53,6 +53,7 @@ export function UserMenu({
 	compact = false
 }: UserMenuProps) {
 	const t = useTranslations('shell');
+	const shared = useTranslations('common');
 	const { mode, setMode } = useTheme();
 
 	const triggerClass = compact
@@ -132,12 +133,20 @@ export function UserMenu({
 						</Link>
 					</DropdownMenu.Item>
 
-					<DropdownMenu.Item asChild>
-						<a href={BRAND.supportUrl} rel="external" className={item}>
+					{SUPPORT_HREF === null ? (
+						<DropdownMenu.Item disabled className={cn(item, 'opacity-55')}>
 							<LifeBuoy className="size-4 shrink-0 text-text-subtle" aria-hidden="true" />
 							<span className="flex-1">{t('support')}</span>
-						</a>
-					</DropdownMenu.Item>
+							<span className="sr-only">{shared('notAvailable')}</span>
+						</DropdownMenu.Item>
+					) : (
+						<DropdownMenu.Item asChild>
+							<a href={SUPPORT_HREF} rel="external" className={item}>
+								<LifeBuoy className="size-4 shrink-0 text-text-subtle" aria-hidden="true" />
+								<span className="flex-1">{t('support')}</span>
+							</a>
+						</DropdownMenu.Item>
+					)}
 
 					<DropdownMenu.Separator className="my-1 h-px bg-border" />
 

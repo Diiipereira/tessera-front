@@ -2,6 +2,8 @@ import { ArrowUpRight, ExternalLink } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
+import { Badge } from '@/components/ui/Badge';
+import { OutboundLink } from '@/components/ui/OutboundLink';
 import { HELP_CARDS, type HelpCard } from '@/lib/marketing';
 import { cn } from '@/lib/utils/cn';
 import { Section, SectionIntro } from './Section';
@@ -12,9 +14,9 @@ const cardClass =
 function CardShell({ card, children }: { card: HelpCard; children: ReactNode }) {
 	if (card.external) {
 		return (
-			<a href={card.href} rel="external" className={cardClass}>
+			<OutboundLink href={card.href} className={cardClass}>
 				{children}
-			</a>
+			</OutboundLink>
 		);
 	}
 
@@ -27,6 +29,7 @@ function CardShell({ card, children }: { card: HelpCard; children: ReactNode }) 
 
 export function HelpCards() {
 	const t = useTranslations('marketing.help');
+	const shared = useTranslations('common');
 
 	return (
 		<Section id="support">
@@ -41,6 +44,7 @@ export function HelpCards() {
 				{HELP_CARDS.map((card) => {
 					const Icon = card.icon;
 					const Arrow = card.external ? ExternalLink : ArrowUpRight;
+					const reachable = !card.external || card.href !== null;
 
 					return (
 						<CardShell key={card.id} card={card}>
@@ -54,9 +58,15 @@ export function HelpCards() {
 								<Arrow className="size-3.5 shrink-0 text-text-subtle" aria-hidden="true" />
 							</div>
 							<p className="text-body text-pretty text-text-muted">{t(`${card.id}.body`)}</p>
-							<span className="font-mono text-caption font-normal text-text-muted">
-								{t(`${card.id}.meta`)}
-							</span>
+							{reachable ? (
+								<span className="font-mono text-caption font-normal text-text-muted">
+									{t(`${card.id}.meta`)}
+								</span>
+							) : (
+								<Badge variant="neutral" className="self-start">
+									{shared('notAvailable')}
+								</Badge>
+							)}
 						</CardShell>
 					);
 				})}

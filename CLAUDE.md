@@ -214,12 +214,31 @@ verdade (`AccountPanel`, `SettingsScreen`, `WelcomeScreen`) e as outras são moc
 fase 7. Numa tela que salva de verdade, o usuário não tem como saber qual botão é qual — então
 ação falsa em tela real é bug, e em tela mock é o combinado.
 
-Três valores na landing são inventados e **só são aceitáveis enquanto o site não é público**:
-`TRUST_STATS` em `lib/marketing.ts` (12.400 servidores, 4.1M membros, 99,9% de uptime),
-`BRAND.supportUrl` (`discord.gg/placeholder`) e `BRAND.statusUrl`. A lista completa, com o que
-cada um precisa virar, está em `docs-markdown/estado-do-projeto.md`, em **"A remover antes de
-fechar o projeto"**. Ao mexer em qualquer um desses arquivos, conferir se a pendência ainda
-vale.
+**Sobrou um valor inventado na landing**, e ele **só é aceitável enquanto o site não é público**:
+`TRUST_STATS` em `lib/marketing.ts` (12.400 servidores, 4.1M membros, 99,9% de uptime). A lista
+completa, com o que cada um precisa virar, está em `docs-markdown/estado-do-projeto.md`, em
+**"A remover antes de fechar o projeto"**. Ao mexer em qualquer um desses arquivos, conferir se a
+pendência ainda vale.
+
+**O servidor de suporte e a página de status saíram da lista em 04/09, pelo mesmo caminho do
+convite.** `BRAND.supportUrl` era `discord.gg/placeholder` e aparecia em **seis** telas — nav e
+rodapé da LP, dois cards de ajuda, `AccountBar`, `UserMenu` e o aviso de bot offline. Agora eles
+vêm de `NEXT_PUBLIC_SUPPORT_URL` e `NEXT_PUBLIC_STATUS_URL` (`lib/support-links.ts`), e sem a
+variável o valor é `null`, não uma URL de mentira. Quem trata o `null` é o `OutboundLink`: ele vira
+um `<span>` inerte com `aria-disabled` e um sufixo `sr-only` dizendo por quê, em vez de um link que
+leva a lugar nenhum. No `UserMenu` quem desabilita é o `disabled` do próprio Radix, porque item de
+menu inerte precisa sair da navegação por teclado — um span apagado continuaria focável.
+
+**No card, o selo entra no lugar da `meta`, não junto.** As duas linhas são afirmações sobre o
+serviço — _"geralmente em menos de 2 horas"_ e _"todos os sistemas operacionais"_ — e mantê-las num
+card desligado seria pior que o placeholder que acabou de sair. A cópia não foi tocada: ela volta
+sozinha quando a variável existir.
+
+**O link do aviso de bot offline passou a apontar para o status, não para o suporte.** Ele diz
+_"Página de status"_ e ia para o servidor do Discord; enquanto as duas eram placeholder a diferença
+não aparecia, e ao configurar só uma apareceria. Há teste que falha se qualquer arquivo dessa lista
+voltar a conter `discord.gg/placeholder` ou `placeholder.dev`, e ele nomeia o arquivo culpado —
+conferido quebrando de propósito.
 
 O convite do bot saiu dessa lista: ele é montado em `lib/discord-invite.ts` a partir de
 `NEXT_PUBLIC_DISCORD_CLIENT_ID`, com o inteiro de permissões derivado dos bits da doc oficial.

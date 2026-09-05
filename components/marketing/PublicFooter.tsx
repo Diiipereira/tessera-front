@@ -1,6 +1,7 @@
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { BrandMark } from '@/components/auth/BrandMark';
+import { OutboundLink } from '@/components/ui/OutboundLink';
 import { BRAND } from '@/lib/brand';
 import { FOOTER_COLUMNS } from '@/lib/marketing';
 import { MOCK_NOW } from '@/lib/time';
@@ -30,9 +31,9 @@ export function PublicFooter() {
 							<div className="flex flex-col items-start gap-2">
 								{column.links.map((link) =>
 									link.external ? (
-										<a key={link.id} href={link.href} rel="external" className={footerLink}>
+										<OutboundLink key={link.id} href={link.href} className={footerLink}>
 											{t(`links.${link.id}`)}
-										</a>
+										</OutboundLink>
 									) : (
 										<Link key={link.id} href={link.href} className={footerLink}>
 											{t(`links.${link.id}`)}
