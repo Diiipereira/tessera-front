@@ -1296,6 +1296,7 @@
 			"title": "Reaction roles",
 			"description": "Members pick their own roles, without asking staff.",
 			"saved": "Reaction roles saved",
+			"new": "New panel",
 			"untitled": "Untitled panel",
 			"defaultName": "Pick your roles",
 			"previewLabel": "Panel preview",

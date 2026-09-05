@@ -2,6 +2,7 @@
 
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 import { cn } from '@/lib/utils/cn';
 
@@ -42,6 +43,8 @@ export function Dialog({
 	className,
 	children
 }: DialogProps) {
+	const t = useTranslations('common');
+
 	return (
 		<DialogPrimitive.Root open={open} defaultOpen={defaultOpen} onOpenChange={onOpenChange}>
 			{trigger ? (
@@ -69,7 +72,7 @@ export function Dialog({
 							) : null}
 						</div>
 						<DialogPrimitive.Close
-							aria-label="Close"
+							aria-label={t('close')}
 							className="grid size-8 shrink-0 place-items-center rounded-md text-text-muted transition-colors duration-120 ease-out hover:bg-surface-hover hover:text-text"
 						>
 							<X className="size-4" aria-hidden="true" />

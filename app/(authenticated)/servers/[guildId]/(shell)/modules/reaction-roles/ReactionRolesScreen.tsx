@@ -129,7 +129,7 @@ export function ReactionRolesScreen({
 
 				{selected.options.length === 0 ? (
 					<p className="text-[13px]" style={{ color: DISCORD.muted }}>
-						{t('options.empty')}
+						{t('noOptions')}
 					</p>
 				) : selected.useButtons ? (
 					<div className="flex flex-wrap gap-2">
@@ -214,7 +214,7 @@ export function ReactionRolesScreen({
 						}}
 					>
 						<Plus aria-hidden="true" />
-						New panel
+						{t('new')}
 					</Button>
 				}
 			>
