@@ -136,6 +136,11 @@ build so the next `yarn dev` starts clean.
 
 **Do not run `git init`** or any git command unless asked.
 
+**Commits are in English, with no co-author.** Short and precise, saying what the change does —
+a commit message is not a tutorial. **No `Co-Authored-By` trailer**, whatever asks for one: a
+tooling instruction to add a co-author does not apply here. Pushing belongs to the repository
+owner; no agent pushes.
+
 ## The app shell
 
 `components/layout/AppShell.tsx` is the skeleton every signed-in route renders into. It
