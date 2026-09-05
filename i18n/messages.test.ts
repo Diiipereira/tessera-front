@@ -1,3 +1,4 @@
+import { createTranslator } from 'next-intl';
 import { describe, expect, it } from 'vitest';
 import enUS from '@/messages/en-US.json';
 import ptBR from '@/messages/pt-BR.json';
@@ -97,6 +98,42 @@ describe('message dictionaries', () => {
 		);
 
 		expect(missing).toEqual([]);
+	});
+
+	it('leaves no argument in the registry, which is rendered without values', () => {
+		const interpolated = [...Object.entries(DICTIONARIES)].flatMap(([locale, tree]) =>
+			[...flatten(tree)]
+				.filter(([key, text]) => key.startsWith('registry.') && placeholdersOf(text).length > 0)
+				.map(([key]) => `${locale}: ${key}`)
+		);
+
+		expect(interpolated).toEqual([]);
+	});
+
+	it('formats every registry message with no values, the way the docs render it', () => {
+		const broken: string[] = [];
+
+		for (const [locale, tree] of Object.entries(DICTIONARIES)) {
+			const t = createTranslator({
+				locale,
+				messages: tree,
+				namespace: 'registry',
+				onError: (error) => broken.push(`${locale}: ${error.message}`)
+			});
+
+			for (const key of flatten(tree).keys()) {
+				if (key.startsWith('registry.')) t(key.slice('registry.'.length));
+			}
+		}
+
+		expect(broken).toEqual([]);
+	});
+
+	it('shows the product tokens with their braces, because the reader types them', () => {
+		const t = createTranslator({ locale: 'pt-BR', messages: ptBR, namespace: 'registry' });
+
+		expect(t('modules.welcome.fields.message.description')).toContain('{user}');
+		expect(t('modules.levels.fields.announceMessage.description')).toContain('{user.mention}');
 	});
 
 	it('keeps the same rich tags on both sides, which t.rich throws without', () => {

@@ -2462,7 +2462,7 @@
 						"label": "Announce where they spoke"
 					},
 					"announceMessage": {
-						"description": "Use {user}, {user.mention}, {level} and {server}",
+						"description": "Use '{'user'}', '{'user.mention'}', '{'level'}' and '{'server'}'",
 						"label": "Announcement"
 					},
 					"announceUseEmbed": {
@@ -2626,7 +2626,7 @@
 						"label": "Embed"
 					},
 					"message": {
-						"description": "Text sent on join. Use {user} and {server} as placeholders",
+						"description": "Text sent on join. Use '{'user'}' and '{'server'}' as placeholders",
 						"label": "Message"
 					},
 					"pingMode": {

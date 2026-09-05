@@ -1166,6 +1166,16 @@ valor do token: erro `FORMATTING_ERROR` e a tela renderiza **o caminho da chave*
 
 A forma escapada funciona nos dois casos, então ela é a única forma certa.
 
+**As 167 chaves do `registry` chegaram do dicionário do bot sem esse escape, e quatro delas
+quebraram a documentação em 04/09** — as descrições de `welcome.message` e `levels.announceMessage`
+nos dois idiomas. O bot resolve com o dicionário dele, que não passa pelo ICU do next-intl; ao
+copiar as chaves para cá, o escape não veio junto. Agora há guard: **nenhuma mensagem sob
+`registry` pode ter argumento ICU**, porque a docs e o painel a renderizam sem passar valor nenhum.
+Um teste formata as 167 com `createTranslator` e zero valores, outro recusa qualquer `{arg}` no
+namespace, e um terceiro exige que `{user}` e `{user.mention}` **cheguem com as chaves** na tela.
+Conferido quebrando de propósito: os quatro caem, e um deles mostra a tela renderizando
+`registry.modules.welcome.fields.messa…`.
+
 Corolário no teste de paridade: `placeholdersOf` extrai argumento ICU, não qualquer `{`.
 A regex é `/\{\s*(\w+)\s*[},]/` — com `/\{(\w+)/` ela casava também o **corpo das ramificações
 do plural** (`{is not a variable` virava `is`), que por definição muda de idioma, e acusava

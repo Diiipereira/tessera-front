@@ -2462,7 +2462,7 @@
 						"label": "Anunciar onde falou"
 					},
 					"announceMessage": {
-						"description": "Use {user}, {user.mention}, {level} e {server}",
+						"description": "Use '{'user'}', '{'user.mention'}', '{'level'}' e '{'server'}'",
 						"label": "Anúncio"
 					},
 					"announceUseEmbed": {
@@ -2626,7 +2626,7 @@
 						"label": "Embed"
 					},
 					"message": {
-						"description": "Texto enviado na entrada. Use {user} e {server} como marcadores",
+						"description": "Texto enviado na entrada. Use '{'user'}' e '{'server'}' como marcadores",
 						"label": "Mensagem"
 					},
 					"pingMode": {
