@@ -2137,7 +2137,9 @@
 			"empty": "Nada foi registrado para este tenant nos últimos trinta dias. Ou o bot não está mais no servidor, ou ele não tem permissão para ver os canais."
 		},
 		"backToServers": "Voltar aos meus servidores",
-		"subtitle": "Administração da plataforma — todo tenant, não só os seus."
+		"subtitle": "Administração da plataforma — todo tenant, não só os seus.",
+		"unreachableTitle": "A API não respondeu",
+		"unreachableBody": "{reason}. Suba ela com <code>{command}</code> no repositório bot-api e recarregue esta página."
 	},
 	"setup": {
 		"steps": {

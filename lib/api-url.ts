@@ -104,3 +104,68 @@ export type TeamListDto = {
 	viewerId: string;
 	viewerRole: TeamRole;
 };
+
+export type TenantSummaryDto = {
+	id: string;
+	name: string;
+	iconHash: string | null;
+	ownerId: string;
+	ownerName: string | null;
+	memberCount: number;
+	planKey: string;
+	locale: string;
+	setupCompleted: boolean;
+	joinedAt: string;
+	leftAt: string | null;
+};
+
+export type TenantModuleDto = {
+	key: string;
+	enabled: boolean;
+	version: number;
+	updatedAt: string | null;
+	updatedByName: string | null;
+};
+
+export type TenantStaffDto = {
+	userId: string;
+	name: string;
+	avatarHash: string | null;
+	role: string;
+	source: string;
+	grantedAt: string | null;
+};
+
+export type TenantDailyDto = {
+	day: string;
+	messages: number;
+	commands: number;
+	joins: number;
+	leaves: number;
+};
+
+export type TenantSubscriptionDto = {
+	planKey: string;
+	status: string;
+	provider: string;
+	currentPeriodEnd: string | null;
+	cancelAtPeriodEnd: boolean;
+};
+
+export type TenantDetailDto = {
+	summary: TenantSummaryDto;
+	modules: TenantModuleDto[];
+	staff: TenantStaffDto[];
+	activity: TenantDailyDto[];
+	subscription: TenantSubscriptionDto | null;
+};
+
+export type BlacklistEntryDto = {
+	targetType: string;
+	targetId: string;
+	name: string | null;
+	reason: string | null;
+	createdByName: string | null;
+	createdAt: string;
+	expiresAt: string | null;
+};

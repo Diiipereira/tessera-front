@@ -1,7 +1,15 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { findTenant } from '@/lib/mock';
+import { cache } from 'react';
+import { toTenantDetail } from '@/lib/admin-presentation';
+import type { TenantDetailDto } from '@/lib/api-url';
+import { readAsStaff, type AdminRead } from '../../access';
+import { Unreachable } from '../../Unreachable';
 import { TenantScreen } from './TenantScreen';
+
+const readTenant = cache((guildId: string): Promise<AdminRead<TenantDetailDto>> =>
+	readAsStaff<TenantDetailDto>(`/admin/tenants/${guildId}`)
+);
 
 export async function generateMetadata({
 	params
@@ -9,15 +17,20 @@ export async function generateMetadata({
 	params: Promise<{ guildId: string }>;
 }): Promise<Metadata> {
 	const { guildId } = await params;
-	const detail = findTenant(guildId);
+	const result = await readTenant(guildId);
 
-	return { title: detail === null ? 'Tenant' : detail.summary.name };
+	return { title: result.status === 'ok' ? result.data.summary.name : 'Tenant' };
 }
 
 export default async function Page({ params }: { params: Promise<{ guildId: string }> }) {
 	const { guildId } = await params;
-	const detail = findTenant(guildId);
-	if (detail === null) notFound();
+	const result = await readTenant(guildId);
 
-	return <TenantScreen detail={detail} />;
+	if (result.status === 'missing') notFound();
+
+	if (result.status === 'unreachable') {
+		return <Unreachable reason={result.reason} />;
+	}
+
+	return <TenantScreen detail={toTenantDetail(result.data)} />;
 }

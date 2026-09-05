@@ -2137,7 +2137,9 @@
 			"empty": "Nothing was written for this tenant in the last thirty days. Either the bot is not in the server any more, or it has no permission to see the channels."
 		},
 		"backToServers": "Back to my servers",
-		"subtitle": "Platform administration — every tenant, not just yours."
+		"subtitle": "Platform administration — every tenant, not just yours.",
+		"unreachableTitle": "The API did not answer",
+		"unreachableBody": "{reason}. Start it with <code>{command}</code> in the bot-api repository, then reload this page."
 	},
 	"setup": {
 		"steps": {
