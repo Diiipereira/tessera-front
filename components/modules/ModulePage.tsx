@@ -73,13 +73,7 @@ export function ModulePage({
 					aside ? 'grid xl:grid-cols-[minmax(0,1fr)_440px]' : 'flex flex-col'
 				)}
 			>
-				<div
-					className={cn(
-						'flex min-w-0 flex-col gap-6',
-						!enabled && 'pointer-events-none opacity-50'
-					)}
-					aria-disabled={!enabled || undefined}
-				>
+				<div className={cn('flex min-w-0 flex-col gap-6', !enabled && 'opacity-75')}>
 					{children}
 				</div>
 
