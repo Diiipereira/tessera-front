@@ -17,7 +17,7 @@ export function PublicFooter() {
 				<div className="grid gap-8 border-b border-border pb-8 sm:grid-cols-2 lg:grid-cols-4">
 					<div className="min-w-0">
 						<div className="mb-3 flex items-center gap-2.5">
-							<BrandMark tone="primary" size="xs" />
+							<BrandMark size="xs" />
 							<span className="text-h4">{BRAND.name}</span>
 						</div>
 						<p className="max-w-[32ch] text-body-sm text-pretty text-text-muted">{t('tagline')}</p>

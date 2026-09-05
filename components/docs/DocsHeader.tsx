@@ -30,7 +30,7 @@ export function DocsHeader({
 					href="/"
 					className="flex shrink-0 items-center gap-2.5 text-text no-underline hover:no-underline"
 				>
-					<BrandMark tone="primary" size="sm" />
+					<BrandMark size="sm" />
 					<span className="hidden text-h4 sm:inline">{BRAND.name}</span>
 					<span className="rounded-sm bg-surface-sunken px-1.5 py-0.5 font-mono text-overline text-text-muted uppercase">
 						{t('badge')}

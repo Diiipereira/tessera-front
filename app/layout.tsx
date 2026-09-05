@@ -18,8 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
 			default: BRAND.name,
 			template: `%s · ${BRAND.name}`
 		},
-		description: t('tagline'),
-		icons: { icon: '/favicon.svg' }
+		description: t('tagline')
 	};
 }
 

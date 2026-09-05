@@ -64,7 +64,7 @@ export function AddServerScreen({ guild, joined, inviteHref }: AddServerScreenPr
 							<Check className="size-6" aria-hidden="true" />
 						</span>
 					) : (
-						<BrandMark size="md" className="size-12 [&_svg]:size-6" />
+						<BrandMark size="lg" />
 					)}
 				</div>
 

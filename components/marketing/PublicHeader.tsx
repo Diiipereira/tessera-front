@@ -16,7 +16,7 @@ export function PublicHeader() {
 		<header className="sticky top-0 z-30 border-b border-border bg-bg/88 backdrop-blur-md">
 			<div className="mx-auto flex h-16 max-w-300 items-center gap-6 px-6 sm:px-8">
 				<Link href="/" className="flex shrink-0 items-center gap-2.5 text-text no-underline">
-					<BrandMark tone="primary" size="sm" />
+					<BrandMark size="sm" />
 					<span className="text-h4">{BRAND.name}</span>
 				</Link>
 

@@ -1,2 +1,2 @@
-export { BrandMark, type BrandMarkSize, type BrandMarkTone } from './BrandMark';
+export { BrandMark, type BrandMarkSize } from './BrandMark';
 export { DiscordButton } from './DiscordButton';
