@@ -71,9 +71,9 @@ export function Topbar({ guild, user, onSearch, onOpenAccount, accountTriggerRef
 			</div>
 
 			<div className="flex items-center justify-end gap-4">
-				<ThemeToggle />
-
 				<LocaleToggle className="hidden lg:flex" />
+
+				<ThemeToggle />
 
 				<Link
 					href="/docs"
@@ -82,6 +82,8 @@ export function Topbar({ guild, user, onSearch, onOpenAccount, accountTriggerRef
 				>
 					<CircleQuestionMark className="size-4" aria-hidden="true" />
 				</Link>
+
+				<span className="mx-1 hidden h-6 w-px bg-border sm:block" aria-hidden="true" />
 
 				<UserMenu
 					user={user}

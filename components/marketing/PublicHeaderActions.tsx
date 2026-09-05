@@ -35,9 +35,9 @@ export function PublicHeaderActions() {
 
 	return (
 		<div className="ml-auto flex shrink-0 items-center gap-3">
-			<ThemeToggle />
-
 			<LocaleToggle className="hidden sm:flex" />
+
+			<ThemeToggle />
 
 			{control === null ? null : (
 				<div className="flex min-w-20 items-center justify-end">{control}</div>

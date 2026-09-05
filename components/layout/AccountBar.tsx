@@ -36,18 +36,19 @@ export function AccountBar({ user }: { user: SessionUser | null }) {
 
 			<div className="flex-1" />
 
-			<ThemeToggle />
-
 			<LocaleToggle className="hidden lg:flex" />
+
+			<ThemeToggle />
 
 			{user === null ? (
 				<Button variant="ghost" size="sm" href="/logout">
 					{t('signOut')}
 				</Button>
 			) : (
-				<div className="ml-2 flex items-center border-l border-border pl-4">
+				<>
+					<span className="mx-1 hidden h-6 w-px bg-border sm:block" aria-hidden="true" />
 					<UserMenu user={user} compact />
-				</div>
+				</>
 			)}
 		</header>
 	);

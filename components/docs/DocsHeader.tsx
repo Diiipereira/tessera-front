@@ -44,8 +44,8 @@ export function DocsHeader({
 				</div>
 
 				<div className="flex shrink-0 items-center gap-2 sm:gap-3">
-					<ThemeToggle />
 					<LocaleToggle className="hidden lg:flex" />
+					<ThemeToggle />
 					<Button variant="outline" href={dashboardHref} aria-label={t('dashboard')}>
 						<LayoutDashboard aria-hidden="true" />
 						<span className="hidden sm:inline">{t('dashboard')}</span>
