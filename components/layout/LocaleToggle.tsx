@@ -1,9 +1,10 @@
 'use client';
 
 import { useLocale, useTranslations } from 'next-intl';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { sameDocsPageIn } from '@/lib/docs/route';
 import { LOCALE_SHORT_NAMES } from '@/lib/locale';
-import { rememberLocale } from '@/lib/locale-client';
+import { loadDocument, rememberLocale } from '@/lib/locale-client';
 import { cn } from '@/lib/utils/cn';
 
 const base =
@@ -19,6 +20,7 @@ export function LocaleToggle({ className }: { className?: string }) {
 	const names = useTranslations('locales');
 	const current = useLocale();
 	const router = useRouter();
+	const pathname = usePathname();
 
 	return (
 		<div
@@ -43,7 +45,11 @@ export function LocaleToggle({ className }: { className?: string }) {
 							if (active) return;
 
 							rememberLocale(option.locale);
-							router.refresh();
+
+							const sibling = sameDocsPageIn(pathname, option.locale);
+
+							if (sibling === undefined) router.refresh();
+							else loadDocument(sibling);
 						}}
 					>
 						{option.short}

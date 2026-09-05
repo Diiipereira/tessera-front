@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import { BRAND } from '@/lib/brand';
 import { INVITE_HREF } from '@/lib/discord-invite';
-import type { DocsHref } from '@/lib/docs/types';
+import type { DocsPath } from '@/lib/docs/route';
 
 export const NAV_LINKS = [
 	{ id: 'features', href: '/#features', external: false },
@@ -69,7 +69,7 @@ export const MODULE_HIGHLIGHTS: ModuleHighlight[] = [
 export const MIRROR_POINTS = ['saveBar', 'conflict', 'audit'] as const;
 
 export type HelpCard = { id: string; icon: LucideIcon; tile: string } & (
-	{ external: true; href: string } | { external: false; href: DocsHref }
+	{ external: true; href: string } | { external: false; href: DocsPath }
 );
 
 export const HELP_CARDS: HelpCard[] = [

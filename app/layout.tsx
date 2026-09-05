@@ -6,12 +6,14 @@ import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import { Toaster } from '@/components/ui/Toaster';
 import { TooltipProvider } from '@/components/ui/tooltip-provider';
 import { BRAND } from '@/lib/brand';
+import { siteBaseUrl } from '@/lib/site-url';
 import './globals.css';
 
 export async function generateMetadata(): Promise<Metadata> {
 	const t = await getTranslations('brand');
 
 	return {
+		metadataBase: new URL(siteBaseUrl()),
 		title: {
 			default: BRAND.name,
 			template: `%s · ${BRAND.name}`

@@ -1,13 +1,22 @@
-import { getLocale } from 'next-intl/server';
+import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { DocsHeader } from '@/components/docs/DocsHeader';
 import { DocsNavTree } from '@/components/docs/DocsNavTree';
 import { PublicFooter } from '@/components/marketing/PublicFooter';
 import { docNav, docSearchIndex } from '@/lib/docs/content';
-import { toLocale } from '@/lib/locale';
+import { localeOfDocsSegment } from '@/lib/locale';
 
-export default async function DocsLayout({ children }: { children: ReactNode }) {
-	const locale = toLocale(await getLocale());
+export default async function DocsLayout({
+	children,
+	params
+}: {
+	children: ReactNode;
+	params: Promise<{ locale: string }>;
+}) {
+	const locale = localeOfDocsSegment((await params).locale);
+
+	if (locale === undefined) notFound();
+
 	const [groups, entries] = await Promise.all([docNav(locale), docSearchIndex(locale)]);
 
 	return (

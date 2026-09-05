@@ -1,8 +1,10 @@
+import { useLocale } from 'next-intl';
 import Link from 'next/link';
 import { isValidElement, type ReactNode } from 'react';
+import { docsHref } from '@/lib/docs/route';
 import { headingSlug } from '@/lib/docs/slug';
 import { docLinkClass } from '@/lib/docs/styles';
-import { docsHref } from '@/lib/docs/types';
+import { toLocale } from '@/lib/locale';
 import { cn } from '@/lib/utils/cn';
 import { CodeBlock } from './CodeBlock';
 
@@ -39,11 +41,12 @@ export function Fence({ children }: { children?: ReactNode }) {
 }
 
 export function Anchor({ href, children }: { href?: string; children?: ReactNode }) {
+	const locale = toLocale(useLocale());
 	const target = href ?? '';
 
 	if (target === '/docs' || target.startsWith('/docs/')) {
 		return (
-			<Link href={docsHref(target.replace(/^\/docs\/?/, ''))} className={docLinkClass}>
+			<Link href={docsHref(locale, target.replace(/^\/docs\/?/, ''))} className={docLinkClass}>
 				{children}
 			</Link>
 		);

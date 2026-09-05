@@ -13,6 +13,19 @@ export const LOCALE_SHORT_NAMES: { locale: SupportedLocale; short: string }[] = 
 	{ locale: 'en-US', short: 'EN' }
 ];
 
+export const DOCS_SEGMENTS: Record<SupportedLocale, string> = {
+	'pt-BR': 'pt',
+	'en-US': 'en'
+};
+
+export function docsSegment(locale: SupportedLocale): string {
+	return DOCS_SEGMENTS[locale];
+}
+
+export function localeOfDocsSegment(segment: string): SupportedLocale | undefined {
+	return SUPPORTED_LOCALES.find((locale) => DOCS_SEGMENTS[locale] === segment);
+}
+
 export function isSupportedLocale(value: string): value is SupportedLocale {
 	return SUPPORTED_LOCALES.some((locale) => locale === value);
 }

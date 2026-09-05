@@ -1,14 +1,16 @@
 import { ArrowLeft, ArrowRight } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
 import type { DocNeighbours } from '@/lib/docs';
-import { docsHref } from '@/lib/docs/types';
+import { docsHref } from '@/lib/docs/route';
+import { toLocale } from '@/lib/locale';
 
 const card =
 	'group flex min-w-0 flex-1 flex-col gap-1 rounded-lg border border-border bg-surface p-4 no-underline transition-colors duration-120 ease-out hover:border-border-strong hover:bg-surface-hover hover:no-underline';
 
 export function DocsPager({ previous, next }: DocNeighbours) {
 	const t = useTranslations('docs');
+	const locale = toLocale(useLocale());
 
 	if (!previous && !next) return null;
 
@@ -18,7 +20,7 @@ export function DocsPager({ previous, next }: DocNeighbours) {
 			className="mt-12 flex flex-wrap gap-4 border-t border-border pt-8"
 		>
 			{previous ? (
-				<Link href={docsHref(previous.slug)} className={card}>
+				<Link href={docsHref(locale, previous.slug)} className={card}>
 					<span className="flex items-center gap-1.5 text-caption font-normal text-text-subtle">
 						<ArrowLeft className="size-3.5" aria-hidden="true" />
 						{t('previous')}
@@ -32,7 +34,7 @@ export function DocsPager({ previous, next }: DocNeighbours) {
 			)}
 
 			{next ? (
-				<Link href={docsHref(next.slug)} className={`${card} text-right`}>
+				<Link href={docsHref(locale, next.slug)} className={`${card} text-right`}>
 					<span className="flex items-center justify-end gap-1.5 text-caption font-normal text-text-subtle">
 						{t('next')}
 						<ArrowRight className="size-3.5" aria-hidden="true" />

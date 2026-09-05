@@ -2,16 +2,18 @@
 
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { Search } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState, type KeyboardEvent } from 'react';
 import { searchDocs, type DocSearchEntry } from '@/lib/docs';
-import { docsHref } from '@/lib/docs/types';
+import { docsHref } from '@/lib/docs/route';
+import { toLocale } from '@/lib/locale';
 import { cn } from '@/lib/utils/cn';
 
 export function DocsSearch({ entries }: { entries: DocSearchEntry[] }) {
 	const t = useTranslations('docs.search');
 	const groups = useTranslations('docs.groups');
+	const locale = toLocale(useLocale());
 	const router = useRouter();
 	const [open, setOpen] = useState(false);
 	const [query, setQuery] = useState('');
@@ -41,9 +43,9 @@ export function DocsSearch({ entries }: { entries: DocSearchEntry[] }) {
 			if (!entry) return;
 			setOpen(false);
 			setQuery('');
-			router.push(docsHref(entry.slug));
+			router.push(docsHref(locale, entry.slug));
 		},
-		[router]
+		[locale, router]
 	);
 
 	function handleKeydown(event: KeyboardEvent<HTMLInputElement>) {

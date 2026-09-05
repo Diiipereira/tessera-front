@@ -380,6 +380,43 @@ browser and returned `null` under jsdom, taking twelve `WelcomeScreen` tests dow
 and a component that reads its own identity out of the URL is harder to test than one that
 is told.
 
+### A URL da documentação carrega o idioma; a do painel, não
+
+**O cookie servia as duas línguas na mesma URL, e para documentação pública isso é defeito.** Uma
+URL só é uma página só para o Google: ele indexava uma das línguas e a outra não existia, e não
+havia `hreflang` porque não havia o que apontar. Desde 04/09 são `/docs/pt/...` e `/docs/en/...`.
+No painel nada mudou — lá o cookie continua sendo a resposta certa, porque não há nada a indexar.
+
+**`/docs` continua existindo e é a porta neutra.** Ela redireciona 307 pelo cookie — temporário,
+nunca 308, senão o navegador fixa uma língua para sempre. É ela que a LP linka, é ela que o
+`x-default` aponta, e é literalmente o caso que a doc do Google descreve para o `x-default`: _"a
+redirecting page that detects the user's language"_. Cada página emite canonical própria mais
+`pt-BR`, `en-US` e `x-default`; sem essa reciprocidade o Google ignora as tags, e o `sitemap.ts`
+repete o mesmo conjunto nas 34 URLs.
+
+**O `proxy.ts` existe porque `setRequestLocale` não resolvia, e isso foi medido no fonte.** O
+next-intl memoiza a config **uma vez por request** (`receiveRuntimeConfig` é um `cache()`), e quem
+resolve primeiro é o root layout — antes de qualquer layout de `[locale]` rodar. Então o
+`setRequestLocale` chegaria com a config já congelada no cookie, e o `<html lang>` sairia errado. O
+padrão do next-intl é `[locale]` na raiz; aqui ele não pode estar, porque isso poria prefixo de
+idioma no painel inteiro. A proxy é o único ponto que enxerga a URL antes de qualquer layout: ela
+lê o prefixo, injeta `x-tessera-docs-locale`, e o `i18n/request.ts` prefere o header e cai no cookie
+fora da documentação. É `proxy.ts` e não `middleware.ts` porque a Next 16 renomeou o arquivo — e a
+doc dela recomenda evitar o recurso salvo quando não há outra saída, que é o caso.
+
+**A rota antiga não podia coexistir com a nova**: `[locale]` e `[...slug]` são nomes diferentes no
+mesmo nível, o que o Next recusa. Por isso link antigo (`/docs/commands`, que a LP usa) é
+redirecionado pela proxy, não por rota.
+
+**O segmento é `pt`/`en` e o `hreflang` é `pt-BR`/`en-US`, de propósito** — o caminho fica curto e a
+tag fica precisa, que é o que o Google lê. O mapa é um `Record<SupportedLocale, string>`, então
+idioma novo sem segmento não compila. E há teste que falha se algum slug de página começar com um
+segmento de idioma: o primeiro segmento é quem decide a língua, e uma página chamada `en` tornaria
+a URL ambígua sem nenhum sintoma.
+
+**O que a URL localizada não resolve** é o resto das rotas — `/servers/:id/modules/welcome` continua
+em inglês nas duas línguas. Isso é a frente §2.7 do `pendencias.md`, e ela não ficou menor.
+
 ## Where things live
 
 ```
@@ -554,9 +591,19 @@ para salvar. A descrição da aba passou a falar só do tema, que é o que sobro
 
 **O `router.refresh()` é o que faz o painel inteiro virar de idioma sem recarregar.** O cookie muda,
 os server components são renderizados de novo com o dicionário novo e o `NextIntlClientProvider`
-recebe as mensagens novas. Medido no app rodando: clicar em `EN` na documentação leva o
-`<html lang>` de `pt-BR` para `en-US` e a navegação de _Primeiros passos_ para _Getting started_, com
-o cookie gravado — sem reload.
+recebe as mensagens novas. Vale em todo lugar onde a URL não carrega o idioma — ou seja, em tudo
+menos na documentação.
+
+**Na documentação o botão carrega o documento novo, e isso não é preguiça.** Desde 04/09 a URL
+carrega o idioma, então trocar de idioma é trocar de URL. A primeira versão fez isso com
+`router.push` e **o botão continuou marcando o idioma antigo** — junto com a busca, o _ON THIS PAGE_
+e, pior, os links da barra lateral, que continuavam apontando para `/docs/en/...`. O motivo é que o
+App Router **não re-renderiza layout compartilhado numa navegação**, e o root layout é onde moram o
+`NextIntlClientProvider` e o `<html lang>`: o conteúdo de servidor virava e a moldura de cliente
+não. Meia correção — reprover o provider só na documentação — deixaria o `<html lang>` mentindo.
+O `loadDocument` do `lib/locale-client.ts` fecha isso pela raiz: idioma é atributo do documento, e
+quem escreve o atributo o Next nunca re-renderiza sozinho. Há teste que falha se a documentação
+voltar a trocar por `refresh`, e se o resto do app passar a recarregar.
 
 **A lista de idiomas do botão mora em `lib/locale.ts`, não no componente.** Duas razões: a regra de
 Fast Refresh não deixa um arquivo de componente exportar constante, e um teste compara

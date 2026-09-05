@@ -3,6 +3,7 @@ import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { adjacentPages } from '@/lib/docs/content';
+import { docsHref } from '@/lib/docs/route';
 import type { DocPage } from '@/lib/docs/types';
 import type { SupportedLocale } from '@/lib/locale';
 import { DocsPager } from './DocsPager';
@@ -29,7 +30,10 @@ export async function DocsArticle({
 					aria-label={t('breadcrumb')}
 					className="mb-4 flex min-w-0 items-center gap-1.5 text-body-sm text-text-muted"
 				>
-					<Link href="/docs" className="no-underline hover:text-text hover:no-underline">
+					<Link
+						href={docsHref(locale, '')}
+						className="no-underline hover:text-text hover:no-underline"
+					>
 						{t('root')}
 					</Link>
 					<ChevronRight className="size-3.5 shrink-0 text-text-subtle" aria-hidden="true" />

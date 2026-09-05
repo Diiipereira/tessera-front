@@ -1,10 +1,10 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
+import { readDocsPath } from '@/lib/docs/route';
 
 export function useActiveSlug(): string {
-	const pathname = usePathname();
-	if (pathname === '/docs' || pathname === '/docs/') return '';
+	const route = readDocsPath(usePathname());
 
-	return pathname.replace(/^\/docs\//, '').replace(/\/$/, '');
+	return route.kind === 'outside' ? '' : route.slug;
 }

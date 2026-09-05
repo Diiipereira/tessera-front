@@ -6,3 +6,7 @@ export function rememberLocale(value: string): void {
 
 	document.cookie = `${LOCALE_COOKIE}=${locale}; path=/; max-age=${age}; samesite=lax`;
 }
+
+export function loadDocument(href: string): void {
+	window.location.assign(href);
+}

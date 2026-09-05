@@ -1,9 +1,10 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
 import type { DocNavGroup } from '@/lib/docs';
-import { docsHref } from '@/lib/docs/types';
+import { docsHref } from '@/lib/docs/route';
+import { toLocale } from '@/lib/locale';
 import { cn } from '@/lib/utils/cn';
 import { useActiveSlug } from './use-active-slug';
 
@@ -23,6 +24,7 @@ export function DocsNavTree({
 	onNavigate?: () => void;
 }) {
 	const t = useTranslations('docs');
+	const locale = toLocale(useLocale());
 	const activeSlug = useActiveSlug();
 
 	return (
@@ -39,7 +41,7 @@ export function DocsNavTree({
 							return (
 								<li key={page.slug}>
 									<Link
-										href={docsHref(page.slug)}
+										href={docsHref(locale, page.slug)}
 										aria-current={active ? 'page' : undefined}
 										onClick={onNavigate}
 										className={cn(item, active ? states.active : states.idle)}

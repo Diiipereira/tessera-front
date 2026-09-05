@@ -1,11 +1,12 @@
 'use client';
 
 import { ArrowUpRight, type LucideIcon } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { Switch } from '@/components/ui/Switch';
-import { docsHref } from '@/lib/docs/types';
+import { docsHref } from '@/lib/docs/route';
+import { toLocale } from '@/lib/locale';
 import type { ModuleId } from '@/lib/types/modules';
 import { cn } from '@/lib/utils/cn';
 
@@ -35,6 +36,7 @@ export function ModulePage({
 	children
 }: ModulePageProps) {
 	const t = useTranslations('modules');
+	const locale = toLocale(useLocale());
 
 	return (
 		<div className="flex min-h-full w-full flex-col p-6 sm:p-8">
@@ -51,7 +53,7 @@ export function ModulePage({
 				<div className="flex shrink-0 items-center gap-4">
 					{headerAction}
 					<Link
-						href={docsHref(`modules/${moduleId}`)}
+						href={docsHref(locale, `modules/${moduleId}`)}
 						className="relative flex items-center gap-1 text-body-sm text-link no-underline before:absolute before:inset-x-0 before:-inset-y-0.5 before:content-[''] hover:text-link-hover"
 					>
 						{t('docs')}

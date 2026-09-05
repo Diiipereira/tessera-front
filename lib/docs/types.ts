@@ -27,12 +27,6 @@ export type DocSearchEntry = {
 
 export type DocNeighbours = { previous: DocPage | null; next: DocPage | null };
 
-export type DocsHref = '/docs' | `/docs/${string}`;
-
-export function docsHref(slug: string): DocsHref {
-	return slug === '' ? '/docs' : `/docs/${slug}`;
-}
-
 export function searchDocs(entries: DocSearchEntry[], query: string): DocSearchEntry[] {
 	const terms = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
 	if (terms.length === 0) return [];
