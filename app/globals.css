@@ -455,6 +455,14 @@
 		outline-offset: 2px;
 	}
 
+	/* Tailwind 4 dropped the button cursor from Preflight, so every button falls back to
+	   the browser arrow while <a href> keeps the hand. :not(:disabled) leaves the
+	   cursor-not-allowed and cursor-wait declared on disabled states alone. */
+	button:not(:disabled),
+	[role='button']:not(:disabled) {
+		cursor: pointer;
+	}
+
 	/* The native stepper cannot be styled, only removed. NumberInput draws its own
 	   chevrons; the input keeps type="number" so Up/Down and the mobile numeric
 	   keypad still work. */
