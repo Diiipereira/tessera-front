@@ -23,6 +23,28 @@ hides them from members who do not hold it.
 	and nothing that can disagree.
 </Callout>
 
+## Settings that hold a list
+
+Some settings are not a value but a list — the roles handed out on arrival, the roles moderation
+may not touch, the channels that pay no XP. A command option holds **one** value, so those do not
+fit in an option.
+
+They are edited through the `edit` option, which every `/config <module>` with that kind of field
+offers:
+
+```
+/config welcome edit:Automatic roles
+```
+
+The command opens a **modal with Discord own picker** — the same list of roles or channels you
+see anywhere else in the client. Whatever is already configured comes pre-selected, and the limit
+of the field is enforced by the picker rather than by an error afterwards.
+
+<Callout tone="info" title="edit goes on its own">
+	Passing `edit` together with another option is refused. It opens a picker instead of saving right
+	away, and accepting both would drop the other option in silence.
+</Callout>
+
 ## Subcommands
 
 Several commands are a family rather than a single verb. `/config` takes one subcommand per

@@ -22,6 +22,27 @@ Discord os esconde de quem não a tem.
 	sincronizar nem o que discordar.
 </Callout>
 
+## Configurações que guardam uma lista
+
+Algumas configurações não são um valor, e sim uma lista — os cargos entregues na entrada, os
+cargos protegidos da moderação, os canais que não pagam XP. Uma opção de comando guarda **um**
+valor, então essas não cabem numa opção.
+
+Elas se editam pela opção `edit`, que todo `/config <módulo>` com esse tipo de campo oferece:
+
+```
+/config welcome edit:Cargos automáticos
+```
+
+O comando abre um **modal com o seletor do próprio Discord** — a mesma lista de cargos ou canais
+que você vê em qualquer outro lugar do cliente. O que já está configurado vem marcado, e o limite
+do campo é imposto pelo seletor, não por uma mensagem de erro depois.
+
+<Callout tone="info" title="O edit vai sozinho">
+	Passar o `edit` junto de outra opção é recusado. Ele abre um seletor em vez de salvar na hora, e
+	aceitar as duas coisas faria a outra opção ser descartada em silêncio.
+</Callout>
+
 ## Subcomandos
 
 Vários comandos são uma família, não um verbo só. O `/config` tem um subcomando por módulo, o
