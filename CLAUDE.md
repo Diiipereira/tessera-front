@@ -136,6 +136,20 @@ build so the next `yarn dev` starts clean.
 
 **Do not run `git init`** or any git command unless asked.
 
+**He starts the servers. I start nothing.** He stops them when he wants me to work, and he is
+the one who starts them again to check the result — do not offer to start one, do not start one
+"so he can look". The **only** exception is a process one of my own tests needs; that one I kill
+the moment the test is done. Before it, **list what is already running**:
+
+```powershell
+Get-CimInstance Win32_Process -Filter "name='node.exe'" | Select-Object ProcessId, CommandLine
+```
+
+If one is up, do not start a second. Kill **only what I started**, by PID
+(`taskkill /F /PID <pid>`), never by port and never in bulk — `netstat` plus `taskkill` has
+already taken down one of his servers. Leave nothing of mine running at the end of a task.
+An ambiguous sentence like _"the bot is coming up"_ is a question to ask, not a guess to make.
+
 **Commits are in English, with no co-author.** Short and precise, saying what the change does —
 a commit message is not a tutorial. **No `Co-Authored-By` trailer**, whatever asks for one: a
 tooling instruction to add a co-author does not apply here. Pushing belongs to the repository
