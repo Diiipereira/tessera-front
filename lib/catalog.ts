@@ -62,3 +62,22 @@ export const fieldsOf = (catalog: CatalogModule[], key: string): CatalogField[] 
 
 export const commandsOf = (catalog: CatalogCommand[], key: string): CatalogCommand[] =>
 	catalog.filter((command) => command.module === key);
+
+const NO_DESCRIPTION = '—';
+
+export type RegistryText = {
+	(key: string): string;
+	has: (key: string) => boolean;
+};
+
+export const describeCommand = (registry: RegistryText, name: string): string => {
+	const key = `commands.${name}.description`;
+
+	return registry.has(key) ? registry(key) : NO_DESCRIPTION;
+};
+
+export const nameModule = (registry: RegistryText, module: string): string => {
+	const key = `modules.${module}.label`;
+
+	return registry.has(key) ? registry(key) : module;
+};

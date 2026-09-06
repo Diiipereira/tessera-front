@@ -2267,6 +2267,9 @@
 			"pay": {
 				"description": "Send some of your money to another member"
 			},
+			"ping": {
+				"description": "Check that the bot is up and answering"
+			},
 			"rank": {
 				"description": "See how far a member has climbed"
 			},
@@ -2278,6 +2281,9 @@
 			},
 			"softban": {
 				"description": "Remove a member, delete their recent messages and let them rejoin"
+			},
+			"test": {
+				"description": "Send a test message using the settings in force"
 			},
 			"ticket": {
 				"description": "Work on the ticket this channel holds"

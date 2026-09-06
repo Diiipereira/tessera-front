@@ -2267,6 +2267,9 @@
 			"pay": {
 				"description": "Mande parte do seu dinheiro para outro membro"
 			},
+			"ping": {
+				"description": "Confere se o bot está de pé e respondendo"
+			},
 			"rank": {
 				"description": "Veja o quanto um membro subiu"
 			},
@@ -2278,6 +2281,9 @@
 			},
 			"softban": {
 				"description": "Remove um membro, apaga as mensagens recentes e deixa ele voltar"
+			},
+			"test": {
+				"description": "Envia uma mensagem de teste com as configurações em vigor"
 			},
 			"ticket": {
 				"description": "Mexe no ticket que este canal guarda"

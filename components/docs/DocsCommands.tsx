@@ -1,5 +1,5 @@
 import { getTranslations } from 'next-intl/server';
-import { commandsOf, loadCommandCatalog } from '@/lib/catalog';
+import { commandsOf, describeCommand, loadCommandCatalog, nameModule } from '@/lib/catalog';
 
 const cellHead = 'px-4 py-2.5 text-left font-mono text-overline text-text-muted uppercase';
 const cellBody = 'px-4 py-3 align-top text-body-sm text-text';
@@ -52,10 +52,10 @@ export async function DocsCommands({ module }: { module?: string }) {
 								<td className={cellBody}>
 									{command.module === null
 										? docs('noModule')
-										: registry(`modules.${command.module}.label`)}
+										: nameModule(registry, command.module)}
 								</td>
 							) : null}
-							<td className={cellBody}>{registry(`commands.${command.name}.description`)}</td>
+							<td className={cellBody}>{describeCommand(registry, command.name)}</td>
 						</tr>
 					))}
 				</tbody>
