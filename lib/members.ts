@@ -1,3 +1,4 @@
+import { userAvatarUrl } from '@/lib/discord-cdn';
 import { colorOf, initialsOf } from '@/lib/guild-presentation';
 import type { Member, MemberStanding } from '@/lib/types/management';
 
@@ -68,7 +69,7 @@ export function toMember(dto: MemberDto): Member {
 		handle: dto.handle === null ? dto.id : `@${dto.handle}`,
 		initials: initialsOf(name),
 		color: colorOf(dto.id),
-		avatarHash: dto.avatarHash,
+		avatarUrl: userAvatarUrl(dto.id, dto.avatarHash),
 		level: dto.level,
 		xp: dto.xp,
 		earningMessages: dto.earningMessages,

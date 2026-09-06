@@ -324,6 +324,7 @@ function GiveawayCard({
 				<Avatar
 					initials={giveaway.hostInitials}
 					color={giveaway.hostColor}
+					src={giveaway.hostAvatarUrl}
 					shape="circle"
 					size="sm"
 				/>

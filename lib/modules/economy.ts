@@ -1,3 +1,4 @@
+import { userAvatarUrl } from '@/lib/discord-cdn';
 import type { GuildModuleStateDto } from '@/lib/api-url';
 import type {
 	EconomyConfig,
@@ -200,6 +201,7 @@ export function toTransactions(page: LedgerDto): Transaction[] {
 			actorName: name,
 			actorInitials: initialsOf(name),
 			actorColor: colourFor(row.userId),
+			actorAvatarUrl: userAvatarUrl(row.userId, row.avatarHash),
 			amount: row.amount,
 			note: row.reason ?? '',
 			at: row.createdAt

@@ -166,7 +166,13 @@ export function LevelsScreen({
 								{entry.rank}
 							</span>
 						)}
-						<Avatar initials={entry.initials} color={entry.color} shape="circle" size="sm" />
+						<Avatar
+							initials={entry.initials}
+							color={entry.color}
+							src={entry.avatarUrl}
+							shape="circle"
+							size="sm"
+						/>
 						<span className="min-w-0 flex-1 truncate text-body-sm">{entry.name}</span>
 						<span className="tabular shrink-0 text-caption font-normal text-text-muted">
 							{t('leaderboard.level', { level: entry.level })}

@@ -1,3 +1,4 @@
+import { userAvatarUrl } from '@/lib/discord-cdn';
 import type { GuildModuleStateDto } from '@/lib/api-url';
 import type { ChannelKind } from '@/lib/types/discord';
 import type {
@@ -200,6 +201,7 @@ export function toOpenTickets(page: TicketsDto): OpenTicket[] {
 			openerName: opener,
 			openerInitials: initialsOf(opener),
 			openerColor: colourFor(ticket.opener.id),
+			openerAvatarUrl: userAvatarUrl(ticket.opener.id, ticket.opener.avatarHash),
 			claimedBy: ticket.claimer === null ? null : nameOf(ticket.claimer),
 			openedAt: ticket.openedAt,
 			status: ticket.status

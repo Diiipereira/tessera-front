@@ -195,6 +195,7 @@ export function MembersScreen({
 												<Avatar
 													initials={member.initials}
 													color={member.color}
+													src={member.avatarUrl}
 													shape="circle"
 													size="sm"
 												/>

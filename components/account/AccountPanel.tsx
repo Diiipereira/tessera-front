@@ -220,7 +220,13 @@ export function AccountPanel({
 									action={<Badge variant="outline">{t('profile.managed')}</Badge>}
 								>
 									<div className="flex items-center gap-4">
-										<Avatar initials={user.initials} color={user.color} shape="circle" size="lg" />
+										<Avatar
+											initials={user.initials}
+											color={user.color}
+											src={user.avatarUrl}
+											shape="circle"
+											size="lg"
+										/>
 										<div className="min-w-0">
 											<p className="truncate text-h4">{user.displayName}</p>
 											<p className="truncate font-mono text-caption font-normal text-text-muted">
@@ -278,7 +284,12 @@ export function AccountPanel({
 												key={guild.id}
 												className="flex items-center gap-3 border-b border-border py-3 first:pt-0 last:border-0"
 											>
-												<Avatar initials={guild.initials} color={guild.color} size="sm" />
+												<Avatar
+													initials={guild.initials}
+													color={guild.color}
+													src={guild.iconUrl}
+													size="sm"
+												/>
 												<div className="min-w-0 flex-1">
 													<p className="truncate text-body">{guild.name}</p>
 													<p className="truncate text-caption font-normal text-text-muted">

@@ -1,3 +1,4 @@
+import { userAvatarUrl } from '@/lib/discord-cdn';
 import type { GuildModuleStateDto } from '@/lib/api-url';
 import type { ChannelKind } from '@/lib/types/discord';
 import type { LeaderboardEntry, LevelsConfig, RoleReward } from '@/lib/types/module-configs';
@@ -173,6 +174,7 @@ export function toLeaderboard(board: LeaderboardDto): LeaderboardEntry[] {
 			name,
 			initials: initialsOf(name),
 			color: colourFor(entry.userId),
+			avatarUrl: userAvatarUrl(entry.userId, entry.avatarHash),
 			level: entry.level,
 			xp: entry.xp
 		};

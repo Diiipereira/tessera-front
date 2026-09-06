@@ -25,7 +25,7 @@ export type Member = {
 	handle: string;
 	initials: string;
 	color: string;
-	avatarHash: string | null;
+	avatarUrl: string | null;
 	level: number;
 	xp: number;
 	earningMessages: number;

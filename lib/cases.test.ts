@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { caseStatus, colorOf, displayName, durationParts, initialsOf } from './cases';
+import { avatarOf, caseStatus, colorOf, displayName, durationParts, initialsOf } from './cases';
 import type { CaseParticipant, ModerationCase } from './types/management';
 
 const NOW = new Date('2026-08-29T12:00:00.000Z');
@@ -121,5 +121,18 @@ describe('durationParts', () => {
 
 	it('prefers the largest unit that fits, so a week is seven days not 168 hours', () => {
 		expect(durationParts(604800).unit).toBe('day');
+	});
+});
+
+describe('avatarOf', () => {
+	it('points at the picture of the participant', () => {
+		const url = avatarOf(person({ avatarHash: 'abc' }));
+
+		expect(url).toContain('444444444444444444');
+		expect(url).toContain('abc');
+	});
+
+	it('has nothing to show for a participant who never set one', () => {
+		expect(avatarOf(person())).toBeNull();
 	});
 });

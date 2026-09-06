@@ -12,6 +12,7 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
 import { Select } from '@/components/ui/Select';
 import {
+	avatarOf,
 	colorOf,
 	diffKindOf,
 	fieldKeyOf,
@@ -224,6 +225,7 @@ export function AuditScreen({ guildId, entries, nextCursor, moduleKeys, now }: A
 										<Avatar
 											initials={initialsOf(entry.actor.name, '?')}
 											color={colorOf(entry.actor.id)}
+											src={avatarOf(entry.actor)}
 											shape="circle"
 											size="sm"
 										/>

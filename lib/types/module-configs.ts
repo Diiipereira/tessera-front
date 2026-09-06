@@ -51,6 +51,7 @@ export type LeaderboardEntry = {
 	name: string;
 	initials: string;
 	color: string;
+	avatarUrl: string | null;
 	level: number;
 	xp: number;
 };
@@ -89,6 +90,7 @@ export type Transaction = {
 	actorName: string;
 	actorInitials: string;
 	actorColor: string;
+	actorAvatarUrl: string | null;
 	amount: number;
 	note: string;
 	at: string;
@@ -131,6 +133,7 @@ export type OpenTicket = {
 	openerName: string;
 	openerInitials: string;
 	openerColor: string;
+	openerAvatarUrl: string | null;
 	claimedBy: string | null;
 	openedAt: string;
 	status: TicketStatus;
@@ -182,6 +185,7 @@ export type Giveaway = {
 	hostName: string;
 	hostInitials: string;
 	hostColor: string;
+	hostAvatarUrl: string | null;
 	state: GiveawayState;
 	endsAt: string;
 	endedAt: string | null;

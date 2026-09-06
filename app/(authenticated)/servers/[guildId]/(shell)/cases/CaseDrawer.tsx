@@ -10,6 +10,7 @@ import { Drawer } from '@/components/ui/Drawer';
 import { Field } from '@/components/ui/Field';
 import { Input } from '@/components/ui/Input';
 import {
+	avatarOf,
 	caseStatus,
 	colorOf,
 	displayName,
@@ -49,6 +50,7 @@ function Person({ participant }: { participant: CaseParticipant }) {
 			<Avatar
 				initials={initialsOf(participant)}
 				color={colorOf(participant)}
+				src={avatarOf(participant)}
 				shape="circle"
 				size="sm"
 			/>

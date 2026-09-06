@@ -114,6 +114,7 @@ export function MemberDrawer({
 					<Avatar
 						initials={member.initials}
 						color={member.color}
+						src={member.avatarUrl}
 						shape="circle"
 						size="lg"
 						className="ring-2 ring-surface"

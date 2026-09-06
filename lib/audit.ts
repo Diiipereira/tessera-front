@@ -1,4 +1,5 @@
-import type { AuditEntry } from '@/lib/types/management';
+import { userAvatarUrl } from '@/lib/discord-cdn';
+import type { AuditActor, AuditEntry } from '@/lib/types/management';
 
 export type DiffKind = 'added' | 'removed' | 'changed';
 
@@ -67,6 +68,10 @@ const AVATAR_COLORS = [
 	'#ec4899',
 	'#ef4444'
 ];
+
+export function avatarOf(actor: AuditActor): string | null {
+	return actor.id === null ? null : userAvatarUrl(actor.id, actor.avatarHash);
+}
 
 export function colorOf(seed: string | null): string {
 	const text = seed ?? '';

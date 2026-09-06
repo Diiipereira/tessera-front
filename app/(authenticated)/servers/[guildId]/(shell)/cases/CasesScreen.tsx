@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
 import { Select } from '@/components/ui/Select';
-import { WRITE_CASES, caseStatus, colorOf, displayName, initialsOf } from '@/lib/cases';
+import { WRITE_CASES, avatarOf, caseStatus, colorOf, displayName, initialsOf } from '@/lib/cases';
 import { can } from '@/lib/team';
 import type { CapabilityCatalogDto } from '@/lib/api-url';
 import { listCases } from '@/lib/cases-client';
@@ -208,6 +208,7 @@ export function CasesScreen({
 													<Avatar
 														initials={initialsOf(entry.target)}
 														color={colorOf(entry.target)}
+														src={avatarOf(entry.target)}
 														shape="circle"
 														size="sm"
 													/>

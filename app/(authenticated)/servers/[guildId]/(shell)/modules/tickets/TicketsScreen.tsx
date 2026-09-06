@@ -265,6 +265,7 @@ export function TicketsScreen({
 													<Avatar
 														initials={ticket.openerInitials}
 														color={ticket.openerColor}
+														src={ticket.openerAvatarUrl}
 														shape="circle"
 														size="sm"
 													/>

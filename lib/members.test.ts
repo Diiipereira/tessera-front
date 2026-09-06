@@ -174,3 +174,16 @@ describe('counting the pages', () => {
 		expect(firstShown(0, 0)).toBe(0);
 	});
 });
+
+describe('toMember pictures', () => {
+	it('builds the picture out of the id and the hash the API sent', () => {
+		const url = toMember(dto()).avatarUrl;
+
+		expect(url).toContain(ALICE);
+		expect(url).toContain('abc');
+	});
+
+	it('has nothing to show for a member who never set one', () => {
+		expect(toMember(dto({ avatarHash: null })).avatarUrl).toBeNull();
+	});
+});

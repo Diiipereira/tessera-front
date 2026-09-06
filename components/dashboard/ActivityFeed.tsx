@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/components/ui/Link';
 import { Avatar } from '@/components/layout/Avatar';
 import { Badge, type BadgeVariant } from '@/components/ui/Badge';
-import { colorOf, fieldKeyOf, fieldLabel, initialsOf } from '@/lib/audit';
+import { avatarOf, colorOf, fieldKeyOf, fieldLabel, initialsOf } from '@/lib/audit';
 import { useRelativeTime } from '@/lib/hooks/useRelativeTime';
 import type { GuildHref } from '@/lib/navigation';
 import type { AuditEntry, AuditSource } from '@/lib/types/management';
@@ -72,6 +72,7 @@ export function ActivityFeed({ entries, auditHref, now }: ActivityFeedProps) {
 							<Avatar
 								initials={initialsOf(entry.actor.name, '?')}
 								color={colorOf(entry.actor.id)}
+								src={avatarOf(entry.actor)}
 								shape="circle"
 								size="sm"
 								className="mt-0.5"

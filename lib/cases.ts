@@ -1,3 +1,4 @@
+import { userAvatarUrl } from '@/lib/discord-cdn';
 import type {
 	CaseParticipant,
 	CaseStatus,
@@ -34,6 +35,10 @@ const AVATAR_COLORS = [
 	'#ec4899',
 	'#ef4444'
 ];
+
+export function avatarOf(participant: CaseParticipant): string | null {
+	return userAvatarUrl(participant.id, participant.avatarHash);
+}
 
 export function colorOf(participant: CaseParticipant): string {
 	let total = 0;

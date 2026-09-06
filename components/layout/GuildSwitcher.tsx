@@ -41,7 +41,7 @@ export function GuildSwitcher({
 
 	const trigger = (
 		<>
-			<Avatar initials={guild.initials} color={guild.color} />
+			<Avatar initials={guild.initials} color={guild.color} src={guild.iconUrl} />
 			<span className={cn('min-w-0 flex-1 text-left', collapsible && 'sidebar-collapsed:hidden')}>
 				<span className="block truncate text-body font-medium">{guild.name}</span>
 				<span className="tabular block text-caption font-normal text-text-muted">
@@ -100,7 +100,12 @@ export function GuildSwitcher({
 									entry.id === guild.id && 'bg-primary-subtle'
 								)}
 							>
-								<Avatar initials={entry.initials} color={entry.color} size="sm" />
+								<Avatar
+									initials={entry.initials}
+									color={entry.color}
+									src={entry.iconUrl}
+									size="sm"
+								/>
 								<span className="min-w-0 flex-1 truncate">{entry.name}</span>
 								{entry.id === guild.id ? (
 									<Check className="size-4 shrink-0 text-primary" aria-label={t('currentServer')} />

@@ -541,6 +541,7 @@ export function EconomyScreen({
 								<Avatar
 									initials={entry.actorInitials}
 									color={entry.actorColor}
+									src={entry.actorAvatarUrl}
 									shape="circle"
 									size="sm"
 								/>

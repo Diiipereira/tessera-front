@@ -1,3 +1,4 @@
+import { userAvatarUrl } from '@/lib/discord-cdn';
 import type { GuildModuleStateDto } from '@/lib/api-url';
 import type { ChannelKind } from '@/lib/types/discord';
 import type { Giveaway, GiveawayState, GiveawaysConfig } from '@/lib/types/module-configs';
@@ -109,6 +110,7 @@ export function toGiveaway(dto: GiveawayDto): Giveaway {
 		hostName: host,
 		hostInitials: initialsOf(host),
 		hostColor: colourFor(dto.host.id),
+		hostAvatarUrl: userAvatarUrl(dto.host.id, dto.host.avatarHash),
 		state: dto.status,
 		endsAt: dto.endsAt,
 		endedAt: dto.endedAt,

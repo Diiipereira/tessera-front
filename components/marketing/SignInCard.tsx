@@ -50,7 +50,13 @@ export function SignInCard({ error, user }: SignInCardProps) {
 
 				{user ? (
 					<div className="flex items-center gap-3 rounded-lg border border-border bg-surface-sunken p-3">
-						<Avatar initials={user.initials} color={user.color} shape="circle" size="lg" />
+						<Avatar
+							initials={user.initials}
+							color={user.color}
+							src={user.avatarUrl}
+							shape="circle"
+							size="lg"
+						/>
 						<div className="min-w-0 flex-1">
 							<p className="truncate text-body font-medium">{user.displayName}</p>
 							<p className="truncate font-mono text-caption font-normal text-text-muted">

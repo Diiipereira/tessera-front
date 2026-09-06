@@ -180,16 +180,96 @@ export const mockLevelsConfig: LevelsConfig = {
 };
 
 export const mockLeaderboard: LeaderboardEntry[] = [
-	{ rank: 1, name: 'kestrel', initials: 'KE', color: '#5865f2', level: 42, xp: 184320 },
-	{ rank: 2, name: 'mora', initials: 'MO', color: '#0d9488', level: 39, xp: 161004 },
-	{ rank: 3, name: 'juno', initials: 'JU', color: '#d97706', level: 36, xp: 139870 },
-	{ rank: 4, name: 'pilar', initials: 'PI', color: '#db2777', level: 31, xp: 104220 },
-	{ rank: 5, name: 'okra', initials: 'OK', color: '#57f287', level: 28, xp: 87410 },
-	{ rank: 6, name: 'ferro', initials: 'FE', color: '#eb459e', level: 24, xp: 64980 },
-	{ rank: 7, name: 'nube', initials: 'NU', color: '#3ba55d', level: 21, xp: 51330 },
-	{ rank: 8, name: 'tilde', initials: 'TI', color: '#f47fff', level: 18, xp: 38940 },
-	{ rank: 9, name: 'vela', initials: 'VE', color: '#fee75c', level: 15, xp: 27600 },
-	{ rank: 10, name: 'zinco', initials: 'ZI', color: '#ed4245', level: 12, xp: 18240 }
+	{
+		rank: 1,
+		name: 'kestrel',
+		initials: 'KE',
+		color: '#5865f2',
+		avatarUrl: null,
+		level: 42,
+		xp: 184320
+	},
+	{
+		rank: 2,
+		name: 'mora',
+		initials: 'MO',
+		color: '#0d9488',
+		avatarUrl: null,
+		level: 39,
+		xp: 161004
+	},
+	{
+		rank: 3,
+		name: 'juno',
+		initials: 'JU',
+		color: '#d97706',
+		avatarUrl: null,
+		level: 36,
+		xp: 139870
+	},
+	{
+		rank: 4,
+		name: 'pilar',
+		initials: 'PI',
+		color: '#db2777',
+		avatarUrl: null,
+		level: 31,
+		xp: 104220
+	},
+	{
+		rank: 5,
+		name: 'okra',
+		initials: 'OK',
+		color: '#57f287',
+		avatarUrl: null,
+		level: 28,
+		xp: 87410
+	},
+	{
+		rank: 6,
+		name: 'ferro',
+		initials: 'FE',
+		color: '#eb459e',
+		avatarUrl: null,
+		level: 24,
+		xp: 64980
+	},
+	{
+		rank: 7,
+		name: 'nube',
+		initials: 'NU',
+		color: '#3ba55d',
+		avatarUrl: null,
+		level: 21,
+		xp: 51330
+	},
+	{
+		rank: 8,
+		name: 'tilde',
+		initials: 'TI',
+		color: '#f47fff',
+		avatarUrl: null,
+		level: 18,
+		xp: 38940
+	},
+	{
+		rank: 9,
+		name: 'vela',
+		initials: 'VE',
+		color: '#fee75c',
+		avatarUrl: null,
+		level: 15,
+		xp: 27600
+	},
+	{
+		rank: 10,
+		name: 'zinco',
+		initials: 'ZI',
+		color: '#ed4245',
+		avatarUrl: null,
+		level: 12,
+		xp: 18240
+	}
 ];
 
 export const mockEconomyConfig: EconomyConfig = {
@@ -241,6 +321,7 @@ export const mockTransactions: Transaction[] = [
 		actorName: 'kestrel',
 		actorInitials: 'KE',
 		actorColor: '#5865f2',
+		actorAvatarUrl: null,
 		amount: 250,
 		note: 'Daily claim, 6 day streak',
 		at: '4 minutes ago'
@@ -251,6 +332,7 @@ export const mockTransactions: Transaction[] = [
 		actorName: 'mora',
 		actorInitials: 'MO',
 		actorColor: '#0d9488',
+		actorAvatarUrl: null,
 		amount: -2500,
 		note: 'Booster colour',
 		at: '22 minutes ago'
@@ -261,6 +343,7 @@ export const mockTransactions: Transaction[] = [
 		actorName: 'juno',
 		actorInitials: 'JU',
 		actorColor: '#d97706',
+		actorAvatarUrl: null,
 		amount: -500,
 		note: 'To @pilar, 25 tax',
 		at: '1 hour ago'
@@ -271,6 +354,7 @@ export const mockTransactions: Transaction[] = [
 		actorName: 'okra',
 		actorInitials: 'OK',
 		actorColor: '#57f287',
+		actorAvatarUrl: null,
 		amount: 75,
 		note: 'Worked as a courier',
 		at: '2 hours ago'
@@ -281,6 +365,7 @@ export const mockTransactions: Transaction[] = [
 		actorName: 'ferro',
 		actorInitials: 'FE',
 		actorColor: '#eb459e',
+		actorAvatarUrl: null,
 		amount: 1000,
 		note: 'Event prize, by @Staff',
 		at: 'Yesterday'
@@ -331,6 +416,7 @@ export const mockOpenTickets: OpenTicket[] = [
 		openerName: 'vela',
 		openerInitials: 'VE',
 		openerColor: '#fee75c',
+		openerAvatarUrl: null,
 		claimedBy: 'ferro',
 		openedAt: '2026-09-04T11:48:00.000Z',
 		status: 'claimed'
@@ -342,6 +428,7 @@ export const mockOpenTickets: OpenTicket[] = [
 		openerName: 'nube',
 		openerInitials: 'NU',
 		openerColor: '#3ba55d',
+		openerAvatarUrl: null,
 		claimedBy: null,
 		openedAt: '2026-09-04T11:12:00.000Z',
 		status: 'open'
@@ -353,6 +440,7 @@ export const mockOpenTickets: OpenTicket[] = [
 		openerName: 'tilde',
 		openerInitials: 'TI',
 		openerColor: '#f47fff',
+		openerAvatarUrl: null,
 		claimedBy: 'mora',
 		openedAt: '2026-09-04T09:00:00.000Z',
 		status: 'claimed'
@@ -364,6 +452,7 @@ export const mockOpenTickets: OpenTicket[] = [
 		openerName: 'zinco',
 		openerInitials: 'ZI',
 		openerColor: '#ed4245',
+		openerAvatarUrl: null,
 		claimedBy: null,
 		openedAt: '2026-09-04T07:00:00.000Z',
 		status: 'open'

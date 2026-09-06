@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+	avatarOf,
 	colorOf,
 	diffKindOf,
 	fieldKeyOf,
@@ -177,5 +178,22 @@ describe('toCsv', () => {
 
 	it('writes an empty log as just the header', () => {
 		expect(toCsv([], csvWords, labels).split('\n')).toHaveLength(1);
+	});
+});
+
+describe('avatarOf', () => {
+	it('points at the picture of whoever acted', () => {
+		const url = avatarOf({ id: '222222222222222222', name: 'Lia', avatarHash: 'abc' });
+
+		expect(url).toContain('222222222222222222');
+		expect(url).toContain('abc');
+	});
+
+	it('has nothing to show when the actor never set one', () => {
+		expect(avatarOf({ id: '222222222222222222', name: 'Lia', avatarHash: null })).toBeNull();
+	});
+
+	it('has nothing to show for an entry no user is attached to', () => {
+		expect(avatarOf({ id: null, name: null, avatarHash: 'abc' })).toBeNull();
 	});
 });

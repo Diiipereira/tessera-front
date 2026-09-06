@@ -204,6 +204,7 @@ export function CommandPalette({ open, onOpenChange, guild, guilds }: CommandPal
 													<Avatar
 														initials={entry.guild.initials}
 														color={entry.guild.color}
+														src={entry.guild.iconUrl}
 														size="sm"
 													/>
 												) : null}
