@@ -43,6 +43,30 @@ do campo é imposto pelo seletor, não por uma mensagem de erro depois.
 	aceitar as duas coisas faria a outra opção ser descartada em silêncio.
 </Callout>
 
+## Em que idioma os comandos aparecem
+
+Duas coisas diferentes decidem o idioma, e confundir as duas é fácil.
+
+**O nome do comando é sempre inglês.** `/config` é `/config` em qualquer idioma — é o que você
+digita, e traduzir isso quebraria todo tutorial, print e pedido de ajuda.
+
+**A descrição que aparece ao digitar `/` segue o idioma do Discord de quem lê.** Publicamos cada
+comando em inglês e em português de uma vez, e o Discord mostra a versão de cada pessoa. Dois
+membros do mesmo servidor, um com o cliente em inglês e outro em português, leem descrições
+diferentes no mesmo instante — cada um na língua dele. Isso é resolvido pelo Discord, antes de a
+interação chegar ao bot.
+
+**O idioma do servidor manda no que o Tessera escreve.** A mensagem de boas-vindas, o anúncio de
+subida de nível, os embeds do canal de log, a DM de quem foi punido, as mensagens de ticket e de
+sorteio. Ele se troca em **Configurações → Idioma do servidor**, ou pelo comando
+`/config server language:`.
+
+<Callout tone="info" title="Mudei o idioma do servidor e as descrições continuaram iguais">
+	É o esperado. O idioma do servidor não alcança a descrição dos comandos, porque ela é do Discord,
+	não nossa. Para ler as descrições em outra língua, mude o idioma do **seu** Discord em
+	Configurações do Usuário → Idioma.
+</Callout>
+
 ## Subcomandos
 
 Vários comandos são uma família, não um verbo só. O `/config` tem um subcomando por módulo, o

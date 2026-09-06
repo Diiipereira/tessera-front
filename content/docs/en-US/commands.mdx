@@ -45,6 +45,29 @@ of the field is enforced by the picker rather than by an error afterwards.
 	away, and accepting both would drop the other option in silence.
 </Callout>
 
+## What language the commands appear in
+
+Two different things decide the language, and they are easy to confuse.
+
+**The command name is always English.** `/config` is `/config` in every language — it is what you
+type, and translating it would break every tutorial, screenshot and request for help.
+
+**The description you see when you type `/` follows the reader's own Discord language.** We publish
+each command in English and in Portuguese at once, and Discord shows each person their version. Two
+members of the same server, one on an English client and one on a Portuguese one, read different
+descriptions at the same moment — each in their own language. Discord resolves this before the
+interaction ever reaches the bot.
+
+**The server language governs what Tessera writes.** The welcome message, the level-up
+announcement, the log channel embeds, the DM to whoever was punished, the ticket and giveaway
+messages. Change it under **Settings → Server language**, or with `/config server language:`.
+
+<Callout tone="info" title="I changed the server language and the descriptions stayed the same">
+	That is expected. The server language does not reach the command descriptions, because they belong
+	to Discord, not to us. To read the descriptions in another language, change your **own** Discord
+	language under User Settings → Language.
+</Callout>
+
 ## Subcommands
 
 Several commands are a family rather than a single verb. `/config` takes one subcommand per
