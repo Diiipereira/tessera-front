@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { BRAND } from '@/lib/brand';
 import { DISCORD, EMBED_SWATCHES } from '@/lib/discord-colors';
+import { toFieldRows } from '@/lib/embed-fields';
 import { renderVariables } from '@/lib/message-variables';
 import type { MessageDraft, MessageVariable } from '@/lib/types/modules';
 import { cn } from '@/lib/utils/cn';
@@ -143,18 +144,23 @@ export function DiscordPreview({ message, variables, timestampLabel }: DiscordPr
 											)}
 
 											{embed.fields.length > 0 ? (
-												<div className="mt-2 flex flex-wrap gap-4">
-													{embed.fields.map((field) => (
+												<div className="mt-2 flex flex-col gap-4">
+													{toFieldRows(embed.fields).map((row) => (
 														<div
-															key={field.id}
-															className={field.inline ? 'min-w-37.5 flex-1' : 'w-full'}
+															key={row.map((field) => field.id).join('+')}
+															data-embed-row=""
+															className="flex gap-4"
 														>
-															<p className="text-[14px] font-semibold text-white">
-																{resolve(field.name)}
-															</p>
-															<p className="text-[14px] wrap-break-word whitespace-pre-wrap">
-																{resolve(field.value)}
-															</p>
+															{row.map((field) => (
+																<div key={field.id} className="min-w-0 flex-1">
+																	<p className="text-[14px] font-semibold text-white">
+																		{resolve(field.name)}
+																	</p>
+																	<p className="text-[14px] wrap-break-word whitespace-pre-wrap">
+																		{resolve(field.value)}
+																	</p>
+																</div>
+															))}
 														</div>
 													))}
 												</div>

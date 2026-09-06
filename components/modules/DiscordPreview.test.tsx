@@ -74,6 +74,26 @@ describe('DiscordPreview images', () => {
 		expect(screen.getByText(copy.embedEmpty)).toBeInTheDocument();
 	});
 
+	it('seats neighbouring inline fields on one row and leaves the rest on their own', () => {
+		const view = show(
+			embedDraft({
+				title: 'Hi',
+				fields: [
+					{ id: 'a', name: 'Rules', value: 'Read them', inline: true },
+					{ id: 'b', name: 'Roles', value: 'Pick one', inline: true },
+					{ id: 'c', name: 'Support', value: 'Open a ticket', inline: false }
+				]
+			})
+		);
+
+		const rows = Array.from(view.container.querySelectorAll('[data-embed-row]'));
+
+		expect(rows).toHaveLength(2);
+		expect(rows[0]?.textContent).toContain('Read them');
+		expect(rows[0]?.textContent).toContain('Pick one');
+		expect(rows[1]?.textContent).toContain('Open a ticket');
+	});
+
 	it('speaks the reader language, not English by default', () => {
 		render(<DiscordPreview message={embedDraft()} variables={variables} />, {
 			wrapper: ({ children }) => <Translated locale="pt-BR">{children}</Translated>
