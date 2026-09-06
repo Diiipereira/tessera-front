@@ -286,7 +286,7 @@ tentar simplificar para "todos os bits até 52 menos o 3" vai pedir uma permiss�
 teste que falha se alguém ocupar o 47 ou abrir um segundo buraco.
 
 **Permissão trocada no convite só vale para quem instalar depois.** O Discord grava as permissões
-no cargo do bot na hora da instalação; servidor que já tem a Tessera continua com as permissões
+no cargo do bot na hora da instalação; servidor que já tem o Tessera continua com as permissões
 antigas até ser reconvidado.
 
 ## Public pages
