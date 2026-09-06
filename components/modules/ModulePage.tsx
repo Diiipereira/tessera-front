@@ -56,7 +56,7 @@ export function ModulePage({
 						href={docsHref(locale, `modules/${moduleId}`)}
 						className="relative flex items-center gap-1 text-body-sm text-link no-underline before:absolute before:inset-x-0 before:-inset-y-0.5 before:content-[''] hover:text-link-hover"
 					>
-						{t('docs')}
+						{t('help')}
 						<ArrowUpRight className="size-3.5" aria-hidden="true" />
 					</Link>
 					<Switch

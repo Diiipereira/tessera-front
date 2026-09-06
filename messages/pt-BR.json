@@ -70,7 +70,6 @@
 		"openNavigation": "Abrir a navegação",
 		"search": "Buscar",
 		"searchOrJump": "Buscar ou ir para…",
-		"helpAndDocs": "Ajuda e documentação",
 		"accountMenu": "Menu da conta",
 		"account": "Conta",
 		"theme": "Tema",
@@ -875,7 +874,7 @@
 		}
 	},
 	"modules": {
-		"docs": "Documentação",
+		"help": "Ajuda do módulo",
 		"enabled": "Ligado",
 		"disabled": "Desligado",
 		"save": {

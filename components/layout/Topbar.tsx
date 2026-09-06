@@ -77,10 +77,11 @@ export function Topbar({ guild, user, onSearch, onOpenAccount, accountTriggerRef
 
 				<Link
 					href="/docs"
-					aria-label={t('helpAndDocs')}
-					className={cn(iconButton, 'hidden sm:grid')}
+					aria-label={t('docs')}
+					className="hidden h-8 shrink-0 items-center gap-1.5 rounded-md px-2 text-body-sm whitespace-nowrap text-text-muted transition-colors duration-120 ease-out hover:bg-surface-hover hover:text-text sm:flex"
 				>
-					<CircleQuestionMark className="size-4" aria-hidden="true" />
+					<CircleQuestionMark className="size-4 shrink-0" aria-hidden="true" />
+					<span className="hidden md:inline">{t('docs')}</span>
 				</Link>
 
 				<span className="mx-1 hidden h-6 w-px bg-border sm:block" aria-hidden="true" />
