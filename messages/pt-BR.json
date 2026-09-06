@@ -1132,13 +1132,13 @@
 				}
 			},
 			"summary": {
-				"spam": "{threshold} mensagens em {window}s",
+				"spam": "{threshold, plural, =1 {# mensagem} other {# mensagens}} em {window}s",
 				"invites": "qualquer convite do Discord",
 				"links": "qualquer link",
 				"caps": "acima de {threshold}% de maiúsculas",
-				"mentions": "{threshold} menções em uma mensagem",
-				"words": "{count} palavras bloqueadas",
-				"attachments": "{threshold} anexos"
+				"mentions": "{threshold, plural, =1 {# menção} other {# menções}} em uma mensagem",
+				"words": "{count, plural, =1 {# palavra bloqueada} other {# palavras bloqueadas}}",
+				"attachments": "{threshold, plural, =1 {# anexo} other {# anexos}}"
 			},
 			"action": {
 				"delete": "Apagar",
@@ -1158,13 +1158,13 @@
 				"unfinished": "{count, plural, =1 {Uma regra ainda está} other {# regras ainda estão}} sem nome, sem palavra ou sem ação, então nada está sendo testado."
 			},
 			"reason": {
-				"invites": "encontrou {count} link(s) de convite",
-				"links": "encontrou {count} link(s)",
-				"mentions": "{count} menções, o limite é {limit}",
+				"invites": "{count, plural, =1 {encontrou # link de convite} other {encontrou # links de convite}}",
+				"links": "{count, plural, =1 {encontrou # link} other {encontrou # links}}",
+				"mentions": "{count, plural, =1 {# menção} other {# menções}}, o limite é {limit}",
 				"caps": "{ratio}% de maiúsculas, o limite é {limit}%",
 				"words": "casou com {found}",
-				"spam": "{count} mensagens dentro da janela, o limite é {limit}",
-				"attachments": "{count} anexos, o limite é {limit}"
+				"spam": "{count, plural, =1 {# mensagem} other {# mensagens}} dentro da janela, o limite é {limit}",
+				"attachments": "{count, plural, =1 {# anexo} other {# anexos}}, o limite é {limit}"
 			},
 			"dialog": {
 				"new": "Nova regra",

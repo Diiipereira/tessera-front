@@ -1,4 +1,5 @@
 import { createTranslator } from 'next-intl';
+import type { ReactNode } from 'react';
 import { describe, expect, it } from 'vitest';
 import enUS from '@/messages/en-US.json';
 import ptBR from '@/messages/pt-BR.json';
@@ -36,6 +37,26 @@ const placeholdersOf = (text: string): string[] =>
 
 const richTagsOf = (text: string): string[] =>
 	[...text.matchAll(RICH_TAG)].map((match) => match[1] ?? '').sort();
+
+type Value = number | ((chunks: ReactNode) => ReactNode);
+
+type Format = (key: string, values: Record<string, Value>) => string;
+
+const valuesFor = (text: string): Record<string, Value> => {
+	const values: Record<string, Value> = {};
+
+	for (const name of placeholdersOf(text)) values[name] = 1;
+	for (const tag of richTagsOf(text)) values[tag] = (chunks: ReactNode) => chunks;
+
+	return values;
+};
+
+const formatterFor = (locale: string, tree: Tree, broken: string[]): Format =>
+	createTranslator({
+		locale,
+		messages: tree,
+		onError: (error) => broken.push(`${locale}: ${error.message}`)
+	}) as unknown as Format;
 
 const english = flatten(enUS);
 const portuguese = flatten(ptBR);
@@ -136,6 +157,18 @@ describe('message dictionaries', () => {
 		expect(t('modules.levels.fields.announceMessage.description')).toContain('{user.mention}');
 	});
 
+	it('formats every message, so a malformed plural is caught here and not on screen', () => {
+		const broken: string[] = [];
+
+		for (const [locale, tree] of Object.entries(DICTIONARIES)) {
+			const format = formatterFor(locale, tree, broken);
+
+			for (const [key, text] of flatten(tree)) format(key, valuesFor(text));
+		}
+
+		expect(broken).toEqual([]);
+	});
+
 	it('keeps the same rich tags on both sides, which t.rich throws without', () => {
 		const mismatched = [...english]
 			.filter(([key, text]) => {
@@ -148,5 +181,47 @@ describe('message dictionaries', () => {
 			.map(([key]) => key);
 
 		expect(mismatched).toEqual([]);
+	});
+});
+
+describe('a message that counts things', () => {
+	const automod = { 'pt-BR': ptBR, 'en-US': enUS } as const;
+
+	const pt = createTranslator({
+		locale: 'pt-BR',
+		messages: automod['pt-BR'],
+		namespace: 'modules.automod'
+	});
+
+	const en = createTranslator({
+		locale: 'en-US',
+		messages: automod['en-US'],
+		namespace: 'modules.automod'
+	});
+
+	it('counts one blocked word in the singular, which is what a new rule usually holds', () => {
+		expect(pt('summary.words', { count: 1 })).toBe('1 palavra bloqueada');
+		expect(en('summary.words', { count: 1 })).toBe('1 blocked word');
+	});
+
+	it('still counts many in the plural', () => {
+		expect(pt('summary.words', { count: 4 })).toBe('4 palavras bloqueadas');
+		expect(en('summary.words', { count: 4 })).toBe('4 blocked words');
+	});
+
+	it('counts one mention, one attachment and one message in the singular too', () => {
+		expect(pt('summary.mentions', { threshold: 1 })).toBe('1 menção em uma mensagem');
+		expect(pt('summary.attachments', { threshold: 1 })).toBe('1 anexo');
+		expect(pt('summary.spam', { threshold: 1, window: 5 })).toBe('1 mensagem em 5s');
+		expect(en('summary.mentions', { threshold: 1 })).toBe('1 mention in one message');
+		expect(en('summary.attachments', { threshold: 1 })).toBe('1 attachment');
+		expect(en('summary.spam', { threshold: 1, window: 5 })).toBe('1 message in 5s');
+	});
+
+	it('says what the playground found without a parenthesised s', () => {
+		expect(pt('reason.links', { count: 1 })).toBe('encontrou 1 link');
+		expect(pt('reason.links', { count: 2 })).toBe('encontrou 2 links');
+		expect(en('reason.invites', { count: 1 })).toBe('found 1 invite link');
+		expect(en('reason.invites', { count: 2 })).toBe('found 2 invite links');
 	});
 });

@@ -1132,13 +1132,13 @@
 				}
 			},
 			"summary": {
-				"spam": "{threshold} messages in {window}s",
+				"spam": "{threshold, plural, =1 {# message} other {# messages}} in {window}s",
 				"invites": "any Discord invite",
 				"links": "any link",
 				"caps": "over {threshold}% capitals",
-				"mentions": "{threshold} mentions in one message",
-				"words": "{count} blocked words",
-				"attachments": "{threshold} attachments"
+				"mentions": "{threshold, plural, =1 {# mention} other {# mentions}} in one message",
+				"words": "{count, plural, =1 {# blocked word} other {# blocked words}}",
+				"attachments": "{threshold, plural, =1 {# attachment} other {# attachments}}"
 			},
 			"action": {
 				"delete": "Delete",
@@ -1158,13 +1158,13 @@
 				"unfinished": "{count, plural, =1 {One rule is} other {# rules are}} still missing a name, a word or an action, so nothing is being tested yet."
 			},
 			"reason": {
-				"invites": "found {count} invite link(s)",
-				"links": "found {count} link(s)",
-				"mentions": "{count} mentions, limit is {limit}",
+				"invites": "{count, plural, =1 {found # invite link} other {found # invite links}}",
+				"links": "{count, plural, =1 {found # link} other {found # links}}",
+				"mentions": "{count, plural, =1 {# mention} other {# mentions}}, limit is {limit}",
 				"caps": "{ratio}% capitals, limit is {limit}%",
 				"words": "matched {found}",
-				"spam": "{count} messages inside the window, limit is {limit}",
-				"attachments": "{count} attachments, limit is {limit}"
+				"spam": "{count, plural, =1 {# message} other {# messages}} inside the window, limit is {limit}",
+				"attachments": "{count, plural, =1 {# attachment} other {# attachments}}, limit is {limit}"
 			},
 			"dialog": {
 				"new": "New rule",
