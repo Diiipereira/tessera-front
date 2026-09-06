@@ -1739,6 +1739,14 @@
 			"saveFailed": "Não foi possível salvar",
 			"unknownFailure": "Falha desconhecida",
 			"previewNote": "As variáveis aparecem com dados de exemplo. A mensagem real usa quem entrou.",
+			"test": {
+				"action": "Enviar teste",
+				"dirty": "Salve as alterações antes de enviar um teste.",
+				"sent": "Teste enviado no canal de boas-vindas",
+				"notReady": "Nada foi enviado: o módulo está desligado, ou ainda não tem canal.",
+				"channelRefused": "Não consegui escrever no canal — confira se ele existe e se eu posso postar lá.",
+				"failed": "Não foi possível enviar o teste"
+			},
 			"message": {
 				"title": "Mensagem de boas-vindas",
 				"description": "Publicada em um canal assim que alguém entra.",

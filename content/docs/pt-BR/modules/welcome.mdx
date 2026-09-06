@@ -52,3 +52,20 @@ módulo, não pela variável.
 ## Comandos
 
 <Commands module="welcome" />
+
+## Testando sem esperar alguém entrar
+
+Não é preciso expulsar e readicionar um membro para ver como a mensagem fica. O botão
+**Enviar teste**, no topo da tela de Boas-vindas, publica a saudação no canal configurado usando
+você como quem acabou de entrar. Pelo Discord, o mesmo teste é `/test module:Boas-vindas`.
+
+O teste usa a configuração **em vigor** — o texto, o embed, o modo de menção e o prazo de
+apagamento que estão salvos. Ele não entrega os cargos automáticos: teste não dá cargo a
+moderador.
+
+<Callout tone="info" title="Salve antes de testar">
+	O botão fica desativado enquanto houver alteração pendente. O teste lê o que está salvo, e testar
+	uma configuração diferente da que está na tela seria enganoso.
+</Callout>
+
+Se o módulo estiver desligado, ou ainda sem canal, nada é enviado e o painel diz qual dos dois é.

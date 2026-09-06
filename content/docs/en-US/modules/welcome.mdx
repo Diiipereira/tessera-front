@@ -52,3 +52,21 @@ not by the variable.
 ## Commands
 
 <Commands module="welcome" />
+
+## Testing without waiting for someone to join
+
+You do not have to kick and re-add a member to see how the message looks. The **Send a test**
+button, at the top of the Welcome screen, posts the greeting in the configured channel using you
+as the member who just arrived. From Discord, the same test is `/test module:Welcome`.
+
+The test uses the settings **in force** — the text, the embed, the mention mode and the delete
+delay that are saved. It does not hand out the automatic roles: a test does not give a moderator
+a role.
+
+<Callout tone="info" title="Save before testing">
+	The button is disabled while a change is pending. The test reads what is saved, and testing a
+	configuration different from the one on screen would be misleading.
+</Callout>
+
+If the module is off, or still has no channel, nothing is sent and the panel says which of the
+two it is.

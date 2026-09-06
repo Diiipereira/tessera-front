@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { describeFailure, patchModule } from './module-client';
+import { describeFailure, patchModule, sendModuleTest } from './module-client';
 
 const GUILD_ID = '931562055025168435';
 
@@ -108,5 +108,55 @@ describe('patchModule', () => {
 
 		expect(init.credentials).toBe('include');
 		expect(init.method).toBe('PATCH');
+	});
+});
+
+describe('sendModuleTest', () => {
+	beforeEach(() => {
+		vi.stubGlobal('fetch', vi.fn());
+	});
+
+	afterEach(() => {
+		vi.unstubAllGlobals();
+	});
+
+	it('posts to the test route of the module, and never to the module itself', async () => {
+		vi.mocked(fetch).mockResolvedValue(json(201, { outcome: 'sent' }));
+
+		await sendModuleTest(GUILD_ID, 'welcome');
+
+		const [url, init] = vi.mocked(fetch).mock.calls[0] as [string, RequestInit];
+
+		expect(url).toContain(`/guilds/${GUILD_ID}/modules/welcome/test`);
+		expect(init.method).toBe('POST');
+	});
+
+	it('carries back what the API decided, so the screen never guesses', async () => {
+		vi.mocked(fetch).mockResolvedValue(json(201, { outcome: 'not-ready' }));
+
+		expect(await sendModuleTest(GUILD_ID, 'welcome')).toEqual({
+			status: 'ok',
+			outcome: 'not-ready'
+		});
+	});
+
+	it('turns a refusal into a message rather than a silent nothing', async () => {
+		vi.mocked(fetch).mockResolvedValue(
+			json(400, { error: { code: 'MODULE_HAS_NO_TEST', message: 'no test' } })
+		);
+
+		expect(await sendModuleTest(GUILD_ID, 'levels')).toEqual({
+			status: 'error',
+			message: 'no test'
+		});
+	});
+
+	it('survives an API that never answered', async () => {
+		vi.mocked(fetch).mockRejectedValue(new Error('offline'));
+
+		expect(await sendModuleTest(GUILD_ID, 'welcome')).toEqual({
+			status: 'error',
+			message: 'offline'
+		});
 	});
 });

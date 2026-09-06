@@ -89,3 +89,37 @@ export async function patchModule(
 
 	return { status: 'error', message: describeFailure(failure, response.status) };
 }
+
+export type ModuleTestOutcome = 'sent' | 'not-ready' | 'channel-refused';
+
+export type ModuleTestResult =
+	{ status: 'ok'; outcome: ModuleTestOutcome } | { status: 'error'; message: string };
+
+export async function sendModuleTest(
+	guildId: string,
+	moduleKey: string
+): Promise<ModuleTestResult> {
+	let response: Response;
+
+	try {
+		response = await fetch(`${moduleUrl(guildId, moduleKey)}/test`, {
+			method: 'POST',
+			credentials: 'include'
+		});
+	} catch (error) {
+		return {
+			status: 'error',
+			message: error instanceof Error ? error.message : 'The API could not be reached'
+		};
+	}
+
+	if (!response.ok) {
+		const failure = (await response.json().catch(() => ({}))) as ErrorBody;
+
+		return { status: 'error', message: describeFailure(failure, response.status) };
+	}
+
+	const body = (await response.json()) as { outcome: ModuleTestOutcome };
+
+	return { status: 'ok', outcome: body.outcome };
+}

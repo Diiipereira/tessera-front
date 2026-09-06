@@ -3,7 +3,7 @@
 import { DoorOpen } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { channelSwitch } from '@/lib/channel-switch';
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { DiscordPreview } from '@/components/modules/DiscordPreview';
 import { MessageComposer } from '@/components/modules/MessageComposer';
 import { ModulePage } from '@/components/modules/ModulePage';
@@ -11,10 +11,11 @@ import { SaveBar } from '@/components/modules/SaveBar';
 import { SettingsSection } from '@/components/modules/SettingsSection';
 import { ChannelPicker } from '@/components/discord/ChannelPicker';
 import { RolePicker } from '@/components/discord/RolePicker';
+import { Button } from '@/components/ui/Button';
 import { Field } from '@/components/ui/Field';
 import { Select } from '@/components/ui/Select';
 import { useConfigDraft, type SaveOutcome } from '@/lib/hooks/useConfigDraft';
-import { patchModule } from '@/lib/module-client';
+import { patchModule, sendModuleTest } from '@/lib/module-client';
 import {
 	WELCOME_AUTO_ROLES_MAX,
 	WELCOME_CHANNEL_KINDS,
@@ -81,6 +82,27 @@ export function WelcomeScreen({
 	);
 
 	const form = useConfigDraft<WelcomeConfig>(config, { save });
+	const [testing, setTesting] = useState(false);
+
+	const runTest = useCallback(async () => {
+		setTesting(true);
+
+		const result = await sendModuleTest(guildId, 'welcome');
+
+		setTesting(false);
+
+		if (result.status === 'error') {
+			toast.error(t('test.failed'), { description: result.message });
+			return;
+		}
+
+		if (result.outcome === 'sent') {
+			toast.success(t('test.sent'));
+			return;
+		}
+
+		toast.warning(t(result.outcome === 'not-ready' ? 'test.notReady' : 'test.channelRefused'));
+	}, [guildId, t]);
 	const draft = form.draft;
 	const switching = channelSwitch(form.saved.channelId, draft.channelId, channels);
 
@@ -107,6 +129,20 @@ export function WelcomeScreen({
 			onEnabledChange={(next) => {
 				form.set('enabled', next);
 			}}
+			headerAction={
+				<Button
+					variant="outline"
+					size="sm"
+					loading={testing}
+					disabled={form.dirty}
+					title={form.dirty ? t('test.dirty') : undefined}
+					onClick={() => {
+						void runTest();
+					}}
+				>
+					{t('test.action')}
+				</Button>
+			}
 			aside={preview}
 			saveBar={
 				<SaveBar

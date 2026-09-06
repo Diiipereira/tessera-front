@@ -1739,6 +1739,14 @@
 			"saveFailed": "Could not save",
 			"unknownFailure": "Unknown failure",
 			"previewNote": "Variables are shown with sample data. The real post uses the member who joined.",
+			"test": {
+				"action": "Send a test",
+				"dirty": "Save your changes before sending a test.",
+				"sent": "Test sent to the welcome channel",
+				"notReady": "Nothing was sent: the module is off, or it still has no channel.",
+				"channelRefused": "I could not write in the channel — check that it exists and that I can post there.",
+				"failed": "Could not send the test"
+			},
 			"message": {
 				"title": "Welcome message",
 				"description": "Posted in a channel the moment someone joins.",
