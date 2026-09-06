@@ -121,7 +121,6 @@
 		"saved": "Preferences saved",
 		"tabs": {
 			"profile": "Profile",
-			"interface": "Interface",
 			"email": "Email",
 			"servers": "Servers",
 			"sessions": "Sessions",
@@ -134,12 +133,6 @@
 			"idLabel": "Discord ID",
 			"idHint": "Support asks for this when something needs looking up.",
 			"upstream": "Change your name or avatar in Discord — {brand} picks it up on the next sign-in."
-		},
-		"interface": {
-			"title": "Interface",
-			"description": "How the dashboard looks on this browser.",
-			"theme": "Theme",
-			"themeHint": "Saved in this browser, not on your account."
 		},
 		"email": {
 			"title": "Email",
@@ -942,6 +935,9 @@
 			"fieldName": "Field name",
 			"fieldValue": "Field value",
 			"inline": "Inline",
+			"inlineHint": "Only changes anything with two or three fields in a row switched on.",
+			"moveField": "Move field {position} of {total}",
+			"moveFieldHint": "Drag it, or use the up and down arrow keys.",
 			"removeField": "Remove field {name}",
 			"unnamedField": "without a name",
 			"image": "Image",
@@ -1321,6 +1317,9 @@
 				"label": "Label",
 				"labelPlaceholder": "Blue",
 				"role": "Role",
+				"add": "Add option",
+				"move": "Move option {position} of {total}",
+				"moveHint": "Drag it, or use the up and down arrow keys.",
 				"remove": "Remove option {label}",
 				"unlabelled": "without a label",
 				"noneWarning": "No options. The panel would post an empty message.",

@@ -27,8 +27,11 @@ import type {
 import { DISCORD } from '@/lib/discord-colors';
 import { cn } from '@/lib/utils/cn';
 import { newId } from '@/lib/utils/id';
+import { moveItem } from '@/lib/utils/reorder';
 
 const MODES: ReactionMode[] = ['toggle', 'unique', 'verify', 'drop'];
+
+const MOVES: Record<string, number> = { ArrowUp: -1, ArrowDown: 1 };
 
 function blankPanel(): ReactionPanel {
 	return {
@@ -96,6 +99,8 @@ export function ReactionRolesScreen({
 	const halfWritten = unfinished(draft.panels);
 
 	const [selectedId, setSelectedId] = useState(draft.panels[0]?.id ?? null);
+	const [dragging, setDragging] = useState<string | null>(null);
+	const [over, setOver] = useState<string | null>(null);
 	const selected = draft.panels.find((panel) => panel.id === selectedId) ?? null;
 
 	function updatePanel(id: string, patch: Partial<ReactionPanel>) {
@@ -113,6 +118,21 @@ export function ReactionRolesScreen({
 				option.id === optionId ? { ...option, ...patch } : option
 			)
 		});
+	}
+
+	function moveOption(panelId: string, optionId: string, to: number) {
+		const panel = draft.panels.find((entry) => entry.id === panelId);
+		if (!panel) return;
+
+		const from = panel.options.findIndex((option) => option.id === optionId);
+		if (from === -1) return;
+
+		updatePanel(panelId, { options: moveItem(panel.options, from, to) });
+	}
+
+	function endDrag() {
+		setDragging(null);
+		setOver(null);
 	}
 
 	const aside = selected ? (
@@ -356,22 +376,70 @@ export function ReactionRolesScreen({
 								}}
 							>
 								<Plus aria-hidden="true" />
-								Add option
+								{t('options.add')}
 							</Button>
 						}
 					>
 						{selected.options.length === 0 ? (
 							<p className="text-body-sm text-text-muted">{t('options.noneWarning')}</p>
 						) : (
-							selected.options.map((option) => (
+							selected.options.map((option, index) => (
 								<div
 									key={option.id}
-									className="flex items-start gap-2 rounded-md border border-border bg-surface-sunken p-3"
+									data-option-row=""
+									onDragOver={(event) => {
+										if (dragging === null) return;
+
+										event.preventDefault();
+										event.dataTransfer.dropEffect = 'move';
+										setOver(option.id);
+									}}
+									onDrop={(event) => {
+										event.preventDefault();
+
+										if (dragging !== null) moveOption(selected.id, dragging, index);
+
+										endDrag();
+									}}
+									className={cn(
+										'flex items-start gap-2 rounded-md border bg-surface-sunken p-3 transition-colors duration-120 ease-out',
+										over === option.id && dragging !== option.id
+											? 'border-primary'
+											: 'border-border',
+										dragging === option.id && 'opacity-50'
+									)}
 								>
-									<GripVertical
-										className="mt-2.5 size-4 shrink-0 cursor-grab text-text-subtle"
-										aria-hidden="true"
-									/>
+									<button
+										type="button"
+										draggable
+										aria-label={t('options.move', {
+											position: index + 1,
+											total: selected.options.length
+										})}
+										title={t('options.moveHint')}
+										onDragStart={(event) => {
+											const row = event.currentTarget.closest('[data-option-row]');
+
+											event.dataTransfer.effectAllowed = 'move';
+											event.dataTransfer.setData('text/plain', option.id);
+
+											if (row instanceof HTMLElement) event.dataTransfer.setDragImage(row, 16, 16);
+
+											setDragging(option.id);
+										}}
+										onDragEnd={endDrag}
+										onKeyDown={(event) => {
+											const step = MOVES[event.key];
+
+											if (step === undefined) return;
+
+											event.preventDefault();
+											moveOption(selected.id, option.id, index + step);
+										}}
+										className="mt-2.5 shrink-0 cursor-grab rounded-sm text-text-subtle transition-colors duration-120 ease-out hover:text-text active:cursor-grabbing"
+									>
+										<GripVertical className="size-4" aria-hidden="true" />
+									</button>
 
 									<div className="flex min-w-0 flex-1 flex-col gap-2">
 										<div className="flex flex-wrap items-end gap-2">

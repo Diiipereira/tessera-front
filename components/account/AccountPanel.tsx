@@ -8,7 +8,6 @@ import {
 	Monitor,
 	MonitorSmartphone,
 	Server,
-	SlidersHorizontal,
 	Smartphone,
 	Trash2,
 	User,
@@ -19,7 +18,6 @@ import { useTranslations } from 'next-intl';
 import { useRef, useState, type KeyboardEvent, type ReactNode, type RefObject } from 'react';
 import { toast } from 'sonner';
 import { Avatar } from '@/components/layout/Avatar';
-import { ThemeToggle } from '@/components/layout/ThemeToggle';
 import { ConfirmDialog } from '@/components/management/ConfirmDialog';
 import { SaveBar } from '@/components/modules/SaveBar';
 import { Badge } from '@/components/ui/Badge';
@@ -39,7 +37,6 @@ import { cn } from '@/lib/utils/cn';
 
 const TABS = [
 	{ id: 'profile', icon: User },
-	{ id: 'interface', icon: SlidersHorizontal },
 	{ id: 'email', icon: Mail },
 	{ id: 'servers', icon: Server },
 	{ id: 'sessions', icon: MonitorSmartphone },
@@ -156,7 +153,7 @@ export function AccountPanel({
 						event.preventDefault();
 						returnFocusTo.current?.focus();
 					}}
-					className="fixed top-1/2 left-1/2 z-50 flex h-[min(32rem,calc(100svh-2rem))] w-[calc(100vw-2rem)] max-w-4xl -translate-1/2 flex-col overflow-hidden rounded-xl border border-border-strong bg-surface-raised shadow-3 data-[state=open]:animate-scale-in"
+					className="fixed top-1/2 left-1/2 z-50 flex h-[min(44rem,calc(100svh-2rem))] w-[calc(100vw-2rem)] max-w-4xl -translate-1/2 flex-col overflow-hidden rounded-xl border border-border-strong bg-surface-raised shadow-3 data-[state=open]:animate-scale-in"
 				>
 					<header className="flex shrink-0 items-center gap-3 border-b border-border px-5 py-4">
 						<div className="min-w-0 flex-1">
@@ -239,20 +236,6 @@ export function AccountPanel({
 									<p className="text-body-sm text-pretty text-text-muted">
 										{t('profile.upstream', { brand: BRAND.name })}
 									</p>
-								</Pane>
-							) : null}
-
-							{tab === 'interface' ? (
-								<Pane title={t('interface.title')} description={t('interface.description')}>
-									<div className="flex items-start justify-between gap-4">
-										<div className="min-w-0">
-											<p className="text-body-sm font-medium">{t('interface.theme')}</p>
-											<p className="text-caption font-normal text-text-muted">
-												{t('interface.themeHint')}
-											</p>
-										</div>
-										<ThemeToggle />
-									</div>
 								</Pane>
 							) : null}
 

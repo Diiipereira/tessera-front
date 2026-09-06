@@ -121,7 +121,6 @@
 		"saved": "Preferências salvas",
 		"tabs": {
 			"profile": "Perfil",
-			"interface": "Interface",
 			"email": "E-mail",
 			"servers": "Servidores",
 			"sessions": "Sessões",
@@ -134,12 +133,6 @@
 			"idLabel": "ID do Discord",
 			"idHint": "O suporte pede este número quando precisa consultar alguma coisa.",
 			"upstream": "Mude seu nome ou avatar no Discord — o {brand} pega na próxima entrada."
-		},
-		"interface": {
-			"title": "Interface",
-			"description": "Como o painel aparece neste navegador.",
-			"theme": "Tema",
-			"themeHint": "Salvo neste navegador, não na sua conta."
 		},
 		"email": {
 			"title": "E-mail",
@@ -942,6 +935,9 @@
 			"fieldName": "Nome do campo",
 			"fieldValue": "Valor do campo",
 			"inline": "Na mesma linha",
+			"inlineHint": "Só muda alguma coisa com dois ou três campos seguidos ligados.",
+			"moveField": "Mover o campo {position} de {total}",
+			"moveFieldHint": "Arraste, ou use as setas para cima e para baixo.",
 			"removeField": "Remover o campo {name}",
 			"unnamedField": "sem nome",
 			"image": "Imagem",
@@ -1321,6 +1317,9 @@
 				"label": "Rótulo",
 				"labelPlaceholder": "Azul",
 				"role": "Cargo",
+				"add": "Adicionar opção",
+				"move": "Mover a opção {position} de {total}",
+				"moveHint": "Arraste, ou use as setas para cima e para baixo.",
 				"remove": "Remover a opção {label}",
 				"unlabelled": "sem rótulo",
 				"noneWarning": "Nenhuma opção. O painel publicaria uma mensagem vazia.",

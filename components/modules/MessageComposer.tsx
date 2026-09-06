@@ -2,7 +2,7 @@
 
 import { GripVertical, Plus, Trash2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useId, useRef } from 'react';
+import { useId, useRef, useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Field } from '@/components/ui/Field';
 import { Input } from '@/components/ui/Input';
@@ -14,9 +14,12 @@ import { insertAtCursor, unknownVariables } from '@/lib/message-variables';
 import type { EmbedField, MessageDraft, MessageMode, MessageVariable } from '@/lib/types/modules';
 import { cn } from '@/lib/utils/cn';
 import { newId } from '@/lib/utils/id';
+import { moveItem } from '@/lib/utils/reorder';
 import { VariableChips } from './VariableChips';
 
 const MODES: MessageMode[] = ['text', 'embed'];
+
+const MOVES: Record<string, number> = { ArrowUp: -1, ArrowDown: 1 };
 
 const segment = 'h-7 rounded-sm px-3 text-caption transition-colors duration-120 ease-out';
 
@@ -35,6 +38,8 @@ export function MessageComposer({ value, onChange, variables }: MessageComposerP
 	const uid = useId();
 	const textRef = useRef<HTMLTextAreaElement>(null);
 	const descriptionRef = useRef<HTMLTextAreaElement>(null);
+	const [dragging, setDragging] = useState<string | null>(null);
+	const [over, setOver] = useState<string | null>(null);
 
 	const activeRef = value.mode === 'text' ? textRef : descriptionRef;
 	const activeText = value.mode === 'text' ? value.text : value.embed.description;
@@ -72,6 +77,19 @@ export function MessageComposer({ value, onChange, variables }: MessageComposerP
 
 	function removeField(id: string) {
 		setEmbed({ fields: value.embed.fields.filter((field) => field.id !== id) });
+	}
+
+	function moveField(id: string, to: number) {
+		const from = value.embed.fields.findIndex((field) => field.id === id);
+
+		if (from === -1) return;
+
+		setEmbed({ fields: moveItem(value.embed.fields, from, to) });
+	}
+
+	function endDrag() {
+		setDragging(null);
+		setOver(null);
 	}
 
 	function hintFor(url: string, fallback: 'imageHint' | 'thumbnailHint') {
@@ -198,15 +216,62 @@ export function MessageComposer({ value, onChange, variables }: MessageComposerP
 						{value.embed.fields.length === 0 ? (
 							<p className="text-body-sm text-text-muted">{t('noFields')}</p>
 						) : (
-							value.embed.fields.map((field) => (
+							value.embed.fields.map((field, index) => (
 								<div
 									key={field.id}
-									className="flex items-start gap-2 rounded-md border border-border bg-surface-sunken p-3"
+									data-field-row=""
+									onDragOver={(event) => {
+										if (dragging === null) return;
+
+										event.preventDefault();
+										event.dataTransfer.dropEffect = 'move';
+										setOver(field.id);
+									}}
+									onDrop={(event) => {
+										event.preventDefault();
+
+										if (dragging !== null) moveField(dragging, index);
+
+										endDrag();
+									}}
+									className={cn(
+										'flex items-start gap-2 rounded-md border bg-surface-sunken p-3 transition-colors duration-120 ease-out',
+										over === field.id && dragging !== field.id ? 'border-primary' : 'border-border',
+										dragging === field.id && 'opacity-50'
+									)}
 								>
-									<GripVertical
-										className="mt-2 size-4 shrink-0 cursor-grab text-text-subtle"
-										aria-hidden="true"
-									/>
+									<button
+										type="button"
+										draggable
+										aria-label={t('moveField', {
+											position: index + 1,
+											total: value.embed.fields.length
+										})}
+										title={t('moveFieldHint')}
+										onDragStart={(event) => {
+											const row = event.currentTarget.closest('[data-field-row]');
+
+											event.dataTransfer.effectAllowed = 'move';
+											event.dataTransfer.setData('text/plain', field.id);
+
+											if (row instanceof HTMLElement) event.dataTransfer.setDragImage(row, 16, 16);
+
+											setDragging(field.id);
+										}}
+										onDragEnd={endDrag}
+										onKeyDown={(event) => {
+											const step = MOVES[event.key];
+
+											if (step === undefined) return;
+
+											event.preventDefault();
+											moveField(field.id, index + step);
+										}}
+										className="mt-2 shrink-0 cursor-grab rounded-sm text-text-subtle transition-colors duration-120 ease-out hover:text-text active:cursor-grabbing"
+									>
+										<GripVertical className="size-4" aria-hidden="true" />
+									</button>
+
 									<div className="flex min-w-0 flex-1 flex-col gap-2">
 										<Input
 											value={field.name}
@@ -231,6 +296,7 @@ export function MessageComposer({ value, onChange, variables }: MessageComposerP
 												updateField(field.id, { inline: next });
 											}}
 											label={t('inline')}
+											description={t('inlineHint')}
 										/>
 									</div>
 									<Button

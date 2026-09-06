@@ -69,7 +69,6 @@ describe('AccountPanel', () => {
 
 		expect(screen.getAllByRole('tab').map((entry) => entry.textContent)).toEqual([
 			'Profile',
-			'Interface',
 			'Email',
 			'Servers',
 			'Sessions',
@@ -96,8 +95,8 @@ describe('AccountPanel', () => {
 		tab('Profile').focus();
 		await user.keyboard('{ArrowDown}{ArrowDown}');
 
-		expect(tab('Email')).toHaveFocus();
-		expect(tab('Email')).toHaveAttribute('aria-selected', 'true');
+		expect(tab('Servers')).toHaveFocus();
+		expect(tab('Servers')).toHaveAttribute('aria-selected', 'true');
 		expect(screen.getAllByRole('tab').filter((entry) => entry.tabIndex === 0)).toHaveLength(1);
 	});
 
