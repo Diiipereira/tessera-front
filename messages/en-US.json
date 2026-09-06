@@ -2219,6 +2219,9 @@
 	},
 	"registry": {
 		"commands": {
+			"automod": {
+				"description": "Rules that watch messages and act on their own"
+			},
 			"balance": {
 				"description": "See what a member has in their wallet"
 			},

@@ -31,3 +31,29 @@ O AutoMod observa as mensagens conforme elas chegam e age nas que casam com uma 
 ## Comandos
 
 <Commands module="automod" />
+
+As regras se criam, se apagam e se testam pelo Discord também — não só pelo painel.
+
+| Comando           | O que faz                                                           |
+| ----------------- | ------------------------------------------------------------------- |
+| `/automod list`   | mostra todas as regras, com gatilho, ação e se estão ligadas        |
+| `/automod add`    | cria uma regra: nome, gatilho, ação, e o limite se o gatilho contar |
+| `/automod edit`   | abre o seletor nativo do Discord para as listas da regra            |
+| `/automod remove` | apaga uma regra, escolhendo pelo nome                               |
+| `/automod test`   | testa um texto contra as regras **salvas**                          |
+
+O `add` cria a regra sem isenções. Os campos que guardam lista — cargos isentos, canais isentos,
+o que acontece ao disparar, e as palavras bloqueadas — se editam pelo `/automod edit`, que abre um
+modal com o seletor do próprio Discord, já marcado com o que está configurado.
+
+Criar uma regra não liga o AutoMod. Com o módulo desligado a regra fica gravada e não age em
+ninguém — o `/automod add` avisa quando é esse o caso. Ligar é `/config automod enabled:true`, ou o
+interruptor do módulo no painel.
+
+<Callout tone="info" title="O teste não usa rascunho">
+	Pelo Discord, o `/automod test` roda contra as regras que estão salvas. No painel, o botão de
+	testar usa o que está na tela, inclusive o que você ainda não salvou.
+</Callout>
+
+Regras de spam e de anexos aparecem como não testáveis pelo `/automod test`: julgar as duas exige
+o histórico recente do canal e os arquivos da mensagem, e um texto digitado não tem nenhum dos dois.

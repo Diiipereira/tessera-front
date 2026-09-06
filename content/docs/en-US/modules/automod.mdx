@@ -31,3 +31,29 @@ AutoMod watches messages as they arrive and acts on the ones that match a rule y
 ## Commands
 
 <Commands module="automod" />
+
+Rules can be created, deleted and tried from Discord as well — not only from the panel.
+
+| Command           | What it does                                                              |
+| ----------------- | ------------------------------------------------------------------------- |
+| `/automod list`   | every rule, with its trigger, its action and whether it is on             |
+| `/automod add`    | create a rule: name, trigger, action, and the limit if the trigger counts |
+| `/automod edit`   | open Discord's own picker for the lists a rule holds                      |
+| `/automod remove` | delete a rule, chosen by name                                             |
+| `/automod test`   | try a text against the rules that are **saved**                           |
+
+`add` creates the rule with no exemptions. The fields that hold a list — exempt roles, exempt
+channels, what happens when it fires, and the blocked words — are edited with `/automod edit`,
+which opens a modal carrying Discord's own picker, already ticked with what is configured.
+
+Creating a rule does not turn AutoMod on. With the module off the rule is stored and acts on
+nobody — `/automod add` says so when that is the case. Turning it on is
+`/config automod enabled:true`, or the module switch in the panel.
+
+<Callout tone="info" title="The test does not use a draft">
+	From Discord, `/automod test` runs against the rules that are saved. In the panel, the test button
+	uses what is on screen, including what you have not saved yet.
+</Callout>
+
+Spam and attachment rules come back as untestable from `/automod test`: judging either one needs
+the channel's recent history and the message's files, and typed text has neither.
