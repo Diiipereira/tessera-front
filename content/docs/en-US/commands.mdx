@@ -58,9 +58,14 @@ members of the same server, one on an English client and one on a Portuguese one
 descriptions at the same moment — each in their own language. Discord resolves this before the
 interaction ever reaches the bot.
 
-**The server language governs what Tessera writes.** The welcome message, the level-up
+**The server language governs what the whole server sees.** The welcome message, the level-up
 announcement, the log channel embeds, the DM to whoever was punished, the ticket and giveaway
-messages. Change it under **Settings → Server language**, or with `/config server language:`.
+messages, and public replies like `/rank` and `/balance`. Change it under **Settings → Server
+language**, or with `/config server language:`.
+
+**The reply only you can see speaks your own language.** That quiet message marked _only you can
+see this_ is a conversation with you, not with the server — so it answers in your language, even on
+a server configured in another.
 
 <Callout tone="info" title="I changed the server language and the descriptions stayed the same">
 	That is expected. The server language does not reach the command descriptions, because they belong

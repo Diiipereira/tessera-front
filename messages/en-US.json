@@ -829,7 +829,7 @@
 			"title": "Language and time",
 			"description": "The messages Tessera sends, and every schedule, follow these.",
 			"serverLanguage": "Server language",
-			"serverLanguageHint": "The language Tessera writes in on this server. What you see when you type / in Discord follows each reader’s own language, not this. Your dashboard language lives in your account.",
+			"serverLanguageHint": "The language of what the whole server sees: welcomes, announcements, logs, DMs. What only you see — and what you see when you type / — follows your own Discord. Your dashboard language lives in your account.",
 			"timezone": "Timezone",
 			"timezoneHint": "Scheduled messages and daily resets run against this clock.",
 			"timezonePlaceholder": "Pick a timezone",
