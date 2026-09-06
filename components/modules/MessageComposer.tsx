@@ -15,6 +15,7 @@ import type { EmbedField, MessageDraft, MessageMode, MessageVariable } from '@/l
 import { cn } from '@/lib/utils/cn';
 import { newId } from '@/lib/utils/id';
 import { moveItem } from '@/lib/utils/reorder';
+import { ImageUrlHelp } from './ImageUrlHelp';
 import { VariableChips } from './VariableChips';
 
 const MODES: MessageMode[] = ['text', 'embed'];
@@ -317,7 +318,11 @@ export function MessageComposer({ value, onChange, variables }: MessageComposerP
 						)}
 					</div>
 
-					<Field label={t('image')} hint={hintFor(value.embed.imageUrl, 'imageHint')}>
+					<Field
+						label={t('image')}
+						hint={hintFor(value.embed.imageUrl, 'imageHint')}
+						action={<ImageUrlHelp />}
+					>
 						<Input
 							value={value.embed.imageUrl}
 							onChange={(event) => {
@@ -327,7 +332,11 @@ export function MessageComposer({ value, onChange, variables }: MessageComposerP
 						/>
 					</Field>
 
-					<Field label={t('thumbnail')} hint={hintFor(value.embed.thumbnailUrl, 'thumbnailHint')}>
+					<Field
+						label={t('thumbnail')}
+						hint={hintFor(value.embed.thumbnailUrl, 'thumbnailHint')}
+						action={<ImageUrlHelp />}
+					>
 						<Input
 							value={value.embed.thumbnailUrl}
 							onChange={(event) => {

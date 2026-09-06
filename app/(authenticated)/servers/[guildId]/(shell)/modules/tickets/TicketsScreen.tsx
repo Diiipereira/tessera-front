@@ -400,8 +400,9 @@ export function TicketsScreen({
 									<RolePicker
 										roles={roles}
 										value={selected.staffRoleIds}
+										max={MAX_STAFF_ROLES}
 										onValueChange={(next) => {
-											updatePanel(selected.id, { staffRoleIds: next.slice(0, MAX_STAFF_ROLES) });
+											updatePanel(selected.id, { staffRoleIds: next });
 										}}
 									/>
 								</Field>

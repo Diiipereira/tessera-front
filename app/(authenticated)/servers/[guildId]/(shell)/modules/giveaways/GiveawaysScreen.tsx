@@ -510,8 +510,9 @@ function NewGiveawayDialog({
 					<RolePicker
 						roles={roles}
 						value={requiredRoleIds}
+						max={MAX_REQUIRED_ROLES}
 						onValueChange={(next) => {
-							setRequiredRoleIds(next.slice(0, MAX_REQUIRED_ROLES));
+							setRequiredRoleIds(next);
 						}}
 						placeholder={t('rolesPlaceholder')}
 					/>

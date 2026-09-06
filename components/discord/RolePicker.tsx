@@ -3,6 +3,7 @@
 import { Check, ChevronsUpDown, Lock } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState, type ReactElement } from 'react';
+import { toast } from 'sonner';
 import { Popover } from '@/components/ui/Popover';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { useFieldState } from '@/components/ui/field-context';
@@ -18,18 +19,37 @@ type RolePickerProps = {
 	value?: string[];
 	onValueChange?: (value: string[]) => void;
 	placeholder?: string;
+	max?: number;
 	id?: string;
 };
 
-export function RolePicker({ roles, value = [], onValueChange, placeholder, id }: RolePickerProps) {
+export function RolePicker({
+	roles,
+	value = [],
+	onValueChange,
+	placeholder,
+	max,
+	id
+}: RolePickerProps) {
 	const t = useTranslations('pickers');
 	const field = useFieldState();
 	const [open, setOpen] = useState(false);
 
 	const selected = roles.filter((role) => value.includes(role.id));
+	const full = max !== undefined && value.length >= max;
+
+	function blocks(role: Role): boolean {
+		return full && !value.includes(role.id);
+	}
 
 	function toggle(role: Role) {
 		if (role.lockedReason) return;
+
+		if (blocks(role)) {
+			toast.info(t('roleLimit', { max: max ?? 0 }), { id: 'role-picker-limit' });
+			return;
+		}
+
 		onValueChange?.(
 			value.includes(role.id) ? value.filter((entry) => entry !== role.id) : [...value, role.id]
 		);
@@ -67,14 +87,16 @@ export function RolePicker({ roles, value = [], onValueChange, placeholder, id }
 
 	function optionButton(role: Role): ReactElement {
 		const isSelected = value.includes(role.id);
+		const unreachable = Boolean(role.lockedReason) || blocks(role);
+
 		return (
 			<button
 				type="button"
 				aria-pressed={isSelected}
-				aria-disabled={role.lockedReason ? true : undefined}
+				aria-disabled={unreachable ? true : undefined}
 				className={cn(
 					row,
-					role.lockedReason
+					unreachable
 						? 'cursor-not-allowed text-text-muted opacity-50'
 						: isSelected
 							? 'bg-primary-subtle text-text'
@@ -114,6 +136,18 @@ export function RolePicker({ roles, value = [], onValueChange, placeholder, id }
 			triggerClassName="flex min-h-9 w-full flex-wrap items-center gap-1.5 rounded-md border border-border bg-surface px-3 py-1.5 text-body text-text transition-colors duration-120 ease-out focus-visible:border-primary focus-visible:outline-none hover:border-border-strong data-[state=open]:border-primary"
 			trigger={trigger}
 		>
+			{max === undefined ? null : (
+				<p
+					aria-live="polite"
+					className={cn(
+						'tabular border-b border-border px-2 py-1.5 text-caption font-normal',
+						full ? 'text-warning-fg' : 'text-text-muted'
+					)}
+				>
+					{t('roleCount', { count: value.length, max })}
+				</p>
+			)}
+
 			<div className="max-h-70 thin-scroll overflow-y-auto overscroll-contain">
 				{roles.map((role) =>
 					role.lockedReason ? (

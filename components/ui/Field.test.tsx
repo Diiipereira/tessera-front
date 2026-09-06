@@ -67,6 +67,19 @@ describe('Field', () => {
 		expect(textarea).toHaveAttribute('aria-invalid', 'true');
 	});
 
+	it('seats an action beside the label without stealing the label from the control', () => {
+		render(
+			<Field label="Image" action={<button type="button">How it works</button>}>
+				<Input />
+			</Field>
+		);
+
+		const action = screen.getByRole('button', { name: 'How it works' });
+
+		expect(screen.getByLabelText('Image')).toBe(screen.getByRole('textbox'));
+		expect(action.parentElement).toBe(screen.getByText('Image').parentElement);
+	});
+
 	it('leaves a bare control untouched when there is no Field around it', () => {
 		render(<Input aria-label="Loose input" />);
 

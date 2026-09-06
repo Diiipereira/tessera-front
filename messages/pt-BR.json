@@ -582,6 +582,8 @@
 		"searchChannelsLabel": "Buscar canais",
 		"roles": "Escolha os cargos…",
 		"noRoles": "Nenhum cargo",
+		"roleCount": "{count} de {max} escolhidos",
+		"roleLimit": "Você já escolheu o máximo de {max} cargos.",
 		"clearSearch": "Limpar a busca",
 		"nothingMatches": "Nada corresponde a isso.",
 		"openTime": "Abrir o seletor de horário",
@@ -935,7 +937,7 @@
 			"fieldName": "Nome do campo",
 			"fieldValue": "Valor do campo",
 			"inline": "Na mesma linha",
-			"inlineHint": "Só muda alguma coisa com dois ou três campos seguidos ligados.",
+			"inlineHint": "Junta este campo com o vizinho de cima ou de baixo, se ele também estiver ligado. Até três por linha.",
 			"moveField": "Mover o campo {position} de {total}",
 			"moveFieldHint": "Arraste, ou use as setas para cima e para baixo.",
 			"removeField": "Remover o campo {name}",
@@ -951,6 +953,29 @@
 			"timestamp": "Mostrar o horário",
 			"timestampHint": "O Discord exibe ao lado do rodapé.",
 			"unknown": "{list} {count, plural, =1 {não é uma variável — vai} other {não são variáveis — vão}} aparecer exatamente como está escrito."
+		},
+		"imageHelp": {
+			"help": "Ajuda sobre a imagem",
+			"title": "Como colocar uma imagem",
+			"body": "O Discord não guarda a figura — ele busca o endereço toda vez que mostra a mensagem.",
+			"points": {
+				"direct": {
+					"title": "Link direto do arquivo",
+					"body": "Precisa terminar em .png, .jpg, .gif ou .webp. Endereço de página que mostra a figura não serve."
+				},
+				"public": {
+					"title": "Endereço público",
+					"body": "Se abrir só depois de um login, o Discord também não abre."
+				},
+				"attachment": {
+					"title": "Anexo do Discord não serve",
+					"body": "O link de um arquivo enviado no Discord expira em menos de um dia, e a figura some da mensagem publicada."
+				},
+				"host": {
+					"title": "Onde hospedar",
+					"body": "Imgur, ou qualquer serviço que devolva um endereço permanente."
+				}
+			}
 		},
 		"url": {
 			"notHttp": "Use um link que comece com http:// ou https://",

@@ -185,8 +185,9 @@ export function WelcomeScreen({
 					<RolePicker
 						roles={roles}
 						value={draft.autoRoleIds}
+						max={WELCOME_AUTO_ROLES_MAX}
 						onValueChange={(next) => {
-							form.set('autoRoleIds', next.slice(0, WELCOME_AUTO_ROLES_MAX));
+							form.set('autoRoleIds', next);
 						}}
 					/>
 				</Field>

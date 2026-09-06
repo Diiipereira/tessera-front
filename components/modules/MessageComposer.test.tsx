@@ -92,6 +92,20 @@ describe('MessageComposer field order', () => {
 		expect(composer.names()).toEqual(['Rules', 'Roles', 'Support']);
 	});
 
+	it('offers the picture rules beside both image fields', async () => {
+		const user = userEvent.setup();
+		renderComposer();
+
+		const help = screen.getAllByRole('button', { name: 'Help with images' });
+
+		expect(help).toHaveLength(2);
+
+		await user.click(help[0] as HTMLElement);
+
+		expect(screen.getByText('How to add an image')).toBeInTheDocument();
+		expect(screen.getByText(/expires within a day/)).toBeInTheDocument();
+	});
+
 	it('keeps the first and last fields put when they are pushed past the ends', async () => {
 		const user = userEvent.setup();
 		const composer = renderComposer();

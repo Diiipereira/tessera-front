@@ -10,6 +10,7 @@ type FieldProps = {
 	hint?: string;
 	help?: string;
 	error?: string;
+	action?: ReactNode;
 	required?: boolean;
 	disabled?: boolean;
 	className?: string;
@@ -21,6 +22,7 @@ export function Field({
 	hint,
 	help,
 	error,
+	action,
 	required = false,
 	disabled = false,
 	className,
@@ -46,21 +48,20 @@ export function Field({
 	return (
 		<div className={cn('flex flex-col', className)}>
 			{label ? (
-				<label
-					htmlFor={controlId}
-					className={cn(
-						'text-body-sm font-medium',
-						disabled ? 'text-text-subtle' : 'text-text',
-						hint ? 'mb-0.5' : 'mb-1.5'
-					)}
-				>
-					{label}
-					{required ? (
-						<span className="text-danger" aria-hidden="true">
-							*
-						</span>
-					) : null}
-				</label>
+				<div className={cn('flex items-center gap-1', hint ? 'mb-0.5' : 'mb-1.5')}>
+					<label
+						htmlFor={controlId}
+						className={cn('text-body-sm font-medium', disabled ? 'text-text-subtle' : 'text-text')}
+					>
+						{label}
+						{required ? (
+							<span className="text-danger" aria-hidden="true">
+								*
+							</span>
+						) : null}
+					</label>
+					{action}
+				</div>
 			) : null}
 
 			{hint ? (

@@ -582,6 +582,8 @@
 		"searchChannelsLabel": "Search channels",
 		"roles": "Pick roles…",
 		"noRoles": "No roles",
+		"roleCount": "{count} of {max} chosen",
+		"roleLimit": "You already picked the most this allows: {max} roles.",
 		"clearSearch": "Clear search",
 		"nothingMatches": "Nothing matches that.",
 		"openTime": "Open the time picker",
@@ -935,7 +937,7 @@
 			"fieldName": "Field name",
 			"fieldValue": "Field value",
 			"inline": "Inline",
-			"inlineHint": "Only changes anything with two or three fields in a row switched on.",
+			"inlineHint": "Puts this field beside the one above or below, when that one is on too. Up to three per row.",
 			"moveField": "Move field {position} of {total}",
 			"moveFieldHint": "Drag it, or use the up and down arrow keys.",
 			"removeField": "Remove field {name}",
@@ -951,6 +953,29 @@
 			"timestamp": "Show a timestamp",
 			"timestampHint": "Discord renders it next to the footer.",
 			"unknown": "{list} {count, plural, =1 {is not a variable — it} other {are not variables — they}} will post as written."
+		},
+		"imageHelp": {
+			"help": "Help with images",
+			"title": "How to add an image",
+			"body": "Discord does not keep the picture — it fetches the address every time it shows the message.",
+			"points": {
+				"direct": {
+					"title": "A direct file link",
+					"body": "It has to end in .png, .jpg, .gif or .webp. The address of a page showing the picture will not do."
+				},
+				"public": {
+					"title": "A public address",
+					"body": "If it only opens after a login, Discord cannot open it either."
+				},
+				"attachment": {
+					"title": "A Discord attachment will not do",
+					"body": "The link to a file uploaded on Discord expires within a day, and the picture vanishes from the published message."
+				},
+				"host": {
+					"title": "Where to host it",
+					"body": "Imgur, or any service that hands you a permanent address."
+				}
+			}
 		},
 		"url": {
 			"notHttp": "Use a link that starts with http:// or https://",
