@@ -8,6 +8,7 @@ import { Popover } from '@/components/ui/Popover';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { useFieldState } from '@/components/ui/field-context';
 import type { Role } from '@/lib/types/discord';
+import { useLockReason } from './lock-reason';
 import { cn } from '@/lib/utils/cn';
 import { formatCount } from '@/lib/utils/format';
 
@@ -32,6 +33,7 @@ export function RolePicker({
 	id
 }: RolePickerProps) {
 	const t = useTranslations('pickers');
+	const lockReason = useLockReason();
 	const field = useFieldState();
 	const [open, setOpen] = useState(false);
 
@@ -43,7 +45,7 @@ export function RolePicker({
 	}
 
 	function toggle(role: Role) {
-		if (role.lockedReason) return;
+		if (role.locked) return;
 
 		if (blocks(role)) {
 			toast.info(t('roleLimit', { max: max ?? 0 }), { id: 'role-picker-limit' });
@@ -87,7 +89,7 @@ export function RolePicker({
 
 	function optionButton(role: Role): ReactElement {
 		const isSelected = value.includes(role.id);
-		const unreachable = Boolean(role.lockedReason) || blocks(role);
+		const unreachable = Boolean(role.locked) || blocks(role);
 
 		return (
 			<button
@@ -117,7 +119,7 @@ export function RolePicker({
 						{formatCount(role.memberCount)}
 					</span>
 				)}
-				{role.lockedReason ? (
+				{role.locked ? (
 					<Lock className="size-3.5 shrink-0 text-warning" aria-hidden="true" />
 				) : isSelected ? (
 					<Check className="size-4 shrink-0 text-primary" aria-hidden="true" />
@@ -150,8 +152,8 @@ export function RolePicker({
 
 			<div className="max-h-70 thin-scroll overflow-y-auto overscroll-contain">
 				{roles.map((role) =>
-					role.lockedReason ? (
-						<Tooltip key={role.id} content={role.lockedReason} side="right" asChild>
+					role.locked ? (
+						<Tooltip key={role.id} content={lockReason(role.locked)} side="right" asChild>
 							{optionButton(role)}
 						</Tooltip>
 					) : (

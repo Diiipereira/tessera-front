@@ -7,8 +7,6 @@ import type { Channel, ChannelKind, Role } from '@/lib/types/discord';
 
 export const CHANNEL_CATEGORY = 4;
 
-export const UNCATEGORISED = 'No category';
-
 const KINDS: Record<number, ChannelKind> = {
 	0: 'text',
 	2: 'voice',
@@ -45,7 +43,7 @@ export function toChannels(dtos: readonly GuildChannelDto[]): Channel[] {
 		const named = dto.parentId === null ? undefined : categories.get(dto.parentId);
 		const categoryId = named === undefined ? null : dto.parentId;
 
-		return [{ id: dto.id, name: dto.name, categoryId, category: named ?? UNCATEGORISED, kind }];
+		return [{ id: dto.id, name: dto.name, categoryId, category: named ?? null, kind }];
 	});
 }
 
@@ -65,8 +63,6 @@ export const loadRoles = cache(async (guildId: string): Promise<Role[]> => {
 			id: role.id,
 			name: role.name,
 			color: role.color === '#000000' ? '#99aab5' : role.color,
-			...(role.managed
-				? { lockedReason: 'Discord manages this role, so it cannot be given out' }
-				: {})
+			...(role.managed ? { locked: 'managed' as const } : {})
 		}));
 });

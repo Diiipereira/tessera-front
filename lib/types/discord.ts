@@ -1,12 +1,14 @@
 export type ChannelKind = 'text' | 'voice' | 'announcement' | 'forum' | 'category';
 
+export type LockedReason = 'managed' | 'aboveBot' | 'noAccess';
+
 export type Channel = {
 	id: string;
 	name: string;
 	categoryId: string | null;
-	category: string;
+	category: string | null;
 	kind: ChannelKind;
-	lockedReason?: string;
+	locked?: LockedReason;
 };
 
 export type Role = {
@@ -14,5 +16,5 @@ export type Role = {
 	name: string;
 	color: string;
 	memberCount?: number;
-	lockedReason?: string;
+	locked?: LockedReason;
 };

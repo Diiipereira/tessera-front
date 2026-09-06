@@ -1,4 +1,3 @@
-import { BRAND } from '@/lib/brand';
 import type { Channel, Role } from '@/lib/types/discord';
 
 const WELCOME = '901234567890120001';
@@ -19,7 +18,7 @@ export const mockChannels: Channel[] = [
 		categoryId: WELCOME,
 		category: 'Welcome',
 		kind: 'text',
-		lockedReason: `${BRAND.name} needs Send Messages in #rules`
+		locked: 'noAccess'
 	},
 	{
 		id: '901234567890123003',
@@ -55,7 +54,7 @@ export const mockChannels: Channel[] = [
 		categoryId: COMMUNITY,
 		category: 'Community',
 		kind: 'voice',
-		lockedReason: `${BRAND.name} can't post in voice channels`
+		locked: 'noAccess'
 	},
 	{
 		id: '901234567890123008',
@@ -86,6 +85,6 @@ export const mockRoles: Role[] = [
 		name: 'Moderator',
 		color: '#5865f2',
 		memberCount: 8,
-		lockedReason: `${BRAND.name}'s role must be above this role`
+		locked: 'aboveBot'
 	}
 ];

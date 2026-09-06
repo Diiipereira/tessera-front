@@ -10,6 +10,7 @@
 		"select": "Select…",
 		"justNow": "just now",
 		"unknownTime": "unknown",
+		"loading": "Loading",
 		"unknown": "Unknown",
 		"notAvailable": "Not available yet"
 	},
@@ -584,6 +585,12 @@
 		"roleCount": "{count} of {max} chosen",
 		"roleLimit": "You already picked the most this allows: {max} roles.",
 		"clearSearch": "Clear search",
+		"noCategory": "No category",
+		"locked": {
+			"managed": "Discord manages this role, so it cannot be given out",
+			"aboveBot": "{brand}'s role must be above this role",
+			"noAccess": "{brand} cannot send messages in this channel"
+		},
 		"nothingMatches": "Nothing matches that.",
 		"openTime": "Open the time picker",
 		"openDate": "Open the date picker",

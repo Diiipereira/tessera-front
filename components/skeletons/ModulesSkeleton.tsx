@@ -1,11 +1,14 @@
+import { useTranslations } from 'next-intl';
 import { Skeleton, TextSkeleton } from '@/components/ui/Skeleton';
 import { navGroups } from '@/lib/navigation';
 
 const CARDS = navGroups.find((group) => group.id === 'modules')?.items.length ?? 0;
 
 export function ModulesSkeleton() {
+	const t = useTranslations('common');
+
 	return (
-		<div className="w-full p-6 sm:p-8" aria-busy="true" aria-label="Loading modules">
+		<div className="w-full p-6 sm:p-8" aria-busy="true" aria-label={t('loading')}>
 			<div className="flex flex-col gap-4">
 				<div>
 					<TextSkeleton line="h1" width="w-40" />

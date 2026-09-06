@@ -19,6 +19,7 @@ import { Tooltip } from '@/components/ui/Tooltip';
 import { useFieldState } from '@/components/ui/field-context';
 import type { Channel, ChannelKind } from '@/lib/types/discord';
 import { cn } from '@/lib/utils/cn';
+import { useLockReason } from './lock-reason';
 
 const ICONS: Record<ChannelKind, LucideIcon> = {
 	text: Hash,
@@ -59,6 +60,7 @@ type ChannelPickerProps = SingleProps | MultipleProps;
 export function ChannelPicker(props: ChannelPickerProps) {
 	const { channels, kinds, placeholder, id } = props;
 	const t = useTranslations('pickers');
+	const lockReason = useLockReason();
 	const field = useFieldState();
 	const [open, setOpen] = useState(false);
 	const [query, setQuery] = useState('');
@@ -72,7 +74,7 @@ export function ChannelPicker(props: ChannelPickerProps) {
 
 	const matches = offered.filter((channel) => channel.name.includes(query.trim().toLowerCase()));
 
-	const groups = matches.reduce<{ id: string; category: string; items: Channel[] }[]>(
+	const groups = matches.reduce<{ id: string; category: string | null; items: Channel[] }[]>(
 		(acc, channel) => {
 			const id = channel.categoryId ?? UNCATEGORISED_GROUP;
 			const group = acc.find((entry) => entry.id === id);
@@ -86,7 +88,7 @@ export function ChannelPicker(props: ChannelPickerProps) {
 	);
 
 	function pick(channel: Channel) {
-		if (channel.lockedReason) return;
+		if (channel.locked) return;
 
 		if (props.multiple === true) {
 			props.onValueChange?.(
@@ -132,10 +134,10 @@ export function ChannelPicker(props: ChannelPickerProps) {
 			<button
 				type="button"
 				aria-pressed={props.multiple === true ? isSelected : undefined}
-				aria-disabled={channel.lockedReason ? true : undefined}
+				aria-disabled={channel.locked ? true : undefined}
 				className={cn(
 					row,
-					channel.lockedReason
+					channel.locked
 						? 'cursor-not-allowed text-text-muted opacity-50'
 						: isSelected
 							? 'bg-primary-subtle text-text'
@@ -147,7 +149,7 @@ export function ChannelPicker(props: ChannelPickerProps) {
 			>
 				<Icon className="size-4 shrink-0 text-text-subtle" aria-hidden="true" />
 				<span className="min-w-0 flex-1 truncate text-left">{channel.name}</span>
-				{channel.lockedReason ? (
+				{channel.locked ? (
 					<Lock className="size-3.5 shrink-0 text-warning" aria-hidden="true" />
 				) : isSelected ? (
 					<Check className="size-4 shrink-0 text-primary" aria-hidden="true" />
@@ -188,12 +190,17 @@ export function ChannelPicker(props: ChannelPickerProps) {
 						<div key={group.id} className="contents">
 							<div className="px-2 pt-3 pb-1 first:pt-1">
 								<span className="font-mono text-overline text-text-muted uppercase">
-									{group.category}
+									{group.category ?? t('noCategory')}
 								</span>
 							</div>
 							{group.items.map((channel) =>
-								channel.lockedReason ? (
-									<Tooltip key={channel.id} content={channel.lockedReason} side="right" asChild>
+								channel.locked ? (
+									<Tooltip
+										key={channel.id}
+										content={lockReason(channel.locked)}
+										side="right"
+										asChild
+									>
 										{optionButton(channel)}
 									</Tooltip>
 								) : (

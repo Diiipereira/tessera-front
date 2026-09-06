@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import { Skeleton, TextSkeleton } from '@/components/ui/Skeleton';
 
 const STATS = [0, 1, 2, 3];
@@ -6,8 +7,10 @@ const CARDS = [0, 1];
 const CARD_ROWS = [0, 1, 2, 3, 4];
 
 export function OverviewSkeleton() {
+	const t = useTranslations('common');
+
 	return (
-		<div className="flex flex-col gap-6" aria-busy="true" aria-label="Loading overview">
+		<div className="flex flex-col gap-6" aria-busy="true" aria-label={t('loading')}>
 			<div>
 				<TextSkeleton line="h1" width="w-48" />
 				<TextSkeleton line="body" width="w-80 max-w-full" />

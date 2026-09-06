@@ -7,7 +7,7 @@ import { ChannelPicker } from './ChannelPicker';
 
 const channel = (over: Partial<Channel> & { id: string; name: string }): Channel => ({
 	categoryId: null,
-	category: 'No category',
+	category: null,
 	kind: 'text',
 	...over
 });

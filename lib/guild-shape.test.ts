@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { GuildChannelDto } from '@/lib/api-url';
-import { UNCATEGORISED, toChannels } from './guild-shape';
+import { toChannels } from './guild-shape';
 
 const dto = (over: Partial<GuildChannelDto> & { id: string; type: number }): GuildChannelDto => ({
 	name: 'channel',
@@ -41,7 +41,7 @@ describe('toChannels', () => {
 	it('keeps a channel that sits outside any category', () => {
 		const [channel] = toChannels([dto({ id: '2', type: 0, name: 'geral' })]);
 
-		expect(channel?.category).toBe(UNCATEGORISED);
+		expect(channel?.category).toBeNull();
 		expect(channel?.categoryId).toBeNull();
 	});
 
@@ -51,7 +51,7 @@ describe('toChannels', () => {
 				id: '1',
 				name: 'Text channels',
 				categoryId: null,
-				category: UNCATEGORISED,
+				category: null,
 				kind: 'category'
 			}
 		]);
@@ -78,8 +78,6 @@ describe('toChannels', () => {
 	});
 
 	it('falls back when a channel points at a category that did not come back', () => {
-		expect(toChannels([dto({ id: '2', type: 0, parentId: 'gone' })])[0]?.category).toBe(
-			UNCATEGORISED
-		);
+		expect(toChannels([dto({ id: '2', type: 0, parentId: 'gone' })])[0]?.category).toBeNull();
 	});
 });

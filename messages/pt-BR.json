@@ -10,6 +10,7 @@
 		"select": "Selecione…",
 		"justNow": "agora mesmo",
 		"unknownTime": "desconhecido",
+		"loading": "Carregando",
 		"unknown": "Desconhecido",
 		"notAvailable": "Ainda não disponível"
 	},
@@ -584,6 +585,12 @@
 		"roleCount": "{count} de {max} escolhidos",
 		"roleLimit": "Você já escolheu o máximo de {max} cargos.",
 		"clearSearch": "Limpar a busca",
+		"noCategory": "Sem categoria",
+		"locked": {
+			"managed": "O Discord gerencia este cargo, então ele não pode ser entregue",
+			"aboveBot": "O cargo do {brand} precisa estar acima deste cargo",
+			"noAccess": "O {brand} não pode enviar mensagens neste canal"
+		},
 		"nothingMatches": "Nada corresponde a isso.",
 		"openTime": "Abrir o seletor de horário",
 		"openDate": "Abrir o seletor de data",

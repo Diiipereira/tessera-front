@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import { Skeleton, TextSkeleton } from '@/components/ui/Skeleton';
 
 const PARAGRAPHS = [
@@ -19,13 +20,11 @@ function ParagraphSkeleton({ widths }: { widths: string[] }) {
 }
 
 export function DocsSkeleton() {
+	const t = useTranslations('common');
+
 	return (
 		<>
-			<main
-				className="max-w-200 min-w-0 flex-1"
-				aria-busy="true"
-				aria-label="Loading documentation"
-			>
+			<main className="max-w-200 min-w-0 flex-1" aria-busy="true" aria-label={t('loading')}>
 				<div className="mb-4 flex h-5 items-center gap-1.5">
 					<Skeleton className="h-3 w-10 rounded-sm" />
 					<Skeleton className="h-3 w-20 rounded-sm" />
