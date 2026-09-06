@@ -2,7 +2,7 @@
 
 import { Crown } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import Link from 'next/link';
+import { Link } from '@/components/ui/Link';
 import { useNavigation } from '@/components/providers/navigation-context';
 import { useSidebar } from '@/components/providers/sidebar-context';
 import { Tooltip } from '@/components/ui/Tooltip';

@@ -2,7 +2,7 @@
 
 import { CircleQuestionMark, Menu, Search } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import Link from 'next/link';
+import { Link } from '@/components/ui/Link';
 import type { RefObject } from 'react';
 import { useSidebar } from '@/components/providers/sidebar-context';
 import { useShortcut } from '@/lib/hooks/useShortcut';

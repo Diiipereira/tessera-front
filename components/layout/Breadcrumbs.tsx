@@ -2,7 +2,7 @@
 
 import { ChevronRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import Link from 'next/link';
+import { Link } from '@/components/ui/Link';
 import { usePathname } from 'next/navigation';
 import { useNavigation } from '@/components/providers/navigation-context';
 import { breadcrumbsFor, guildHref } from '@/lib/navigation';

@@ -1,5 +1,5 @@
 import { useLocale } from 'next-intl';
-import Link from 'next/link';
+import { Link } from '@/components/ui/Link';
 import { isValidElement, type ReactNode } from 'react';
 import { docsHref } from '@/lib/docs/route';
 import { headingSlug } from '@/lib/docs/slug';

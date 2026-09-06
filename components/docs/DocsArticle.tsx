@@ -1,6 +1,6 @@
 import { ChevronRight } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
-import Link from 'next/link';
+import { Link } from '@/components/ui/Link';
 import type { ReactNode } from 'react';
 import { adjacentPages } from '@/lib/docs/content';
 import { docsHref } from '@/lib/docs/route';

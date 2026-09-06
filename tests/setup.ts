@@ -45,3 +45,9 @@ HTMLCanvasElement.prototype.getContext = (() => ({
 	stroke: () => undefined,
 	fill: () => undefined
 })) as unknown as typeof HTMLCanvasElement.prototype.getContext;
+
+Element.prototype.animate = (() => ({
+	cancel: () => undefined,
+	finish: () => undefined,
+	finished: Promise.resolve()
+})) as unknown as typeof Element.prototype.animate;

@@ -1,6 +1,6 @@
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
-import Link from 'next/link';
+import { Link } from '@/components/ui/Link';
 import type { DocNeighbours } from '@/lib/docs';
 import { docsHref } from '@/lib/docs/route';
 import { toLocale } from '@/lib/locale';

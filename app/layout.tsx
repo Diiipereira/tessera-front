@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getTranslations } from 'next-intl/server';
 import type { ReactNode } from 'react';
+import { NavigationBlockerProvider } from '@/components/providers/NavigationBlocker';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import { Toaster } from '@/components/ui/Toaster';
 import { TooltipProvider } from '@/components/ui/tooltip-provider';
@@ -61,7 +62,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
 				<NextIntlClientProvider>
 					<ThemeProvider>
 						<TooltipProvider delayDuration={400} disableHoverableContent>
-							{children}
+							<NavigationBlockerProvider>{children}</NavigationBlockerProvider>
 						</TooltipProvider>
 						<Toaster />
 					</ThemeProvider>

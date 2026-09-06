@@ -1,6 +1,7 @@
 'use client';
 
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { useNavigationHold } from '@/components/providers/navigation-blocker-context';
 
 export type SaveState = 'idle' | 'saving' | 'conflict';
 
@@ -69,6 +70,33 @@ export function useConfigDraft<T extends object>(
 		() => (Object.keys(draft) as (keyof T)[]).filter((key) => !deepEqual(draft[key], saved[key])),
 		[draft, saved]
 	);
+
+	const unsaved = changedKeys.length > 0 || state === 'conflict';
+	const holdId = useId();
+	const { hold, release } = useNavigationHold();
+
+	useEffect(() => {
+		if (unsaved) hold(holdId);
+		else release(holdId);
+
+		return () => {
+			release(holdId);
+		};
+	}, [unsaved, holdId, hold, release]);
+
+	useEffect(() => {
+		if (!unsaved) return;
+
+		const warn = (event: BeforeUnloadEvent) => {
+			event.preventDefault();
+		};
+
+		window.addEventListener('beforeunload', warn);
+
+		return () => {
+			window.removeEventListener('beforeunload', warn);
+		};
+	}, [unsaved]);
 
 	const set = useCallback(<K extends keyof T>(key: K, value: T[K]) => {
 		setDraft((current) => ({ ...current, [key]: value }));

@@ -2,7 +2,7 @@
 
 import { ArrowRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import Link from 'next/link';
+import { Link } from '@/components/ui/Link';
 import { Badge, type BadgeVariant } from '@/components/ui/Badge';
 import { Switch } from '@/components/ui/Switch';
 import { moduleIcons } from '@/lib/module-icons';

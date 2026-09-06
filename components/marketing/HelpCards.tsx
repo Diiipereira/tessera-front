@@ -1,6 +1,6 @@
 import { ArrowUpRight, ExternalLink } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import Link from 'next/link';
+import { Link } from '@/components/ui/Link';
 import type { ReactNode } from 'react';
 import { Badge } from '@/components/ui/Badge';
 import { OutboundLink } from '@/components/ui/OutboundLink';

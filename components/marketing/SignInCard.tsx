@@ -2,7 +2,7 @@
 
 import { LayoutDashboard, Lock, LogOut, RefreshCw } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import Link from 'next/link';
+import { Link } from '@/components/ui/Link';
 import { useState } from 'react';
 import { DiscordButton } from '@/components/auth/DiscordButton';
 import { Avatar } from '@/components/layout/Avatar';

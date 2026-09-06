@@ -238,6 +238,7 @@
 	--animate-slide-in-left: slide-in-left 220ms cubic-bezier(0.16, 1, 0.3, 1);
 	--animate-slide-in-right: slide-in-right 220ms cubic-bezier(0.16, 1, 0.3, 1);
 	--animate-rise: rise 260ms cubic-bezier(0.16, 1, 0.3, 1);
+	--animate-fall: fall 200ms cubic-bezier(0.4, 0, 1, 1) forwards;
 	--animate-drift: drift 9s ease-in-out infinite;
 	--animate-dash: dash 1.6s linear infinite;
 
@@ -256,6 +257,17 @@
 		50% {
 			opacity: 0.7;
 			transform: translateY(-6px);
+		}
+	}
+
+	@keyframes fall {
+		from {
+			transform: none;
+			opacity: 1;
+		}
+		to {
+			transform: translateY(115%);
+			opacity: 0;
 		}
 	}
 

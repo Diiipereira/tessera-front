@@ -4,6 +4,7 @@ import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { Search, type LucideIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
+import { useNavigationBlockerStore } from '@/components/providers/navigation-blocker-context';
 import { useCallback, useEffect, useMemo, useState, type KeyboardEvent } from 'react';
 import { guildHref, navGroups, type GuildHref } from '@/lib/navigation';
 import type { Guild } from '@/lib/types/guild';
@@ -32,6 +33,7 @@ export function CommandPalette({ open, onOpenChange, guild, guilds }: CommandPal
 	const nav = useTranslations('nav');
 	const shared = useTranslations('common');
 	const router = useRouter();
+	const blocker = useNavigationBlockerStore();
 	const [query, setQuery] = useState('');
 	const [cursor, setCursor] = useState(0);
 
@@ -106,10 +108,17 @@ export function CommandPalette({ open, onOpenChange, guild, guilds }: CommandPal
 	const select = useCallback(
 		(entry: Entry | undefined) => {
 			if (!entry) return;
+
 			onOpenChange(false);
+
+			if (blocker.isBlocked()) {
+				blocker.refuse();
+				return;
+			}
+
 			router.push(entry.href);
 		},
-		[onOpenChange, router]
+		[blocker, onOpenChange, router]
 	);
 
 	function handleKeydown(event: KeyboardEvent<HTMLInputElement>) {

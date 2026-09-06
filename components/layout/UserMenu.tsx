@@ -12,7 +12,7 @@ import {
 	User
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import Link from 'next/link';
+import { Link } from '@/components/ui/Link';
 import type { RefObject } from 'react';
 import { useTheme, type ThemeMode } from '@/components/providers/theme-context';
 import { SUPPORT_HREF } from '@/lib/support-links';

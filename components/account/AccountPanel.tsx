@@ -427,7 +427,7 @@ export function AccountPanel({
 							});
 						}}
 						onResolveConflict={form.resolveConflict}
-						className="static m-0 sm:mx-0 sm:mb-0"
+						variant="inline"
 					/>
 
 					<ConfirmDialog

@@ -1,7 +1,7 @@
 'use client';
 
 import { useLocale, useTranslations } from 'next-intl';
-import Link from 'next/link';
+import { Link } from '@/components/ui/Link';
 import type { DocNavGroup } from '@/lib/docs';
 import { docsHref } from '@/lib/docs/route';
 import { toLocale } from '@/lib/locale';

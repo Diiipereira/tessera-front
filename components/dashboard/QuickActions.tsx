@@ -1,6 +1,6 @@
 import { ChevronRight, Gift, Megaphone, Ticket, UserPlus, type LucideIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import Link from 'next/link';
+import { Link } from '@/components/ui/Link';
 import { guildHref } from '@/lib/navigation';
 
 const actions: { id: string; icon: LucideIcon; path: string }[] = [

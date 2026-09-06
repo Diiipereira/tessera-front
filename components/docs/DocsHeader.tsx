@@ -2,7 +2,7 @@
 
 import { LayoutDashboard } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import Link from 'next/link';
+import { Link } from '@/components/ui/Link';
 import { BrandMark } from '@/components/auth/BrandMark';
 import { LocaleToggle } from '@/components/layout/LocaleToggle';
 import { ThemeToggle } from '@/components/layout/ThemeToggle';

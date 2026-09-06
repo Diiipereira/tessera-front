@@ -2,7 +2,7 @@
 
 import { ArrowUpRight, type LucideIcon } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
-import Link from 'next/link';
+import { Link } from '@/components/ui/Link';
 import type { ReactNode } from 'react';
 import { Switch } from '@/components/ui/Switch';
 import { docsHref } from '@/lib/docs/route';

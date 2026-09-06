@@ -1,5 +1,5 @@
 import { useTranslations } from 'next-intl';
-import Link from 'next/link';
+import { Link } from '@/components/ui/Link';
 import { Crown } from 'lucide-react';
 import { Meter } from '@/components/ui/Meter';
 import { guildHref } from '@/lib/navigation';

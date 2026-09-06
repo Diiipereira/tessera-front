@@ -1,5 +1,5 @@
 import { useTranslations } from 'next-intl';
-import Link from 'next/link';
+import { Link } from '@/components/ui/Link';
 import { BrandMark } from '@/components/auth/BrandMark';
 import { OutboundLink } from '@/components/ui/OutboundLink';
 import { BRAND } from '@/lib/brand';
