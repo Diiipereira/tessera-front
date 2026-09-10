@@ -40,6 +40,7 @@ export default async function Page({ params, searchParams }: GuildPageProps) {
 			channels={channels}
 			roles={roles}
 			variables={welcomeVariables(guild.name)}
+			botName={settings.data.botNickname}
 		/>
 	);
 }

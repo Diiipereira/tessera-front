@@ -84,6 +84,7 @@ function renderScreen(overrides: Partial<WelcomeConfig> = {}) {
 				channels={channels}
 				roles={roles}
 				variables={variables}
+				botName="Tessera Dev"
 			/>
 		</TooltipProvider>,
 		{ wrapper: Translated }
@@ -127,8 +128,17 @@ describe('WelcomeScreen', () => {
 	it('substitutes only the variables the bot actually replaces', () => {
 		renderScreen();
 
-		expect(within(previewPanel()).getByText('Welcome to Tessera Dev')).toBeInTheDocument();
-		expect(within(previewPanel()).getByText(/Glad you made it, novato/)).toBeInTheDocument();
+		expect(previewPanel()).toHaveTextContent('Welcome to Tessera Dev');
+		expect(previewPanel()).toHaveTextContent(/Glad you made it, novato/);
+	});
+
+	it('marks the substituted piece, so the reader sees where it came from', () => {
+		renderScreen();
+
+		const filled = within(previewPanel()).getAllByTitle('{server}');
+
+		expect(filled.length).toBeGreaterThan(0);
+		expect(filled[0]).toHaveTextContent('Tessera Dev');
 	});
 
 	it('offers exactly the two variables the greeting understands', () => {

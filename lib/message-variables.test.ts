@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
 	insertAtCursor,
+	looksLikeMention,
 	renderVariables,
+	toSegments,
 	unknownVariables,
 	usedVariables
 } from './message-variables';
@@ -84,5 +86,48 @@ describe('insertAtCursor', () => {
 	it('does not double the space when one is already there', () => {
 		const result = insertAtCursor('Hello ', '{user}', 6, 6);
 		expect(result.text).toBe('Hello {user}');
+	});
+});
+
+describe('toSegments', () => {
+	it('marks which piece came from a variable, so the preview can show it', () => {
+		expect(toSegments('oi {user}, bem-vindo', variables)).toEqual([
+			{ text: 'oi ', variable: null },
+			{ text: 'novato', variable: variables[0] },
+			{ text: ', bem-vindo', variable: null }
+		]);
+	});
+
+	it('keeps the longer token whole, so {user} never eats {user.mention}', () => {
+		const segments = toSegments('{user.mention} falou com {user}', variables);
+
+		expect(segments.map((segment) => segment.text)).toEqual(['@novato', ' falou com ', 'novato']);
+	});
+
+	it('marks every occurrence, not only the first', () => {
+		const segments = toSegments('{user} e {user}', variables);
+
+		expect(segments.filter((segment) => segment.variable !== null)).toHaveLength(2);
+	});
+
+	it('leaves a text with no variable in one piece', () => {
+		expect(toSegments('nada aqui', variables)).toEqual([{ text: 'nada aqui', variable: null }]);
+	});
+
+	it('gives back nothing for an empty text, instead of an empty piece', () => {
+		expect(toSegments('', variables)).toEqual([]);
+	});
+
+	it('leaves an unknown token alone, because nothing will replace it', () => {
+		expect(toSegments('{nope}', variables)).toEqual([{ text: '{nope}', variable: null }]);
+	});
+});
+
+describe('looksLikeMention', () => {
+	it('reads a sample that Discord would render as a chip', () => {
+		expect(looksLikeMention('@novato')).toBe(true);
+		expect(looksLikeMention('#welcome')).toBe(true);
+		expect(looksLikeMention('novato')).toBe(false);
+		expect(looksLikeMention('12,432')).toBe(false);
 	});
 });

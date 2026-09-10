@@ -3,9 +3,9 @@
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { BRAND } from '@/lib/brand';
-import { DISCORD, EMBED_SWATCHES } from '@/lib/discord-colors';
+import { DISCORD, EMBED_SWATCHES, MENTION, VARIABLE } from '@/lib/discord-colors';
 import { toFieldRows } from '@/lib/embed-fields';
-import { renderVariables } from '@/lib/message-variables';
+import { looksLikeMention, toSegments, type MessageSegment } from '@/lib/message-variables';
 import type { MessageDraft, MessageVariable } from '@/lib/types/modules';
 import { cn } from '@/lib/utils/cn';
 
@@ -13,7 +13,10 @@ type DiscordPreviewProps = {
 	message: MessageDraft;
 	variables: MessageVariable[];
 	timestampLabel?: string;
+	botName?: string;
 };
+
+const initialsOf = (name: string): string => name.slice(0, 2).toUpperCase();
 
 function PreviewImage({ src, frame, fit }: { src: string; frame: string; fit: string }) {
 	const [failed, setFailed] = useState(false);
@@ -45,21 +48,57 @@ function PreviewImage({ src, frame, fit }: { src: string; frame: string; fit: st
 	);
 }
 
-function Line({ text }: { text: string }) {
+function Filled({ segment }: { segment: MessageSegment }) {
+	if (segment.variable === null) {
+		return <>{segment.text}</>;
+	}
+
+	const mention = looksLikeMention(segment.text);
+
+	return (
+		<span
+			title={segment.variable.token}
+			className="rounded-[3px] px-0.5 font-medium"
+			style={{
+				backgroundColor: mention ? MENTION.fill : VARIABLE.fill,
+				color: mention ? MENTION.text : VARIABLE.text
+			}}
+		>
+			{segment.text}
+		</span>
+	);
+}
+
+function Text({ text, variables }: { text: string; variables: MessageVariable[] }) {
+	return (
+		<>
+			{toSegments(text, variables).map((segment, index) => (
+				<Filled key={index} segment={segment} />
+			))}
+		</>
+	);
+}
+
+function Line({ text, variables }: { text: string; variables: MessageVariable[] }) {
 	return (
 		<>
 			{text.split('\n').map((line, index) => (
 				<span key={index} className="block min-h-lh">
-					{line}
+					<Text text={line} variables={variables} />
 				</span>
 			))}
 		</>
 	);
 }
 
-export function DiscordPreview({ message, variables, timestampLabel }: DiscordPreviewProps) {
+export function DiscordPreview({
+	message,
+	variables,
+	timestampLabel,
+	botName
+}: DiscordPreviewProps) {
 	const t = useTranslations('modules.preview');
-	const resolve = (value: string) => renderVariables(value, variables);
+	const shown = botName === undefined || botName === '' ? BRAND.botName : botName;
 	const embed = message.embed;
 	const stamp = timestampLabel ?? t('timestampSample');
 
@@ -82,12 +121,12 @@ export function DiscordPreview({ message, variables, timestampLabel }: DiscordPr
 					className="grid size-10 shrink-0 place-items-center rounded-full text-[13px] font-bold text-white"
 					style={{ backgroundColor: EMBED_SWATCHES[0] }}
 				>
-					{BRAND.name.slice(0, 2).toUpperCase()}
+					{initialsOf(shown)}
 				</span>
 
 				<div className="min-w-0 flex-1">
 					<div className="flex items-center gap-2">
-						<span className="text-[15px] font-medium text-white">{BRAND.botName}</span>
+						<span className="text-[15px] font-medium text-white">{shown}</span>
 						<span
 							className="rounded-[3px] px-1 text-[10px] font-semibold text-white uppercase"
 							style={{ backgroundColor: EMBED_SWATCHES[0] }}
@@ -104,7 +143,7 @@ export function DiscordPreview({ message, variables, timestampLabel }: DiscordPr
 							{message.text === '' ? (
 								<span style={{ color: DISCORD.muted }}>{t('nothing')}</span>
 							) : (
-								<Line text={resolve(message.text)} />
+								<Line text={message.text} variables={variables} />
 							)}
 						</div>
 					) : embedIsEmpty ? (
@@ -127,19 +166,19 @@ export function DiscordPreview({ message, variables, timestampLabel }: DiscordPr
 										<div className="min-w-0 flex-1">
 											{embed.authorName === '' ? null : (
 												<p className="mb-1 text-[14px] font-semibold text-white">
-													{resolve(embed.authorName)}
+													<Text text={embed.authorName} variables={variables} />
 												</p>
 											)}
 
 											{embed.title === '' ? null : (
 												<p className="text-[16px] font-semibold text-white">
-													{resolve(embed.title)}
+													<Text text={embed.title} variables={variables} />
 												</p>
 											)}
 
 											{embed.description === '' ? null : (
 												<div className="mt-2 text-[14px] wrap-break-word whitespace-pre-wrap">
-													<Line text={resolve(embed.description)} />
+													<Line text={embed.description} variables={variables} />
 												</div>
 											)}
 
@@ -154,10 +193,10 @@ export function DiscordPreview({ message, variables, timestampLabel }: DiscordPr
 															{row.map((field) => (
 																<div key={field.id} className="min-w-0 flex-1">
 																	<p className="text-[14px] font-semibold text-white">
-																		{resolve(field.name)}
+																		<Text text={field.name} variables={variables} />
 																	</p>
 																	<p className="text-[14px] wrap-break-word whitespace-pre-wrap">
-																		{resolve(field.value)}
+																		<Text text={field.value} variables={variables} />
 																	</p>
 																</div>
 															))}
@@ -186,7 +225,7 @@ export function DiscordPreview({ message, variables, timestampLabel }: DiscordPr
 
 									{embed.footerText === '' && !embed.timestamp ? null : (
 										<p className="mt-2 text-[12px]" style={{ color: DISCORD.muted }}>
-											{resolve(embed.footerText)}
+											<Text text={embed.footerText} variables={variables} />
 											{embed.footerText !== '' && embed.timestamp ? ' • ' : ''}
 											{embed.timestamp ? stamp : ''}
 										</p>

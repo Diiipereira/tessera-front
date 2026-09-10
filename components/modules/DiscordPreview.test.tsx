@@ -1,5 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
+import { BRAND } from '@/lib/brand';
 import { emptyEmbedDraft, welcomeVariables } from '@/lib/modules/welcome';
 import enUS from '@/messages/en-US.json';
 import { Translated } from '@/tests/i18n';
@@ -100,5 +101,29 @@ describe('DiscordPreview images', () => {
 		});
 
 		expect(screen.getByText(/O embed está vazio/)).toBeInTheDocument();
+	});
+});
+
+const plainDraft: MessageDraft = {
+	mode: 'text',
+	text: 'oi',
+	embed: emptyEmbedDraft()
+};
+
+describe('the name on the preview', () => {
+	it('wears the nickname the server gave the bot', () => {
+		render(<DiscordPreview message={plainDraft} variables={[]} botName="Tessera Dev" />, {
+			wrapper: Translated
+		});
+
+		expect(screen.getByText('Tessera Dev')).toBeInTheDocument();
+	});
+
+	it('falls back to the product name when the server set no nickname', () => {
+		render(<DiscordPreview message={plainDraft} variables={[]} botName="" />, {
+			wrapper: Translated
+		});
+
+		expect(screen.getByText(BRAND.botName)).toBeInTheDocument();
 	});
 });

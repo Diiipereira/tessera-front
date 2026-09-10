@@ -52,6 +52,7 @@ function renderScreen() {
 				channels={channels}
 				roles={roles}
 				variables={welcomeVariables('Tessera Dev')}
+				botName="Tessera Dev"
 			/>
 		</TooltipProvider>,
 		{ wrapper: Translated }

@@ -7,6 +7,16 @@ export const DISCORD = {
 	muted: '#949ba4'
 } as const;
 
+export const MENTION = {
+	fill: 'rgba(88, 101, 242, 0.3)',
+	text: '#dee0fc'
+} as const;
+
+export const VARIABLE = {
+	fill: 'rgba(255, 255, 255, 0.08)',
+	text: '#f2f3f5'
+} as const;
+
 export const EMBED_SWATCHES = [
 	'#5865f2',
 	'#57f287',

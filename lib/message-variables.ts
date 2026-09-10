@@ -7,6 +7,39 @@ export function renderVariables(text: string, variables: MessageVariable[]): str
 	);
 }
 
+export type MessageSegment = { text: string; variable: MessageVariable | null };
+
+export function toSegments(text: string, variables: MessageVariable[]): MessageSegment[] {
+	const segments: MessageSegment[] = [];
+	let rest = text;
+
+	while (rest !== '') {
+		const found = variables
+			.map((variable) => ({ variable, at: rest.indexOf(variable.token) }))
+			.filter((hit) => hit.at >= 0)
+			.sort((left, right) => left.at - right.at)
+			.at(0);
+
+		if (found === undefined) {
+			segments.push({ text: rest, variable: null });
+			break;
+		}
+
+		if (found.at > 0) {
+			segments.push({ text: rest.slice(0, found.at), variable: null });
+		}
+
+		segments.push({ text: found.variable.sample, variable: found.variable });
+		rest = rest.slice(found.at + found.variable.token.length);
+	}
+
+	return segments;
+}
+
+export function looksLikeMention(sample: string): boolean {
+	return sample.startsWith('@') || sample.startsWith('#');
+}
+
 export function usedVariables(text: string, variables: MessageVariable[]): MessageVariable[] {
 	return variables.filter((variable) => text.includes(variable.token));
 }
