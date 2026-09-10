@@ -440,6 +440,28 @@
 	}
 }
 
+/* Radix's `SelectViewport` injects `[data-radix-select-viewport]{scrollbar-width:none}` plus
+   `::-webkit-scrollbar{display:none}` from a <style> inside the portal, which lands after this
+   sheet and wins on source order at equal specificity. Naming the attribute next to the class
+   raises specificity enough to put the bar back, so a long list reads as scrollable instead of
+   cut off. */
+.thin-scroll[data-radix-select-viewport] {
+	scrollbar-width: thin;
+	scrollbar-color: var(--border-strong) transparent;
+}
+
+@supports selector(::-webkit-scrollbar) {
+	.thin-scroll[data-radix-select-viewport] {
+		scrollbar-width: auto;
+		scrollbar-color: auto;
+	}
+
+	.thin-scroll[data-radix-select-viewport]::-webkit-scrollbar {
+		display: block;
+		width: 5px;
+	}
+}
+
 @layer base {
 	* {
 		border-color: var(--border);

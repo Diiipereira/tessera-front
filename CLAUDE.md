@@ -535,14 +535,17 @@ frozen. `react-remove-scroll` only runs the **last** lock on its stack, so
 `<Popover.Root modal>` pushes its own lock and hands the wheel back. `RolePicker` and
 `ChannelPicker` both set it. Verified by dispatching a real wheel event: `scrollTop` 0 → 106.
 
-**O `Select` rola por botão, porque o Radix esconde a barra de propósito.** O `SelectViewport`
-injeta `[data-radix-select-viewport]{scrollbar-width:none}` mais
-`::-webkit-scrollbar{display:none}` num `<style>` dentro do próprio conteúdo — ou seja, depois da
-folha do app, então o `thin-scroll` que estava ali era CSS morto e uma lista longa (os 15 eventos
-do registro) parecia cortada, sem nada dizendo que dava para rolar. A afordância que a lib oferece
-é `ScrollUpButton` / `ScrollDownButton`, que se renderizam sozinhos e só quando há o que rolar;
-para eles funcionarem o `Content` precisa ser `flex flex-col` e o `Viewport` `min-h-0`, senão o
-`flex: 1` que o Radix põe inline não tem como encolher. O teto virou
+**O `Select` mostra barra de rolagem, e ela custa um seletor mais específico que o do Radix.** O
+`SelectViewport` injeta `[data-radix-select-viewport]{scrollbar-width:none}` mais
+`::-webkit-scrollbar{display:none}` num `<style>` dentro do próprio conteúdo. O `thin-scroll`
+sozinho era CSS morto por dois motivos somados: o `@utility` do Tailwind sai em
+`@layer utilities`, e estilo em camada perde para estilo sem camada — que é o caso do `<style>`
+do Radix — e, mesmo empatando, quem vem depois ganha. A saída é
+`.thin-scroll[data-radix-select-viewport]`, sem camada e com uma classe **mais** um atributo:
+ganha por especificidade, não por ordem. Eu tinha resolvido isso antes com `ScrollUpButton` /
+`ScrollDownButton`, e era a resposta errada para o pedido — seta não é barra, e o `ChannelPicker`
+da mesma tela já mostrava barra. O `Content` continua `flex flex-col` e o `Viewport` `min-h-0`,
+senão o `flex: 1` que o Radix põe inline não tem como encolher. O teto é
 `min(20rem, var(--radix-select-content-available-height, 20rem))`: o `size()` do popper sempre
 grava essa variável, e o fallback existe para o primeiro quadro, antes de ela ser gravada.
 
