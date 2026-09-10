@@ -170,6 +170,12 @@ describe('ModerationScreen', () => {
 		}
 	});
 
+	it('says the ladder saves itself, because the save bar does not cover it', async () => {
+		paint();
+
+		expect(await screen.findByText(copy.ladder.savesItself)).toBeInTheDocument();
+	});
+
 	it('says over how many days the points keep counting', async () => {
 		paint();
 

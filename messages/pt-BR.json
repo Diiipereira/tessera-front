@@ -1883,6 +1883,8 @@
 				}
 			},
 			"ladder": {
+				"title": "Escada",
+				"savesItself": "Cada degrau é gravado assim que você acrescenta ou tira. O botão Salvar do rodapé não vale para esta lista.",
 				"counting": "Os pontos somam ao longo de {days} dias e depois param de contar.",
 				"loading": "Lendo a escada…",
 				"empty": "Nenhum degrau ainda. Nada acontece sozinho.",
@@ -1926,7 +1928,9 @@
 							"body": "Na hora de aplicar a punição, pela opção de gravidade do /warn, do /timeout e do /mute."
 						}
 					}
-				}
+				},
+				"added": "Degrau acrescentado",
+				"removed": "Degrau removido"
 			}
 		},
 		"welcome": {

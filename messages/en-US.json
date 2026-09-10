@@ -1883,6 +1883,8 @@
 				}
 			},
 			"ladder": {
+				"title": "The ladder",
+				"savesItself": "Each step is written the moment you add or remove it. The Save button at the bottom does not cover this list.",
 				"counting": "Points add up over {days} days, then stop counting.",
 				"loading": "Reading the ladder…",
 				"empty": "No rungs yet. Nothing happens on its own.",
@@ -1926,7 +1928,9 @@
 							"body": "As the punishment is given, through the severity option on /warn, /timeout and /mute."
 						}
 					}
-				}
+				},
+				"added": "Step added",
+				"removed": "Step removed"
 			}
 		},
 		"welcome": {

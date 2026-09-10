@@ -10,6 +10,8 @@ const AUTO_ACTIONS = [0, 1, 2, 3, 4, 5];
 
 const DEFAULTS = [0, 1, 2];
 
+const RUNGS = [0, 1, 2];
+
 export function ModerationSkeleton() {
 	return (
 		<ModulePageSkeleton label="Moderation">
@@ -69,9 +71,30 @@ export function ModerationSkeleton() {
 
 				<FieldSkeleton hint control="h-9.5" />
 				<FieldSkeleton hint control="h-9.5" />
+				<FieldSkeleton hint control="h-9.5" />
+
+				<div className="flex flex-col gap-3 rounded-lg border border-border bg-surface-sunken p-4">
+					<div className="flex flex-col gap-0.5">
+						<TextSkeleton line="body-sm" width="w-20" />
+						<TextSkeleton line="caption" width="w-140 max-w-full" />
+					</div>
+
+					<TextSkeleton line="body-sm" width="w-80 max-w-full" />
+
+					<div className="flex flex-col gap-1">
+						{RUNGS.map((rung) => (
+							<Skeleton key={rung} className="h-11 w-full rounded-md" />
+						))}
+					</div>
+
+					<div className="flex flex-wrap items-end gap-3">
+						<Skeleton className="h-9.5 w-28 rounded-md" />
+						<Skeleton className="h-9.5 w-44 rounded-md" />
+						<Skeleton className="h-9.5 w-40 rounded-md" />
+					</div>
+				</div>
 
 				<TextSkeleton line="caption" width="w-120 max-w-full" />
-				<TextSkeleton line="caption" width="w-140 max-w-full" />
 			</SectionSkeleton>
 		</ModulePageSkeleton>
 	);

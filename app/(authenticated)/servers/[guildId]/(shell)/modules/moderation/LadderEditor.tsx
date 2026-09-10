@@ -87,6 +87,7 @@ export function LadderEditor({ guildId, canWrite }: { guildId: string; canWrite:
 				return;
 			}
 
+			toast.success(t('added'));
 			refresh();
 		});
 	};
@@ -102,12 +103,18 @@ export function LadderEditor({ guildId, canWrite }: { guildId: string; canWrite:
 				return;
 			}
 
+			toast.success(t('removed'));
 			refresh();
 		});
 	};
 
 	return (
-		<div className="flex flex-col gap-3">
+		<div className="flex flex-col gap-3 rounded-lg border border-border bg-surface-sunken p-4">
+			<div className="flex flex-col gap-0.5">
+				<p className="text-body-sm font-medium">{t('title')}</p>
+				<p className="text-caption font-normal text-text-muted">{t('savesItself')}</p>
+			</div>
+
 			<p className="text-body-sm text-text-muted">{t('counting', { days: windowDays })}</p>
 
 			{rules === null ? (
