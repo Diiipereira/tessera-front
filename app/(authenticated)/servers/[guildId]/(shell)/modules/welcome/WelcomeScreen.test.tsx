@@ -261,7 +261,7 @@ describe('WelcomeScreen', () => {
 		const user = userEvent.setup();
 		renderScreen();
 
-		const picker = screen.getByRole('button', { name: /role/i });
+		const picker = screen.getByRole('button', { name: enUS.pickers.roles });
 		await user.click(picker);
 
 		for (const role of roles) {

@@ -10,12 +10,13 @@ import { Switch } from '@/components/ui/Switch';
 import { Textarea } from '@/components/ui/Textarea';
 import { BRAND } from '@/lib/brand';
 import { imageUrlIssue } from '@/lib/embed-urls';
+import { MODULE_HELP } from '@/lib/module-help';
 import { insertAtCursor, unknownVariables } from '@/lib/message-variables';
 import type { EmbedField, MessageDraft, MessageMode, MessageVariable } from '@/lib/types/modules';
 import { cn } from '@/lib/utils/cn';
 import { newId } from '@/lib/utils/id';
 import { moveItem } from '@/lib/utils/reorder';
-import { ImageUrlHelp } from './ImageUrlHelp';
+import { FieldHelp } from './FieldHelp';
 import { VariableChips } from './VariableChips';
 
 const MODES: MessageMode[] = ['text', 'embed'];
@@ -321,7 +322,7 @@ export function MessageComposer({ value, onChange, variables }: MessageComposerP
 					<Field
 						label={t('image')}
 						hint={hintFor(value.embed.imageUrl, 'imageHint')}
-						action={<ImageUrlHelp />}
+						action={<FieldHelp {...MODULE_HELP.image} />}
 					>
 						<Input
 							value={value.embed.imageUrl}
@@ -335,7 +336,7 @@ export function MessageComposer({ value, onChange, variables }: MessageComposerP
 					<Field
 						label={t('thumbnail')}
 						hint={hintFor(value.embed.thumbnailUrl, 'thumbnailHint')}
-						action={<ImageUrlHelp />}
+						action={<FieldHelp {...MODULE_HELP.image} />}
 					>
 						<Input
 							value={value.embed.thumbnailUrl}

@@ -971,7 +971,7 @@
 			"unknown": "{list} {count, plural, =1 {não é uma variável — vai} other {não são variáveis — vão}} aparecer exatamente como está escrito."
 		},
 		"imageHelp": {
-			"help": "Ajuda sobre a imagem",
+			"label": "Ajuda sobre a imagem",
 			"title": "Como colocar uma imagem",
 			"body": "O Discord não guarda a figura — ele busca o endereço toda vez que mostra a mensagem.",
 			"points": {
@@ -1673,7 +1673,30 @@
 				"title": "Cargo de silenciado",
 				"description": "O cargo que o /mute entrega. O timeout do Discord para em 28 dias; o mute não.",
 				"role": "Cargo",
-				"roleHint": "Sem ele, o /mute recusa em vez de não fazer nada em silêncio."
+				"roleHint": "Sem ele, o /mute recusa em vez de não fazer nada em silêncio.",
+				"help": {
+					"label": "Ajuda sobre silenciar",
+					"title": "Castigo e silenciamento são coisas diferentes",
+					"body": "Um é do Discord e tem prazo máximo; o outro é um cargo seu e não tem.",
+					"points": {
+						"timeout": {
+							"title": "Castigo (timeout)",
+							"body": "É do próprio Discord, não precisa de cargo nenhum e para em 28 dias."
+						},
+						"mute": {
+							"title": "Silenciamento (mute)",
+							"body": "É este cargo. Não tem teto de prazo, e é o que serve para punição longa."
+						},
+						"channels": {
+							"title": "O cargo só cala se os canais negarem a fala",
+							"body": "Nas permissões de cada canal, negue Enviar Mensagens e Falar para ele."
+						},
+						"missing": {
+							"title": "Sem cargo escolhido, o /mute recusa",
+							"body": "Ele avisa quem digitou, em vez de não fazer nada em silêncio."
+						}
+					}
+				}
 			},
 			"protected": {
 				"title": "Cargos protegidos",
@@ -1681,7 +1704,30 @@
 				"roles": "Cargos protegidos",
 				"rolesHint": "Remover o cargo é ato consciente e fica registrado no audit log do próprio Discord.",
 				"placeholder": "Ninguém está protegido…",
-				"reversalNote": "Desbanir e dessilenciar continuam passando. Levantar uma punição não é punir."
+				"reversalNote": "Desbanir e dessilenciar continuam passando. Levantar uma punição não é punir.",
+				"help": {
+					"label": "Ajuda sobre cargos protegidos",
+					"title": "O que a proteção alcança",
+					"body": "Enquanto a pessoa tiver um destes cargos, o Tessera não a pune — nem por comando, nem sozinho.",
+					"points": {
+						"punishments": {
+							"title": "Toda punição",
+							"body": "Advertência, castigo, silenciamento, expulsão, banimento e softban."
+						},
+						"escalation": {
+							"title": "Inclusive a escada de escalonamento",
+							"body": "É isto que impede um degrau automático de calar um administrador."
+						},
+						"reversal": {
+							"title": "Desbanir e dessilenciar continuam passando",
+							"body": "Um protegido banido por engano precisa continuar podendo ser desbanido."
+						},
+						"remove": {
+							"title": "Para punir mesmo assim, tire o cargo antes",
+							"body": "É um ato consciente, e ele fica registrado no audit log do próprio Discord."
+						}
+					}
+				}
 			},
 			"defaults": {
 				"title": "Padrões",
@@ -1694,7 +1740,34 @@
 				"softbanPurgeHint": "Um por padrão: apagar é justamente o objetivo do softban.",
 				"days": "{count, plural, =0 {Não apagar nada} =1 {1 dia} other {# dias}}",
 				"requireReason": "Exigir motivo",
-				"requireReasonHint": "A punição é recusada sem motivo. Reversões e anotações ficam de fora."
+				"requireReasonHint": "A punição é recusada sem motivo. Reversões e anotações ficam de fora.",
+				"help": {
+					"label": "Ajuda sobre apagar mensagens",
+					"title": "O que apagar mensagens faz",
+					"body": "As duas escolhas abaixo dizem quanto do que a pessoa escreveu some junto com a punição.",
+					"points": {
+						"window": {
+							"title": "O prazo conta de agora para trás",
+							"body": "Sete dias é o máximo que o Discord aceita."
+						},
+						"gone": {
+							"title": "Não tem volta",
+							"body": "Mensagem apagada assim não é recuperável por ninguém, nem por você."
+						},
+						"ban": {
+							"title": "Por que banir vem em nenhum",
+							"body": "A pessoa já saiu, e apagar uma semana sem querer é irreversível. É o mesmo padrão do menu do Discord."
+						},
+						"softban": {
+							"title": "Por que o softban vem em 1 dia",
+							"body": "No softban apagar é o objetivo: ele bane e desbane em seguida só para limpar o que foi escrito."
+						},
+						"override": {
+							"title": "O comando pode passar por cima",
+							"body": "O /ban e o /softban aceitam os dias na hora; isto aqui é o que vale quando ninguém escolhe."
+						}
+					}
+				}
 			},
 			"dm": {
 				"title": "Avisando o membro",
@@ -1708,7 +1781,30 @@
 				"appealHint": "Enviado em linha própria, só quando preenchido.",
 				"preview": "O que o membro lê",
 				"previewLead": "Você foi advertido em {server}.",
-				"previewReason": "Motivo: spam no #geral"
+				"previewReason": "Motivo: spam no #geral",
+				"help": {
+					"label": "Ajuda sobre o aviso por DM",
+					"title": "Quando o aviso chega, e quando não chega",
+					"body": "O Tessera tenta avisar antes de a punição cair, e nem sempre há como entregar.",
+					"points": {
+						"before": {
+							"title": "A DM sai antes da punição",
+							"body": "Depois de expulsar ou banir pode não haver mais caminho até a pessoa."
+						},
+						"blocked": {
+							"title": "Quem fecha a DM não recebe",
+							"body": "É configuração de privacidade dela, e o Tessera não contorna."
+						},
+						"failure": {
+							"title": "Falhar não cancela nada",
+							"body": "A punição acontece do mesmo jeito e o caso é registrado."
+						},
+						"kick": {
+							"title": "A do kick não leva número de caso",
+							"body": "O caso só é numerado depois da ação, e a DM já saiu. A do /warn leva."
+						}
+					}
+				}
 			},
 			"escalation": {
 				"title": "Quando o motor age sozinho",
@@ -1724,7 +1820,67 @@
 				"unreachable": "Algumas ações precisam de gente, e não há canal para pedir. Escolha um, ou deixe o motor fazer tudo.",
 				"window": "Dias em que os pontos contam",
 				"windowHint": "Infração mais velha fica no histórico, mas para de pesar.",
-				"notBuilt": "Leve vale 1 ponto, moderada 3, pesada 6, gravíssima 10. O moderador classifica cada punição na hora de aplicar."
+				"help": {
+					"label": "Ajuda sobre escalonamento",
+					"title": "Como os pontos viram punição",
+					"body": "Cada punição vale pontos por gravidade. Ao cruzar um limiar da escada, o degrau daquele limiar dispara.",
+					"points": {
+						"counting": {
+							"title": "Só advertência, castigo e silenciamento contam",
+							"body": "Anotação não pune, e expulsar ou banir é o fim da linha, não um degrau."
+						},
+						"oneStep": {
+							"title": "Um degrau por punição",
+							"body": "Com limiares 2, 5 e 10, quem sai de 4 para 7 dispara o de 5. Quem pula vários de uma vez dispara só o mais alto."
+						},
+						"who": {
+							"title": "O degrau age sozinho ou chama a equipe",
+							"body": "Quem decide isso é a lista de ações automáticas."
+						}
+					}
+				},
+				"autoHelp": {
+					"label": "Ajuda sobre ações automáticas",
+					"title": "O que o Tessera aplica sozinho",
+					"body": "Ação marcada aqui é aplicada no instante em que o degrau dispara, sem ninguém confirmar.",
+					"points": {
+						"unchecked": {
+							"title": "Desmarcada, o degrau vira um chamado",
+							"body": "O Tessera avisa no canal de escalonamento sugerindo a ação, e um moderador decide."
+						},
+						"duration": {
+							"title": "A duração é do degrau, e só o castigo e o silenciamento têm uma",
+							"body": "Expulsar e banir não têm prazo — eles não se desfazem sozinhos."
+						},
+						"protected": {
+							"title": "Alvo protegido nunca é automático",
+							"body": "Mesmo com a ação marcada, quem tem cargo protegido só gera o chamado."
+						},
+						"dm": {
+							"title": "O aviso é o da punição aplicada",
+							"body": "Não sai um segundo texto dizendo que foi automático; muda só o motivo."
+						}
+					}
+				},
+				"windowHelp": {
+					"label": "Ajuda sobre a janela",
+					"title": "O que a janela faz",
+					"body": "Ponto mais velho que este prazo deixa de contar.",
+					"points": {
+						"rolling": {
+							"title": "Ela corre com o relógio",
+							"body": "Hoje somam os últimos 30 dias; amanhã, os últimos 30 contados de amanhã."
+						},
+						"kept": {
+							"title": "Nada é apagado",
+							"body": "O caso continua no registro e no histórico da pessoa; ele só para de somar."
+						},
+						"revoked": {
+							"title": "Caso anulado para de contar na hora",
+							"body": "Anular tira os pontos dele, esteja dentro da janela ou não."
+						}
+					}
+				}
 			},
 			"ladder": {
 				"counting": "Os pontos somam ao longo de {days} dias e depois param de contar.",
@@ -1739,7 +1895,38 @@
 				"add": "Acrescentar degrau",
 				"badPoints": "Os pontos precisam ser um número inteiro, de um para cima.",
 				"addFailed": "Não foi possível acrescentar o degrau",
-				"removeFailed": "Não foi possível tirar o degrau"
+				"removeFailed": "Não foi possível tirar o degrau",
+				"pointsHelp": {
+					"label": "Ajuda sobre os pontos",
+					"title": "Quanto vale cada gravidade",
+					"body": "O limiar que você digita aqui é somado a partir destes pesos.",
+					"points": {
+						"light": {
+							"title": "Leve",
+							"body": "1 ponto. É o que vale quando o moderador não escolhe nada."
+						},
+						"moderate": {
+							"title": "Moderada",
+							"body": "3 pontos."
+						},
+						"heavy": {
+							"title": "Pesada",
+							"body": "6 pontos."
+						},
+						"severe": {
+							"title": "Gravíssima",
+							"body": "10 pontos."
+						},
+						"total": {
+							"title": "O limiar é um total acumulado",
+							"body": "Ele não precisa ser um destes números: 11 é pesada mais moderada mais duas leves. Vale de 1 a 1000, e o degrau também dispara quando o total pula por cima dele."
+						},
+						"grading": {
+							"title": "Quem classifica é o moderador",
+							"body": "Na hora de aplicar a punição, pela opção de gravidade do /warn, do /timeout e do /mute."
+						}
+					}
+				}
 			}
 		},
 		"welcome": {
@@ -1773,23 +1960,90 @@
 				"inline": "Mencionar na mensagem",
 				"inlineHint": "'{'user'}' vira uma menção de verdade.",
 				"ghost": "Menção fantasma",
-				"ghostHint": "Uma menção separada é publicada e apagada em seguida."
+				"ghostHint": "Uma menção separada é publicada e apagada em seguida.",
+				"help": {
+					"label": "Ajuda sobre menção",
+					"title": "Os três modos",
+					"body": "A diferença é quem recebe notificação e o que sobra na mensagem.",
+					"points": {
+						"none": {
+							"title": "Não mencionar",
+							"body": "O '{'user'}' vira o nome de exibição e ninguém é notificado."
+						},
+						"inline": {
+							"title": "Mencionar na mensagem",
+							"body": "O '{'user'}' vira menção de verdade: a pessoa é notificada e a menção fica no texto."
+						},
+						"ghost": {
+							"title": "Menção fantasma",
+							"body": "O Tessera publica a menção sozinha e apaga em seguida — a pessoa é notificada e o canal não fica com o ping."
+						},
+						"ghostText": {
+							"title": "No modo fantasma o '{'user'}' vira o nome",
+							"body": "Senão a pessoa seria mencionada duas vezes, e a segunda não sumiria."
+						}
+					}
+				}
 			},
 			"autorole": {
 				"title": "Cargo automático",
 				"description": "Dado automaticamente na entrada. Até {max, number} cargos.",
-				"label": "Cargos a atribuir"
+				"label": "Cargos a atribuir",
+				"labelHint": "Cargo que o Tessera não alcança é pulado, e o resto é entregue.",
+				"help": {
+					"label": "Ajuda sobre cargo automático",
+					"title": "Quando um cargo não é entregue",
+					"body": "O Tessera entrega o que consegue e pula o resto, sem travar a entrada de ninguém.",
+					"points": {
+						"above": {
+							"title": "O cargo do Tessera precisa estar acima",
+							"body": "Nas configurações do servidor, arraste o cargo dele para cima de cada cargo escolhido aqui."
+						},
+						"permission": {
+							"title": "Ele precisa de Gerenciar Cargos",
+							"body": "Sem essa permissão ele não entrega nenhum."
+						},
+						"managed": {
+							"title": "Cargo de bot, de impulso ou de integração não vale",
+							"body": "Esses o Discord administra sozinho, e ninguém os entrega à mão."
+						},
+						"join": {
+							"title": "Vale para quem entrar depois",
+							"body": "Salvar aqui não distribui o cargo a quem já está no servidor."
+						}
+					}
+				}
 			},
 			"cleanup": {
 				"title": "Limpeza",
 				"description": "Evita que o canal fique lotado de mensagens de entrada.",
 				"label": "Apagar a mensagem",
+				"labelHint": "O tempo conta a partir do momento em que a mensagem é publicada.",
 				"keep": "Manter",
 				"seconds30": "Depois de 30 segundos",
 				"minutes1": "Depois de 1 minuto",
 				"minutes5": "Depois de 5 minutos",
 				"hours1": "Depois de 1 hora",
-				"days1": "Depois de 1 dia"
+				"days1": "Depois de 1 dia",
+				"help": {
+					"label": "Ajuda sobre limpeza",
+					"title": "O que é apagado",
+					"body": "Só a mensagem de boas-vindas que o Tessera publicou.",
+					"points": {
+						"own": {
+							"title": "Nada mais é tocado",
+							"body": "O que as pessoas escreverem no canal fica."
+						},
+						"ghost": {
+							"title": "A menção fantasma não depende daqui",
+							"body": "Ela é apagada no instante em que sai, qualquer que seja a escolha deste campo."
+						},
+						"restart": {
+							"title": "O relógio vive na memória do bot",
+							"body": "Se o Tessera reiniciar antes da hora, aquela mensagem fica no canal."
+						}
+					}
+				}
 			}
 		}
 	},

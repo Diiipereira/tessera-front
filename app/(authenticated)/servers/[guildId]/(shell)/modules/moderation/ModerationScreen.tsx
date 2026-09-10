@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useCallback, useRef } from 'react';
 import { ChannelPicker } from '@/components/discord/ChannelPicker';
 import { RolePicker } from '@/components/discord/RolePicker';
+import { FieldHelp } from '@/components/modules/FieldHelp';
 import { ModulePage } from '@/components/modules/ModulePage';
 import { SaveBar } from '@/components/modules/SaveBar';
 import { SettingsSection } from '@/components/modules/SettingsSection';
@@ -16,6 +17,7 @@ import { Select } from '@/components/ui/Select';
 import { Textarea } from '@/components/ui/Textarea';
 import { Switch } from '@/components/ui/Switch';
 import { useConfigDraft, type SaveOutcome } from '@/lib/hooks/useConfigDraft';
+import { MODULE_HELP } from '@/lib/module-help';
 import { patchModule } from '@/lib/module-client';
 import {
 	AUTO_ACTIONS,
@@ -133,7 +135,11 @@ export function ModerationScreen({
 			</SettingsSection>
 
 			<SettingsSection title={t('muted.title')} description={t('muted.description')}>
-				<Field label={t('muted.role')} hint={t('muted.roleHint')}>
+				<Field
+					label={t('muted.role')}
+					hint={t('muted.roleHint')}
+					action={<FieldHelp {...MODULE_HELP.moderationMuted} />}
+				>
 					<RolePicker
 						roles={roles}
 						value={draft.mutedRoleId === null ? [] : [draft.mutedRoleId]}
@@ -145,7 +151,11 @@ export function ModerationScreen({
 			</SettingsSection>
 
 			<SettingsSection title={t('protected.title')} description={t('protected.description')}>
-				<Field label={t('protected.roles')} hint={t('protected.rolesHint')}>
+				<Field
+					label={t('protected.roles')}
+					hint={t('protected.rolesHint')}
+					action={<FieldHelp {...MODULE_HELP.moderationProtected} />}
+				>
 					<RolePicker
 						roles={roles}
 						value={draft.protectedRoleIds}
@@ -160,7 +170,11 @@ export function ModerationScreen({
 				<p className="text-caption font-normal text-text-muted">{t('protected.reversalNote')}</p>
 			</SettingsSection>
 
-			<SettingsSection title={t('defaults.title')} description={t('defaults.description')}>
+			<SettingsSection
+				title={t('defaults.title')}
+				description={t('defaults.description')}
+				action={<FieldHelp {...MODULE_HELP.moderationPurge} />}
+			>
 				<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 					<Field className="h-full" label={t('defaults.timeout')} hint={t('defaults.timeoutHint')}>
 						<div className="mt-auto">
@@ -220,7 +234,11 @@ export function ModerationScreen({
 				/>
 			</SettingsSection>
 
-			<SettingsSection title={t('dm.title')} description={t('dm.description')}>
+			<SettingsSection
+				title={t('dm.title')}
+				description={t('dm.description')}
+				action={<FieldHelp {...MODULE_HELP.moderationDm} />}
+			>
 				<Switch
 					checked={draft.dmOnAction}
 					onCheckedChange={(next) => {
@@ -270,8 +288,16 @@ export function ModerationScreen({
 				) : null}
 			</SettingsSection>
 
-			<SettingsSection title={t('escalation.title')} description={t('escalation.description')}>
-				<Field label={t('escalation.auto')} hint={t('escalation.autoHint')}>
+			<SettingsSection
+				title={t('escalation.title')}
+				description={t('escalation.description')}
+				action={<FieldHelp {...MODULE_HELP.moderationEscalation} />}
+			>
+				<Field
+					label={t('escalation.auto')}
+					hint={t('escalation.autoHint')}
+					action={<FieldHelp {...MODULE_HELP.moderationAutoActions} />}
+				>
 					<div className="flex flex-wrap gap-x-6 gap-y-2">
 						{AUTO_ACTIONS.map((action) => (
 							<Checkbox
@@ -322,10 +348,15 @@ export function ModerationScreen({
 					</Alert>
 				) : null}
 
-				<Field label={t('escalation.window')} hint={t('escalation.windowHint')} className="w-40">
+				<Field
+					label={t('escalation.window')}
+					hint={t('escalation.windowHint')}
+					action={<FieldHelp {...MODULE_HELP.moderationWindow} />}
+				>
 					<Input
 						value={String(draft.escalationWindowDays)}
 						inputMode="numeric"
+						className="w-40"
 						onChange={(event) => {
 							form.set('escalationWindowDays', asWindowDays(Number(event.target.value)));
 						}}
@@ -335,7 +366,6 @@ export function ModerationScreen({
 				<LadderEditor guildId={guildId} canWrite={true} />
 
 				<p className="text-caption font-normal text-text-muted">{t('escalation.protectedNote')}</p>
-				<p className="text-caption font-normal text-text-muted">{t('escalation.notBuilt')}</p>
 			</SettingsSection>
 		</ModulePage>
 	);

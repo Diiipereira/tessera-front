@@ -4,10 +4,13 @@ import { CircleHelp } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Popover } from '@/components/ui/Popover';
 
-const POINTS = ['direct', 'public', 'attachment', 'host'] as const;
+type FieldHelpProps = {
+	namespace: string;
+	points: readonly string[];
+};
 
-export function ImageUrlHelp() {
-	const t = useTranslations('modules.imageHelp');
+export function FieldHelp({ namespace, points }: FieldHelpProps) {
+	const t = useTranslations(namespace);
 
 	return (
 		<Popover
@@ -17,7 +20,7 @@ export function ImageUrlHelp() {
 			trigger={
 				<>
 					<CircleHelp className="size-3.5" aria-hidden="true" />
-					<span className="sr-only">{t('help')}</span>
+					<span className="sr-only">{t('label')}</span>
 				</>
 			}
 		>
@@ -27,7 +30,7 @@ export function ImageUrlHelp() {
 			</div>
 
 			<ul className="flex flex-col p-1">
-				{POINTS.map((point) => (
+				{points.map((point) => (
 					<li key={point} className="flex flex-col gap-0.5 px-2 py-1.5">
 						<span className="text-caption font-medium">{t(`points.${point}.title`)}</span>
 						<span className="text-caption font-normal text-pretty text-text-muted">

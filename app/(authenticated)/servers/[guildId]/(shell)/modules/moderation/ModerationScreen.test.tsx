@@ -154,10 +154,20 @@ describe('ModerationScreen', () => {
 		expect(screen.getByText(copy.escalation.protectedNote)).toBeInTheDocument();
 	});
 
-	it('explains what each severity is worth, which is what decides the points', () => {
+	it('explains what each severity is worth right where the threshold is typed', async () => {
+		const user = userEvent.setup();
 		paint();
 
-		expect(screen.getByText(copy.escalation.notBuilt)).toBeInTheDocument();
+		const help = copy.ladder.pointsHelp;
+
+		await user.click(await screen.findByRole('button', { name: help.label }));
+
+		expect(screen.getByText(help.title)).toBeInTheDocument();
+
+		for (const grade of [help.points.light, help.points.severe, help.points.grading]) {
+			expect(screen.getByText(grade.title)).toBeInTheDocument();
+			expect(screen.getByText(grade.body)).toBeInTheDocument();
+		}
 	});
 
 	it('says over how many days the points keep counting', async () => {

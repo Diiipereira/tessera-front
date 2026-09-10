@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { channelSwitch } from '@/lib/channel-switch';
 import { useCallback, useRef, useState } from 'react';
 import { DiscordPreview } from '@/components/modules/DiscordPreview';
+import { FieldHelp } from '@/components/modules/FieldHelp';
 import { MessageComposer } from '@/components/modules/MessageComposer';
 import { ModulePage } from '@/components/modules/ModulePage';
 import { SaveBar } from '@/components/modules/SaveBar';
@@ -15,6 +16,7 @@ import { Button } from '@/components/ui/Button';
 import { Field } from '@/components/ui/Field';
 import { Select } from '@/components/ui/Select';
 import { useConfigDraft, type SaveOutcome } from '@/lib/hooks/useConfigDraft';
+import { MODULE_HELP } from '@/lib/module-help';
 import { patchModule, sendModuleTest } from '@/lib/module-client';
 import {
 	WELCOME_AUTO_ROLES_MAX,
@@ -211,7 +213,11 @@ export function WelcomeScreen({
 			</SettingsSection>
 
 			<SettingsSection title={t('mention.title')} description={t('mention.description')}>
-				<Field label={t('mention.label')} hint={t(`mention.${draft.pingMode}Hint`)}>
+				<Field
+					label={t('mention.label')}
+					hint={t(`mention.${draft.pingMode}Hint`)}
+					action={<FieldHelp {...MODULE_HELP.welcomeMention} />}
+				>
 					<Select
 						value={draft.pingMode}
 						onValueChange={(next) => {
@@ -226,7 +232,11 @@ export function WelcomeScreen({
 				title={t('autorole.title')}
 				description={t('autorole.description', { max: WELCOME_AUTO_ROLES_MAX })}
 			>
-				<Field label={t('autorole.label')}>
+				<Field
+					label={t('autorole.label')}
+					hint={t('autorole.labelHint')}
+					action={<FieldHelp {...MODULE_HELP.welcomeAutorole} />}
+				>
 					<RolePicker
 						roles={roles}
 						value={draft.autoRoleIds}
@@ -239,7 +249,11 @@ export function WelcomeScreen({
 			</SettingsSection>
 
 			<SettingsSection title={t('cleanup.title')} description={t('cleanup.description')}>
-				<Field label={t('cleanup.label')}>
+				<Field
+					label={t('cleanup.label')}
+					hint={t('cleanup.labelHint')}
+					action={<FieldHelp {...MODULE_HELP.welcomeCleanup} />}
+				>
 					<Select
 						value={String(draft.deleteAfter ?? 0)}
 						onValueChange={(next) => {

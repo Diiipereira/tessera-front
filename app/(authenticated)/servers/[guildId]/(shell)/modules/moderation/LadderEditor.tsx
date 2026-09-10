@@ -4,11 +4,13 @@ import { Trash2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import { FieldHelp } from '@/components/modules/FieldHelp';
 import { Button } from '@/components/ui/Button';
 import { Field } from '@/components/ui/Field';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { addRule, loadLadder, removeRule, type EscalationRule } from '@/lib/escalation-client';
+import { MODULE_HELP } from '@/lib/module-help';
 import {
 	AUTO_ACTIONS,
 	TIMEOUT_KEYS,
@@ -153,10 +155,11 @@ export function LadderEditor({ guildId, canWrite }: { guildId: string; canWrite:
 
 			{canWrite ? (
 				<div className="flex flex-wrap items-end gap-3">
-					<Field label={t('points')} className="w-28">
+					<Field label={t('points')} action={<FieldHelp {...MODULE_HELP.moderationPoints} />}>
 						<Input
 							value={threshold}
 							inputMode="numeric"
+							className="w-28"
 							onChange={(event) => {
 								setThreshold(event.target.value);
 							}}

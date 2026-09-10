@@ -971,7 +971,7 @@
 			"unknown": "{list} {count, plural, =1 {is not a variable — it} other {are not variables — they}} will post as written."
 		},
 		"imageHelp": {
-			"help": "Help with images",
+			"label": "Help with images",
 			"title": "How to add an image",
 			"body": "Discord does not keep the picture — it fetches the address every time it shows the message.",
 			"points": {
@@ -1673,7 +1673,30 @@
 				"title": "Muted role",
 				"description": "The role /mute hands out. A Discord timeout stops at 28 days; a mute does not.",
 				"role": "Role",
-				"roleHint": "Without one, /mute refuses instead of silently doing nothing."
+				"roleHint": "Without one, /mute refuses instead of silently doing nothing.",
+				"help": {
+					"label": "Help with muting",
+					"title": "A timeout and a mute are not the same thing",
+					"body": "One is Discord's and has a hard ceiling; the other is a role of yours and has none.",
+					"points": {
+						"timeout": {
+							"title": "Timeout",
+							"body": "It belongs to Discord, needs no role at all and stops at 28 days."
+						},
+						"mute": {
+							"title": "Mute",
+							"body": "It is this role. No ceiling on how long it lasts, which is what makes it fit a long punishment."
+						},
+						"channels": {
+							"title": "The role only silences if the channels deny speech",
+							"body": "In each channel's permissions, deny Send Messages and Speak for it."
+						},
+						"missing": {
+							"title": "With no role picked, /mute refuses",
+							"body": "It tells whoever ran it, instead of quietly doing nothing."
+						}
+					}
+				}
 			},
 			"protected": {
 				"title": "Protected roles",
@@ -1681,7 +1704,30 @@
 				"roles": "Protected roles",
 				"rolesHint": "Removing the role is deliberate and leaves a trail in the Discord audit log.",
 				"placeholder": "Nobody is protected…",
-				"reversalNote": "Unban and unmute still go through. Lifting a punishment is not punishing."
+				"reversalNote": "Unban and unmute still go through. Lifting a punishment is not punishing.",
+				"help": {
+					"label": "Help with protected roles",
+					"title": "What the protection covers",
+					"body": "While a member holds one of these roles, Tessera does not punish them — not by command, not on its own.",
+					"points": {
+						"punishments": {
+							"title": "Every punishment",
+							"body": "Warn, timeout, mute, kick, ban and softban."
+						},
+						"escalation": {
+							"title": "The escalation ladder included",
+							"body": "This is what stops an automatic step from silencing an administrator."
+						},
+						"reversal": {
+							"title": "Unban and unmute still go through",
+							"body": "A protected member banned by mistake has to stay possible to unban."
+						},
+						"remove": {
+							"title": "To punish anyway, take the role off first",
+							"body": "That is a deliberate act, and it lands in Discord's own audit log."
+						}
+					}
+				}
 			},
 			"defaults": {
 				"title": "Defaults",
@@ -1694,7 +1740,34 @@
 				"softbanPurgeHint": "One by default: deleting is the whole point of a softban.",
 				"days": "{count, plural, =0 {Delete nothing} =1 {1 day} other {# days}}",
 				"requireReason": "Require a reason",
-				"requireReasonHint": "The punishment is refused without one. Reversals and notes are exempt."
+				"requireReasonHint": "The punishment is refused without one. Reversals and notes are exempt.",
+				"help": {
+					"label": "Help with deleting messages",
+					"title": "What deleting messages does",
+					"body": "The two choices below say how much of what the member wrote goes away with the punishment.",
+					"points": {
+						"window": {
+							"title": "The window counts backwards from now",
+							"body": "Seven days is the most Discord accepts."
+						},
+						"gone": {
+							"title": "There is no undo",
+							"body": "Messages deleted this way are recoverable by nobody, you included."
+						},
+						"ban": {
+							"title": "Why ban starts at none",
+							"body": "The member is already gone, and deleting a week by accident cannot be undone. It is the same default as Discord's own menu."
+						},
+						"softban": {
+							"title": "Why softban starts at 1 day",
+							"body": "In a softban, deleting is the point: it bans and unbans right after just to clear what was written."
+						},
+						"override": {
+							"title": "The command can override it",
+							"body": "/ban and /softban take the number of days inline; this is what applies when nobody picks."
+						}
+					}
+				}
 			},
 			"dm": {
 				"title": "Telling the member",
@@ -1708,7 +1781,30 @@
 				"appealHint": "Sent on its own line, only when it is filled in.",
 				"preview": "What the member reads",
 				"previewLead": "You were warned in {server}.",
-				"previewReason": "Reason: spam in #general"
+				"previewReason": "Reason: spam in #general",
+				"help": {
+					"label": "Help with the direct message",
+					"title": "When the notice arrives, and when it does not",
+					"body": "Tessera tries to warn the member before the punishment lands, and there is not always a way through.",
+					"points": {
+						"before": {
+							"title": "The DM goes out before the punishment",
+							"body": "After a kick or a ban there may be no route left to the member."
+						},
+						"blocked": {
+							"title": "Closed DMs get nothing",
+							"body": "That is their own privacy setting, and Tessera does not work around it."
+						},
+						"failure": {
+							"title": "Failing cancels nothing",
+							"body": "The punishment happens all the same and the case is recorded."
+						},
+						"kick": {
+							"title": "The kick notice carries no case number",
+							"body": "The case is numbered after the action, and the DM has already gone. The /warn one carries it."
+						}
+					}
+				}
 			},
 			"escalation": {
 				"title": "When the engine acts on its own",
@@ -1724,7 +1820,67 @@
 				"unreachable": "Some actions need a human, and there is no channel to ask in. Pick one, or let the engine do everything.",
 				"window": "Days the points count",
 				"windowHint": "Older infractions stay in the history but stop weighing.",
-				"notBuilt": "Light is 1 point, moderate 3, heavy 6, severe 10. A moderator grades each punishment as they give it."
+				"help": {
+					"label": "Help with escalation",
+					"title": "How points turn into a punishment",
+					"body": "Every punishment is worth points by severity. Crossing a threshold on the ladder fires that threshold's step.",
+					"points": {
+						"counting": {
+							"title": "Only warns, timeouts and mutes count",
+							"body": "A note punishes nobody, and a kick or a ban is the end of the line, not a step."
+						},
+						"oneStep": {
+							"title": "One step per punishment",
+							"body": "With thresholds at 2, 5 and 10, going from 4 to 7 fires the one at 5. Jumping several at once fires only the highest."
+						},
+						"who": {
+							"title": "A step either acts or calls the staff",
+							"body": "The list of automatic actions is what decides."
+						}
+					}
+				},
+				"autoHelp": {
+					"label": "Help with automatic actions",
+					"title": "What Tessera applies on its own",
+					"body": "An action ticked here is applied the instant a step fires, with nobody to confirm it.",
+					"points": {
+						"unchecked": {
+							"title": "Left unticked, the step becomes a call",
+							"body": "Tessera posts in the escalation channel suggesting the action, and a moderator decides."
+						},
+						"duration": {
+							"title": "The duration belongs to the step, and only timeouts and mutes have one",
+							"body": "Kicks and bans have no term — they do not undo themselves."
+						},
+						"protected": {
+							"title": "A protected target is never automatic",
+							"body": "Even with the action ticked, someone holding a protected role only raises the call."
+						},
+						"dm": {
+							"title": "The notice is the applied punishment's",
+							"body": "No second message says it was automatic; only the reason changes."
+						}
+					}
+				},
+				"windowHelp": {
+					"label": "Help with the window",
+					"title": "What the window does",
+					"body": "Points older than this term stop counting.",
+					"points": {
+						"rolling": {
+							"title": "It moves with the clock",
+							"body": "Today the last 30 days add up; tomorrow, the last 30 counted from tomorrow."
+						},
+						"kept": {
+							"title": "Nothing is erased",
+							"body": "The case stays in the log and in the member's history; it just stops adding up."
+						},
+						"revoked": {
+							"title": "A revoked case stops counting at once",
+							"body": "Revoking takes its points away, inside the window or not."
+						}
+					}
+				}
 			},
 			"ladder": {
 				"counting": "Points add up over {days} days, then stop counting.",
@@ -1739,7 +1895,38 @@
 				"add": "Add rung",
 				"badPoints": "Points must be a whole number, one or more.",
 				"addFailed": "Could not add the rung",
-				"removeFailed": "Could not remove the rung"
+				"removeFailed": "Could not remove the rung",
+				"pointsHelp": {
+					"label": "Help with points",
+					"title": "What each severity is worth",
+					"body": "The threshold you type here is added up from these weights.",
+					"points": {
+						"light": {
+							"title": "Light",
+							"body": "1 point. It is what applies when the moderator picks nothing."
+						},
+						"moderate": {
+							"title": "Moderate",
+							"body": "3 points."
+						},
+						"heavy": {
+							"title": "Heavy",
+							"body": "6 points."
+						},
+						"severe": {
+							"title": "Severe",
+							"body": "10 points."
+						},
+						"total": {
+							"title": "The threshold is a running total",
+							"body": "It does not have to be one of these numbers: 11 is heavy plus moderate plus two lights. Anything from 1 to 1000 works, and a step also fires when the total jumps past it."
+						},
+						"grading": {
+							"title": "The moderator does the grading",
+							"body": "As the punishment is given, through the severity option on /warn, /timeout and /mute."
+						}
+					}
+				}
 			}
 		},
 		"welcome": {
@@ -1773,23 +1960,90 @@
 				"inline": "Mention in the message",
 				"inlineHint": "'{'user'}' becomes a real mention.",
 				"ghost": "Ghost ping",
-				"ghostHint": "A separate mention is posted and deleted at once."
+				"ghostHint": "A separate mention is posted and deleted at once.",
+				"help": {
+					"label": "Help with mentions",
+					"title": "The three modes",
+					"body": "What differs is who gets notified and what stays in the message.",
+					"points": {
+						"none": {
+							"title": "Do not mention",
+							"body": "'{'user'}' becomes the display name and nobody is notified."
+						},
+						"inline": {
+							"title": "Mention in the message",
+							"body": "'{'user'}' becomes a real mention: the member is notified and the mention stays in the text."
+						},
+						"ghost": {
+							"title": "Ghost ping",
+							"body": "Tessera posts the mention on its own and deletes it right after — the member is notified and the channel keeps no ping."
+						},
+						"ghostText": {
+							"title": "In ghost mode '{'user'}' becomes the name",
+							"body": "Otherwise the member would be mentioned twice, and the second one would not go away."
+						}
+					}
+				}
 			},
 			"autorole": {
 				"title": "Autorole",
 				"description": "Given automatically on join. Up to {max, number} roles.",
-				"label": "Roles to assign"
+				"label": "Roles to assign",
+				"labelHint": "A role Tessera cannot reach is skipped, and the rest are handed out.",
+				"help": {
+					"label": "Help with automatic roles",
+					"title": "When a role is not handed out",
+					"body": "Tessera gives what it can and skips the rest, without holding anyone at the door.",
+					"points": {
+						"above": {
+							"title": "Tessera's role has to sit above",
+							"body": "In the server settings, drag its role above every role picked here."
+						},
+						"permission": {
+							"title": "It needs Manage Roles",
+							"body": "Without that permission it hands out none of them."
+						},
+						"managed": {
+							"title": "Bot, boost and integration roles do not work",
+							"body": "Discord runs those itself, and nobody hands them out by hand."
+						},
+						"join": {
+							"title": "It applies to whoever joins next",
+							"body": "Saving here does not hand the role to people already in the server."
+						}
+					}
+				}
 			},
 			"cleanup": {
 				"title": "Cleanup",
 				"description": "Keep the channel from filling up with joins.",
 				"label": "Delete the greeting",
+				"labelHint": "The delay is counted from the moment the greeting is posted.",
 				"keep": "Keep it",
 				"seconds30": "After 30 seconds",
 				"minutes1": "After 1 minute",
 				"minutes5": "After 5 minutes",
 				"hours1": "After 1 hour",
-				"days1": "After 1 day"
+				"days1": "After 1 day",
+				"help": {
+					"label": "Help with cleanup",
+					"title": "What gets deleted",
+					"body": "Only the greeting Tessera posted.",
+					"points": {
+						"own": {
+							"title": "Nothing else is touched",
+							"body": "Whatever people write in the channel stays."
+						},
+						"ghost": {
+							"title": "The ghost ping does not depend on this",
+							"body": "It is deleted the instant it goes out, whatever this field says."
+						},
+						"restart": {
+							"title": "The timer lives in the bot's memory",
+							"body": "If Tessera restarts before the delay is up, that message stays in the channel."
+						}
+					}
+				}
 			}
 		}
 	},
