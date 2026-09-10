@@ -163,6 +163,7 @@ export type ReactionPanel = {
 	id: string;
 	name: string;
 	channelId: string | null;
+	message: MessageDraft;
 	mode: ReactionMode;
 	useButtons: boolean;
 	options: ReactionOption[];

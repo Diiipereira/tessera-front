@@ -14,7 +14,7 @@ import {
 	type LevelRewardDto
 } from '@/lib/modules/levels';
 import type { GuildPageProps } from '@/lib/types/page';
-import type { GuildSettings } from '@/lib/types/management';
+import type { GuildSettingsDto } from '@/lib/types/management';
 import { LevelsScreen } from './LevelsScreen';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -35,7 +35,7 @@ export default async function Page({ params, searchParams }: GuildPageProps) {
 		apiGet<GuildModuleStateDto>(`/guilds/${guildId}/modules/levels`),
 		apiGet<{ rewards: LevelRewardDto[] }>(`/guilds/${guildId}/levels/rewards`),
 		apiGet<LeaderboardDto>(`/guilds/${guildId}/levels/leaderboard`),
-		apiGet<GuildSettings>(`/guilds/${guildId}/settings`),
+		apiGet<GuildSettingsDto>(`/guilds/${guildId}/settings`),
 		loadChannels(guildId),
 		loadRoles(guildId)
 	]);
@@ -66,6 +66,8 @@ export default async function Page({ params, searchParams }: GuildPageProps) {
 			roles={roles}
 			variables={levelVariables(guild.name)}
 			leaderboard={toLeaderboard(board.status === 'ok' ? board.data : EMPTY_BOARD)}
+			botName={settings.data.botNickname}
+			botAvatarUrl={settings.data.botAvatarUrl}
 		/>
 	);
 }

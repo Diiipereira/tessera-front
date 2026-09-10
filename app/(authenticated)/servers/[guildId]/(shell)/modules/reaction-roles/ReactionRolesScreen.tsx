@@ -6,6 +6,8 @@ import { useCallback, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { ChannelPicker } from '@/components/discord/ChannelPicker';
 import { RolePicker } from '@/components/discord/RolePicker';
+import { DiscordPreview } from '@/components/modules/DiscordPreview';
+import { MessageComposer } from '@/components/modules/MessageComposer';
 import { ModulePage } from '@/components/modules/ModulePage';
 import { SaveBar } from '@/components/modules/SaveBar';
 import { SettingsSection } from '@/components/modules/SettingsSection';
@@ -17,6 +19,7 @@ import { useConfigDraft, type SaveOutcome } from '@/lib/hooks/useConfigDraft';
 import { patchModule } from '@/lib/module-client';
 import { loadPanels, savePanels } from '@/lib/reaction-roles-client';
 import { toPanelPayload, toReactionRolesConfig, unfinished } from '@/lib/modules/reaction-roles';
+import { emptyEmbedDraft } from '@/lib/modules/welcome';
 import type { Channel, Role } from '@/lib/types/discord';
 import type {
 	ReactionMode,
@@ -33,11 +36,12 @@ const MODES: ReactionMode[] = ['toggle', 'unique', 'verify', 'drop'];
 
 const MOVES: Record<string, number> = { ArrowUp: -1, ArrowDown: 1 };
 
-function blankPanel(): ReactionPanel {
+function blankPanel(defaultColor: string): ReactionPanel {
 	return {
 		id: newId('rp'),
 		name: '',
 		channelId: null,
+		message: { mode: 'text', text: '', embed: emptyEmbedDraft(defaultColor) },
 		mode: 'toggle',
 		useButtons: true,
 		options: []
@@ -50,6 +54,9 @@ type ReactionRolesScreenProps = {
 	version: number;
 	channels: Channel[];
 	roles: Role[];
+	defaultColor: string;
+	botName: string;
+	botAvatarUrl: string | null;
 };
 
 export function ReactionRolesScreen({
@@ -57,7 +64,10 @@ export function ReactionRolesScreen({
 	config,
 	version,
 	channels,
-	roles
+	roles,
+	defaultColor,
+	botName,
+	botAvatarUrl
 }: ReactionRolesScreenProps) {
 	const t = useTranslations('modules.reactionRoles');
 	const preview = useTranslations('modules.preview');
@@ -142,43 +152,45 @@ export function ReactionRolesScreen({
 		>
 			<h2 className="text-h4">{preview('title')}</h2>
 
-			<div className="rounded-lg p-4" style={{ backgroundColor: DISCORD.surface }}>
-				<p className="mb-3 text-[15px] text-white">
-					{selected.name === '' ? t('defaultName') : selected.name}
-				</p>
-
-				{selected.options.length === 0 ? (
-					<p className="text-[13px]" style={{ color: DISCORD.muted }}>
-						{t('noOptions')}
-					</p>
-				) : selected.useButtons ? (
-					<div className="flex flex-wrap gap-2">
-						{selected.options.map((option) => (
-							<span
-								key={option.id}
-								className="inline-flex h-8 items-center gap-1.5 rounded-[3px] px-3 text-[14px] font-medium text-white"
-								style={{ backgroundColor: DISCORD.button }}
-							>
-								<span aria-hidden="true">{option.emoji}</span>
-								{option.label === '' ? t('defaultOption') : option.label}
-							</span>
-						))}
-					</div>
-				) : (
-					<div className="flex flex-wrap gap-1.5">
-						{selected.options.map((option) => (
-							<span
-								key={option.id}
-								className="inline-flex h-6 items-center gap-1 rounded-md px-2 text-[13px]"
-								style={{ backgroundColor: DISCORD.reaction, color: DISCORD.text }}
-							>
-								<span aria-hidden="true">{option.emoji}</span>
-								<span className="tabular">1</span>
-							</span>
-						))}
-					</div>
-				)}
-			</div>
+			<DiscordPreview
+				message={selected.message}
+				variables={[]}
+				botName={botName}
+				botAvatarUrl={botAvatarUrl}
+				footer={
+					selected.options.length === 0 ? (
+						<p className="text-[13px]" style={{ color: DISCORD.muted }}>
+							{t('noOptions')}
+						</p>
+					) : selected.useButtons ? (
+						<div className="flex flex-wrap gap-2">
+							{selected.options.map((option) => (
+								<span
+									key={option.id}
+									className="inline-flex h-8 items-center gap-1.5 rounded-[3px] px-3 text-[14px] font-medium text-white"
+									style={{ backgroundColor: DISCORD.button }}
+								>
+									<span aria-hidden="true">{option.emoji}</span>
+									{option.label === '' ? t('defaultOption') : option.label}
+								</span>
+							))}
+						</div>
+					) : (
+						<div className="flex flex-wrap gap-1.5">
+							{selected.options.map((option) => (
+								<span
+									key={option.id}
+									className="inline-flex h-6 items-center gap-1 rounded-md px-2 text-[13px]"
+									style={{ backgroundColor: DISCORD.reaction, color: DISCORD.text }}
+								>
+									<span aria-hidden="true">{option.emoji}</span>
+									<span className="tabular">1</span>
+								</span>
+							))}
+						</div>
+					)
+				}
+			/>
 
 			<p className="text-caption font-normal text-text-muted">{t(`mode.${selected.mode}.blurb`)}</p>
 		</section>
@@ -228,7 +240,7 @@ export function ReactionRolesScreen({
 						variant="outline"
 						size="sm"
 						onClick={() => {
-							const panel = blankPanel();
+							const panel = blankPanel(defaultColor);
 							form.set('panels', [...draft.panels, panel]);
 							setSelectedId(panel.id);
 						}}
@@ -305,6 +317,14 @@ export function ReactionRolesScreen({
 								}}
 							/>
 						</Field>
+
+						<MessageComposer
+							value={selected.message}
+							onChange={(next) => {
+								updatePanel(selected.id, { message: next });
+							}}
+							variables={[]}
+						/>
 
 						<div className="flex flex-col gap-2">
 							<span className="text-body-sm font-medium">{t('settings.mode')}</span>

@@ -964,6 +964,7 @@
 		},
 		"preview": {
 			"title": "Prévia",
+			"note": "As variáveis aparecem com dados de exemplo. A mensagem real usa o que aconteceu.",
 			"bot": "Bot",
 			"timestampSample": "Hoje às 14:32",
 			"nothing": "Nada para publicar ainda.",
@@ -1588,7 +1589,6 @@
 			"saved": "Cargos por reação salvos",
 			"new": "Novo painel",
 			"untitled": "Painel sem nome",
-			"defaultName": "Escolha seus cargos",
 			"previewLabel": "Prévia do painel",
 			"defaultOption": "Cargo",
 			"panels": {
@@ -1598,12 +1598,16 @@
 				"title": "Configurações do painel",
 				"delete": "Excluir {name}",
 				"name": "Nome do painel",
-				"nameHint": "Aparece como a mensagem acima das opções.",
+				"nameHint": "Só para você achar o painel nesta tela. Ela não vai para o Discord.",
 				"namePlaceholder": "Escolha suas cores",
 				"channel": "Canal",
 				"buttons": "Usar botões em vez de reações",
 				"buttonsHint": "Botões são mais claros e não somem por acidente.",
 				"mode": "Modo"
+			},
+			"message": {
+				"title": "Mensagem do painel",
+				"description": "O texto e o embed publicados acima das opções."
 			},
 			"options": {
 				"title": "Opções",

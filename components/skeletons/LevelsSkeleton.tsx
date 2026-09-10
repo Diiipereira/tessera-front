@@ -4,6 +4,7 @@ import {
 	FieldSkeleton,
 	LineSkeleton,
 	ModulePageSkeleton,
+	PreviewSkeleton,
 	SectionSkeleton,
 	SwitchSkeleton
 } from '@/components/modules/ModuleSkeleton';
@@ -64,6 +65,7 @@ export function LevelsSkeleton() {
 				<SwitchSkeleton />
 				<FieldSkeleton />
 				<ComposerSkeleton />
+				<PreviewSkeleton />
 			</SectionSkeleton>
 
 			<SectionSkeleton>

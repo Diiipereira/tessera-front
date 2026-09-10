@@ -11,7 +11,7 @@ import {
 	toScheduledConfig,
 	type ScheduledMessagesDto
 } from '@/lib/modules/scheduled';
-import type { GuildSettings } from '@/lib/types/management';
+import type { GuildSettingsDto } from '@/lib/types/management';
 import type { GuildPageProps } from '@/lib/types/page';
 import { ScheduledScreen } from './ScheduledScreen';
 
@@ -30,7 +30,7 @@ export default async function Page({ params, searchParams }: GuildPageProps) {
 	const [state, page, settings, channels] = await Promise.all([
 		apiGet<GuildModuleStateDto>(`/guilds/${guildId}/modules/scheduled`),
 		apiGet<ScheduledMessagesDto>(`/guilds/${guildId}/scheduled`),
-		apiGet<GuildSettings>(`/guilds/${guildId}/settings`),
+		apiGet<GuildSettingsDto>(`/guilds/${guildId}/settings`),
 		loadChannels(guildId)
 	]);
 
@@ -59,6 +59,8 @@ export default async function Page({ params, searchParams }: GuildPageProps) {
 			channels={channels}
 			variables={scheduledVariables(guild.name)}
 			now={new Date().toISOString()}
+			botName={settings.data.botNickname}
+			botAvatarUrl={settings.data.botAvatarUrl}
 		/>
 	);
 }

@@ -6,6 +6,7 @@ import { useCallback, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { ChannelPicker } from '@/components/discord/ChannelPicker';
 import { MessageComposer } from '@/components/modules/MessageComposer';
+import { MessagePreview } from '@/components/modules/MessagePreview';
 import { ModulePage } from '@/components/modules/ModulePage';
 import { SaveBar } from '@/components/modules/SaveBar';
 import { SettingsSection } from '@/components/modules/SettingsSection';
@@ -47,6 +48,8 @@ type ScheduledScreenProps = {
 	version: number;
 	channels: Channel[];
 	variables: MessageVariable[];
+	botName: string;
+	botAvatarUrl: string | null;
 	now: string;
 };
 
@@ -57,7 +60,9 @@ export function ScheduledScreen({
 	version,
 	channels,
 	variables,
-	now
+	now,
+	botName,
+	botAvatarUrl
 }: ScheduledScreenProps) {
 	const t = useTranslations('modules.scheduled');
 	const relativeTime = useRelativeTime();
@@ -417,6 +422,13 @@ export function ScheduledScreen({
 								update(selected.id, { message: next });
 							}}
 							variables={variables}
+						/>
+
+						<MessagePreview
+							message={selected.message}
+							variables={variables}
+							botName={botName}
+							botAvatarUrl={botAvatarUrl}
 						/>
 					</SettingsSection>
 				</>

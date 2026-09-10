@@ -10,6 +10,7 @@ import {
 	unfinished,
 	type ReactionPanelDto
 } from './reaction-roles';
+import { emptyEmbedDraft } from './welcome';
 
 const SAVED_ID = 'e6b3e0a2-1111-4222-8333-444444444444';
 const RED = '901234567890123001';
@@ -28,6 +29,8 @@ const dto = (patch: Partial<ReactionPanelDto> = {}): ReactionPanelDto => ({
 	name: 'Colours',
 	channelId: '901234567890123008',
 	messageId: '901234567890123500',
+	message: 'Escolha a sua cor',
+	embed: {},
 	mode: 'toggle',
 	useButtons: true,
 	enabled: true,
@@ -39,6 +42,7 @@ const panel = (patch: Partial<ReactionPanel> = {}): ReactionPanel => ({
 	id: SAVED_ID,
 	name: 'Colours',
 	channelId: '901234567890123008',
+	message: { mode: 'text', text: '', embed: emptyEmbedDraft() },
 	mode: 'toggle',
 	useButtons: true,
 	options: [{ id: 'option-1', emoji: '🔴', roleId: RED, label: 'Red', description: '' }],
@@ -56,6 +60,20 @@ describe('isSavedId', () => {
 });
 
 describe('toReactionRolesConfig', () => {
+	it('reads the message the API sent into the composer', () => {
+		expect(toReactionRolesConfig(state(true), [dto()]).panels[0]?.message.text).toBe(
+			'Escolha a sua cor'
+		);
+	});
+
+	it('opens in embed mode only when the panel actually has an embed', () => {
+		expect(toReactionRolesConfig(state(true), [dto()]).panels[0]?.message.mode).toBe('text');
+		expect(
+			toReactionRolesConfig(state(true), [dto({ embed: { title: 'Cores' } })]).panels[0]?.message
+				.mode
+		).toBe('embed');
+	});
+
 	it('takes whether the module is on from the module state', () => {
 		expect(toReactionRolesConfig(state(false), [dto()]).enabled).toBe(false);
 	});
@@ -74,6 +92,30 @@ describe('toReactionRolesConfig', () => {
 });
 
 describe('toPanelPayload', () => {
+	it('sends the text the guild wrote, so the panel says something of its own', () => {
+		const written = panel({
+			message: { mode: 'text', text: 'Escolha a sua cor', embed: emptyEmbedDraft() }
+		});
+
+		expect(toPanelPayload([written])[0]?.message).toBe('Escolha a sua cor');
+		expect(toPanelPayload([written])[0]?.embed).toEqual({});
+	});
+
+	it('sends the embed only in embed mode, so switching back does not publish both', () => {
+		const written = panel({
+			message: {
+				mode: 'embed',
+				text: 'above',
+				embed: { ...emptyEmbedDraft(), title: 'Cores' }
+			}
+		});
+
+		expect(toPanelPayload([written])[0]?.embed).toMatchObject({ title: 'Cores' });
+		expect(
+			toPanelPayload([{ ...written, message: { ...written.message, mode: 'text' } }])[0]?.embed
+		).toEqual({});
+	});
+
 	it('sends the id of a panel the API knows', () => {
 		expect(toPanelPayload([panel()])[0]?.id).toBe(SAVED_ID);
 	});

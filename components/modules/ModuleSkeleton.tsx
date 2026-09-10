@@ -188,6 +188,27 @@ export function ComposerSkeleton({ embed = false }: { embed?: boolean }) {
 	);
 }
 
+export function PreviewSkeleton() {
+	return (
+		<div className="flex flex-col gap-2">
+			<TextSkeleton line="body-sm" width="w-16" />
+
+			<div className="rounded-lg bg-surface-sunken p-4">
+				<div className="flex gap-3">
+					<Skeleton className="size-10 shrink-0 rounded-full" />
+					<div className="min-w-0 flex-1">
+						<TextSkeleton line="body" width="w-40" />
+						<TextSkeleton line="body" />
+						<TextSkeleton line="body" width="w-2/3" />
+					</div>
+				</div>
+			</div>
+
+			<TextSkeleton line="caption" width="w-2/3" />
+		</div>
+	);
+}
+
 export function LineSkeleton({ width = 'w-full' }: { width?: string }) {
 	return <TextSkeleton line="body" width={width} />;
 }

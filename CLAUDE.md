@@ -943,6 +943,19 @@ dicionário; o `ConfigSaveError` carrega o `failure` justamente para isso. E o `
 **dois** ramos: só `state === 'idle'` é "salvou" — um 409 resolvido não é sucesso e não pode
 dizer que foi.
 
+**Compositor sem prévia é escrever às cegas, e duas telas ficaram assim por meses.** Níveis e
+Mensagens agendadas tinham `MessageComposer` e nenhum `DiscordPreview`. O `MessagePreview` é o
+bloco compartilhado — rótulo, prévia e a frase de que os dados são de exemplo — para quando a
+prévia mora **dentro** da seção, logo abaixo do compositor; o card do `aside` continua sendo
+escrito à mão nas telas que têm coluna lateral. As duas páginas já buscavam `/settings`: bastou
+tipar a resposta como `GuildSettingsDto` em vez de `GuildSettings` para a prévia mostrar o apelido
+e a foto reais do bot, sem requisição nova.
+
+**O `DiscordPreview` tem um `footer`, e ele existe porque o botão faz parte da mensagem.** Cargos
+por reação e Tickets desenhavam os botões numa caixa **abaixo** da prévia, como se fossem outra
+coisa; no Discord eles são a mesma mensagem. O slot renderiza dentro da coluna do conteúdo, depois
+do texto ou do embed.
+
 State comes from `useConfigDraft`, which owns draft-vs-saved, the dirty flag and the
 changed-key count that the SaveBar prints. It compares **deeply**: a shallow compare
 reports a nested edit as clean and quietly loses the user's work, and editing a value

@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { ChannelPicker } from '@/components/discord/ChannelPicker';
 import { RolePicker } from '@/components/discord/RolePicker';
 import { MessageComposer } from '@/components/modules/MessageComposer';
+import { MessagePreview } from '@/components/modules/MessagePreview';
 import { ModulePage } from '@/components/modules/ModulePage';
 import { SaveBar } from '@/components/modules/SaveBar';
 import { SettingsSection } from '@/components/modules/SettingsSection';
@@ -58,6 +59,8 @@ type LevelsScreenProps = {
 	channels: Channel[];
 	roles: Role[];
 	variables: MessageVariable[];
+	botName: string;
+	botAvatarUrl: string | null;
 	leaderboard: LeaderboardEntry[];
 };
 
@@ -69,7 +72,9 @@ export function LevelsScreen({
 	channels,
 	roles,
 	variables,
-	leaderboard
+	leaderboard,
+	botName,
+	botAvatarUrl
 }: LevelsScreenProps) {
 	const t = useTranslations('modules.levels');
 	const describe = useApiFailure();
@@ -332,6 +337,13 @@ export function LevelsScreen({
 								form.set('announceMessage', next);
 							}}
 							variables={variables}
+						/>
+
+						<MessagePreview
+							message={draft.announceMessage}
+							variables={variables}
+							botName={botName}
+							botAvatarUrl={botAvatarUrl}
 						/>
 					</>
 				) : null}

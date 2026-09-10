@@ -6,6 +6,7 @@ import type { Channel, Role } from '@/lib/types/discord';
 import type { ReactionRolesConfig } from '@/lib/types/module-configs';
 import { Translated } from '@/tests/i18n';
 import { ReactionRolesScreen } from './ReactionRolesScreen';
+import { emptyEmbedDraft } from '@/lib/modules/welcome';
 
 vi.mock('@/lib/module-client', () => ({ patchModule: vi.fn() }));
 vi.mock('@/lib/reaction-roles-client', () => ({ loadPanels: vi.fn(), savePanels: vi.fn() }));
@@ -39,6 +40,7 @@ const config: ReactionRolesConfig = {
 			id: 'panel-1',
 			name: 'Colours',
 			channelId: '901234567890123001',
+			message: { mode: 'text', text: '', embed: emptyEmbedDraft() },
 			mode: 'toggle',
 			useButtons: true,
 			options: [
@@ -58,6 +60,9 @@ function renderScreen() {
 					guildId={GUILD_ID}
 					config={config}
 					version={1}
+					defaultColor="#5865F2"
+					botName="Tessera Dev"
+					botAvatarUrl={null}
 					channels={channels}
 					roles={roles}
 				/>

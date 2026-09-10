@@ -2,6 +2,7 @@ import {
 	ComposerSkeleton,
 	FieldSkeleton,
 	ModulePageSkeleton,
+	PreviewSkeleton,
 	SectionSkeleton
 } from '@/components/modules/ModuleSkeleton';
 import { Skeleton, TextSkeleton } from '@/components/ui/Skeleton';
@@ -75,6 +76,7 @@ export function ScheduledSkeleton() {
 
 			<SectionSkeleton description={false}>
 				<ComposerSkeleton />
+				<PreviewSkeleton />
 			</SectionSkeleton>
 		</ModulePageSkeleton>
 	);

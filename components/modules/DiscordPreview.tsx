@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { BRAND } from '@/lib/brand';
 import { DISCORD, EMBED_SWATCHES, MENTION, VARIABLE } from '@/lib/discord-colors';
 import { toFieldRows } from '@/lib/embed-fields';
@@ -15,6 +15,7 @@ type DiscordPreviewProps = {
 	timestampLabel?: string;
 	botName?: string;
 	botAvatarUrl?: string | null;
+	footer?: ReactNode;
 };
 
 const initialsOf = (name: string): string => name.slice(0, 2).toUpperCase();
@@ -97,7 +98,8 @@ export function DiscordPreview({
 	variables,
 	timestampLabel,
 	botName,
-	botAvatarUrl
+	botAvatarUrl,
+	footer
 }: DiscordPreviewProps) {
 	const t = useTranslations('modules.preview');
 	const shown = botName === undefined || botName === '' ? BRAND.botName : botName;
@@ -248,6 +250,8 @@ export function DiscordPreview({
 							</div>
 						</div>
 					)}
+
+					{footer === undefined ? null : <div className="mt-2">{footer}</div>}
 				</div>
 			</div>
 		</div>

@@ -13,6 +13,7 @@ import type {
 	OpenTicket
 } from '@/lib/types/module-configs';
 import type { EmbedDraft, MessageDraft } from '@/lib/types/modules';
+import { emptyEmbedDraft } from '@/lib/modules/welcome';
 
 function emptyEmbed(): EmbedDraft {
 	return {
@@ -477,6 +478,7 @@ export const mockReactionRolesConfig: ReactionRolesConfig = {
 			id: 'rp1',
 			name: 'Pick your colours',
 			channelId: '901234567890123004',
+			message: { mode: 'text', text: '', embed: emptyEmbedDraft() },
 			mode: 'unique',
 			useButtons: true,
 			options: [
@@ -500,6 +502,7 @@ export const mockReactionRolesConfig: ReactionRolesConfig = {
 			id: 'rp2',
 			name: 'Verify to enter',
 			channelId: '901234567890123002',
+			message: { mode: 'text', text: '', embed: emptyEmbedDraft() },
 			mode: 'verify',
 			useButtons: true,
 			options: [

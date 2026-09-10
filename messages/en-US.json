@@ -964,6 +964,7 @@
 		},
 		"preview": {
 			"title": "Preview",
+			"note": "The variables show sample data. The real message uses what actually happened.",
 			"bot": "Bot",
 			"timestampSample": "Today at 14:32",
 			"nothing": "Nothing to post yet.",
@@ -1588,7 +1589,6 @@
 			"saved": "Reaction roles saved",
 			"new": "New panel",
 			"untitled": "Untitled panel",
-			"defaultName": "Pick your roles",
 			"previewLabel": "Panel preview",
 			"defaultOption": "Role",
 			"panels": {
@@ -1598,12 +1598,16 @@
 				"title": "Panel settings",
 				"delete": "Delete {name}",
 				"name": "Panel name",
-				"nameHint": "Shown as the message above the options.",
+				"nameHint": "Only so you can find the panel on this screen. It is not posted to Discord.",
 				"namePlaceholder": "Pick your colours",
 				"channel": "Channel",
 				"buttons": "Use buttons instead of reactions",
 				"buttonsHint": "Buttons are clearer and cannot be removed by accident.",
 				"mode": "Mode"
+			},
+			"message": {
+				"title": "Panel message",
+				"description": "The text and the embed posted above the options."
 			},
 			"options": {
 				"title": "Options",

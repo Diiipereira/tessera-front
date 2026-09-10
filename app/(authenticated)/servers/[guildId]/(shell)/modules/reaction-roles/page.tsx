@@ -8,6 +8,7 @@ import { ApiUnreachableError, resolveGuild } from '@/lib/guild-access';
 import { loadChannels, loadRoles } from '@/lib/guild-shape';
 import { toReactionRolesConfig, type ReactionPanelDto } from '@/lib/modules/reaction-roles';
 import type { GuildPageProps } from '@/lib/types/page';
+import type { GuildSettingsDto } from '@/lib/types/management';
 import { ReactionRolesScreen } from './ReactionRolesScreen';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -22,14 +23,20 @@ export default async function Page({ params, searchParams }: GuildPageProps) {
 
 	if (query.state === 'loading') return <ReactionRolesSkeleton />;
 
-	const [state, panels, channels, roles] = await Promise.all([
+	const [state, panels, settings, channels, roles] = await Promise.all([
 		apiGet<GuildModuleStateDto>(`/guilds/${guildId}/modules/reaction-roles`),
 		apiGet<{ panels: ReactionPanelDto[] }>(`/guilds/${guildId}/reaction-roles`),
+		apiGet<GuildSettingsDto>(`/guilds/${guildId}/settings`),
 		loadChannels(guildId),
 		loadRoles(guildId)
 	]);
 
-	if (state.status === 'unauthenticated' || panels.status === 'unauthenticated') redirect('/login');
+	if (
+		state.status === 'unauthenticated' ||
+		panels.status === 'unauthenticated' ||
+		settings.status === 'unauthenticated'
+	)
+		redirect('/login');
 
 	if (state.status === 'unreachable')
 		throw new ApiUnreachableError(state.reason, state.answered, state.code ?? null);
@@ -37,13 +44,19 @@ export default async function Page({ params, searchParams }: GuildPageProps) {
 	if (panels.status === 'unreachable')
 		throw new ApiUnreachableError(panels.reason, panels.answered, panels.code ?? null);
 
+	if (settings.status === 'unreachable')
+		throw new ApiUnreachableError(settings.reason, settings.answered, settings.code ?? null);
+
 	return (
 		<ReactionRolesScreen
 			guildId={guildId}
-			config={toReactionRolesConfig(state.data, panels.data.panels)}
+			config={toReactionRolesConfig(state.data, panels.data.panels, settings.data.embedColor)}
 			version={state.data.version}
 			channels={channels}
 			roles={roles}
+			defaultColor={settings.data.embedColor}
+			botName={settings.data.botNickname}
+			botAvatarUrl={settings.data.botAvatarUrl}
 		/>
 	);
 }
