@@ -101,6 +101,7 @@
 		"giveaways": "Giveaways",
 		"custom-commands": "Custom commands",
 		"scheduled": "Scheduled messages",
+		"embeds": "Embeds",
 		"commands": "Commands",
 		"members": "Members",
 		"cases": "Cases",
@@ -3286,6 +3287,41 @@
 				},
 				"label": "Welcome"
 			}
+		}
+	},
+	"embeds": {
+		"title": "Embeds",
+		"description": "Build an embed, see exactly how it will read, and post it to a channel.",
+		"compose": {
+			"title": "Message",
+			"description": "Text or embed — whichever is selected here is what gets posted."
+		},
+		"preview": {
+			"title": "Preview",
+			"description": "Drawn from the same values the post will carry."
+		},
+		"send": {
+			"title": "Post it",
+			"description": "Sends one message now, as Tessera.",
+			"channel": "Channel",
+			"action": "Post to the channel",
+			"note": "Members and roles named in the text are pinged; @everyone never is.",
+			"sent": "Posted.",
+			"channelRefused": "Tessera could not write in that channel. Check its permissions there.",
+			"failed": "Nothing was posted"
+		},
+		"json": {
+			"title": "JSON",
+			"description": "Copy this embed to reuse elsewhere, or paste one you already have.",
+			"label": "Embed as JSON",
+			"placeholder": "Paste an embed here and press Apply.",
+			"copy": "Copy this embed",
+			"apply": "Apply",
+			"copied": "Copied to the clipboard.",
+			"copyRefused": "The browser refused the clipboard — the JSON is in the box.",
+			"applied": "Embed loaded from the JSON.",
+			"unreadable": "That is not valid JSON.",
+			"notAnEmbed": "That JSON has no embed in it."
 		}
 	}
 }

@@ -8,6 +8,7 @@ import {
 	Gavel,
 	Gift,
 	LayoutDashboard,
+	Palette,
 	ScrollText,
 	Settings,
 	Shield,
@@ -66,6 +67,7 @@ export const navGroups: NavGroup[] = [
 	{
 		id: 'management',
 		items: [
+			{ id: 'embeds', path: '/embeds', icon: Palette },
 			{ id: 'commands', path: '/commands', icon: SquareSlash },
 			{ id: 'members', path: '/members', icon: Users },
 			{ id: 'cases', path: '/cases', icon: Gavel },

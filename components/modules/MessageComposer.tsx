@@ -106,7 +106,7 @@ export function MessageComposer({
 		return issue === null ? t(fallback) : urls(issue);
 	}
 
-	const unknown = unknownVariables(activeText, variables);
+	const unknown = variables.length === 0 ? [] : unknownVariables(activeText, variables);
 
 	return (
 		<div className="flex flex-col gap-4">
@@ -141,7 +141,7 @@ export function MessageComposer({
 				<div className="flex-1" />
 			</div>
 
-			<VariableChips variables={variables} onInsert={insert} />
+			{variables.length > 0 ? <VariableChips variables={variables} onInsert={insert} /> : null}
 
 			{value.mode === 'text' ? (
 				<Textarea

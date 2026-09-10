@@ -114,7 +114,7 @@ export function LevelCurveChart({ curve, maxLevel = 30 }: LevelCurveChartProps) 
 			},
 			true
 		);
-	}, [curve, maxLevel, resolved, t]);
+	}, [curve, locale, maxLevel, resolved, t]);
 
 	return (
 		<div

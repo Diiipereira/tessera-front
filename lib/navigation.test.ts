@@ -97,7 +97,7 @@ describe('navGroups', () => {
 		]);
 	});
 
-	it('has 20 destinations in total', () => {
-		expect(navGroups.flatMap((group) => group.items)).toHaveLength(20);
+	it('has 21 destinations in total', () => {
+		expect(navGroups.flatMap((group) => group.items)).toHaveLength(21);
 	});
 });

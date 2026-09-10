@@ -1241,6 +1241,38 @@ em vez de _1.234_ — são 22 chamadas em 11 telas, e o conserto é passar o loc
 17 skeletons passam `label="Levels"` e viram `aria-label` de "Loading {label}": texto só de
 leitor de tela, em inglês, nas duas línguas.
 
+## A tela de Embeds é um ateliê, e de propósito não escreve config
+
+`/servers/[guildId]/embeds` monta um embed, mostra a prévia e **publica uma vez** num canal. Ela
+não grava em `welcome.embed` nem em `levels.announceEmbed`, e a ponte para os módulos é o JSON.
+
+O pedido original era _"seleciona o módulo, cria o embed e testa lá"_, e a razão de não ser assim
+é endereçamento: welcome e levels têm **um** embed por guild, mas tickets, cargos por reação,
+agendadas e registros têm **um por linha** — um seletor de módulo não sabe responder _qual painel,
+qual mensagem, qual evento_. E gravar dali criaria um segundo escritor para um JSONB que a tela do
+módulo também escreve, com a versão otimista do `useConfigDraft` de um lado só. O ateliê é onde se
+desenha; a tela do módulo continua sendo onde se salva.
+
+**O JSON exportado é o do Discord; o importado pode ser qualquer um dos dois.** `authorName`,
+`authorIconUrl`, `footerText`, `imageUrl` e `thumbnailUrl` só existem no nosso rascunho, então a
+presença de qualquer uma delas identifica o formato. Sem nenhuma, vale o do Discord — que é o
+formato que chega colado de fora e cujo `color` numérico o `toEmbedDraft` descartaria calado,
+deixando a cor do servidor no lugar da cor colada.
+
+**Campo colado ganha id na hora.** As linhas do editor são reordenadas por `id` e é ele a chave de
+React de cada linha; JSON do Discord não tem id nenhum, e sem mintar um a lista quebraria no
+primeiro arrastar.
+
+**Tela sem variáveis não mostra a régua de variáveis.** `variables={[]}` deixava a linha
+_INSERIR_ pendurada vazia e fazia o `unknownVariables` acusar **todo** `{token}` como variável
+desconhecida — o oposto do que se quer num embed que vai ser copiado para outra tela. O
+`MessageComposer` agora esconde a régua e cala o aviso quando a lista está vazia; isso vale para o
+ateliê e para os cargos por reação, que já passavam `[]`.
+
+**O botão de publicar é o `POST /guilds/:id/embeds/send`, e ele não é um "salvar".** Ele envia uma
+mensagem agora, como o Tessera, com menção a membro e cargo permitida e `@everyone` nunca. A tela
+diz isso embaixo do botão em vez de deixar a pessoa descobrir publicando.
+
 ## Token de produto no dicionário precisa de escape ICU
 
 `{user}`, `{server}` e `{date}` são texto que o leitor **deve ver com as chaves**, mas o ICU

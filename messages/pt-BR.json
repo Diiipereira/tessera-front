@@ -101,6 +101,7 @@
 		"giveaways": "Sorteios",
 		"custom-commands": "Comandos personalizados",
 		"scheduled": "Mensagens agendadas",
+		"embeds": "Embeds",
 		"commands": "Comandos",
 		"members": "Membros",
 		"cases": "Casos",
@@ -3286,6 +3287,41 @@
 				},
 				"label": "Boas-vindas"
 			}
+		}
+	},
+	"embeds": {
+		"title": "Embeds",
+		"description": "Monte um embed, veja exatamente como ele vai ficar e publique num canal.",
+		"compose": {
+			"title": "Mensagem",
+			"description": "Texto ou embed — o que estiver selecionado aqui é o que vai ser publicado."
+		},
+		"preview": {
+			"title": "Prévia",
+			"description": "Desenhada a partir dos mesmos valores que a publicação leva."
+		},
+		"send": {
+			"title": "Publicar",
+			"description": "Envia uma mensagem agora, como o Tessera.",
+			"channel": "Canal",
+			"action": "Publicar no canal",
+			"note": "Membros e cargos citados no texto são notificados; @everyone nunca é.",
+			"sent": "Publicado.",
+			"channelRefused": "O Tessera não conseguiu escrever nesse canal. Confira as permissões dele lá.",
+			"failed": "Nada foi publicado"
+		},
+		"json": {
+			"title": "JSON",
+			"description": "Copie este embed para reaproveitar em outro lugar, ou cole um que você já tem.",
+			"label": "Embed em JSON",
+			"placeholder": "Cole um embed aqui e clique em Aplicar.",
+			"copy": "Copiar este embed",
+			"apply": "Aplicar",
+			"copied": "Copiado para a área de transferência.",
+			"copyRefused": "O navegador recusou a área de transferência — o JSON está na caixa.",
+			"applied": "Embed carregado a partir do JSON.",
+			"unreadable": "Isso não é um JSON válido.",
+			"notAnEmbed": "Esse JSON não tem embed nenhum dentro."
 		}
 	}
 }
