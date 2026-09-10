@@ -8,6 +8,8 @@ import { Skeleton, TextSkeleton } from '@/components/ui/Skeleton';
 
 const AUTO_ACTIONS = [0, 1, 2, 3, 4, 5];
 
+const DEFAULTS = [0, 1, 2];
+
 export function ModerationSkeleton() {
 	return (
 		<ModulePageSkeleton label="Moderation">
@@ -25,9 +27,11 @@ export function ModerationSkeleton() {
 			</SectionSkeleton>
 
 			<SectionSkeleton>
-				<FieldSkeleton hint control="h-9" width="w-56" />
-				<FieldSkeleton hint control="h-9" width="w-56" />
-				<FieldSkeleton hint control="h-9" width="w-56" />
+				<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+					{DEFAULTS.map((column) => (
+						<FieldSkeleton key={column} hint control="h-9" />
+					))}
+				</div>
 				<SwitchSkeleton />
 			</SectionSkeleton>
 

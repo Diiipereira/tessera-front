@@ -161,38 +161,54 @@ export function ModerationScreen({
 			</SettingsSection>
 
 			<SettingsSection title={t('defaults.title')} description={t('defaults.description')}>
-				<Field label={t('defaults.timeout')} hint={t('defaults.timeoutHint')}>
-					<Select
-						options={TIMEOUT_KEYS.map((key) => ({ value: key, label: durations(key) }))}
-						value={draft.timeoutDefault}
-						onValueChange={(next) => {
-							form.set('timeoutDefault', asTimeoutKey(next));
-						}}
-						className="w-56"
-					/>
-				</Field>
+				<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+					<Field className="h-full" label={t('defaults.timeout')} hint={t('defaults.timeoutHint')}>
+						<div className="mt-auto">
+							<Select
+								options={TIMEOUT_KEYS.map((key) => ({ value: key, label: durations(key) }))}
+								value={draft.timeoutDefault}
+								onValueChange={(next) => {
+									form.set('timeoutDefault', asTimeoutKey(next));
+								}}
+								className="w-full"
+							/>
+						</div>
+					</Field>
 
-				<Field label={t('defaults.banPurge')} hint={t('defaults.banPurgeHint')}>
-					<Select
-						options={purgeOptions}
-						value={String(draft.banPurgeDays)}
-						onValueChange={(next) => {
-							form.set('banPurgeDays', Number(next));
-						}}
-						className="w-56"
-					/>
-				</Field>
+					<Field
+						className="h-full"
+						label={t('defaults.banPurge')}
+						hint={t('defaults.banPurgeHint')}
+					>
+						<div className="mt-auto">
+							<Select
+								options={purgeOptions}
+								value={String(draft.banPurgeDays)}
+								onValueChange={(next) => {
+									form.set('banPurgeDays', Number(next));
+								}}
+								className="w-full"
+							/>
+						</div>
+					</Field>
 
-				<Field label={t('defaults.softbanPurge')} hint={t('defaults.softbanPurgeHint')}>
-					<Select
-						options={purgeOptions}
-						value={String(draft.softbanPurgeDays)}
-						onValueChange={(next) => {
-							form.set('softbanPurgeDays', Number(next));
-						}}
-						className="w-56"
-					/>
-				</Field>
+					<Field
+						className="h-full"
+						label={t('defaults.softbanPurge')}
+						hint={t('defaults.softbanPurgeHint')}
+					>
+						<div className="mt-auto">
+							<Select
+								options={purgeOptions}
+								value={String(draft.softbanPurgeDays)}
+								onValueChange={(next) => {
+									form.set('softbanPurgeDays', Number(next));
+								}}
+								className="w-full"
+							/>
+						</div>
+					</Field>
+				</div>
 
 				<Switch
 					checked={draft.requireReason}
