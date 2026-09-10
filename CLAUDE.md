@@ -938,13 +938,32 @@ não mudou. O `min-h-full` resolve porque `main` é item de flex com altura defi
 `SettingsScreen`, que é management e não `ModulePage`, tinha o mesmo defeito latente e recebeu o
 mesmo tratamento; tela nova com `SaveBar` precisa da mesma raiz.
 
-**Erro de domínio da API nunca vai cru para o `toast`.** O `catch` do save do registro fazia
-`toast.error(error.message)`, e a mensagem do `LogChannelMissingError` é escrita em inglês, no
-servidor — um painel em pt-BR mostrava _"The log event ... is switched on without a channel"_.
-Quem traduz é o `useApiFailure`, que troca o `code` do corpo (`INVALID_LOG_ROUTE`) por uma frase do
-dicionário; o `ConfigSaveError` carrega o `failure` justamente para isso. E o `then` do save tem
-**dois** ramos: só `state === 'idle'` é "salvou" — um 409 resolvido não é sucesso e não pode
-dizer que foi.
+**Erro de domínio da API nunca vai cru para o `toast`, e agora há teste.** O `catch` do save do
+registro fazia `toast.error(error.message)`, e a mensagem do `LogChannelMissingError` é escrita em
+inglês, no servidor — um painel em pt-BR mostrava _"The log event ... is switched on without a
+channel"_. Quem traduz é o `useApiFailure`, que troca o `code` do corpo (`INVALID_LOG_ROUTE`) por
+uma frase do dicionário; o `ConfigSaveError` carrega o `failure` justamente para isso. E o `then`
+do save tem **dois** ramos: só `state === 'idle'` é "salvou" — um 409 resolvido não é sucesso e
+não pode dizer que foi.
+
+**Consertar a tela que ele viu não conserta a classe, e aqui isso custou a mesma bronca duas
+vezes.** Eu arrumei o toast do registro e deixei `ReactionRolesScreen`, `AutoModScreen` e
+`CaseDrawer` com o mesmo `error instanceof Error ? error.message : …` — foi assim que
+_"A panel needs a name the staff can recognise"_ apareceu num painel em português. O ramo do erro
+agora existe **uma vez**, no `useThrownFailure`: `ConfigSaveError` vira `describe(failure)` e
+qualquer outra coisa vira `INTERNAL_ERROR`, que é a verdade (rede já vira `unreachable()` dentro
+dos clientes, então uma rejeição que não é `ConfigSaveError` é defeito nosso). As quatro chaves
+`unknownFailure` dos dicionários morreram junto.
+
+**O guarda é o `tests/i18n-coverage.test.ts`, que passou a ler chamada de `toast` também.** Ele
+extrai a chamada inteira por contagem de parênteses — ela quase sempre atravessa linhas — e
+reprova duas coisas: `.message`, `.fallback` ou `instanceof Error` dentro dela, e literal de duas
+palavras, porque **chave de i18n não tem espaço** e prosa tem. A primeira versão comparava com uma
+regex de literal e casava o **trecho entre** dois literais (`', { count: … }), { description: t('`),
+acusando dez telas certas; quem resolveu foi tokenizar os literais em ordem em vez de procurá-los.
+Verificado plantando os dois defeitos de volta — o `error.message` e um `toast.success('Panel
+saved')` — e conferindo que o teste nomeia arquivo e linha. O mesmo arquivo foi para o
+`tessera-admin`, onde a classe também já tinha aparecido.
 
 **Compositor sem prévia é escrever às cegas, e duas telas ficaram assim por meses.** Níveis e
 Mensagens agendadas tinham `MessageComposer` e nenhum `DiscordPreview`. O `MessagePreview` é o

@@ -881,7 +881,6 @@
 		"description": "How {brand} behaves in {guild}, and the things you can only do once.",
 		"saved": "Settings saved",
 		"saveFailed": "Could not save",
-		"unknownFailure": "Unknown failure",
 		"notAvailable": "Not available yet",
 		"language": {
 			"title": "Language and time",
@@ -2068,15 +2067,13 @@
 					"body": "Joining, leaving and moving between channels. Noisy on big servers."
 				}
 			},
-			"saveFailed": "Logging settings could not be saved",
-			"unknownFailure": "Unknown failure"
+			"saveFailed": "Logging settings could not be saved"
 		},
 		"moderation": {
 			"title": "Moderation",
 			"description": "Warns, timeouts, mutes and bans — every one of them written to the case log.",
 			"saved": "Moderation settings saved",
 			"saveFailed": "Moderation settings not saved",
-			"unknownFailure": "The API could not be reached",
 			"log": {
 				"title": "Where cases are posted",
 				"description": "Every punishment posts a card here, whoever ran it and wherever from.",
@@ -2352,7 +2349,6 @@
 			"description": "Greet new members and give them a role the moment they join.",
 			"saved": "Welcome settings saved",
 			"saveFailed": "Could not save",
-			"unknownFailure": "Unknown failure",
 			"previewNote": "Variables are shown with sample data. The real post uses the member who joined.",
 			"test": {
 				"action": "Send a test",

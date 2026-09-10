@@ -56,7 +56,7 @@ import type {
 import type { Channel, Role } from '@/lib/types/discord';
 import { cn } from '@/lib/utils/cn';
 import { newId } from '@/lib/utils/id';
-import { useApiFailure } from '@/lib/hooks/useApiFailure';
+import { useApiFailure, useThrownFailure } from '@/lib/hooks/useApiFailure';
 
 const TRIGGERS: { id: AutoModTrigger; icon: LucideIcon }[] = [
 	{ id: 'spam', icon: MessageSquareWarning },
@@ -109,6 +109,7 @@ type AutoModScreenProps = {
 export function AutoModScreen({ guildId, config, version, channels, roles }: AutoModScreenProps) {
 	const t = useTranslations('modules.automod');
 	const describe = useApiFailure();
+	const explain = useThrownFailure();
 	const versionRef = useRef(version);
 
 	const save = useCallback(
@@ -246,7 +247,7 @@ export function AutoModScreen({ guildId, config, version, channels, roles }: Aut
 								toast.success(t('saved'));
 							})
 							.catch((error: unknown) => {
-								toast.error(error instanceof Error ? error.message : t('saveFailed'));
+								toast.error(t('saveFailed'), { description: explain(error) });
 							});
 					}}
 					onResolveConflict={form.resolveConflict}

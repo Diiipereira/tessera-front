@@ -19,13 +19,13 @@ import { avatarLimitLabel, avatarTypesLabel, readAsDataUri, refusalFor } from '@
 import { BRAND } from '@/lib/brand';
 import { EMBED_SWATCHES } from '@/lib/discord-colors';
 import { removeBot, resetAllModules } from '@/lib/guild-bot-client';
-import { ConfigSaveError, useConfigDraft, type SaveOutcome } from '@/lib/hooks/useConfigDraft';
+import { useConfigDraft, type SaveOutcome } from '@/lib/hooks/useConfigDraft';
 import { SUPPORTED_LOCALES } from '@/lib/locale';
 import { toEditableSettings } from '@/lib/settings';
 import { patchSettings } from '@/lib/settings-client';
 import { timezoneOptions } from '@/lib/timezones';
 import type { GuildSettings } from '@/lib/types/management';
-import { useApiFailure } from '@/lib/hooks/useApiFailure';
+import { useApiFailure, useThrownFailure } from '@/lib/hooks/useApiFailure';
 
 type SettingsScreenProps = {
 	guildId: string;
@@ -44,6 +44,7 @@ export function SettingsScreen({
 }: SettingsScreenProps) {
 	const t = useTranslations('settings');
 	const describe = useApiFailure();
+	const explain = useThrownFailure();
 	const localeNames = useTranslations('locales');
 	const save = useCallback(
 		async (next: GuildSettings): Promise<SaveOutcome<GuildSettings>> => {
@@ -130,13 +131,10 @@ export function SettingsScreen({
 			},
 			(error: unknown) => {
 				setRemoving(false);
-				toast.error(t('danger.removeFailed'), {
-					description:
-						error instanceof ConfigSaveError ? describe(error.failure) : t('unknownFailure')
-				});
+				toast.error(t('danger.removeFailed'), { description: explain(error) });
 			}
 		);
-	}, [guildId, guildName, router, t, describe]);
+	}, [guildId, guildName, router, t, describe, explain]);
 
 	const [confirmingReset, setConfirmingReset] = useState(false);
 	const [resetting, setResetting] = useState(false);
@@ -160,13 +158,10 @@ export function SettingsScreen({
 			},
 			(error: unknown) => {
 				setResetting(false);
-				toast.error(t('danger.resetFailed'), {
-					description:
-						error instanceof ConfigSaveError ? describe(error.failure) : t('unknownFailure')
-				});
+				toast.error(t('danger.resetFailed'), { description: explain(error) });
 			}
 		);
-	}, [guildId, router, t, describe]);
+	}, [guildId, router, t, describe, explain]);
 
 	return (
 		<div className="flex min-h-full w-full flex-col p-6 sm:p-8">
@@ -418,10 +413,7 @@ export function SettingsScreen({
 							if (state === 'idle') toast.success(t('saved'));
 						},
 						(error: unknown) => {
-							toast.error(t('saveFailed'), {
-								description:
-									error instanceof ConfigSaveError ? describe(error.failure) : t('unknownFailure')
-							});
+							toast.error(t('saveFailed'), { description: explain(error) });
 						}
 					);
 				}}

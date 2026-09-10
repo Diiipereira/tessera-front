@@ -15,7 +15,7 @@ import { RolePicker } from '@/components/discord/RolePicker';
 import { Button } from '@/components/ui/Button';
 import { Field } from '@/components/ui/Field';
 import { Select } from '@/components/ui/Select';
-import { ConfigSaveError, useConfigDraft, type SaveOutcome } from '@/lib/hooks/useConfigDraft';
+import { useConfigDraft, type SaveOutcome } from '@/lib/hooks/useConfigDraft';
 import { MODULE_HELP } from '@/lib/module-help';
 import { patchModule, sendModuleTest } from '@/lib/module-client';
 import {
@@ -28,7 +28,7 @@ import {
 import type { Channel, Role } from '@/lib/types/discord';
 import type { MessageVariable, WelcomeConfig, WelcomePingMode } from '@/lib/types/modules';
 import { toast } from 'sonner';
-import { useApiFailure } from '@/lib/hooks/useApiFailure';
+import { useApiFailure, useThrownFailure } from '@/lib/hooks/useApiFailure';
 
 const PING_MODES: WelcomePingMode[] = ['none', 'inline', 'ghost'];
 
@@ -66,6 +66,7 @@ export function WelcomeScreen({
 }: WelcomeScreenProps) {
 	const t = useTranslations('modules.welcome');
 	const describe = useApiFailure();
+	const explain = useThrownFailure();
 	const previewText = useTranslations('modules.preview');
 	const switchText = useTranslations('channelSwitch');
 	const versionRef = useRef(version);
@@ -169,10 +170,7 @@ export function WelcomeScreen({
 								if (state === 'idle') toast.success(t('saved'));
 							},
 							(error: unknown) => {
-								toast.error(t('saveFailed'), {
-									description:
-										error instanceof ConfigSaveError ? describe(error.failure) : t('unknownFailure')
-								});
+								toast.error(t('saveFailed'), { description: explain(error) });
 							}
 						);
 					}}

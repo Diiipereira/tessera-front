@@ -881,7 +881,6 @@
 		"description": "Como o {brand} se comporta em {guild}, e as coisas que só dá para fazer uma vez.",
 		"saved": "Configurações salvas",
 		"saveFailed": "Não foi possível salvar",
-		"unknownFailure": "Falha desconhecida",
 		"notAvailable": "Ainda não disponível",
 		"language": {
 			"title": "Idioma e horário",
@@ -2068,15 +2067,13 @@
 					"body": "Entrada, saída e troca de canal. Barulhento em servidor grande."
 				}
 			},
-			"saveFailed": "Não consegui salvar as configurações de logs",
-			"unknownFailure": "Falha desconhecida"
+			"saveFailed": "Não consegui salvar as configurações de logs"
 		},
 		"moderation": {
 			"title": "Moderação",
 			"description": "Advertências, timeouts, silenciamentos e banimentos — todos gravados no registro de casos.",
 			"saved": "Configurações de moderação salvas",
 			"saveFailed": "As configurações de moderação não foram salvas",
-			"unknownFailure": "Não foi possível falar com a API",
 			"log": {
 				"title": "Onde os casos são publicados",
 				"description": "Toda punição publica um card aqui, seja quem for que a aplicou e de onde.",
@@ -2352,7 +2349,6 @@
 			"description": "Receba quem acabou de entrar e dê um cargo na hora.",
 			"saved": "Configurações de boas-vindas salvas",
 			"saveFailed": "Não foi possível salvar",
-			"unknownFailure": "Falha desconhecida",
 			"previewNote": "As variáveis aparecem com dados de exemplo. A mensagem real usa quem entrou.",
 			"test": {
 				"action": "Enviar teste",

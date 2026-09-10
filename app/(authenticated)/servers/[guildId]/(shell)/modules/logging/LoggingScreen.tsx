@@ -17,8 +17,8 @@ import { Badge } from '@/components/ui/Badge';
 import { Popover } from '@/components/ui/Popover';
 import { Select } from '@/components/ui/Select';
 import { Switch } from '@/components/ui/Switch';
-import { ConfigSaveError, useConfigDraft, type SaveOutcome } from '@/lib/hooks/useConfigDraft';
-import { useApiFailure } from '@/lib/hooks/useApiFailure';
+import { useConfigDraft, type SaveOutcome } from '@/lib/hooks/useConfigDraft';
+import { useApiFailure, useThrownFailure } from '@/lib/hooks/useApiFailure';
 import { loadRoutes, saveRoutes, sendLogTest } from '@/lib/logging-client';
 import { MODULE_HELP } from '@/lib/module-help';
 import { useRelativeTime } from '@/lib/hooks/useRelativeTime';
@@ -71,7 +71,7 @@ export function LoggingScreen({
 }: LoggingScreenProps) {
 	const t = useTranslations('modules.logging');
 	const name = eventNamer(t);
-	const describe = useApiFailure();
+	const explain = useThrownFailure();
 	const versionRef = useRef(version);
 
 	const save = useCallback(
@@ -163,10 +163,7 @@ export function LoggingScreen({
 								if (state === 'idle') toast.success(t('saved'));
 							},
 							(error: unknown) => {
-								toast.error(t('saveFailed'), {
-									description:
-										error instanceof ConfigSaveError ? describe(error.failure) : t('unknownFailure')
-								});
+								toast.error(t('saveFailed'), { description: explain(error) });
 							}
 						);
 					}}

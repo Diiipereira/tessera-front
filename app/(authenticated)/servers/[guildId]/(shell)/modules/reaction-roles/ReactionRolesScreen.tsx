@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/Button';
 import { Field } from '@/components/ui/Field';
 import { Input } from '@/components/ui/Input';
 import { Switch } from '@/components/ui/Switch';
+import { useThrownFailure } from '@/lib/hooks/useApiFailure';
 import { useConfigDraft, type SaveOutcome } from '@/lib/hooks/useConfigDraft';
 import { patchModule } from '@/lib/module-client';
 import { loadPanels, savePanels } from '@/lib/reaction-roles-client';
@@ -70,6 +71,7 @@ export function ReactionRolesScreen({
 	botAvatarUrl
 }: ReactionRolesScreenProps) {
 	const t = useTranslations('modules.reactionRoles');
+	const explain = useThrownFailure();
 	const preview = useTranslations('modules.preview');
 	const versionRef = useRef(version);
 
@@ -220,7 +222,7 @@ export function ReactionRolesScreen({
 								toast.success(t('saved'));
 							})
 							.catch((error: unknown) => {
-								toast.error(error instanceof Error ? error.message : t('saveFailed'));
+								toast.error(t('saveFailed'), { description: explain(error) });
 							});
 					}}
 					onResolveConflict={form.resolveConflict}

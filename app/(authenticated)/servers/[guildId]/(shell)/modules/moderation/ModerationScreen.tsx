@@ -16,7 +16,7 @@ import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { Textarea } from '@/components/ui/Textarea';
 import { Switch } from '@/components/ui/Switch';
-import { ConfigSaveError, useConfigDraft, type SaveOutcome } from '@/lib/hooks/useConfigDraft';
+import { useConfigDraft, type SaveOutcome } from '@/lib/hooks/useConfigDraft';
 import { MODULE_HELP } from '@/lib/module-help';
 import { patchModule } from '@/lib/module-client';
 import {
@@ -36,7 +36,7 @@ import {
 import type { Channel, Role } from '@/lib/types/discord';
 import { LadderEditor } from './LadderEditor';
 import { toast } from 'sonner';
-import { useApiFailure } from '@/lib/hooks/useApiFailure';
+import { useThrownFailure } from '@/lib/hooks/useApiFailure';
 
 const PURGE_DAYS = Array.from({ length: MAX_PURGE_DAYS + 1 }, (_, day) => day);
 
@@ -58,7 +58,7 @@ export function ModerationScreen({
 	roles
 }: ModerationScreenProps) {
 	const t = useTranslations('modules.moderation');
-	const describe = useApiFailure();
+	const explain = useThrownFailure();
 	const shared = useTranslations('modules');
 	const durations = useTranslations('durations');
 	const actions = useTranslations('cases.action');
@@ -113,10 +113,7 @@ export function ModerationScreen({
 								if (state === 'idle') toast.success(t('saved'));
 							},
 							(error: unknown) => {
-								toast.error(t('saveFailed'), {
-									description:
-										error instanceof ConfigSaveError ? describe(error.failure) : t('unknownFailure')
-								});
+								toast.error(t('saveFailed'), { description: explain(error) });
 							}
 						);
 					}}

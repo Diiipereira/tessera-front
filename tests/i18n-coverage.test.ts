@@ -16,17 +16,21 @@ const PROSE_TEMPLATE = /`[^`$]*[A-Za-z]{3,}[^`$]* [A-Za-z]{2,}[^`]*`/;
 
 const KEYWORDS = new Set(['return', 'export', 'default', 'from', 'true', 'false', 'type']);
 
-function sources(dir: string): string[] {
+function sources(dir: string, wanted: (name: string) => boolean): string[] {
 	return readdirSync(dir).flatMap((name) => {
 		const path = join(dir, name);
 
 		if (statSync(path).isDirectory()) {
-			return SKIP_DIRS.has(name) ? [] : sources(path);
+			return SKIP_DIRS.has(name) ? [] : sources(path, wanted);
 		}
 
-		return name.endsWith('.tsx') && !/\.(test|spec)\.tsx$/.test(name) ? [path] : [];
+		return wanted(name) && !/\.(test|spec)\.tsx?$/.test(name) ? [path] : [];
 	});
 }
+
+const MARKUP = (name: string): boolean => name.endsWith('.tsx');
+
+const CODE = (name: string): boolean => name.endsWith('.ts') || name.endsWith('.tsx');
 
 function inJsx(lines: string[], index: number): boolean {
 	const before = [...lines.slice(0, index)].reverse().find((line) => line.trim() !== '') ?? '';
@@ -70,7 +74,10 @@ function flatten(node: Tree, prefix = ''): string[] {
 }
 
 describe('every screen speaks the language of whoever is looking', () => {
-	const files = [...sources(join(ROOT, 'app')), ...sources(join(ROOT, 'components'))]
+	const files = [
+		...sources(join(ROOT, 'app'), MARKUP),
+		...sources(join(ROOT, 'components'), MARKUP)
+	]
 		.map((path) => relative(ROOT, path).split(String.fromCharCode(92)).join('/'))
 		.filter((path) => !OUTSIDE_THE_PROVIDER.includes(path));
 
@@ -80,6 +87,93 @@ describe('every screen speaks the language of whoever is looking', () => {
 
 	it.each(files)('%s has no sentence written straight into the markup', (path) => {
 		expect(leaks(join(ROOT, path))).toEqual([]);
+	});
+});
+
+const RAW_RUNTIME_TEXT = /\.message\b|\.fallback\b|instanceof Error/;
+
+const INTERPOLATION = /\$\{[^}]*\}/g;
+
+const TWO_WORDS = /[A-Za-z]{2,}[^\n]*\s[^\n]*[A-Za-z]{2,}/;
+
+function literalsIn(text: string): string[] {
+	const found: string[] = [];
+	let cursor = 0;
+
+	while (cursor < text.length) {
+		const quote = text[cursor];
+
+		if (quote !== "'" && quote !== '"' && quote !== '`') {
+			cursor += 1;
+			continue;
+		}
+
+		let end = cursor + 1;
+
+		while (end < text.length && text[end] !== quote) {
+			end += text[end] === String.fromCharCode(92) ? 2 : 1;
+		}
+
+		found.push(text.slice(cursor + 1, end));
+		cursor = end + 1;
+	}
+
+	return found;
+}
+
+const isProse = (literal: string): boolean => TWO_WORDS.test(literal.replace(INTERPOLATION, ''));
+
+type ToastCall = { line: number; text: string };
+
+function toastCalls(source: string): ToastCall[] {
+	const calls: ToastCall[] = [];
+	const opener = /\btoast\.[a-z]+\(/g;
+	let found = opener.exec(source);
+
+	while (found !== null) {
+		let depth = 1;
+		let cursor = found.index + found[0].length;
+
+		while (cursor < source.length && depth > 0) {
+			if (source[cursor] === '(') depth += 1;
+			if (source[cursor] === ')') depth -= 1;
+			cursor += 1;
+		}
+
+		calls.push({
+			line: source.slice(0, found.index).split('\n').length,
+			text: source.slice(found.index, cursor)
+		});
+
+		found = opener.exec(source);
+	}
+
+	return calls;
+}
+
+function shouts(path: string): string[] {
+	const source = readFileSync(path, 'utf8');
+
+	return toastCalls(source)
+		.filter(({ text }) => RAW_RUNTIME_TEXT.test(text) || literalsIn(text).some(isProse))
+		.map(({ line, text }) => `${String(line)}: ${text.split('\n')[0] ?? ''}`);
+}
+
+describe('a toast never shows text the reader did not ask for in their language', () => {
+	const toasting = [
+		...sources(join(ROOT, 'app'), CODE),
+		...sources(join(ROOT, 'components'), CODE),
+		...sources(join(ROOT, 'lib'), CODE)
+	]
+		.map((path) => relative(ROOT, path).split(String.fromCharCode(92)).join('/'))
+		.filter((path) => readFileSync(join(ROOT, path), 'utf8').includes('toast.'));
+
+	it('finds the screens that raise toasts, so an empty sweep cannot pass as clean', () => {
+		expect(toasting.length).toBeGreaterThan(20);
+	});
+
+	it.each(toasting)('%s hands every toast a translated sentence', (path) => {
+		expect(shouts(join(ROOT, path))).toEqual([]);
 	});
 });
 
