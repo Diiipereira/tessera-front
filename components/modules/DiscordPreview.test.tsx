@@ -127,3 +127,29 @@ describe('the name on the preview', () => {
 		expect(screen.getByText(BRAND.botName)).toBeInTheDocument();
 	});
 });
+
+describe('the face on the preview', () => {
+	it('wears the picture the server gave the bot', () => {
+		render(
+			<DiscordPreview
+				message={plainDraft}
+				variables={[]}
+				botAvatarUrl="https://cdn.discordapp.com/guilds/g/users/u/avatars/h.png?size=128"
+			/>,
+			{ wrapper: Translated }
+		);
+
+		expect(screen.getByRole('presentation')).toHaveAttribute(
+			'src',
+			'https://cdn.discordapp.com/guilds/g/users/u/avatars/h.png?size=128'
+		);
+	});
+
+	it('falls back to initials when the server set no picture', () => {
+		render(<DiscordPreview message={plainDraft} variables={[]} botName="Tessera Dev" />, {
+			wrapper: Translated
+		});
+
+		expect(screen.getByText('TE')).toBeInTheDocument();
+	});
+});

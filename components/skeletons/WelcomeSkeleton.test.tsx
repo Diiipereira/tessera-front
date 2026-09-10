@@ -53,6 +53,7 @@ function renderScreen() {
 				roles={roles}
 				variables={welcomeVariables('Tessera Dev')}
 				botName="Tessera Dev"
+				botAvatarUrl={null}
 			/>
 		</TooltipProvider>,
 		{ wrapper: Translated }

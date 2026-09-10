@@ -14,6 +14,7 @@ type DiscordPreviewProps = {
 	variables: MessageVariable[];
 	timestampLabel?: string;
 	botName?: string;
+	botAvatarUrl?: string | null;
 };
 
 const initialsOf = (name: string): string => name.slice(0, 2).toUpperCase();
@@ -95,7 +96,8 @@ export function DiscordPreview({
 	message,
 	variables,
 	timestampLabel,
-	botName
+	botName,
+	botAvatarUrl
 }: DiscordPreviewProps) {
 	const t = useTranslations('modules.preview');
 	const shown = botName === undefined || botName === '' ? BRAND.botName : botName;
@@ -116,13 +118,17 @@ export function DiscordPreview({
 			style={{ backgroundColor: DISCORD.surface, color: DISCORD.text }}
 		>
 			<div className="flex gap-3">
-				<span
-					aria-hidden="true"
-					className="grid size-10 shrink-0 place-items-center rounded-full text-[13px] font-bold text-white"
-					style={{ backgroundColor: EMBED_SWATCHES[0] }}
-				>
-					{initialsOf(shown)}
-				</span>
+				{botAvatarUrl == null ? (
+					<span
+						aria-hidden="true"
+						className="grid size-10 shrink-0 place-items-center rounded-full text-[13px] font-bold text-white"
+						style={{ backgroundColor: EMBED_SWATCHES[0] }}
+					>
+						{initialsOf(shown)}
+					</span>
+				) : (
+					<img src={botAvatarUrl} alt="" className="size-10 shrink-0 rounded-full object-cover" />
+				)}
 
 				<div className="min-w-0 flex-1">
 					<div className="flex items-center gap-2">

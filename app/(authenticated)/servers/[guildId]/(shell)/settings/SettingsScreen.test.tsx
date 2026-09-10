@@ -2,6 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createTranslator } from 'next-intl';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { avatarLimitLabel, avatarTypesLabel } from '@/lib/avatar-file';
 import { BRAND } from '@/lib/brand';
 import type { GuildSettings } from '@/lib/types/management';
 import enUS from '@/messages/en-US.json';
@@ -53,9 +54,17 @@ const t = createTranslator({ locale: 'en-US', messages: enUS });
 const UNBUILT = [copy.backup.export, copy.backup.import];
 
 function setup() {
-	return render(<SettingsScreen guildId={GUILD_ID} settings={SETTINGS} guildName={GUILD_NAME} />, {
-		wrapper: Translated
-	});
+	return render(
+		<SettingsScreen
+			guildId={GUILD_ID}
+			settings={SETTINGS}
+			guildName={GUILD_NAME}
+			botAvatarUrl={null}
+		/>,
+		{
+			wrapper: Translated
+		}
+	);
 }
 
 async function confirmRemoval() {
@@ -218,13 +227,62 @@ describe('SettingsScreen', () => {
 	});
 
 	it('reads in the language the reader picked, not in English by default', () => {
-		render(<SettingsScreen guildId={GUILD_ID} settings={SETTINGS} guildName={GUILD_NAME} />, {
-			wrapper: ({ children }) => <Translated locale="pt-BR">{children}</Translated>
-		});
+		render(
+			<SettingsScreen
+				guildId={GUILD_ID}
+				settings={SETTINGS}
+				guildName={GUILD_NAME}
+				botAvatarUrl={null}
+			/>,
+			{
+				wrapper: ({ children }) => <Translated locale="pt-BR">{children}</Translated>
+			}
+		);
 
 		expect(
 			screen.getByRole('heading', { name: ptBR.settings.title, level: 1 })
 		).toBeInTheDocument();
 		expect(screen.getByText(ptBR.settings.danger.title)).toBeInTheDocument();
+	});
+});
+
+describe("the bot's picture", () => {
+	it('says the server has none instead of showing a broken image', () => {
+		setup();
+
+		expect(screen.getByText(copy.appearance.avatarEmpty)).toBeInTheDocument();
+		expect(
+			screen.getByRole('button', { name: new RegExp(copy.appearance.avatarChoose) })
+		).toBeInTheDocument();
+	});
+
+	it('shows the picture the server already set, and offers to remove it', () => {
+		render(
+			<SettingsScreen
+				guildId={GUILD_ID}
+				settings={SETTINGS}
+				guildName={GUILD_NAME}
+				botAvatarUrl="https://cdn.discordapp.com/guilds/g/users/u/avatars/h.png?size=128"
+			/>,
+			{ wrapper: Translated }
+		);
+
+		expect(
+			screen.getByRole('button', { name: new RegExp(copy.appearance.avatarRemove) })
+		).toBeInTheDocument();
+		expect(screen.queryByText(copy.appearance.avatarEmpty)).not.toBeInTheDocument();
+	});
+
+	it('says only this server is affected, and names the formats and the size', () => {
+		setup();
+
+		const hint = t('settings.appearance.avatarHint', {
+			types: avatarTypesLabel(),
+			limit: avatarLimitLabel()
+		});
+
+		expect(screen.getByText(hint)).toBeInTheDocument();
+		expect(hint).toContain('GIF');
+		expect(hint).toContain('2 MB');
 	});
 });

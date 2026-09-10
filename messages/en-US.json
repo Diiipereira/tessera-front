@@ -843,7 +843,17 @@
 			"useColor": "Use {color}",
 			"embedColorHex": "Embed colour hex",
 			"nickname": "Bot nickname",
-			"nicknameHint": "Empty keeps {brand}. Members see this name in the sidebar."
+			"nicknameHint": "Empty keeps {brand}. Members see this name in the sidebar.",
+			"avatar": "Bot picture",
+			"avatarHint": "This server only — the Tessera picture on other servers stays as it is. {types}, up to {limit}.",
+			"avatarChoose": "Choose a picture",
+			"avatarReplace": "Replace picture",
+			"avatarRemove": "Remove picture",
+			"avatarEmpty": "No picture of its own on this server",
+			"avatarWrongType": "The picture has to be a PNG, a JPEG or a GIF.",
+			"avatarTooLarge": "The picture has to be {limit} or smaller.",
+			"avatarSaved": "Picture changed on this server.",
+			"avatarRemoved": "Picture removed."
 		},
 		"backup": {
 			"title": "Backup and restore",

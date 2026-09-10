@@ -85,6 +85,7 @@ function renderScreen(overrides: Partial<WelcomeConfig> = {}) {
 				roles={roles}
 				variables={variables}
 				botName="Tessera Dev"
+				botAvatarUrl={null}
 			/>
 		</TooltipProvider>,
 		{ wrapper: Translated }

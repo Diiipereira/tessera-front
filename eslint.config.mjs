@@ -151,7 +151,7 @@ export default ts.config(
 		}
 	},
 	{
-		files: ['components/modules/DiscordPreview.tsx'],
+		files: ['components/modules/DiscordPreview.tsx', '**/settings/SettingsScreen.tsx'],
 		rules: { '@next/next/no-img-element': 'off' }
 	},
 	{

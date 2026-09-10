@@ -843,7 +843,17 @@
 			"useColor": "Usar {color}",
 			"embedColorHex": "Cor dos embeds em hexadecimal",
 			"nickname": "Apelido do bot",
-			"nicknameHint": "Vazio mantém {brand}. Os membros veem este nome na barra lateral."
+			"nicknameHint": "Vazio mantém {brand}. Os membros veem este nome na barra lateral.",
+			"avatar": "Foto do bot",
+			"avatarHint": "Vale só neste servidor — a foto do Tessera em outros servidores não muda. {types}, até {limit}.",
+			"avatarChoose": "Escolher foto",
+			"avatarReplace": "Trocar foto",
+			"avatarRemove": "Remover foto",
+			"avatarEmpty": "Sem foto própria neste servidor",
+			"avatarWrongType": "A foto precisa ser PNG, JPEG ou GIF.",
+			"avatarTooLarge": "A foto precisa ter até {limit}.",
+			"avatarSaved": "Foto trocada neste servidor.",
+			"avatarRemoved": "Foto removida."
 		},
 		"backup": {
 			"title": "Backup e restauração",

@@ -6,7 +6,7 @@ import { ApiUnreachableError, resolveGuild } from '@/lib/guild-access';
 import { loadChannels, loadRoles } from '@/lib/guild-shape';
 import { toWelcomeConfig, welcomeVariables } from '@/lib/modules/welcome';
 import type { GuildPageProps } from '@/lib/types/page';
-import type { GuildSettings } from '@/lib/types/management';
+import type { GuildSettingsDto } from '@/lib/types/management';
 import { WelcomeScreen } from './WelcomeScreen';
 
 export const metadata = { title: 'Welcome' };
@@ -19,7 +19,7 @@ export default async function Page({ params, searchParams }: GuildPageProps) {
 
 	const [state, settings, channels, roles] = await Promise.all([
 		apiGet<GuildModuleStateDto>(`/guilds/${guildId}/modules/welcome`),
-		apiGet<GuildSettings>(`/guilds/${guildId}/settings`),
+		apiGet<GuildSettingsDto>(`/guilds/${guildId}/settings`),
 		loadChannels(guildId),
 		loadRoles(guildId)
 	]);
@@ -41,6 +41,7 @@ export default async function Page({ params, searchParams }: GuildPageProps) {
 			roles={roles}
 			variables={welcomeVariables(guild.name)}
 			botName={settings.data.botNickname}
+			botAvatarUrl={settings.data.botAvatarUrl}
 		/>
 	);
 }

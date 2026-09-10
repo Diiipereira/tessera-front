@@ -3,7 +3,7 @@
 import { Download, RotateCcw, Trash2, Upload } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
-import { useCallback, useMemo, useState, type ReactNode } from 'react';
+import { useCallback, useMemo, useRef, useState, type ReactNode } from 'react';
 import { toast } from 'sonner';
 import { ConfirmDialog } from '@/components/management/ConfirmDialog';
 import { PageHeader } from '@/components/management/PageHeader';
@@ -15,6 +15,7 @@ import { Combobox } from '@/components/ui/Combobox';
 import { Field } from '@/components/ui/Field';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
+import { avatarLimitLabel, avatarTypesLabel, readAsDataUri, refusalFor } from '@/lib/avatar-file';
 import { BRAND } from '@/lib/brand';
 import { EMBED_SWATCHES } from '@/lib/discord-colors';
 import { removeBot, resetAllModules } from '@/lib/guild-bot-client';
@@ -29,9 +30,17 @@ type SettingsScreenProps = {
 	guildId: string;
 	settings: GuildSettings;
 	guildName: string;
+	botAvatarUrl: string | null;
 };
 
-export function SettingsScreen({ guildId, settings, guildName }: SettingsScreenProps) {
+const AVATAR_LIMIT_LABEL = avatarLimitLabel();
+
+export function SettingsScreen({
+	guildId,
+	settings,
+	guildName,
+	botAvatarUrl
+}: SettingsScreenProps) {
 	const t = useTranslations('settings');
 	const localeNames = useTranslations('locales');
 	const save = useCallback(
@@ -51,6 +60,54 @@ export function SettingsScreen({ guildId, settings, guildName }: SettingsScreenP
 	const router = useRouter();
 	const [confirmingRemoval, setConfirmingRemoval] = useState(false);
 	const [removing, setRemoving] = useState(false);
+	const [avatarUrl, setAvatarUrl] = useState(botAvatarUrl);
+	const [sendingAvatar, setSendingAvatar] = useState(false);
+	const filePicker = useRef<HTMLInputElement>(null);
+
+	const sendAvatar = useCallback(
+		async (botAvatar: string | null): Promise<void> => {
+			setSendingAvatar(true);
+
+			const result = await patchSettings(guildId, { botAvatar });
+
+			setSendingAvatar(false);
+
+			if (result.status === 'error') {
+				toast.error(result.message);
+				return;
+			}
+
+			setAvatarUrl(result.settings.botAvatarUrl);
+			toast.success(t(botAvatar === null ? 'appearance.avatarRemoved' : 'appearance.avatarSaved'));
+		},
+		[guildId, t]
+	);
+
+	const chooseAvatar = useCallback(
+		(file: File | undefined): void => {
+			if (file === undefined) return;
+
+			const refusal = refusalFor(file);
+
+			if (refusal === 'type') {
+				toast.error(t('appearance.avatarWrongType'));
+				return;
+			}
+
+			if (refusal === 'size') {
+				toast.error(t('appearance.avatarTooLarge', { limit: AVATAR_LIMIT_LABEL }));
+				return;
+			}
+
+			void readAsDataUri(file).then(
+				(uri) => sendAvatar(uri),
+				() => {
+					toast.error(t('appearance.avatarWrongType'));
+				}
+			);
+		},
+		[sendAvatar, t]
+	);
 
 	const leave = useCallback(() => {
 		setRemoving(true);
@@ -190,6 +247,68 @@ export function SettingsScreen({ guildId, settings, guildName }: SettingsScreenP
 							placeholder={BRAND.name}
 							className="max-w-80"
 						/>
+					</Field>
+					<Field
+						label={t('appearance.avatar')}
+						hint={t('appearance.avatarHint', {
+							types: avatarTypesLabel(),
+							limit: AVATAR_LIMIT_LABEL
+						})}
+					>
+						<div className="flex items-center gap-4">
+							{avatarUrl === null ? (
+								<span className="text-muted-foreground grid size-16 shrink-0 place-items-center rounded-full border border-dashed text-[11px]">
+									{BRAND.name.slice(0, 2).toUpperCase()}
+								</span>
+							) : (
+								<img
+									src={avatarUrl}
+									alt=""
+									className="size-16 shrink-0 rounded-full object-cover"
+								/>
+							)}
+
+							<div className="flex flex-wrap items-center gap-2">
+								<input
+									ref={filePicker}
+									type="file"
+									accept="image/png,image/jpeg,image/gif"
+									className="hidden"
+									aria-label={t('appearance.avatar')}
+									onChange={(event) => {
+										chooseAvatar(event.target.files?.[0]);
+										event.target.value = '';
+									}}
+								/>
+								<Button
+									type="button"
+									variant="secondary"
+									disabled={sendingAvatar}
+									onClick={() => filePicker.current?.click()}
+								>
+									<Upload className="size-4" />
+									{t(avatarUrl === null ? 'appearance.avatarChoose' : 'appearance.avatarReplace')}
+								</Button>
+
+								{avatarUrl === null ? (
+									<span className="text-muted-foreground text-xs">
+										{t('appearance.avatarEmpty')}
+									</span>
+								) : (
+									<Button
+										type="button"
+										variant="ghost"
+										disabled={sendingAvatar}
+										onClick={() => {
+											void sendAvatar(null);
+										}}
+									>
+										<Trash2 className="size-4" />
+										{t('appearance.avatarRemove')}
+									</Button>
+								)}
+							</div>
+						</div>
 					</Field>
 				</SettingsSection>
 

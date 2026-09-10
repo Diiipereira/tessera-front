@@ -26,6 +26,7 @@ export default async function Page({ params, searchParams }: GuildPageProps) {
 			guildId={guildId}
 			settings={toEditableSettings(settings.data)}
 			guildName={guild.name}
+			botAvatarUrl={settings.data.botAvatarUrl}
 		/>
 	);
 }

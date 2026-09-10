@@ -1,6 +1,6 @@
 import { apiBaseUrl } from '@/lib/api-url';
 import { describeFailure, type ErrorBody } from '@/lib/module-client';
-import type { GuildSettingsDto } from '@/lib/types/management';
+import type { GuildSettingsDto, GuildSettingsPatch } from '@/lib/types/management';
 
 export type SettingsWriteResult =
 	{ status: 'saved'; settings: GuildSettingsDto } | { status: 'error'; message: string };
@@ -9,7 +9,7 @@ const settingsUrl = (guildId: string): string => `${apiBaseUrl()}/guilds/${guild
 
 export async function patchSettings(
 	guildId: string,
-	body: Partial<GuildSettingsDto>
+	body: GuildSettingsPatch
 ): Promise<SettingsWriteResult> {
 	let response: Response;
 

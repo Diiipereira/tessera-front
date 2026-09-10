@@ -174,4 +174,10 @@ export type GuildSettings = {
 
 export type GuildSettingsDto = GuildSettings & {
 	setupCompleted: boolean;
+	botAvatarUrl: string | null;
+};
+
+export type GuildSettingsPatch = Partial<GuildSettings> & {
+	setupCompleted?: boolean;
+	botAvatar?: string | null;
 };

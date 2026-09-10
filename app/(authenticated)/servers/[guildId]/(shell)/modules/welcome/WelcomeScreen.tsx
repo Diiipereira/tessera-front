@@ -47,6 +47,7 @@ type WelcomeScreenProps = {
 	roles: Role[];
 	variables: MessageVariable[];
 	botName: string;
+	botAvatarUrl: string | null;
 };
 
 export function WelcomeScreen({
@@ -57,7 +58,8 @@ export function WelcomeScreen({
 	channels,
 	roles,
 	variables,
-	botName
+	botName,
+	botAvatarUrl
 }: WelcomeScreenProps) {
 	const t = useTranslations('modules.welcome');
 	const previewText = useTranslations('modules.preview');
@@ -115,7 +117,12 @@ export function WelcomeScreen({
 		>
 			<h2 className="min-w-0 truncate text-h4">{previewText('title')}</h2>
 
-			<DiscordPreview message={draft.message} variables={variables} botName={botName} />
+			<DiscordPreview
+				message={draft.message}
+				variables={variables}
+				botName={botName}
+				botAvatarUrl={botAvatarUrl}
+			/>
 
 			<p className="text-caption font-normal text-text-muted">{t('previewNote')}</p>
 		</section>
