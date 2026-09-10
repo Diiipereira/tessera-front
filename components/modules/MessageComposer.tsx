@@ -32,9 +32,15 @@ type MessageComposerProps = {
 	value: MessageDraft;
 	onChange: (value: MessageDraft) => void;
 	variables: MessageVariable[];
+	modes?: MessageMode[];
 };
 
-export function MessageComposer({ value, onChange, variables }: MessageComposerProps) {
+export function MessageComposer({
+	value,
+	onChange,
+	variables,
+	modes = MODES
+}: MessageComposerProps) {
 	const t = useTranslations('modules.composer');
 	const urls = useTranslations('modules.url');
 	const uid = useId();
@@ -108,9 +114,12 @@ export function MessageComposer({ value, onChange, variables }: MessageComposerP
 				<div
 					role="group"
 					aria-label={t('format')}
-					className="flex items-center gap-0.5 rounded-md border border-border bg-surface-sunken p-0.5"
+					className={cn(
+						'flex items-center gap-0.5 rounded-md border border-border bg-surface-sunken p-0.5',
+						modes.length < 2 && 'hidden'
+					)}
 				>
-					{MODES.map((mode) => (
+					{modes.map((mode) => (
 						<button
 							key={mode}
 							type="button"

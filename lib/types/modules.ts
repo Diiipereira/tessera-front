@@ -36,6 +36,7 @@ export type EmbedField = {
 
 export type EmbedDraft = {
 	authorName: string;
+	authorIconUrl?: string;
 	title: string;
 	description: string;
 	color: string;

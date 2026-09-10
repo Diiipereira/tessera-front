@@ -30,6 +30,7 @@ export type LogEvent = {
 	group: LogGroup;
 	channelId: string | null;
 	enabled: boolean;
+	template: Record<string, unknown> | null;
 };
 
 export type LoggingConfig = {

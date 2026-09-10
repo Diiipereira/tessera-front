@@ -985,7 +985,29 @@
 				"channel": "O canal em que a mensagem cai",
 				"date": "A data de hoje no fuso do servidor",
 				"level": "O nível do membro",
-				"balance": "O saldo do membro"
+				"balance": "O saldo do membro",
+				"logLine": "A frase que o Tessera escreveria",
+				"logEvent": "O nome do evento",
+				"logServer": "O nome do servidor",
+				"logWho": "O nome de quem o registro fala",
+				"logAvatar": "A foto de quem o registro fala",
+				"logId": "O id que vai no rodapé",
+				"logMember": "O membro de quem o registro fala",
+				"logModerator": "Quem fez, segundo a auditoria",
+				"logChannel": "O canal onde aconteceu",
+				"logContent": "O texto da mensagem",
+				"logBefore": "Como era antes",
+				"logAfter": "Como ficou",
+				"logReason": "O motivo informado",
+				"logRoles": "Os cargos que tinha",
+				"logAdded": "Os cargos ganhos",
+				"logRemoved": "Os cargos perdidos",
+				"logCount": "Quantos",
+				"logName": "O nome do que mudou",
+				"logCreated": "Quando a conta foi criada",
+				"logUntil": "Até quando vale",
+				"logFrom": "O canal de onde veio",
+				"logLink": "Um link de volta para a mensagem"
 			}
 		},
 		"composer": {
@@ -1819,11 +1841,109 @@
 			"events": {
 				"title": "Eventos",
 				"description": "{enabled} de {total} eventos estão sendo registrados.",
-				"missing": "{count, plural, =1 {1 evento está ligado sem canal definido — ele não vai ser registrado em lugar nenhum.} other {# eventos estão ligados sem canal definido — eles não vão ser registrados em lugar nenhum.}}",
+				"help": {
+					"label": "Ajuda sobre os eventos",
+					"title": "Cada evento tem canal e chave próprios",
+					"body": "Ligar um evento é fazer as duas coisas: escolher o canal e virar a chave.",
+					"points": {
+						"channel": {
+							"title": "Um canal por evento, não um por servidor",
+							"body": "Apontar todos para um canal preenche o grupo inteiro de uma vez, e depois ainda dá para trocar um a um."
+						},
+						"needsChannel": {
+							"title": "Evento ligado sem canal barra o salvamento",
+							"body": "A API recusa a lista inteira, então o aviso amarelo lá em cima precisa ser resolvido antes de salvar."
+						},
+						"permission": {
+							"title": "O Tessera precisa enxergar e escrever no canal escolhido",
+							"body": "Sem permissão o registro some sem erro nenhum na tela, só um aviso no log do bot."
+						},
+						"bots": {
+							"title": "Mensagem de bot nunca é registrada",
+							"body": "Vale para apagada e para editada, incluindo as do próprio Tessera."
+						},
+						"cache": {
+							"title": "Ele só sabe contar o que viu",
+							"body": "Mensagem apagada muito tempo depois de enviada chega sem conteúdo e sem autor, porque o Discord manda só o id."
+						},
+						"who": {
+							"title": "Quem fez vem do registro de auditoria",
+							"body": "O Tessera lê isso com a permissão Ver Registro de Auditoria. Sem ela o registro sai do mesmo jeito, só que sem nome."
+						}
+					}
+				},
+				"missing": "{count, plural, =1 {O evento {names} está ligado sem canal. Escolha um canal ou desligue o evento, porque assim o salvamento é recusado.} other {Estes eventos estão ligados sem canal: {names}. Escolha um canal ou desligue os eventos, porque assim o salvamento é recusado.}}",
 				"noChannel": "Nenhum canal…",
 				"log": "Registrar {name}",
 				"setAll": "Apontar todos para um canal",
 				"setAllHint": "Vale para todo evento de {group}, ligado ou não."
+			},
+			"preview": {
+				"title": "Prévia",
+				"description": "Como o registro aparece no canal, com dados de exemplo.",
+				"event": "Evento",
+				"unknown": "desconhecido",
+				"help": {
+					"label": "Ajuda sobre a prévia",
+					"title": "Dado inventado, forma real",
+					"body": "Os nomes e o texto são de mentira; a cor, a frase e os campos são os que o Tessera envia.",
+					"points": {
+						"server": {
+							"title": "Ela é lida no idioma do servidor",
+							"body": "Troque o idioma em Configurações e o registro muda junto, para quem quer que esteja olhando."
+						},
+						"audit": {
+							"title": "Quem fez vem do registro de auditoria do Discord",
+							"body": "O Tessera precisa da permissão Ver Registro de Auditoria para nomear um moderador, e alguns atos não têm ninguém a nomear."
+						},
+						"avatar": {
+							"title": "A foto e o nome saem de quem o registro fala",
+							"body": "O exemplo não tem foto, então o bloco aparece só com o nome."
+						}
+					}
+				}
+			},
+			"test": {
+				"action": "Enviar teste",
+				"dirty": "Salve as alterações antes de enviar um teste.",
+				"sent": "Teste enviado no canal deste evento",
+				"notReady": "Nada foi enviado: o módulo está desligado, ou este evento não tem canal.",
+				"channelRefused": "Não consegui escrever no canal — confira se ele existe e se eu posso postar lá.",
+				"failed": "Não foi possível enviar o teste"
+			},
+			"template": {
+				"edit": "Personalizar",
+				"editOne": "Personalizar o registro de {name}",
+				"title": "O seu registro de {name}",
+				"description": "Escreva o embed que o Tessera envia. Deixe vazio e vale o padrão.",
+				"custom": "Personalizado",
+				"reset": "Voltar ao padrão",
+				"apply": "Usar este registro",
+				"preview": "Como vai ficar",
+				"failed": "Não consegui desenhar a prévia",
+				"help": {
+					"label": "Ajuda sobre personalizar",
+					"title": "Template vazio quer dizer o padrão",
+					"body": "O que você deixar em branco, o Tessera escreve como sempre escreveu.",
+					"points": {
+						"line": {
+							"title": "A frase padrão é uma variável também",
+							"body": "Ponha '{'line'}' na descrição para manter o que o Tessera escreveria e acrescentar em volta."
+						},
+						"tokens": {
+							"title": "As variáveis mudam conforme o evento",
+							"body": "Um banimento tem moderador e motivo; uma entrada não tem nenhum dos dois. Só é oferecido o que o evento carrega."
+						},
+						"empty": {
+							"title": "Variável que o evento não carrega sai vazia",
+							"body": "Não é erro e não impede o registro de sair."
+						},
+						"save": {
+							"title": "Só vale depois de salvar a tela",
+							"body": "Fechar este diálogo guarda o rascunho; quem grava é a barra de salvar."
+						}
+					}
+				}
 			},
 			"groups": {
 				"Messages": "Mensagens",
@@ -1837,8 +1957,46 @@
 				"description": "Nada que venha daqui é registrado, independentemente dos eventos.",
 				"channels": "Canais ignorados",
 				"channelsPlaceholder": "Nada ignorado…",
+				"channelsHelp": {
+					"label": "Ajuda sobre canais ignorados",
+					"title": "Ele só silencia os eventos que acontecem num canal",
+					"body": "Entrada, banimento ou mudança no servidor não pertencem a canal nenhum, então passam direto.",
+					"points": {
+						"reaches": {
+							"title": "Alcança mensagem apagada, editada, exclusão em massa e voz",
+							"body": "São os eventos que sabem dizer em que canal aconteceram."
+						},
+						"one": {
+							"title": "A tela guarda um canal por vez",
+							"body": "Escolher outro substitui o anterior."
+						},
+						"still": {
+							"title": "Ignorar não impede nada de acontecer",
+							"body": "A mensagem continua sendo apagada; o que não acontece é o registro sobre ela."
+						}
+					}
+				},
 				"roles": "Cargos ignorados",
-				"rolesPlaceholder": "Ninguém ignorado…"
+				"rolesPlaceholder": "Ninguém ignorado…",
+				"rolesHelp": {
+					"label": "Ajuda sobre cargos ignorados",
+					"title": "Quem tem um destes cargos não vira registro",
+					"body": "Não precisa ter todos: um cargo da lista já basta.",
+					"points": {
+						"reaches": {
+							"title": "Alcança os eventos que carregam quem agiu",
+							"body": "Mensagem apagada e editada, saída, apelido, timeout e voz."
+						},
+						"blind": {
+							"title": "Entrada, banimento e exclusão em massa passam",
+							"body": "Nesses o registro não carrega cargo de ninguém, então a lista não tem o que comparar."
+						},
+						"use": {
+							"title": "Serve para tirar barulho, não para esconder gente",
+							"body": "O ato continua acontecendo, e continua aparecendo na auditoria que o próprio Discord guarda."
+						}
+					}
+				}
 			},
 			"event": {
 				"message_delete": {
@@ -1859,34 +2017,51 @@
 				},
 				"member_leave": {
 					"name": "Membro saiu",
-					"body": "E que cargos tinha."
+					"body": "Que cargos tinha, e se foi expulso."
 				},
 				"nickname": {
 					"name": "Apelido alterado",
 					"body": "Antigo e novo."
 				},
+				"member_roles": {
+					"name": "Cargos alterados",
+					"body": "Quem ganhou e quem perdeu cargo."
+				},
 				"ban": {
 					"name": "Membro banido",
-					"body": "Moderador e motivo."
+					"body": "Quem baniu, quem foi banido e o motivo."
+				},
+				"unban": {
+					"name": "Banimento removido",
+					"body": "Quem tirou, e de quem."
 				},
 				"timeout": {
 					"name": "Membro em timeout",
-					"body": "Duração e motivo."
+					"body": "Quem aplicou, até quando e o motivo."
 				},
 				"channel_change": {
-					"name": "Canal criado ou excluído",
-					"body": "Inclui as permissões sobrescritas."
+					"name": "Canal alterado",
+					"body": "Criado, excluído ou renomeado, e por quem."
 				},
 				"role_change": {
-					"name": "Cargo criado ou excluído",
-					"body": "E edições de permissão."
+					"name": "Cargo alterado",
+					"body": "Criado, excluído ou renomeado, e por quem."
+				},
+				"thread_change": {
+					"name": "Tópico alterado",
+					"body": "Criado, excluído ou renomeado, e por quem."
+				},
+				"server_change": {
+					"name": "Servidor alterado",
+					"body": "O nome e a foto do servidor."
 				},
 				"voice_join": {
 					"name": "Entrada ou saída de voz",
-					"body": "Barulhento em servidor grande."
+					"body": "Entrada, saída e troca de canal. Barulhento em servidor grande."
 				}
 			},
-			"saveFailed": "Não consegui salvar as configurações de logs"
+			"saveFailed": "Não consegui salvar as configurações de logs",
+			"unknownFailure": "Falha desconhecida"
 		},
 		"moderation": {
 			"title": "Moderação",

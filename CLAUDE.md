@@ -535,6 +535,17 @@ frozen. `react-remove-scroll` only runs the **last** lock on its stack, so
 `<Popover.Root modal>` pushes its own lock and hands the wheel back. `RolePicker` and
 `ChannelPicker` both set it. Verified by dispatching a real wheel event: `scrollTop` 0 → 106.
 
+**O `Select` rola por botão, porque o Radix esconde a barra de propósito.** O `SelectViewport`
+injeta `[data-radix-select-viewport]{scrollbar-width:none}` mais
+`::-webkit-scrollbar{display:none}` num `<style>` dentro do próprio conteúdo — ou seja, depois da
+folha do app, então o `thin-scroll` que estava ali era CSS morto e uma lista longa (os 15 eventos
+do registro) parecia cortada, sem nada dizendo que dava para rolar. A afordância que a lib oferece
+é `ScrollUpButton` / `ScrollDownButton`, que se renderizam sozinhos e só quando há o que rolar;
+para eles funcionarem o `Content` precisa ser `flex flex-col` e o `Viewport` `min-h-0`, senão o
+`flex: 1` que o Radix põe inline não tem como encolher. O teto virou
+`min(20rem, var(--radix-select-content-available-height, 20rem))`: o `size()` do popper sempre
+grava essa variável, e o fallback existe para o primeiro quadro, antes de ela ser gravada.
+
 ## Form controls
 
 `Field` owns the anatomy — label, hint above the control, error or help below, never both
@@ -903,7 +914,7 @@ skeleton is three components in `components/modules/`, and a new module screen i
 a matter of filling them in:
 
 - `ModulePage` — icon tile, `h1`, description, Docs link and the master enable switch;
-  optional `aside` becomes a sticky 380px right column at `xl`. It dims and disables the
+  optional `aside` becomes a sticky 440px right column at `xl`. It dims and disables the
   body when the module is off, so a screen never has to handle that itself.
 - `SettingsSection` — one Card with an `h4`, an optional description and children stacked
   at `gap-5`. That gap is the 20px rhythm the brief asks for; do not vary it per screen.
@@ -923,6 +934,14 @@ e **0px** depois; com conteúdo alto a diferença é zero nos dois, ou seja o co
 não mudou. O `min-h-full` resolve porque `main` é item de flex com altura definida. O
 `SettingsScreen`, que é management e não `ModulePage`, tinha o mesmo defeito latente e recebeu o
 mesmo tratamento; tela nova com `SaveBar` precisa da mesma raiz.
+
+**Erro de domínio da API nunca vai cru para o `toast`.** O `catch` do save do registro fazia
+`toast.error(error.message)`, e a mensagem do `LogChannelMissingError` é escrita em inglês, no
+servidor — um painel em pt-BR mostrava _"The log event ... is switched on without a channel"_.
+Quem traduz é o `useApiFailure`, que troca o `code` do corpo (`INVALID_LOG_ROUTE`) por uma frase do
+dicionário; o `ConfigSaveError` carrega o `failure` justamente para isso. E o `then` do save tem
+**dois** ramos: só `state === 'idle'` é "salvou" — um 409 resolvido não é sucesso e não pode
+dizer que foi.
 
 State comes from `useConfigDraft`, which owns draft-vs-saved, the dirty flag and the
 changed-key count that the SaveBar prints. It compares **deeply**: a shallow compare

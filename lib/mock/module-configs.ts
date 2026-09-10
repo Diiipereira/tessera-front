@@ -95,67 +95,78 @@ export const mockLoggingConfig: LoggingConfig = {
 			id: 'message_delete',
 			group: 'Messages',
 			channelId: '901234567890123008',
-			enabled: true
+			enabled: true,
+			template: null
 		},
 		{
 			id: 'message_edit',
 			group: 'Messages',
 			channelId: '901234567890123008',
-			enabled: true
+			enabled: true,
+			template: null
 		},
 		{
 			id: 'bulk_delete',
 			group: 'Messages',
 			channelId: '901234567890123008',
-			enabled: false
+			enabled: false,
+			template: null
 		},
 		{
 			id: 'member_join',
 			group: 'Members',
 			channelId: '901234567890123009',
-			enabled: true
+			enabled: true,
+			template: null
 		},
 		{
 			id: 'member_leave',
 			group: 'Members',
 			channelId: '901234567890123009',
-			enabled: true
+			enabled: true,
+			template: null
 		},
 		{
 			id: 'nickname',
 			group: 'Members',
 			channelId: null,
-			enabled: false
+			enabled: false,
+			template: null
 		},
 		{
 			id: 'ban',
 			group: 'Moderation',
 			channelId: '901234567890123008',
-			enabled: true
+			enabled: true,
+			template: null
 		},
 		{
 			id: 'timeout',
 			group: 'Moderation',
 			channelId: '901234567890123008',
-			enabled: true
+			enabled: true,
+			template: null
 		},
 		{
 			id: 'channel_change',
 			group: 'Server',
 			channelId: null,
-			enabled: false
+			enabled: false,
+			template: null
 		},
 		{
 			id: 'role_change',
 			group: 'Server',
 			channelId: null,
-			enabled: false
+			enabled: false,
+			template: null
 		},
 		{
 			id: 'voice_join',
 			group: 'Voice',
 			channelId: null,
-			enabled: false
+			enabled: false,
+			template: null
 		}
 	]
 };

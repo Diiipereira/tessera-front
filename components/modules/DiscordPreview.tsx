@@ -171,7 +171,15 @@ export function DiscordPreview({
 									<div className="flex gap-4">
 										<div className="min-w-0 flex-1">
 											{embed.authorName === '' ? null : (
-												<p className="mb-1 text-[14px] font-semibold text-white">
+												<p className="mb-1 flex items-center gap-2 text-[14px] font-semibold text-white">
+													{embed.authorIconUrl === undefined ||
+													embed.authorIconUrl === '' ? null : (
+														<img
+															src={embed.authorIconUrl}
+															alt=""
+															className="size-6 shrink-0 rounded-full object-cover"
+														/>
+													)}
 													<Text text={embed.authorName} variables={variables} />
 												</p>
 											)}

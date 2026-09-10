@@ -76,6 +76,26 @@ export const MODULE_HELP = {
 	automodExempt: {
 		namespace: 'modules.automod.dialog.exemptHelp',
 		points: ['any', 'channel', 'bots']
+	},
+	loggingEvents: {
+		namespace: 'modules.logging.events.help',
+		points: ['channel', 'who', 'needsChannel', 'permission', 'bots', 'cache']
+	},
+	loggingPreview: {
+		namespace: 'modules.logging.preview.help',
+		points: ['server', 'audit', 'avatar']
+	},
+	loggingTemplate: {
+		namespace: 'modules.logging.template.help',
+		points: ['line', 'tokens', 'empty', 'save']
+	},
+	loggingIgnoredChannels: {
+		namespace: 'modules.logging.ignore.channelsHelp',
+		points: ['reaches', 'one', 'still']
+	},
+	loggingIgnoredRoles: {
+		namespace: 'modules.logging.ignore.rolesHelp',
+		points: ['reaches', 'blind', 'use']
 	}
 } as const satisfies Record<string, Help>;
 

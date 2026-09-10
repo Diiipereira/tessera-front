@@ -8,9 +8,12 @@ import {
 	missingChannel,
 	toLoggingConfig,
 	toLoggingPatch,
+	toLogTemplate,
 	toRoutePayload,
+	toTemplateDraft,
 	type LogDestinationDto
 } from './logging';
+import { FALLBACK_EMBED_COLOR, emptyEmbedDraft } from './welcome';
 
 const CHANNEL = '901234567890123008';
 const ROLE = '901234567890123010';
@@ -28,6 +31,7 @@ const destination = (patch: Partial<LogDestinationDto> = {}): LogDestinationDto 
 	group: 'Messages',
 	channelId: CHANNEL,
 	enabled: true,
+	template: null,
 	...patch
 });
 
@@ -36,6 +40,7 @@ const event = (patch: Partial<LogEvent> = {}): LogEvent => ({
 	group: 'Messages',
 	channelId: CHANNEL,
 	enabled: true,
+	template: null,
 	...patch
 });
 
@@ -76,7 +81,7 @@ describe('toLoggingConfig', () => {
 describe('what the screen sends back', () => {
 	it('names each event the way the API named it', () => {
 		expect(toRoutePayload([event({ id: 'ban' })])).toEqual([
-			{ eventType: 'ban', channelId: CHANNEL, enabled: true }
+			{ eventType: 'ban', channelId: CHANNEL, enabled: true, template: null }
 		]);
 	});
 
@@ -132,5 +137,58 @@ describe('the dictionaries', () => {
 			expect(text.name, id).not.toBe('');
 			expect(text.body, id).not.toBe('');
 		}
+	});
+});
+
+describe('a template the owner wrote', () => {
+	it('sends nothing when the form is empty, so the default keeps its place', () => {
+		expect(toLogTemplate(emptyEmbedDraft())).toBeNull();
+	});
+
+	it('sends a template as soon as there is something to say', () => {
+		expect(toLogTemplate({ ...emptyEmbedDraft(), title: 'Olha' })).toEqual({
+			title: 'Olha',
+			color: FALLBACK_EMBED_COLOR
+		});
+	});
+
+	it('drops the row ids the form uses, which the API refuses', () => {
+		const written = toLogTemplate({
+			...emptyEmbedDraft(),
+			title: 'Olha',
+			fields: [{ id: 'row-1', name: 'Motivo', value: '{reason}', inline: true }]
+		});
+
+		expect(written?.['fields']).toEqual([{ name: 'Motivo', value: '{reason}', inline: true }]);
+	});
+
+	it('drops a half-written field instead of sending an empty one', () => {
+		const written = toLogTemplate({
+			...emptyEmbedDraft(),
+			title: 'Olha',
+			fields: [{ id: 'row-1', name: 'Motivo', value: '', inline: false }]
+		});
+
+		expect(written?.['fields']).toBeUndefined();
+	});
+
+	it('reads back what it wrote, so opening the dialog twice shows the same thing', () => {
+		const draft = {
+			...emptyEmbedDraft(),
+			title: 'Olha',
+			description: '{line}',
+			fields: [{ id: 'row-1', name: 'Motivo', value: '{reason}', inline: true }]
+		};
+
+		const again = toTemplateDraft(toLogTemplate(draft));
+
+		expect(again.title).toBe('Olha');
+		expect(again.description).toBe('{line}');
+		expect(again.fields.map((one) => one.name)).toEqual(['Motivo']);
+	});
+
+	it('reads a template that was never written as an empty form', () => {
+		expect(toTemplateDraft(null).title).toBe('');
+		expect(toTemplateDraft(null).fields).toEqual([]);
 	});
 });

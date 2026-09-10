@@ -1,7 +1,7 @@
 'use client';
 
 import * as SelectPrimitive from '@radix-ui/react-select';
-import { Check, ChevronsUpDown } from 'lucide-react';
+import { Check, ChevronDown, ChevronUp, ChevronsUpDown } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils/cn';
 import { useFieldState } from './field-context';
@@ -76,9 +76,13 @@ export function Select({
 					position="popper"
 					sideOffset={4}
 					collisionPadding={12}
-					className="z-60 max-h-80 w-(--radix-select-trigger-width) overflow-hidden rounded-lg border border-border-strong bg-surface-raised p-1 shadow-2 data-[state=open]:animate-pop"
+					className="z-60 flex max-h-[min(20rem,var(--radix-select-content-available-height,20rem))] w-(--radix-select-trigger-width) flex-col overflow-hidden rounded-lg border border-border-strong bg-surface-raised p-1 shadow-2 data-[state=open]:animate-pop"
 				>
-					<SelectPrimitive.Viewport className="max-h-[inherit] thin-scroll overflow-y-auto overscroll-contain">
+					<SelectPrimitive.ScrollUpButton className="flex h-5 shrink-0 cursor-default items-center justify-center rounded-sm text-text-subtle hover:bg-surface-hover hover:text-text">
+						<ChevronUp className="size-3.5" aria-hidden="true" />
+					</SelectPrimitive.ScrollUpButton>
+
+					<SelectPrimitive.Viewport className="min-h-0 overscroll-contain">
 						{options.map((option) => (
 							<SelectPrimitive.Item
 								key={option.value}
@@ -99,6 +103,10 @@ export function Select({
 							</SelectPrimitive.Item>
 						))}
 					</SelectPrimitive.Viewport>
+
+					<SelectPrimitive.ScrollDownButton className="flex h-5 shrink-0 cursor-default items-center justify-center rounded-sm text-text-subtle hover:bg-surface-hover hover:text-text">
+						<ChevronDown className="size-3.5" aria-hidden="true" />
+					</SelectPrimitive.ScrollDownButton>
 				</SelectPrimitive.Content>
 			</SelectPrimitive.Portal>
 		</SelectPrimitive.Root>

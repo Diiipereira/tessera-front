@@ -985,7 +985,29 @@
 				"channel": "The channel the message lands in",
 				"date": "Today's date in the server timezone",
 				"level": "The member level",
-				"balance": "The member balance"
+				"balance": "The member balance",
+				"logLine": "The sentence Tessera would have written",
+				"logEvent": "The name of the event",
+				"logServer": "The name of the server",
+				"logWho": "The name of whoever the entry is about",
+				"logAvatar": "The picture of whoever the entry is about",
+				"logId": "The id in the footer",
+				"logMember": "The member the entry is about",
+				"logModerator": "Whoever did it, from the audit log",
+				"logChannel": "The channel it happened in",
+				"logContent": "The text of the message",
+				"logBefore": "What it was before",
+				"logAfter": "What it became",
+				"logReason": "The reason given",
+				"logRoles": "The roles held",
+				"logAdded": "The roles gained",
+				"logRemoved": "The roles lost",
+				"logCount": "How many",
+				"logName": "The name of what changed",
+				"logCreated": "When the account was created",
+				"logUntil": "When it ends",
+				"logFrom": "The channel they came from",
+				"logLink": "A link back to the message"
 			}
 		},
 		"composer": {
@@ -1819,11 +1841,109 @@
 			"events": {
 				"title": "Events",
 				"description": "{enabled} of {total} events are being written.",
-				"missing": "{count, plural, =1 {1 event is on with no channel set — it will not be written anywhere.} other {# events are on with no channel set — they will not be written anywhere.}}",
+				"help": {
+					"label": "Help with events",
+					"title": "Each event has a channel and a switch of its own",
+					"body": "Turning one on means both: picking the channel and flipping the switch.",
+					"points": {
+						"channel": {
+							"title": "A channel per event, not one per server",
+							"body": "Set all to one channel fills a whole group at once, and you can still change them one by one afterwards."
+						},
+						"needsChannel": {
+							"title": "An event on with no channel blocks the save",
+							"body": "The API refuses the whole list, so the amber warning at the top has to be cleared before saving."
+						},
+						"permission": {
+							"title": "Tessera has to see and write in the chosen channel",
+							"body": "Without permission the entry vanishes with no error on screen, only a warning in the bot log."
+						},
+						"bots": {
+							"title": "A message from a bot is never written",
+							"body": "It holds for deleted and edited alike, Tessera itself included."
+						},
+						"cache": {
+							"title": "It can only tell what it saw",
+							"body": "A message deleted long after it was sent comes through with no content and no author, because Discord sends only the id."
+						},
+						"who": {
+							"title": "Who did it comes from the audit log",
+							"body": "Tessera reads it with the View Audit Log permission. Without it the entry still goes out, only without a name."
+						}
+					}
+				},
+				"missing": "{count, plural, =1 {The {names} event is on with no channel. Pick a channel or switch it off, because saving is refused like this.} other {These events are on with no channel: {names}. Pick a channel or switch them off, because saving is refused like this.}}",
 				"noChannel": "No channel…",
 				"log": "Log {name}",
 				"setAll": "Set all to one channel",
 				"setAllHint": "Applies to every {group} event, on or off."
+			},
+			"preview": {
+				"title": "Preview",
+				"description": "What the entry looks like in the channel, with sample data.",
+				"event": "Event",
+				"unknown": "unknown",
+				"help": {
+					"label": "Help with the preview",
+					"title": "Sample data, real shape",
+					"body": "The names and the text are invented; the colour, the wording and the fields are the ones Tessera sends.",
+					"points": {
+						"server": {
+							"title": "It reads in the language of the server",
+							"body": "Change the language in Settings and the entry changes with it, whoever is looking."
+						},
+						"audit": {
+							"title": "Who did it comes from the Discord audit log",
+							"body": "Tessera needs View Audit Log for that line to name a moderator, and some acts have nobody to name."
+						},
+						"avatar": {
+							"title": "The picture and the name come from whoever the entry is about",
+							"body": "The sample has none, so the block shows a plain name."
+						}
+					}
+				}
+			},
+			"test": {
+				"action": "Send a test",
+				"dirty": "Save your changes before sending a test.",
+				"sent": "Test sent to this event's channel",
+				"notReady": "Nothing was sent: the module is off, or this event has no channel.",
+				"channelRefused": "I could not write in the channel — check that it exists and that I can post there.",
+				"failed": "The test could not be sent"
+			},
+			"template": {
+				"edit": "Customise",
+				"editOne": "Customise the {name} entry",
+				"title": "Your own entry for {name}",
+				"description": "Write the embed Tessera sends. Leave it empty and the default is used.",
+				"custom": "Customised",
+				"reset": "Back to the default",
+				"apply": "Use this entry",
+				"preview": "How it will look",
+				"failed": "The preview could not be drawn",
+				"help": {
+					"label": "Help with customising",
+					"title": "An empty template means the default",
+					"body": "Whatever you leave blank, Tessera writes as it always did.",
+					"points": {
+						"line": {
+							"title": "The default sentence is a variable of its own",
+							"body": "Put '{'line'}' in the description to keep what Tessera would have written and add around it."
+						},
+						"tokens": {
+							"title": "The variables change with the event",
+							"body": "A ban has a moderator and a reason; a member joining has neither. Only what the event carries is offered."
+						},
+						"empty": {
+							"title": "A variable the event does not carry comes out blank",
+							"body": "It is not an error and it does not stop the entry from going out."
+						},
+						"save": {
+							"title": "It only takes effect after you save the screen",
+							"body": "Closing this dialog keeps the draft; the Save bar is what writes it."
+						}
+					}
+				}
 			},
 			"groups": {
 				"Messages": "Messages",
@@ -1837,8 +1957,46 @@
 				"description": "Nothing from these is ever logged, whatever the events say.",
 				"channels": "Ignored channels",
 				"channelsPlaceholder": "Nothing ignored…",
+				"channelsHelp": {
+					"label": "Help with ignored channels",
+					"title": "It only silences the events that happen in a channel",
+					"body": "A join, a ban or a server change belongs to no channel, so it goes through untouched.",
+					"points": {
+						"reaches": {
+							"title": "It reaches deleted, edited, bulk delete and voice",
+							"body": "Those are the events that can say which channel they happened in."
+						},
+						"one": {
+							"title": "The screen holds one channel at a time",
+							"body": "Picking another one replaces the previous."
+						},
+						"still": {
+							"title": "Ignoring stops nothing from happening",
+							"body": "The message is still deleted; what does not happen is the entry about it."
+						}
+					}
+				},
 				"roles": "Ignored roles",
-				"rolesPlaceholder": "Nobody ignored…"
+				"rolesPlaceholder": "Nobody ignored…",
+				"rolesHelp": {
+					"label": "Help with ignored roles",
+					"title": "Whoever holds one of these roles does not become an entry",
+					"body": "Not all of them: a single role from the list is enough.",
+					"points": {
+						"reaches": {
+							"title": "It reaches the events that carry who acted",
+							"body": "Deleted and edited messages, leaves, nicknames, timeouts and voice."
+						},
+						"blind": {
+							"title": "Joins, bans and bulk deletes go through",
+							"body": "Those entries carry nobody roles, so the list has nothing to compare against."
+						},
+						"use": {
+							"title": "It is for cutting noise, not for hiding people",
+							"body": "The act still happens, and it still shows in the audit log Discord keeps on its own."
+						}
+					}
+				}
 			},
 			"event": {
 				"message_delete": {
@@ -1859,34 +2017,51 @@
 				},
 				"member_leave": {
 					"name": "Member left",
-					"body": "And what roles they had."
+					"body": "The roles they had, and whether they were kicked."
 				},
 				"nickname": {
 					"name": "Nickname changed",
 					"body": "Old and new."
 				},
+				"member_roles": {
+					"name": "Roles changed",
+					"body": "Who gained a role and who lost one."
+				},
 				"ban": {
 					"name": "Member banned",
-					"body": "Moderator and reason."
+					"body": "Who banned, who was banned, and the reason."
+				},
+				"unban": {
+					"name": "Ban lifted",
+					"body": "Who lifted it, and on whom."
 				},
 				"timeout": {
 					"name": "Member timed out",
-					"body": "Duration and reason."
+					"body": "Who applied it, until when, and the reason."
 				},
 				"channel_change": {
-					"name": "Channel created or deleted",
-					"body": "Includes permission overwrites."
+					"name": "Channel changed",
+					"body": "Created, deleted or renamed, and by whom."
 				},
 				"role_change": {
-					"name": "Role created or deleted",
-					"body": "And permission edits."
+					"name": "Role changed",
+					"body": "Created, deleted or renamed, and by whom."
+				},
+				"thread_change": {
+					"name": "Thread changed",
+					"body": "Created, deleted or renamed, and by whom."
+				},
+				"server_change": {
+					"name": "Server changed",
+					"body": "The name and the picture of the server."
 				},
 				"voice_join": {
 					"name": "Voice join or leave",
-					"body": "Noisy on big servers."
+					"body": "Joining, leaving and moving between channels. Noisy on big servers."
 				}
 			},
-			"saveFailed": "Logging settings could not be saved"
+			"saveFailed": "Logging settings could not be saved",
+			"unknownFailure": "Unknown failure"
 		},
 		"moderation": {
 			"title": "Moderation",
