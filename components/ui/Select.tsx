@@ -75,6 +75,7 @@ export function Select({
 				<SelectPrimitive.Content
 					position="popper"
 					sideOffset={4}
+					collisionPadding={12}
 					className="z-60 max-h-80 w-(--radix-select-trigger-width) overflow-hidden rounded-lg border border-border-strong bg-surface-raised p-1 shadow-2 data-[state=open]:animate-pop"
 				>
 					<SelectPrimitive.Viewport className="max-h-[inherit] thin-scroll overflow-y-auto overscroll-contain">

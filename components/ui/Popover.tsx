@@ -46,6 +46,7 @@ export function Popover({
 					side={side}
 					align={align}
 					sideOffset={4}
+					collisionPadding={12}
 					className={cn(
 						'z-60 max-w-xs rounded-lg border border-border-strong bg-surface-raised p-3 shadow-2 data-[state=open]:animate-pop',
 						className

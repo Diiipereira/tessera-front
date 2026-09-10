@@ -27,6 +27,7 @@ export function Tooltip({
 				<TooltipPrimitive.Content
 					side={side}
 					sideOffset={6}
+					collisionPadding={12}
 					className="z-70 max-w-xs rounded-sm bg-tooltip px-2 py-1.5 text-caption font-normal text-tooltip-fg shadow-2 data-[state=delayed-open]:animate-pop"
 				>
 					{content}
