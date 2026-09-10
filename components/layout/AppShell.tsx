@@ -34,7 +34,9 @@ function ShellMain({ children }: { children: ReactNode }) {
 	const skeleton = pendingHref === null ? null : routeSkeleton(pendingHref);
 
 	return (
-		<main className="relative min-h-0 min-w-0 flex-1 overflow-y-auto">{skeleton ?? children}</main>
+		<main className="relative min-h-0 min-w-0 flex-1 scrollbar-gutter-stable overflow-y-auto">
+			{skeleton ?? children}
+		</main>
 	);
 }
 
