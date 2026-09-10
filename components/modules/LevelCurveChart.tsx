@@ -4,7 +4,7 @@ import { LineChart } from 'echarts/charts';
 import { GridComponent, TooltipComponent } from 'echarts/components';
 import * as echarts from 'echarts/core';
 import { SVGRenderer } from 'echarts/renderers';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useEffect, useRef } from 'react';
 import { useTheme } from '@/components/providers/theme-context';
 import { buildCurve } from '@/lib/levels';
@@ -19,6 +19,7 @@ type LevelCurveChartProps = {
 
 export function LevelCurveChart({ curve, maxLevel = 30 }: LevelCurveChartProps) {
 	const t = useTranslations('modules.levels.chart');
+	const locale = useLocale();
 	const { resolved } = useTheme();
 	const containerRef = useRef<HTMLDivElement>(null);
 	const chartRef = useRef<echarts.ECharts | null>(null);
@@ -70,7 +71,7 @@ export function LevelCurveChart({ curve, maxLevel = 30 }: LevelCurveChartProps) 
 					borderWidth: 1,
 					padding: [8, 10],
 					textStyle: { color: readChartToken(styles, '--text'), fontSize: 12 },
-					valueFormatter: (value: number) => `${value.toLocaleString('en-US')} XP`
+					valueFormatter: (value: number) => t('xp', { xp: value.toLocaleString(locale) })
 				},
 				xAxis: {
 					type: 'category',

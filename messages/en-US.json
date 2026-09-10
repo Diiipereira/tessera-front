@@ -3,6 +3,7 @@
 		"save": "Save",
 		"cancel": "Cancel",
 		"close": "Close",
+		"confirm": "Confirm",
 		"discard": "Discard",
 		"open": "Open",
 		"remove": "Remove",
@@ -1689,6 +1690,7 @@
 			"rewards": {
 				"title": "Role rewards",
 				"description": "Given when a member reaches the level.",
+				"add": "Add reward",
 				"empty": "No rewards. Levels are cosmetic only.",
 				"level": "Level",
 				"role": "Role",
@@ -1720,7 +1722,8 @@
 			},
 			"chart": {
 				"level": "Level",
-				"totalXp": "Total XP"
+				"totalXp": "Total XP",
+				"xp": "{xp} XP"
 			}
 		},
 		"scheduled": {
@@ -2734,11 +2737,15 @@
 		"perMonth": "/month",
 		"save": "save {percent}%",
 		"currentPlan": "{plan} plan",
+		"fromNowLine": "{plan} from now",
+		"todayLine": "{plan} today",
 		"staysActive": "{plan} stays active until {date}.",
 		"perMonthLong": "per month",
 		"billedYearly": ", billed yearly",
+		"yearlySave": "Yearly · save {percent}%",
 		"managePayment": "Manage payment",
 		"cancelPlan": "Cancel plan",
+		"keepPlan": "Keep it",
 		"cardEnding": "{brand} ending {last4}",
 		"noCard": "No payment method on file.",
 		"youAreHere": "You are here",
@@ -2751,7 +2758,9 @@
 		"invoiceStatus": "Status",
 		"proration": "{left} of {total} days are left, so you are {verb} {amount}.",
 		"chargedVerb": "charged",
+		"chargedToday": "{amount} charged today.",
 		"creditedVerb": "credited",
+		"creditedNext": "{amount} credited to the next invoice.",
 		"dropsToFree": "On {date} this server drops to Free. Anything over the free limits stops working then.",
 		"endingBody": "{plan} stays active until {date}, then the server drops to Free and anything over the Free limits stops running.",
 		"renewLine": "{verb} {relative} — {date}. {left} of {total} days left in this period.",

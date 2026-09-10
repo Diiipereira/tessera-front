@@ -1215,6 +1215,32 @@ only the component. Same split for `sidebar-context.ts` and `tooltip-provider.ts
 helpers went to `lib/` for the same reason — `commandNameError` to `lib/commands.ts`,
 `formatCountdown` to `lib/time.ts`.
 
+## Frase escrita no meio do JSX é bug, e agora há teste
+
+`tests/i18n-coverage.test.ts` percorre `app/` e `components/`, um caso por arquivo, e falha
+quando acha (a) uma linha que é só prosa entre duas tags e (b) um literal de template com duas
+palavras ou mais fora de `className`, `href` e afins. Ele nasceu depois de o dono achar
+_"Add reward"_ na tela de Níveis com o painel em pt-BR — e a varredura que o originou encontrou
+mais oito: _Add item_ na Economia, _Cancel_, _Confirm_, _Keep it_, `Move to {plano}`,
+`{valor} charged today`, `Yearly · save {n}%` e `It stays active until {data}` no Billing, que é
+tela mock e por isso ninguém lia. O teste foi conferido plantando a string de volta: ele acusa
+arquivo e linha.
+
+O mesmo arquivo compara as **chaves** dos dois dicionários. Elas estavam em paridade perfeita
+(2210 e 2210) e continuam — o defeito nunca foi tradução faltando, foi texto que nunca chegou ao
+dicionário. É a mesma rede que o `apps/bot` já tinha em `locale.spec.ts`, e que o dashboard não
+tinha.
+
+**`app/global-error.tsx` é a única tela isenta, e está na lista do teste.** Ela renderiza o
+próprio `<html>`, acima do provider que carrega o dicionário, então `useTranslations` não existe
+ali. Qualquer outro arquivo que entre nessa lista precisa desse mesmo tipo de motivo.
+
+**O que a rede não pega, e ficou anotado:** `formatCount` (`lib/utils/format.ts`) monta números com
+`Intl.NumberFormat('en-US')` cravado, então um servidor com 1234 membros lê _1,234_ em português
+em vez de _1.234_ — são 22 chamadas em 11 telas, e o conserto é passar o locale, não um regex. Os
+17 skeletons passam `label="Levels"` e viram `aria-label` de "Loading {label}": texto só de
+leitor de tela, em inglês, nas duas línguas.
+
 ## Token de produto no dicionário precisa de escape ICU
 
 `{user}`, `{server}` e `{date}` são texto que o leitor **deve ver com as chaves**, mas o ICU

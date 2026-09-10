@@ -423,7 +423,7 @@ export function EconomyScreen({
 						}}
 					>
 						<Plus aria-hidden="true" />
-						Add item
+						{t('shop.new')}
 					</Button>
 				}
 			>

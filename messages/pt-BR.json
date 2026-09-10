@@ -3,6 +3,7 @@
 		"save": "Salvar",
 		"cancel": "Cancelar",
 		"close": "Fechar",
+		"confirm": "Confirmar",
 		"discard": "Descartar",
 		"open": "Abrir",
 		"remove": "Remover",
@@ -1689,6 +1690,7 @@
 			"rewards": {
 				"title": "Cargos de recompensa",
 				"description": "Entregues quando o membro alcança o nível.",
+				"add": "Adicionar recompensa",
 				"empty": "Nenhuma recompensa. Os níveis são só cosméticos.",
 				"level": "Nível",
 				"role": "Cargo",
@@ -1720,7 +1722,8 @@
 			},
 			"chart": {
 				"level": "Nível",
-				"totalXp": "XP total"
+				"totalXp": "XP total",
+				"xp": "{xp} XP"
 			}
 		},
 		"scheduled": {
@@ -2734,11 +2737,15 @@
 		"perMonth": "/mês",
 		"save": "economize {percent}%",
 		"currentPlan": "Plano {plan}",
+		"fromNowLine": "{plan} a partir de agora",
+		"todayLine": "{plan} hoje",
 		"staysActive": "O {plan} continua ativo até {date}.",
 		"perMonthLong": "por mês",
 		"billedYearly": ", cobrado anualmente",
+		"yearlySave": "Anual · economize {percent}%",
 		"managePayment": "Gerenciar pagamento",
 		"cancelPlan": "Cancelar o plano",
+		"keepPlan": "Manter o plano",
 		"cardEnding": "{brand} terminado em {last4}",
 		"noCard": "Nenhuma forma de pagamento cadastrada.",
 		"youAreHere": "Você está aqui",
@@ -2751,7 +2758,9 @@
 		"invoiceStatus": "Estado",
 		"proration": "Restam {left} de {total} dias, então você será {verb} {amount}.",
 		"chargedVerb": "cobrado em",
+		"chargedToday": "{amount} cobrado hoje.",
 		"creditedVerb": "creditado em",
+		"creditedNext": "{amount} creditado na próxima fatura.",
 		"dropsToFree": "Em {date} este servidor cai para o Free. O que passar dos limites gratuitos para de funcionar nessa data.",
 		"endingBody": "O {plan} continua ativo até {date}, e depois o servidor cai para o Free e o que passar dos limites gratuitos para de rodar.",
 		"renewLine": "{verb} {relative} — {date}. Restam {left} de {total} dias neste período.",

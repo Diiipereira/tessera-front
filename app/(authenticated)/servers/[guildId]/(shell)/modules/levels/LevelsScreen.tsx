@@ -370,7 +370,7 @@ export function LevelsScreen({
 						}}
 					>
 						<Plus aria-hidden="true" />
-						Add reward
+						{t('rewards.add')}
 					</Button>
 				}
 			>

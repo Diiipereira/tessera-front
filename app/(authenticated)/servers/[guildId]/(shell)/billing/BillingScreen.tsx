@@ -31,6 +31,7 @@ import { formatCount } from '@/lib/utils/format';
 
 export function BillingScreen({ billing }: { billing: BillingState }) {
 	const t = useTranslations('billing');
+	const shared = useTranslations('common');
 
 	const featuresOf = (plan: PlanTier): string[] =>
 		Object.values(t.raw(`plan.${plan}.features`) as Record<string, string>);
@@ -316,7 +317,7 @@ export function BillingScreen({ billing }: { billing: BillingState }) {
 				onOpenChange={(open) => {
 					if (!open) setTarget(null);
 				}}
-				title={target === null ? '' : `Move to ${target.name}`}
+				title={target === null ? '' : t('moveTo', { plan: target.name })}
 				description={t('change.description')}
 				footer={
 					<>
@@ -326,7 +327,7 @@ export function BillingScreen({ billing }: { billing: BillingState }) {
 								setTarget(null);
 							}}
 						>
-							Cancel
+							{shared('cancel')}
 						</Button>
 						<Button
 							onClick={() => {
@@ -335,15 +336,15 @@ export function BillingScreen({ billing }: { billing: BillingState }) {
 								toast.success(t('change.now', { plan: target.name }), {
 									description:
 										proration > 0
-											? `${formatPrice(proration)} charged today.`
+											? t('chargedToday', { amount: formatPrice(proration) })
 											: proration < 0
-												? `${formatPrice(Math.abs(proration))} credited to the next invoice.`
+												? t('creditedNext', { amount: formatPrice(Math.abs(proration)) })
 												: t('change.nothing')
 								});
 								setTarget(null);
 							}}
 						>
-							Confirm
+							{shared('confirm')}
 						</Button>
 					</>
 				}
@@ -357,8 +358,8 @@ export function BillingScreen({ billing }: { billing: BillingState }) {
 									value: 'yearly',
 									label:
 										yearlySavingsPercent(target) > 0
-											? `Yearly · save ${String(yearlySavingsPercent(target))}%`
-											: 'Yearly'
+											? t('yearlySave', { percent: yearlySavingsPercent(target) })
+											: t('plans.yearly')
 								}
 							]}
 							value={cycle}
@@ -368,11 +369,11 @@ export function BillingScreen({ billing }: { billing: BillingState }) {
 
 						<dl className="flex flex-col gap-2 rounded-md border border-border bg-surface-sunken p-3">
 							<Row
-								label={`${current.name} today`}
+								label={t('todayLine', { plan: current.name })}
 								value={formatPrice(cycleTotalCents(current, cycle))}
 							/>
 							<Row
-								label={`${target.name} from now`}
+								label={t('fromNowLine', { plan: target.name })}
 								value={formatPrice(cycleTotalCents(target, cycle))}
 							/>
 							<Row
@@ -408,14 +409,17 @@ export function BillingScreen({ billing }: { billing: BillingState }) {
 								setCancelling(false);
 							}}
 						>
-							Keep it
+							{t('keepPlan')}
 						</Button>
 						<Button
 							variant="danger"
 							onClick={() => {
 								setCancelling(false);
 								toast.success(t('cancel.done'), {
-									description: `It stays active until ${dateOnly(billing.renewsAt)}.`
+									description: t('staysActive', {
+										plan: current.name,
+										date: dateOnly(billing.renewsAt)
+									})
 								});
 							}}
 						>
