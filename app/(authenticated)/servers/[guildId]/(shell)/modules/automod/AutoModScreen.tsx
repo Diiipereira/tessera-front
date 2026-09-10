@@ -20,6 +20,7 @@ import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { ChannelPicker } from '@/components/discord/ChannelPicker';
 import { RolePicker } from '@/components/discord/RolePicker';
+import { FieldHelp } from '@/components/modules/FieldHelp';
 import { ModulePage } from '@/components/modules/ModulePage';
 import { SaveBar } from '@/components/modules/SaveBar';
 import { SettingsSection } from '@/components/modules/SettingsSection';
@@ -33,6 +34,7 @@ import { Switch } from '@/components/ui/Switch';
 import { Textarea } from '@/components/ui/Textarea';
 import { loadRules, saveRules, testMessage } from '@/lib/automod-client';
 import { useConfigDraft, type SaveOutcome } from '@/lib/hooks/useConfigDraft';
+import { MODULE_HELP } from '@/lib/module-help';
 import { patchModule } from '@/lib/module-client';
 import {
 	MAX_THRESHOLD,
@@ -143,16 +145,17 @@ export function AutoModScreen({ guildId, config, version, channels, roles }: Aut
 
 	const [editing, setEditing] = useState<AutoModRule | null>(null);
 	const [isNew, setIsNew] = useState(false);
-	const [sample, setSample] = useState('CHECK THIS OUT discord.gg/freestuff @everyone');
+	const [sample, setSample] = useState('');
 	const [reading, setReading] = useState<AutomodReading>(NOTHING);
 	const [problem, setProblem] = useState<string | null>(null);
 
-	const idle = rules.length === 0 || !testable(rules);
+	const blank = sample.trim() === '';
+	const idle = blank || rules.length === 0 || !testable(rules);
 	const shown = idle ? NOTHING : reading;
 	const failure = idle ? null : problem;
 
 	useEffect(() => {
-		if (rules.length === 0 || !testable(rules)) return;
+		if (sample.trim() === '' || rules.length === 0 || !testable(rules)) return;
 
 		const controller = new AbortController();
 
@@ -250,7 +253,11 @@ export function AutoModScreen({ guildId, config, version, channels, roles }: Aut
 				/>
 			}
 		>
-			<SettingsSection title={t('rules.title')} description={t('rules.description')}>
+			<SettingsSection
+				title={t('rules.title')}
+				description={t('rules.description')}
+				action={<FieldHelp {...MODULE_HELP.automodRules} />}
+			>
 				{rules.length === 0 ? (
 					<p className="text-body-sm text-text-muted">{t('rules.empty')}</p>
 				) : (
@@ -355,10 +362,15 @@ export function AutoModScreen({ guildId, config, version, channels, roles }: Aut
 				)}
 			</SettingsSection>
 
-			<SettingsSection title={t('playground.title')} description={t('playground.description')}>
+			<SettingsSection
+				title={t('playground.title')}
+				description={t('playground.description')}
+				action={<FieldHelp {...MODULE_HELP.automodPlayground} />}
+			>
 				<Field label={t('playground.sample')}>
 					<Textarea
 						value={sample}
+						placeholder={t('playground.placeholder')}
 						onChange={(event) => {
 							setSample(event.target.value);
 						}}
@@ -381,7 +393,9 @@ export function AutoModScreen({ guildId, config, version, channels, roles }: Aut
 							: 'border-border bg-surface-sunken'
 					)}
 				>
-					{failure !== null ? (
+					{blank ? (
+						<p className="text-body-sm text-text-muted">{t('playground.waiting')}</p>
+					) : failure !== null ? (
 						<p className="text-body-sm text-danger">{failure}</p>
 					) : shown.fired.length === 0 ? (
 						<p className="text-body-sm text-text-muted">{t('playground.clear')}</p>
@@ -465,7 +479,8 @@ function RuleDialog({ rule, isNew, channels, roles, onCancel, onSave }: RuleDial
 		});
 	}
 
-	const needsThreshold = work.trigger !== 'invites' && work.trigger !== 'links';
+	const needsThreshold =
+		work.trigger !== 'invites' && work.trigger !== 'links' && work.trigger !== 'words';
 	const needsWindow = work.trigger === 'spam';
 	const needsWords = work.trigger === 'words';
 	const missing = incomplete(work);
@@ -510,9 +525,12 @@ function RuleDialog({ rule, isNew, channels, roles, onCancel, onSave }: RuleDial
 				</Field>
 
 				<div className="flex flex-col gap-2" role="group" aria-labelledby={triggerLabelId}>
-					<span id={triggerLabelId} className="text-body-sm font-medium">
-						{t('rules.firesOn')}
-					</span>
+					<div className="flex items-center gap-1">
+						<span id={triggerLabelId} className="text-body-sm font-medium">
+							{t('rules.firesOn')}
+						</span>
+						<FieldHelp {...MODULE_HELP.automodTrigger} />
+					</div>
 					<div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
 						{TRIGGERS.map((trigger) => {
 							const Icon = trigger.icon;
@@ -557,6 +575,7 @@ function RuleDialog({ rule, isNew, channels, roles, onCancel, onSave }: RuleDial
 					<Field
 						label={t('dialog.words')}
 						hint={missing === 'words' ? t('dialog.needWords') : t('dialog.wordsHint')}
+						action={<FieldHelp {...MODULE_HELP.automodWords} />}
 					>
 						<Textarea
 							value={work.words.join('\n')}
@@ -574,6 +593,7 @@ function RuleDialog({ rule, isNew, channels, roles, onCancel, onSave }: RuleDial
 							<Field
 								label={work.trigger === 'caps' ? t('dialog.percent') : t('dialog.threshold')}
 								hint={work.trigger === 'caps' ? t('dialog.capsHint') : undefined}
+								action={<FieldHelp {...MODULE_HELP.automodThreshold} />}
 							>
 								<NumberInput
 									min={1}
@@ -606,9 +626,12 @@ function RuleDialog({ rule, isNew, channels, roles, onCancel, onSave }: RuleDial
 					role="group"
 					aria-labelledby={actionsLabelId}
 				>
-					<span id={actionsLabelId} className="text-body-sm font-medium">
-						{t('rules.then')}
-					</span>
+					<div className="flex items-center gap-1">
+						<span id={actionsLabelId} className="text-body-sm font-medium">
+							{t('rules.then')}
+						</span>
+						<FieldHelp {...MODULE_HELP.automodActions} />
+					</div>
 					<div className="flex flex-wrap gap-1.5">
 						{ACTIONS.map((action) => {
 							const active = work.actions.includes(action);
@@ -638,7 +661,10 @@ function RuleDialog({ rule, isNew, channels, roles, onCancel, onSave }: RuleDial
 				</div>
 
 				<div className="grid gap-5 border-t border-border pt-5 sm:grid-cols-2">
-					<Field label={t('dialog.exemptRoles')}>
+					<Field
+						label={t('dialog.exemptRoles')}
+						action={<FieldHelp {...MODULE_HELP.automodExempt} />}
+					>
 						<RolePicker
 							roles={roles}
 							value={work.exemptRoleIds}

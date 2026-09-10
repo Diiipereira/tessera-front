@@ -16,7 +16,7 @@ export function FieldHelp({ namespace, points }: FieldHelpProps) {
 		<Popover
 			align="start"
 			triggerClassName="grid size-5 place-items-center rounded-sm text-text-muted transition-colors duration-120 ease-out hover:bg-surface-hover hover:text-text"
-			className="w-80 max-w-none p-0"
+			className="max-h-(--radix-popover-content-available-height) w-80 max-w-none thin-scroll overflow-y-auto p-0"
 			trigger={
 				<>
 					<CircleHelp className="size-3.5" aria-hidden="true" />

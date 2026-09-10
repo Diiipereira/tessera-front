@@ -1156,7 +1156,34 @@
 			"untitled": "Regra sem nome",
 			"rules": {
 				"title": "Regras",
-				"description": "Conferidas de cima para baixo. A primeira regra que dispara vence.",
+				"description": "Todas as regras ligadas são conferidas. Se mais de uma disparar, vale a punição mais dura.",
+				"help": {
+					"label": "Ajuda sobre as regras",
+					"title": "Todas as regras são conferidas, não só a primeira",
+					"body": "O que dispara se soma, e só a punição é uma só.",
+					"points": {
+						"together": {
+							"title": "Uma mensagem pode disparar várias regras",
+							"body": "Se qualquer regra que disparou manda apagar, a mensagem é apagada; se qualquer uma manda registrar, o registro sai."
+						},
+						"harshest": {
+							"title": "Só uma punição é aplicada, a mais dura",
+							"body": "Entre tudo que disparou vale a ordem advertir, timeout, expulsar, banir — nunca duas de uma vez."
+						},
+						"moderation": {
+							"title": "Punir e registrar dependem do módulo de Moderação",
+							"body": "Com ele desligado o AutoMod ainda apaga a mensagem, mas não abre caso nem avisa ninguém."
+						},
+						"ladder": {
+							"title": "A punição vira caso numerado e conta pontos",
+							"body": "Advertência e timeout do AutoMod pesam na escada de escalonamento igual aos de um moderador."
+						},
+						"save": {
+							"title": "Nada muda no servidor antes de salvar",
+							"body": "Criar, editar e desligar regra aqui é rascunho até você clicar em Salvar."
+						}
+					}
+				},
 				"empty": "Nenhuma regra ainda. Nada está sendo filtrado.",
 				"rule": "Regra",
 				"firesOn": "Dispara em",
@@ -1217,7 +1244,32 @@
 			"playground": {
 				"title": "Playground de teste",
 				"description": "Cole algo que um membro poderia mandar e veja quais regras pegariam.",
+				"help": {
+					"label": "Ajuda sobre o playground",
+					"title": "Ele testa o que está na tela, inclusive o que você ainda não salvou",
+					"body": "É uma simulação do texto da mensagem, não do servidor inteiro.",
+					"points": {
+						"draft": {
+							"title": "Ele roda contra o rascunho",
+							"body": "As regras vão daqui exatamente como estão agora, enquanto o /automod test no Discord roda contra o que está salvo."
+						},
+						"exempt": {
+							"title": "Cargos e canais isentos não entram na simulação",
+							"body": "A regra aparece disparando mesmo que, no servidor, quem mandou fosse isento."
+						},
+						"history": {
+							"title": "Spam e anexos não dá para testar aqui",
+							"body": "Um depende do ritmo das mensagens anteriores e o outro dos arquivos, e esta caixa só tem texto."
+						},
+						"all": {
+							"title": "Ele lista tudo que dispararia",
+							"body": "No servidor essas regras se somam numa punição só, a mais dura."
+						}
+					}
+				},
 				"sample": "Mensagem de exemplo",
+				"placeholder": "OLHA SÓ ISSO discord.gg/gratis @everyone",
+				"waiting": "Escreva ou cole uma mensagem acima para ver o que aconteceria.",
 				"clear": "Nada dispara. Esta mensagem passaria.",
 				"fires": "dispararia",
 				"untestable": "{names} não dá para testar aqui — {count, plural, =1 {ela precisa} other {elas precisam}} de histórico de mensagens ou de anexos.",
@@ -1252,7 +1304,130 @@
 				"capsHint": "Acima desta proporção de letras.",
 				"needAction": "Escolha ao menos uma ação, ou a regra não faz nada.",
 				"needName": "Dê um nome à regra, ou ninguém vai saber para que ela servia.",
-				"needWords": "Coloque pelo menos uma palavra, ou a regra não bloqueia nada."
+				"needWords": "Coloque pelo menos uma palavra, ou a regra não bloqueia nada.",
+				"triggerHelp": {
+					"label": "Ajuda sobre os gatilhos",
+					"title": "O que cada gatilho mede",
+					"body": "A regra tem um gatilho só. Para vigiar duas coisas, crie duas regras.",
+					"points": {
+						"spam": {
+							"title": "Spam",
+							"body": "Conta as mensagens da mesma pessoa dentro da janela de segundos que você escolher."
+						},
+						"invites": {
+							"title": "Convites",
+							"body": "Pega discord.gg/x, discord.com/invite/x e os apelidos antigos, inclusive convite do seu próprio servidor."
+						},
+						"links": {
+							"title": "Links",
+							"body": "Qualquer endereço, com ou sem https. Disfarce comum como site[.]com e site . com é desfeito antes de comparar."
+						},
+						"caps": {
+							"title": "Maiúsculas",
+							"body": "A proporção de maiúsculas entre as letras da mensagem. Mensagem com menos de 10 caracteres nunca dispara."
+						},
+						"mentions": {
+							"title": "Menções",
+							"body": "Quantas pessoas e cargos foram marcados numa mensagem só."
+						},
+						"words": {
+							"title": "Palavras",
+							"body": "A sua lista, comparada por palavra inteira e ignorando maiúsculas."
+						},
+						"attachments": {
+							"title": "Anexos",
+							"body": "Quantos arquivos vieram na mesma mensagem, seja qual for o tipo."
+						}
+					}
+				},
+				"wordsHelp": {
+					"label": "Ajuda sobre as palavras",
+					"title": "Como a lista é comparada",
+					"body": "Uma por linha, e cada linha é comparada por palavra inteira.",
+					"points": {
+						"whole": {
+							"title": "Palavra inteira, nunca pedaço",
+							"body": "bobo não dispara em bobolândia: a palavra precisa estar separada, entre espaços ou pontuação."
+						},
+						"case": {
+							"title": "Maiúsculas são ignoradas, acentos não",
+							"body": "NÃO casa com não, mas nao é outra palavra e precisa de linha própria."
+						},
+						"phrase": {
+							"title": "Uma linha pode ser uma frase",
+							"body": "vende conta só dispara com as duas palavras juntas, nessa ordem."
+						},
+						"limit": {
+							"title": "Até 200 linhas de 64 caracteres",
+							"body": "Linha repetida e linha vazia são descartadas ao salvar."
+						}
+					}
+				},
+				"thresholdHelp": {
+					"label": "Ajuda sobre o limite",
+					"title": "O número é o ponto em que a regra passa a disparar",
+					"body": "Ele conta a partir do valor, não acima dele.",
+					"points": {
+						"atLeast": {
+							"title": "Limite 5 dispara com 5",
+							"body": "A conferência é por igual ou maior, então 4 passa e 5 já pega."
+						},
+						"caps": {
+							"title": "Em Maiúsculas o número é porcentagem",
+							"body": "70 quer dizer 70% das letras em maiúscula. Emoji, número e pontuação ficam fora da conta."
+						},
+						"window": {
+							"title": "A janela só existe no Spam",
+							"body": "5 dentro de 5 segundos quer dizer cinco mensagens da mesma pessoa nesses cinco segundos."
+						},
+						"range": {
+							"title": "Ele vai de 1 a 100",
+							"body": "Um limite de 1 faz a regra disparar já na primeira ocorrência."
+						}
+					}
+				},
+				"actionHelp": {
+					"label": "Ajuda sobre as ações",
+					"title": "Dá para marcar mais de uma",
+					"body": "Apagar e advertir juntos é o par mais comum.",
+					"points": {
+						"delete": {
+							"title": "Apagar não é punir",
+							"body": "Ele tira a mensagem e mais nada. A punição é a que você marcar ao lado."
+						},
+						"harshest": {
+							"title": "Duas punições marcadas viram uma",
+							"body": "Se a regra dispara com Advertir e Banir marcados, o que acontece é o banimento."
+						},
+						"timeout": {
+							"title": "O timeout usa a duração padrão da Moderação",
+							"body": "Não há campo de duração aqui: vale o padrão configurado na tela de Moderação."
+						},
+						"log": {
+							"title": "Só registrar não toca em ninguém",
+							"body": "Ele escreve no canal de log da Moderação, e sem canal escolhido lá nada aparece."
+						}
+					}
+				},
+				"exemptHelp": {
+					"label": "Ajuda sobre as exceções",
+					"title": "Quem esta regra nunca alcança",
+					"body": "A exceção vale para esta regra só, não para o AutoMod inteiro.",
+					"points": {
+						"any": {
+							"title": "Basta ter um dos cargos",
+							"body": "Não precisa ter todos: um cargo da lista já isenta a pessoa."
+						},
+						"channel": {
+							"title": "No canal escolhido a regra fica muda",
+							"body": "Ela continua valendo em todos os outros canais do servidor."
+						},
+						"bots": {
+							"title": "Bot nenhum é conferido",
+							"body": "O AutoMod ignora mensagem de bot, então não é preciso isentar os seus."
+						}
+					}
+				}
 			},
 			"saveFailed": "Não consegui salvar as regras do AutoMod"
 		},

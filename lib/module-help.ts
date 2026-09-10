@@ -48,6 +48,34 @@ export const MODULE_HELP = {
 	moderationWindow: {
 		namespace: 'modules.moderation.escalation.windowHelp',
 		points: ['rolling', 'kept', 'revoked']
+	},
+	automodRules: {
+		namespace: 'modules.automod.rules.help',
+		points: ['together', 'harshest', 'moderation', 'ladder', 'save']
+	},
+	automodPlayground: {
+		namespace: 'modules.automod.playground.help',
+		points: ['draft', 'exempt', 'history', 'all']
+	},
+	automodTrigger: {
+		namespace: 'modules.automod.dialog.triggerHelp',
+		points: ['spam', 'invites', 'links', 'caps', 'mentions', 'words', 'attachments']
+	},
+	automodWords: {
+		namespace: 'modules.automod.dialog.wordsHelp',
+		points: ['whole', 'case', 'phrase', 'limit']
+	},
+	automodThreshold: {
+		namespace: 'modules.automod.dialog.thresholdHelp',
+		points: ['atLeast', 'caps', 'window', 'range']
+	},
+	automodActions: {
+		namespace: 'modules.automod.dialog.actionHelp',
+		points: ['delete', 'harshest', 'timeout', 'log']
+	},
+	automodExempt: {
+		namespace: 'modules.automod.dialog.exemptHelp',
+		points: ['any', 'channel', 'bots']
 	}
 } as const satisfies Record<string, Help>;
 

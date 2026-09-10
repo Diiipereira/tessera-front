@@ -1156,7 +1156,34 @@
 			"untitled": "Untitled rule",
 			"rules": {
 				"title": "Rules",
-				"description": "Checked top to bottom. The first rule that fires wins.",
+				"description": "Every enabled rule is checked. If more than one fires, the harshest punishment is the one applied.",
+				"help": {
+					"label": "Help with rules",
+					"title": "Every rule is checked, not just the first",
+					"body": "Whatever fires adds up, and only the punishment is a single one.",
+					"points": {
+						"together": {
+							"title": "One message can fire several rules",
+							"body": "If any rule that fired says delete, the message goes; if any says log, the entry is written."
+						},
+						"harshest": {
+							"title": "Only one punishment is applied, the harshest",
+							"body": "Across everything that fired the order is warn, timeout, kick, ban — never two at once."
+						},
+						"moderation": {
+							"title": "Punishing and logging need the Moderation module",
+							"body": "With it off AutoMod still deletes the message, but opens no case and tells nobody."
+						},
+						"ladder": {
+							"title": "The punishment becomes a numbered case and counts points",
+							"body": "A warn or a timeout from AutoMod weighs on the escalation ladder just like a moderator's."
+						},
+						"save": {
+							"title": "Nothing changes in the server until you save",
+							"body": "Creating, editing and switching rules off here is a draft until you press Save."
+						}
+					}
+				},
 				"empty": "No rules yet. Nothing is being filtered.",
 				"rule": "Rule",
 				"firesOn": "Fires on",
@@ -1217,7 +1244,32 @@
 			"playground": {
 				"title": "Test playground",
 				"description": "Paste something a member might send and see which rules would catch it.",
+				"help": {
+					"label": "Help with the playground",
+					"title": "It tests what is on the screen, including what you have not saved",
+					"body": "It simulates the text of a message, not the whole server.",
+					"points": {
+						"draft": {
+							"title": "It runs against the draft",
+							"body": "The rules go from here exactly as they are now, while /automod test in Discord runs against what is saved."
+						},
+						"exempt": {
+							"title": "Exempt roles and channels are not simulated",
+							"body": "A rule shows up firing even when, in the server, whoever sent it would be exempt."
+						},
+						"history": {
+							"title": "Spam and attachments cannot be tested here",
+							"body": "One depends on the pace of earlier messages and the other on files, and this box only has text."
+						},
+						"all": {
+							"title": "It lists everything that would fire",
+							"body": "In the server those rules add up to a single punishment, the harshest one."
+						}
+					}
+				},
 				"sample": "Sample message",
+				"placeholder": "CHECK THIS OUT discord.gg/freestuff @everyone",
+				"waiting": "Type or paste a message above to see what would happen.",
 				"clear": "Nothing fires. This message would go through.",
 				"fires": "would fire",
 				"untestable": "{names} cannot be tested here — {count, plural, =1 {it needs} other {they need}} message history or attachments.",
@@ -1252,7 +1304,130 @@
 				"capsHint": "Above this share of letters.",
 				"needAction": "Pick at least one action, or the rule does nothing.",
 				"needName": "Give the rule a name, or nobody will know what it was for.",
-				"needWords": "Add at least one word, or the rule blocks nothing."
+				"needWords": "Add at least one word, or the rule blocks nothing.",
+				"triggerHelp": {
+					"label": "Help with triggers",
+					"title": "What each trigger measures",
+					"body": "A rule has one trigger. To watch two things, create two rules.",
+					"points": {
+						"spam": {
+							"title": "Spam",
+							"body": "Counts the messages of one person inside the window of seconds you choose."
+						},
+						"invites": {
+							"title": "Invites",
+							"body": "Catches discord.gg/x, discord.com/invite/x and the old aliases, including an invite to your own server."
+						},
+						"links": {
+							"title": "Links",
+							"body": "Any address, with or without https. Common disguises like site[.]com and site . com are undone before comparing."
+						},
+						"caps": {
+							"title": "Capitals",
+							"body": "The share of capitals among the letters of the message. A message under 10 characters never fires."
+						},
+						"mentions": {
+							"title": "Mentions",
+							"body": "How many people and roles were tagged in a single message."
+						},
+						"words": {
+							"title": "Words",
+							"body": "Your own list, matched whole-word and ignoring case."
+						},
+						"attachments": {
+							"title": "Attachments",
+							"body": "How many files came in the same message, whatever the type."
+						}
+					}
+				},
+				"wordsHelp": {
+					"label": "Help with blocked words",
+					"title": "How the list is matched",
+					"body": "One per line, and each line is compared as a whole word.",
+					"points": {
+						"whole": {
+							"title": "Whole word, never a fragment",
+							"body": "fool does not fire on foolish: the word has to stand apart, between spaces or punctuation."
+						},
+						"case": {
+							"title": "Case is ignored, accents are not",
+							"body": "SPAM matches spam, but spám is a different word and needs a line of its own."
+						},
+						"phrase": {
+							"title": "A line can be a phrase",
+							"body": "selling accounts only fires with both words together, in that order."
+						},
+						"limit": {
+							"title": "Up to 200 lines of 64 characters",
+							"body": "Repeated and empty lines are dropped when you save."
+						}
+					}
+				},
+				"thresholdHelp": {
+					"label": "Help with the threshold",
+					"title": "The number is where the rule starts firing",
+					"body": "It counts from the value, not above it.",
+					"points": {
+						"atLeast": {
+							"title": "A threshold of 5 fires at 5",
+							"body": "The check is at-or-above, so 4 goes through and 5 already catches."
+						},
+						"caps": {
+							"title": "For Capitals the number is a percentage",
+							"body": "70 means 70% of the letters are capitals. Emoji, digits and punctuation stay out of the count."
+						},
+						"window": {
+							"title": "The window only exists for Spam",
+							"body": "5 within 5 seconds means five messages from the same person inside those five seconds."
+						},
+						"range": {
+							"title": "It runs from 1 to 100",
+							"body": "A threshold of 1 makes the rule fire on the very first occurrence."
+						}
+					}
+				},
+				"actionHelp": {
+					"label": "Help with actions",
+					"title": "You can tick more than one",
+					"body": "Delete and warn together is the most common pair.",
+					"points": {
+						"delete": {
+							"title": "Delete is not a punishment",
+							"body": "It removes the message and nothing else. The punishment is whatever you tick beside it."
+						},
+						"harshest": {
+							"title": "Two punishments ticked become one",
+							"body": "If the rule fires with Warn and Ban ticked, the ban is what happens."
+						},
+						"timeout": {
+							"title": "Timeout uses the default duration from Moderation",
+							"body": "There is no duration field here: the default set on the Moderation screen is what applies."
+						},
+						"log": {
+							"title": "Log only touches nobody",
+							"body": "It writes to the Moderation log channel, and with no channel picked there nothing shows up."
+						}
+					}
+				},
+				"exemptHelp": {
+					"label": "Help with exemptions",
+					"title": "Who this rule never reaches",
+					"body": "The exemption is for this rule alone, not for all of AutoMod.",
+					"points": {
+						"any": {
+							"title": "Holding any one of the roles is enough",
+							"body": "It is not all of them: a single role from the list already exempts the person."
+						},
+						"channel": {
+							"title": "In the chosen channel the rule goes quiet",
+							"body": "It still applies in every other channel of the server."
+						},
+						"bots": {
+							"title": "No bot is ever checked",
+							"body": "AutoMod ignores messages from bots, so there is no need to exempt yours."
+						}
+					}
+				}
 			},
 			"saveFailed": "AutoMod rules could not be saved"
 		},
