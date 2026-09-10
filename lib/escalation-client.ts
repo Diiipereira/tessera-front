@@ -1,5 +1,5 @@
 import { apiBaseUrl } from '@/lib/api-url';
-import { describeFailure, type ErrorBody } from '@/lib/module-client';
+import { failureFrom, unreachable, type ApiFailure, type ErrorBody } from '@/lib/api-errors';
 import type { AutoAction } from '@/lib/modules/moderation';
 
 export type EscalationRule = {
@@ -15,16 +15,16 @@ export type EscalationLadder = {
 };
 
 export type LadderResult =
-	{ status: 'ok'; ladder: EscalationLadder } | { status: 'error'; message: string };
+	{ status: 'ok'; ladder: EscalationLadder } | { status: 'error'; failure: ApiFailure };
 
-export type RuleResult = { status: 'ok' } | { status: 'error'; message: string };
+export type RuleResult = { status: 'ok' } | { status: 'error'; failure: ApiFailure };
 
 const ladderUrl = (guildId: string): string => `${apiBaseUrl()}/guilds/${guildId}/escalation`;
 
-async function failureOf(response: Response): Promise<string> {
+async function failureOf(response: Response): Promise<ApiFailure> {
 	const body = (await response.json().catch(() => ({}))) as ErrorBody;
 
-	return describeFailure(body, response.status);
+	return failureFrom(body, response.status);
 }
 
 export async function loadLadder(guildId: string): Promise<LadderResult> {
@@ -35,11 +35,11 @@ export async function loadLadder(guildId: string): Promise<LadderResult> {
 	} catch (error) {
 		return {
 			status: 'error',
-			message: error instanceof Error ? error.message : 'The API could not be reached'
+			failure: unreachable(error)
 		};
 	}
 
-	if (!response.ok) return { status: 'error', message: await failureOf(response) };
+	if (!response.ok) return { status: 'error', failure: await failureOf(response) };
 
 	return { status: 'ok', ladder: (await response.json()) as EscalationLadder };
 }
@@ -60,11 +60,11 @@ export async function addRule(
 	} catch (error) {
 		return {
 			status: 'error',
-			message: error instanceof Error ? error.message : 'The API could not be reached'
+			failure: unreachable(error)
 		};
 	}
 
-	if (!response.ok) return { status: 'error', message: await failureOf(response) };
+	if (!response.ok) return { status: 'error', failure: await failureOf(response) };
 
 	return { status: 'ok' };
 }
@@ -80,11 +80,11 @@ export async function removeRule(guildId: string, threshold: number): Promise<Ru
 	} catch (error) {
 		return {
 			status: 'error',
-			message: error instanceof Error ? error.message : 'The API could not be reached'
+			failure: unreachable(error)
 		};
 	}
 
-	if (!response.ok) return { status: 'error', message: await failureOf(response) };
+	if (!response.ok) return { status: 'error', failure: await failureOf(response) };
 
 	return { status: 'ok' };
 }

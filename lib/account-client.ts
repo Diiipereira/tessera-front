@@ -1,7 +1,7 @@
 import { apiBaseUrl } from '@/lib/api-url';
-import { describeFailure, type ErrorBody } from '@/lib/module-client';
+import { failureFrom, unreachable, type ApiFailure, type ErrorBody } from '@/lib/api-errors';
 
-export type SessionRevokeResult = { status: 'revoked' } | { status: 'error'; message: string };
+export type SessionRevokeResult = { status: 'revoked' } | { status: 'error'; failure: ApiFailure };
 
 const sessionsUrl = (): string => `${apiBaseUrl()}/auth/sessions`;
 
@@ -13,7 +13,7 @@ async function remove(url: string): Promise<SessionRevokeResult> {
 	} catch (error) {
 		return {
 			status: 'error',
-			message: error instanceof Error ? error.message : 'The API could not be reached'
+			failure: unreachable(error)
 		};
 	}
 
@@ -21,7 +21,7 @@ async function remove(url: string): Promise<SessionRevokeResult> {
 
 	const failure = (await response.json().catch(() => ({}))) as ErrorBody;
 
-	return { status: 'error', message: describeFailure(failure, response.status) };
+	return { status: 'error', failure: failureFrom(failure, response.status) };
 }
 
 export const revokeSession = (sessionId: string): Promise<SessionRevokeResult> =>

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { describeFailure, patchModule, sendModuleTest } from './module-client';
+import { patchModule, sendModuleTest } from './module-client';
 
 const GUILD_ID = '931562055025168435';
 
@@ -9,36 +9,6 @@ const json = (status: number, body: unknown): Response =>
 		status,
 		json: () => Promise.resolve(body)
 	}) as Response;
-
-describe('describeFailure', () => {
-	it('spells out every validation issue the registry raised', () => {
-		expect(
-			describeFailure(
-				{
-					error: {
-						code: 'CONFIG_INVALID',
-						message: 'invalid',
-						details: {
-							issues: [
-								{ path: 'message', message: 'Too big' },
-								{ path: 'autoRoles', message: 'Too many' }
-							]
-						}
-					}
-				},
-				400
-			)
-		).toBe('message: Too big; autoRoles: Too many');
-	});
-
-	it('falls back to the message when there are no issues', () => {
-		expect(describeFailure({ error: { message: 'Nope' } }, 403)).toBe('Nope');
-	});
-
-	it('never leaves the caller without something to show', () => {
-		expect(describeFailure({}, 500)).toBe('The API answered 500');
-	});
-});
 
 describe('patchModule', () => {
 	const fetchMock = vi.fn();
@@ -78,13 +48,17 @@ describe('patchModule', () => {
 	it('reports a validation refusal as an error the member can read', async () => {
 		fetchMock.mockResolvedValue(
 			json(400, {
-				error: { details: { issues: [{ path: 'message', message: 'Too big' }] } }
+				error: {
+					code: 'CONFIG_INVALID',
+					message: 'invalid',
+					details: { issues: [{ path: 'message', message: 'Too big' }] }
+				}
 			})
 		);
 
 		await expect(patchModule(GUILD_ID, 'welcome', { version: 4 })).resolves.toEqual({
 			status: 'error',
-			message: 'message: Too big'
+			failure: { code: 'CONFIG_INVALID', fallback: 'invalid', fields: ['message'] }
 		});
 	});
 
@@ -93,7 +67,7 @@ describe('patchModule', () => {
 
 		await expect(patchModule(GUILD_ID, 'welcome', { version: 4 })).resolves.toEqual({
 			status: 'error',
-			message: 'Failed to fetch'
+			failure: { code: 'UNREACHABLE', fallback: 'Failed to fetch' }
 		});
 	});
 
@@ -147,7 +121,7 @@ describe('sendModuleTest', () => {
 
 		expect(await sendModuleTest(GUILD_ID, 'levels')).toEqual({
 			status: 'error',
-			message: 'no test'
+			failure: { code: 'MODULE_HAS_NO_TEST', fallback: 'no test' }
 		});
 	});
 
@@ -156,7 +130,7 @@ describe('sendModuleTest', () => {
 
 		expect(await sendModuleTest(GUILD_ID, 'welcome')).toEqual({
 			status: 'error',
-			message: 'offline'
+			failure: { code: 'UNREACHABLE', fallback: 'offline' }
 		});
 	});
 });

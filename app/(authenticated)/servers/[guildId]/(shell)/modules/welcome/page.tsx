@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import { redirect } from 'next/navigation';
 import { WelcomeSkeleton } from '@/components/skeletons/WelcomeSkeleton';
 import { apiGet } from '@/lib/api';
@@ -9,7 +11,11 @@ import type { GuildPageProps } from '@/lib/types/page';
 import type { GuildSettingsDto } from '@/lib/types/management';
 import { WelcomeScreen } from './WelcomeScreen';
 
-export const metadata = { title: 'Welcome' };
+export async function generateMetadata(): Promise<Metadata> {
+	const t = await getTranslations('modules.welcome');
+
+	return { title: t('title') };
+}
 
 export default async function Page({ params, searchParams }: GuildPageProps) {
 	const [{ guildId }, query] = await Promise.all([params, searchParams]);

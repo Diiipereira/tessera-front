@@ -1,16 +1,16 @@
 import { apiBaseUrl } from '@/lib/api-url';
-import { describeFailure, type ErrorBody } from '@/lib/module-client';
+import { failureFrom, unreachable, type ApiFailure, type ErrorBody } from '@/lib/api-errors';
 import type { LogDestinationDto, LogRoutePayload } from '@/lib/modules/logging';
 
 export type RoutesResult =
-	{ status: 'ok'; events: LogDestinationDto[] } | { status: 'error'; message: string };
+	{ status: 'ok'; events: LogDestinationDto[] } | { status: 'error'; failure: ApiFailure };
 
 const routesUrl = (guildId: string): string => `${apiBaseUrl()}/guilds/${guildId}/logging`;
 
-async function failureOf(response: Response): Promise<string> {
+async function failureOf(response: Response): Promise<ApiFailure> {
 	const body = (await response.json().catch(() => ({}))) as ErrorBody;
 
-	return describeFailure(body, response.status);
+	return failureFrom(body, response.status);
 }
 
 export async function loadRoutes(guildId: string): Promise<RoutesResult> {
@@ -21,11 +21,11 @@ export async function loadRoutes(guildId: string): Promise<RoutesResult> {
 	} catch (error) {
 		return {
 			status: 'error',
-			message: error instanceof Error ? error.message : 'The API could not be reached'
+			failure: unreachable(error)
 		};
 	}
 
-	if (!response.ok) return { status: 'error', message: await failureOf(response) };
+	if (!response.ok) return { status: 'error', failure: await failureOf(response) };
 
 	const body = (await response.json()) as { events: LogDestinationDto[] };
 
@@ -48,11 +48,11 @@ export async function saveRoutes(
 	} catch (error) {
 		return {
 			status: 'error',
-			message: error instanceof Error ? error.message : 'The API could not be reached'
+			failure: unreachable(error)
 		};
 	}
 
-	if (!response.ok) return { status: 'error', message: await failureOf(response) };
+	if (!response.ok) return { status: 'error', failure: await failureOf(response) };
 
 	const body = (await response.json()) as { events: LogDestinationDto[] };
 

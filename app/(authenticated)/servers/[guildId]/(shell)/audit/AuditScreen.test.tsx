@@ -213,7 +213,10 @@ describe('AuditScreen', () => {
 
 	it('says the read failed instead of showing an empty log', async () => {
 		const user = userEvent.setup();
-		readAudit.mockResolvedValue({ status: 'error', message: 'No dashboard access' });
+		readAudit.mockResolvedValue({
+			status: 'error',
+			failure: { code: 'FORBIDDEN', fallback: 'No dashboard access' }
+		});
 		paint([entry()], '1787997840000.42');
 
 		await user.click(screen.getByRole('button', { name: 'Load older entries' }));

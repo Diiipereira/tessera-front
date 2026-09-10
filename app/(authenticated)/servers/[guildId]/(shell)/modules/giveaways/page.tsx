@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import { redirect } from 'next/navigation';
 import { GiveawaysSkeleton } from '@/components/skeletons/GiveawaysSkeleton';
 import { apiGet } from '@/lib/api';
@@ -9,7 +11,11 @@ import { toGiveaways, toGiveawaysConfig, type GiveawaysDto } from '@/lib/modules
 import type { GuildPageProps } from '@/lib/types/page';
 import { GiveawaysScreen } from './GiveawaysScreen';
 
-export const metadata = { title: 'Giveaways' };
+export async function generateMetadata(): Promise<Metadata> {
+	const t = await getTranslations('modules.giveaways');
+
+	return { title: t('title') };
+}
 
 const EMPTY: GiveawaysDto = { giveaways: [], nextCursor: null, running: 0 };
 

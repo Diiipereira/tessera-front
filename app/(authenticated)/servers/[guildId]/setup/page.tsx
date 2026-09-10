@@ -1,18 +1,23 @@
+import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import { redirect } from 'next/navigation';
 import { apiGet } from '@/lib/api';
 import type { GuildModuleListDto } from '@/lib/api-url';
-import { BRAND } from '@/lib/brand';
 import { ApiUnreachableError, lookupGuild, resolveGuild } from '@/lib/guild-access';
 import { loadChannels, loadRoles } from '@/lib/guild-shape';
 import { toSetupModules } from '@/lib/setup';
 import type { GuildSettingsDto } from '@/lib/types/management';
 import { SetupWizard } from './SetupWizard';
 
-export async function generateMetadata({ params }: { params: Promise<{ guildId: string }> }) {
+export async function generateMetadata({
+	params
+}: {
+	params: Promise<{ guildId: string }>;
+}): Promise<Metadata> {
 	const { guildId } = await params;
-	const guild = await lookupGuild(guildId);
+	const [guild, t] = await Promise.all([lookupGuild(guildId), getTranslations('setup')]);
 
-	return { title: `Set up ${guild?.name ?? 'server'} · ${BRAND.name}` };
+	return { title: t('metaTitle', { server: guild?.name ?? t('unnamedServer') }) };
 }
 
 export default async function Page({ params }: { params: Promise<{ guildId: string }> }) {

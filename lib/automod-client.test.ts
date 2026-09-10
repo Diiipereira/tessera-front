@@ -68,7 +68,7 @@ describe('the automod client', () => {
 
 			await expect(loadRules(GUILD_ID)).resolves.toEqual({
 				status: 'error',
-				message: 'You cannot read this'
+				failure: { code: 'FORBIDDEN', fallback: 'You cannot read this' }
 			});
 		});
 
@@ -77,7 +77,7 @@ describe('the automod client', () => {
 
 			await expect(loadRules(GUILD_ID)).resolves.toEqual({
 				status: 'error',
-				message: 'fetch failed'
+				failure: { code: 'UNREACHABLE', fallback: 'fetch failed' }
 			});
 		});
 	});
@@ -106,7 +106,8 @@ describe('the automod client', () => {
 			vi.mocked(fetch).mockResolvedValue(
 				json(400, {
 					error: {
-						code: 'VALIDATION_FAILED',
+						code: 'INVALID_AUTOMOD_RULE',
+						message: 'invalid',
 						details: { issues: [{ path: 'rules.0.name', message: 'is required' }] }
 					}
 				})
@@ -114,7 +115,7 @@ describe('the automod client', () => {
 
 			await expect(saveRules(GUILD_ID, [rule])).resolves.toEqual({
 				status: 'error',
-				message: 'rules.0.name: is required'
+				failure: { code: 'INVALID_AUTOMOD_RULE', fallback: 'invalid', fields: ['rules.0.name'] }
 			});
 		});
 	});
@@ -160,12 +161,14 @@ describe('the automod client', () => {
 
 		it('reports a refusal rather than leaving the last reading on screen', async () => {
 			vi.mocked(fetch).mockResolvedValue(
-				json(400, { error: { message: 'That rule has no name' } })
+				json(400, {
+					error: { code: 'INVALID_AUTOMOD_RULE', message: 'That rule has no name' }
+				})
 			);
 
 			await expect(testMessage(GUILD_ID, 'x', [rule])).resolves.toEqual({
 				status: 'error',
-				message: 'That rule has no name'
+				failure: { code: 'INVALID_AUTOMOD_RULE', fallback: 'That rule has no name' }
 			});
 		});
 	});

@@ -1,5 +1,5 @@
 import { apiBaseUrl } from '@/lib/api-url';
-import { describeFailure, type ErrorBody } from '@/lib/module-client';
+import { failureFrom, unreachable, type ApiFailure, type ErrorBody } from '@/lib/api-errors';
 import type { AuditPage, AuditSource } from '@/lib/types/management';
 
 export type AuditQuery = {
@@ -10,7 +10,7 @@ export type AuditQuery = {
 };
 
 export type AuditReadResult =
-	{ status: 'ok'; page: AuditPage } | { status: 'error'; message: string };
+	{ status: 'ok'; page: AuditPage } | { status: 'error'; failure: ApiFailure };
 
 export function auditUrl(guildId: string, query: AuditQuery): string {
 	const search = new URLSearchParams();
@@ -25,16 +25,13 @@ export function auditUrl(guildId: string, query: AuditQuery): string {
 	return `${apiBaseUrl()}/guilds/${guildId}/audit${suffix}`;
 }
 
-const unreachable = (error: unknown): string =>
-	error instanceof Error ? error.message : 'The API could not be reached';
-
 export async function readAudit(guildId: string, query: AuditQuery): Promise<AuditReadResult> {
 	let response: Response;
 
 	try {
 		response = await fetch(auditUrl(guildId, query), { credentials: 'include' });
 	} catch (error) {
-		return { status: 'error', message: unreachable(error) };
+		return { status: 'error', failure: unreachable(error) };
 	}
 
 	if (response.ok) {
@@ -43,5 +40,5 @@ export async function readAudit(guildId: string, query: AuditQuery): Promise<Aud
 
 	const failure = (await response.json().catch(() => ({}))) as ErrorBody;
 
-	return { status: 'error', message: describeFailure(failure, response.status) };
+	return { status: 'error', failure: failureFrom(failure, response.status) };
 }

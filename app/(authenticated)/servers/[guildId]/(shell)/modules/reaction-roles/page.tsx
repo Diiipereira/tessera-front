@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import { redirect } from 'next/navigation';
 import { ReactionRolesSkeleton } from '@/components/skeletons/ReactionRolesSkeleton';
 import { apiGet } from '@/lib/api';
@@ -8,7 +10,11 @@ import { toReactionRolesConfig, type ReactionPanelDto } from '@/lib/modules/reac
 import type { GuildPageProps } from '@/lib/types/page';
 import { ReactionRolesScreen } from './ReactionRolesScreen';
 
-export const metadata = { title: 'Reaction roles' };
+export async function generateMetadata(): Promise<Metadata> {
+	const t = await getTranslations('modules.reactionRoles');
+
+	return { title: t('title') };
+}
 
 export default async function Page({ params, searchParams }: GuildPageProps) {
 	const [{ guildId }, query] = await Promise.all([params, searchParams]);

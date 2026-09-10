@@ -23,6 +23,7 @@ import {
 import { listCases, revokeCase } from '@/lib/cases-client';
 import { useRelativeTime } from '@/lib/hooks/useRelativeTime';
 import type { CaseParticipant, CaseStatus, ModerationCase } from '@/lib/types/management';
+import { useApiFailure } from '@/lib/hooks/useApiFailure';
 
 const STATUS_VARIANTS: Record<CaseStatus, BadgeVariant> = {
 	standing: 'success',
@@ -86,6 +87,7 @@ export function CaseDrawer({
 	onRevoked
 }: CaseDrawerProps) {
 	const t = useTranslations('cases');
+	const describe = useApiFailure();
 	const relativeTime = useRelativeTime();
 	const [others, setOthers] = useState<ModerationCase[] | null>(null);
 	const [reason, setReason] = useState('');
@@ -119,7 +121,7 @@ export function CaseDrawer({
 				setBusy(false);
 
 				if (result.status === 'error') {
-					toast.error(t('undo.failed'), { description: result.message });
+					toast.error(t('undo.failed'), { description: describe(result.failure) });
 					return;
 				}
 

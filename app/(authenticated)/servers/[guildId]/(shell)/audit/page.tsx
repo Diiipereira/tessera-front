@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import { redirect } from 'next/navigation';
 import { AuditSkeleton } from '@/components/skeletons/AuditSkeleton';
 import { apiGet } from '@/lib/api';
@@ -6,7 +8,11 @@ import type { AuditPage } from '@/lib/types/management';
 import type { GuildPageProps } from '@/lib/types/page';
 import { AuditScreen } from './AuditScreen';
 
-export const metadata = { title: 'Audit log' };
+export async function generateMetadata(): Promise<Metadata> {
+	const t = await getTranslations('audit');
+
+	return { title: t('title') };
+}
 
 type ModuleCatalog = { modules: { key: string }[] };
 

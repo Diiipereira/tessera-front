@@ -81,7 +81,7 @@ describe('listCases', () => {
 
 		expect(await listCases(GUILD_ID, {})).toEqual({
 			status: 'error',
-			message: 'connect ECONNREFUSED'
+			failure: { code: 'UNREACHABLE', fallback: 'connect ECONNREFUSED' }
 		});
 	});
 });

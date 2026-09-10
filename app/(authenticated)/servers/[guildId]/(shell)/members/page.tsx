@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import { redirect } from 'next/navigation';
 import { MembersSkeleton } from '@/components/skeletons/MembersSkeleton';
 import { apiGet } from '@/lib/api';
@@ -8,7 +10,11 @@ import { blankMemberQuery, toMembers, toSearchParams, type MemberListDto } from 
 import type { GuildPageProps } from '@/lib/types/page';
 import { MembersScreen } from './MembersScreen';
 
-export const metadata = { title: 'Members' };
+export async function generateMetadata(): Promise<Metadata> {
+	const t = await getTranslations('members');
+
+	return { title: t('title') };
+}
 
 const currencyOf = (state: GuildModuleStateDto): string | null => {
 	const named = state.config['currencyName'];

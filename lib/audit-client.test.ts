@@ -81,6 +81,9 @@ describe('readAudit', () => {
 
 		const result = await readAudit(GUILD_ID, {});
 
-		expect(result).toEqual({ status: 'error', message: 'connect ECONNREFUSED' });
+		expect(result).toEqual({
+			status: 'error',
+			failure: { code: 'UNREACHABLE', fallback: 'connect ECONNREFUSED' }
+		});
 	});
 });

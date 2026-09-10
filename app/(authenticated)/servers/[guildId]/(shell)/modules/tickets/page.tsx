@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import { redirect } from 'next/navigation';
 import { TicketsSkeleton } from '@/components/skeletons/TicketsSkeleton';
 import { apiGet } from '@/lib/api';
@@ -16,7 +18,11 @@ import type { GuildSettings } from '@/lib/types/management';
 import type { GuildPageProps } from '@/lib/types/page';
 import { TicketsScreen } from './TicketsScreen';
 
-export const metadata = { title: 'Tickets' };
+export async function generateMetadata(): Promise<Metadata> {
+	const t = await getTranslations('modules.tickets');
+
+	return { title: t('title') };
+}
 
 const EMPTY: TicketsDto = { tickets: [], nextCursor: null, open: 0 };
 

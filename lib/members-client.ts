@@ -1,5 +1,5 @@
 import { apiBaseUrl } from '@/lib/api-url';
-import { describeFailure, type ErrorBody } from '@/lib/module-client';
+import { failureFrom, unreachable, type ApiFailure, type ErrorBody } from '@/lib/api-errors';
 import {
 	toMember,
 	toMembers,
@@ -13,14 +13,14 @@ import type { Member, MemberDetail } from '@/lib/types/management';
 export type MemberPage = { members: Member[]; total: number; searched: boolean };
 
 export type MemberLoadResult =
-	{ status: 'loaded'; page: MemberPage } | { status: 'error'; message: string };
+	{ status: 'loaded'; page: MemberPage } | { status: 'error'; failure: ApiFailure };
 
 export type MemberDetailResult =
-	{ status: 'loaded'; detail: MemberDetail } | { status: 'error'; message: string };
+	{ status: 'loaded'; detail: MemberDetail } | { status: 'error'; failure: ApiFailure };
 
 const membersUrl = (guildId: string): string => `${apiBaseUrl()}/guilds/${guildId}/members`;
 
-type Answer<T> = { ok: true; data: T } | { ok: false; message: string };
+type Answer<T> = { ok: true; data: T } | { ok: false; failure: ApiFailure };
 
 async function read<T>(url: string): Promise<Answer<T>> {
 	let response: Response;
@@ -30,7 +30,7 @@ async function read<T>(url: string): Promise<Answer<T>> {
 	} catch (error) {
 		return {
 			ok: false,
-			message: error instanceof Error ? error.message : 'The API could not be reached'
+			failure: unreachable(error)
 		};
 	}
 
@@ -38,7 +38,7 @@ async function read<T>(url: string): Promise<Answer<T>> {
 
 	const failure = (await response.json().catch(() => ({}))) as ErrorBody;
 
-	return { ok: false, message: describeFailure(failure, response.status) };
+	return { ok: false, failure: failureFrom(failure, response.status) };
 }
 
 export async function loadMembers(guildId: string, query: MemberQuery): Promise<MemberLoadResult> {
@@ -46,7 +46,7 @@ export async function loadMembers(guildId: string, query: MemberQuery): Promise<
 		`${membersUrl(guildId)}?${toSearchParams(query).toString()}`
 	);
 
-	if (!result.ok) return { status: 'error', message: result.message };
+	if (!result.ok) return { status: 'error', failure: result.failure };
 
 	return {
 		status: 'loaded',
@@ -61,7 +61,7 @@ export async function loadMembers(guildId: string, query: MemberQuery): Promise<
 export async function loadMember(guildId: string, userId: string): Promise<MemberDetailResult> {
 	const result = await read<MemberDetailDto>(`${membersUrl(guildId)}/${userId}`);
 
-	if (!result.ok) return { status: 'error', message: result.message };
+	if (!result.ok) return { status: 'error', failure: result.failure };
 
 	return {
 		status: 'loaded',

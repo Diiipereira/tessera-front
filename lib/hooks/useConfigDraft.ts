@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useNavigationHold } from '@/components/providers/navigation-blocker-context';
+import type { ApiFailure } from '@/lib/api-errors';
 
 export type SaveState = 'idle' | 'saving' | 'conflict';
 
@@ -10,16 +11,19 @@ export type ConflictChoice = 'reload' | 'keep-mine';
 export type SaveOutcome<T> =
 	| { status: 'saved'; saved: T }
 	| { status: 'conflict'; current: T }
-	| { status: 'error'; message: string };
+	| { status: 'error'; failure: ApiFailure };
 
 export type ConfigDraftOptions<T> = {
 	save?: (draft: T) => Promise<SaveOutcome<T>>;
 };
 
 export class ConfigSaveError extends Error {
-	constructor(message: string) {
-		super(message);
+	readonly failure: ApiFailure;
+
+	constructor(failure: ApiFailure) {
+		super(failure.fallback);
 		this.name = 'ConfigSaveError';
+		this.failure = failure;
 	}
 }
 
@@ -136,7 +140,7 @@ export function useConfigDraft<T extends object>(
 
 		if (outcome.status === 'error') {
 			setState('idle');
-			throw new ConfigSaveError(outcome.message);
+			throw new ConfigSaveError(outcome.failure);
 		}
 
 		setSaved(outcome.saved);

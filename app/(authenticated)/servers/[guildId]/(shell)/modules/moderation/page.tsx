@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import { redirect } from 'next/navigation';
 import { ModerationSkeleton } from '@/components/skeletons/ModerationSkeleton';
 import { apiGet } from '@/lib/api';
@@ -8,7 +10,11 @@ import { toModerationConfig } from '@/lib/modules/moderation';
 import type { GuildPageProps } from '@/lib/types/page';
 import { ModerationScreen } from './ModerationScreen';
 
-export const metadata = { title: 'Moderation' };
+export async function generateMetadata(): Promise<Metadata> {
+	const t = await getTranslations('modules.moderation');
+
+	return { title: t('title') };
+}
 
 export default async function Page({ params, searchParams }: GuildPageProps) {
 	const [{ guildId }, query] = await Promise.all([params, searchParams]);

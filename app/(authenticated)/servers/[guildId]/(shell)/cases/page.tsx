@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import { redirect } from 'next/navigation';
 import { CasesSkeleton } from '@/components/skeletons/CasesSkeleton';
 import { apiGet, type ApiResult } from '@/lib/api';
@@ -7,7 +9,11 @@ import type { CasePage } from '@/lib/types/management';
 import type { GuildPageProps } from '@/lib/types/page';
 import { CasesScreen } from './CasesScreen';
 
-export const metadata = { title: 'Cases' };
+export async function generateMetadata(): Promise<Metadata> {
+	const t = await getTranslations('cases');
+
+	return { title: t('title') };
+}
 
 function unwrap<T>(result: ApiResult<T>): T {
 	if (result.status === 'unauthenticated') redirect('/login');

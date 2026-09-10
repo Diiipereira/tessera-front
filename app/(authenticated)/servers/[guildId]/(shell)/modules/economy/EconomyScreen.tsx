@@ -45,6 +45,7 @@ import type {
 import { cn } from '@/lib/utils/cn';
 import { newId } from '@/lib/utils/id';
 import { formatCount } from '@/lib/utils/format';
+import { useApiFailure } from '@/lib/hooks/useApiFailure';
 
 const KIND_VARIANTS: Record<TransactionKind, BadgeVariant> = {
 	daily: 'success',
@@ -122,6 +123,7 @@ export function EconomyScreen({
 	now
 }: EconomyScreenProps) {
 	const t = useTranslations('modules.economy');
+	const describe = useApiFailure();
 	const versionRef = useRef(version);
 	const relativeTime = useRelativeTime();
 	const rightNow = new Date(now);
@@ -175,7 +177,7 @@ export function EconomyScreen({
 			if (controller.signal.aborted) return;
 
 			if (result.status === 'error') {
-				toast.error(result.message);
+				toast.error(describe(result.failure));
 				return;
 			}
 
@@ -185,7 +187,7 @@ export function EconomyScreen({
 		return () => {
 			controller.abort();
 		};
-	}, [guildId, filter]);
+	}, [guildId, filter, describe]);
 
 	const unnamed = nameless(draft.shop);
 
@@ -603,7 +605,7 @@ export function EconomyScreen({
 											setClearing(false);
 
 											if (result.status === 'error') {
-												toast.error(result.message);
+												toast.error(describe(result.failure));
 												return;
 											}
 

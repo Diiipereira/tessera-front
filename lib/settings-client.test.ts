@@ -52,7 +52,7 @@ describe('patchSettings', () => {
 
 		await expect(patchSettings(GUILD_ID, { locale: 'es-ES' })).resolves.toEqual({
 			status: 'error',
-			message: '"es-ES" is not a locale'
+			failure: { code: 'SETTINGS_INVALID', fallback: '"es-ES" is not a locale' }
 		});
 	});
 
@@ -61,7 +61,7 @@ describe('patchSettings', () => {
 
 		await expect(patchSettings(GUILD_ID, { locale: 'en-US' })).resolves.toEqual({
 			status: 'error',
-			message: 'fetch failed'
+			failure: { code: 'UNREACHABLE', fallback: 'fetch failed' }
 		});
 	});
 
@@ -74,6 +74,9 @@ describe('patchSettings', () => {
 
 		const result = await patchSettings(GUILD_ID, { locale: 'en-US' });
 
-		expect(result).toEqual({ status: 'error', message: 'The API answered 500' });
+		expect(result).toEqual({
+			status: 'error',
+			failure: { code: 'HTTP_500', fallback: 'The API answered 500' }
+		});
 	});
 });

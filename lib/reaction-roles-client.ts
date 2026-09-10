@@ -1,20 +1,16 @@
 import { apiBaseUrl } from '@/lib/api-url';
-import { describeFailure, type ErrorBody } from '@/lib/module-client';
+import { failureFrom, unreachable, type ApiFailure, type ErrorBody } from '@/lib/api-errors';
 import type { ReactionPanelDto, ReactionPanelPayload } from '@/lib/modules/reaction-roles';
 
 export type PanelsResult =
-	{ status: 'ok'; panels: ReactionPanelDto[] } | { status: 'error'; message: string };
+	{ status: 'ok'; panels: ReactionPanelDto[] } | { status: 'error'; failure: ApiFailure };
 
 const panelsUrl = (guildId: string): string => `${apiBaseUrl()}/guilds/${guildId}/reaction-roles`;
 
-async function failureOf(response: Response): Promise<string> {
+async function failureOf(response: Response): Promise<ApiFailure> {
 	const body = (await response.json().catch(() => ({}))) as ErrorBody;
 
-	return describeFailure(body, response.status);
-}
-
-function unreachable(error: unknown): string {
-	return error instanceof Error ? error.message : 'The API could not be reached';
+	return failureFrom(body, response.status);
 }
 
 export async function loadPanels(guildId: string): Promise<PanelsResult> {
@@ -23,10 +19,10 @@ export async function loadPanels(guildId: string): Promise<PanelsResult> {
 	try {
 		response = await fetch(panelsUrl(guildId), { credentials: 'include' });
 	} catch (error) {
-		return { status: 'error', message: unreachable(error) };
+		return { status: 'error', failure: unreachable(error) };
 	}
 
-	if (!response.ok) return { status: 'error', message: await failureOf(response) };
+	if (!response.ok) return { status: 'error', failure: await failureOf(response) };
 
 	const body = (await response.json()) as { panels: ReactionPanelDto[] };
 
@@ -47,10 +43,10 @@ export async function savePanels(
 			body: JSON.stringify({ panels })
 		});
 	} catch (error) {
-		return { status: 'error', message: unreachable(error) };
+		return { status: 'error', failure: unreachable(error) };
 	}
 
-	if (!response.ok) return { status: 'error', message: await failureOf(response) };
+	if (!response.ok) return { status: 'error', failure: await failureOf(response) };
 
 	const body = (await response.json()) as { panels: ReactionPanelDto[] };
 

@@ -1,9 +1,9 @@
 import { apiBaseUrl } from '@/lib/api-url';
-import { describeFailure, type ErrorBody } from '@/lib/module-client';
+import { failureFrom, unreachable, type ApiFailure, type ErrorBody } from '@/lib/api-errors';
 import type { GuildSettingsDto, GuildSettingsPatch } from '@/lib/types/management';
 
 export type SettingsWriteResult =
-	{ status: 'saved'; settings: GuildSettingsDto } | { status: 'error'; message: string };
+	{ status: 'saved'; settings: GuildSettingsDto } | { status: 'error'; failure: ApiFailure };
 
 const settingsUrl = (guildId: string): string => `${apiBaseUrl()}/guilds/${guildId}/settings`;
 
@@ -23,7 +23,7 @@ export async function patchSettings(
 	} catch (error) {
 		return {
 			status: 'error',
-			message: error instanceof Error ? error.message : 'The API could not be reached'
+			failure: unreachable(error)
 		};
 	}
 
@@ -33,5 +33,5 @@ export async function patchSettings(
 
 	const failure = (await response.json().catch(() => ({}))) as ErrorBody;
 
-	return { status: 'error', message: describeFailure(failure, response.status) };
+	return { status: 'error', failure: failureFrom(failure, response.status) };
 }

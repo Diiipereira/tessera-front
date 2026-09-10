@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { addRule, loadLadder, removeRule, type EscalationRule } from '@/lib/escalation-client';
 import { MODULE_HELP } from '@/lib/module-help';
+import { useApiFailure } from '@/lib/hooks/useApiFailure';
 import {
 	AUTO_ACTIONS,
 	TIMEOUT_KEYS,
@@ -41,6 +42,7 @@ const asKey = (value: string): TimeoutKey => TIMEOUT_KEYS.find((entry) => entry 
 
 export function LadderEditor({ guildId, canWrite }: { guildId: string; canWrite: boolean }) {
 	const t = useTranslations('modules.moderation.ladder');
+	const describe = useApiFailure();
 	const actions = useTranslations('cases.action');
 	const durations = useTranslations('durations');
 
@@ -83,7 +85,7 @@ export function LadderEditor({ guildId, canWrite }: { guildId: string; canWrite:
 			setBusy(false);
 
 			if (result.status === 'error') {
-				toast.error(t('addFailed'), { description: result.message });
+				toast.error(t('addFailed'), { description: describe(result.failure) });
 				return;
 			}
 
@@ -99,7 +101,7 @@ export function LadderEditor({ guildId, canWrite }: { guildId: string; canWrite:
 			setBusy(false);
 
 			if (result.status === 'error') {
-				toast.error(t('removeFailed'), { description: result.message });
+				toast.error(t('removeFailed'), { description: describe(result.failure) });
 				return;
 			}
 

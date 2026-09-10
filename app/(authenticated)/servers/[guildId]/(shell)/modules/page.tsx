@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
 import { ModulesSkeleton } from '@/components/skeletons/ModulesSkeleton';
@@ -8,7 +10,11 @@ import { toModuleSummaries, type ModuleCatalogDto } from '@/lib/modules/catalog'
 import type { GuildPageProps } from '@/lib/types/page';
 import { ModulesScreen } from './ModulesScreen';
 
-export const metadata = { title: 'Modules' };
+export async function generateMetadata(): Promise<Metadata> {
+	const t = await getTranslations('modulesList');
+
+	return { title: t('title') };
+}
 
 export default function Page({ params, searchParams }: GuildPageProps) {
 	return (

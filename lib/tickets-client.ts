@@ -1,13 +1,13 @@
 import { apiBaseUrl } from '@/lib/api-url';
-import { describeFailure, type ErrorBody } from '@/lib/module-client';
+import { failureFrom, unreachable, type ApiFailure, type ErrorBody } from '@/lib/api-errors';
 import type { TicketPanelDto, TicketPanelPayload, TicketsDto } from '@/lib/modules/tickets';
 import type { TicketStatus } from '@/lib/types/module-configs';
 
 export type PanelsResult =
-	{ status: 'ok'; panels: TicketPanelDto[] } | { status: 'error'; message: string };
+	{ status: 'ok'; panels: TicketPanelDto[] } | { status: 'error'; failure: ApiFailure };
 
 export type TicketsResult =
-	{ status: 'ok'; page: TicketsDto } | { status: 'error'; message: string };
+	{ status: 'ok'; page: TicketsDto } | { status: 'error'; failure: ApiFailure };
 
 const ticketsUrl = (guildId: string): string => `${apiBaseUrl()}/guilds/${guildId}/tickets`;
 
@@ -31,17 +31,13 @@ export const ticketQuery = (
 	return params.toString();
 };
 
-async function failureOf(response: Response): Promise<string> {
+async function failureOf(response: Response): Promise<ApiFailure> {
 	const body = (await response.json().catch(() => ({}))) as ErrorBody;
 
-	return describeFailure(body, response.status);
+	return failureFrom(body, response.status);
 }
 
-function unreachable(error: unknown): string {
-	return error instanceof Error ? error.message : 'The API could not be reached';
-}
-
-async function call(url: string, init?: RequestInit): Promise<Response | string> {
+async function call(url: string, init?: RequestInit): Promise<Response | ApiFailure> {
 	try {
 		return await fetch(url, { credentials: 'include', ...init });
 	} catch (error) {
@@ -52,9 +48,9 @@ async function call(url: string, init?: RequestInit): Promise<Response | string>
 export async function loadPanels(guildId: string): Promise<PanelsResult> {
 	const response = await call(`${ticketsUrl(guildId)}/panels`);
 
-	if (typeof response === 'string') return { status: 'error', message: response };
+	if (!(response instanceof Response)) return { status: 'error', failure: response };
 
-	if (!response.ok) return { status: 'error', message: await failureOf(response) };
+	if (!response.ok) return { status: 'error', failure: await failureOf(response) };
 
 	const body = (await response.json()) as { panels: TicketPanelDto[] };
 
@@ -71,9 +67,9 @@ export async function savePanels(
 		body: JSON.stringify({ panels })
 	});
 
-	if (typeof response === 'string') return { status: 'error', message: response };
+	if (!(response instanceof Response)) return { status: 'error', failure: response };
 
-	if (!response.ok) return { status: 'error', message: await failureOf(response) };
+	if (!response.ok) return { status: 'error', failure: await failureOf(response) };
 
 	const body = (await response.json()) as { panels: TicketPanelDto[] };
 
@@ -87,9 +83,9 @@ export async function loadTickets(
 ): Promise<TicketsResult> {
 	const response = await call(`${ticketsUrl(guildId)}?${ticketQuery(statuses, limit)}`);
 
-	if (typeof response === 'string') return { status: 'error', message: response };
+	if (!(response instanceof Response)) return { status: 'error', failure: response };
 
-	if (!response.ok) return { status: 'error', message: await failureOf(response) };
+	if (!response.ok) return { status: 'error', failure: await failureOf(response) };
 
 	return { status: 'ok', page: (await response.json()) as TicketsDto };
 }

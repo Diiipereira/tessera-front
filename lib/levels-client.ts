@@ -1,28 +1,25 @@
 import { apiBaseUrl } from '@/lib/api-url';
-import { describeFailure, type ErrorBody } from '@/lib/module-client';
+import { failureFrom, unreachable, type ApiFailure, type ErrorBody } from '@/lib/api-errors';
 import type { LeaderboardDto, LevelRewardDto } from '@/lib/modules/levels';
 
 export type RewardsResult =
-	{ status: 'ok'; rewards: LevelRewardDto[] } | { status: 'error'; message: string };
+	{ status: 'ok'; rewards: LevelRewardDto[] } | { status: 'error'; failure: ApiFailure };
 
 export type BoardResult =
-	{ status: 'ok'; board: LeaderboardDto } | { status: 'error'; message: string };
+	{ status: 'ok'; board: LeaderboardDto } | { status: 'error'; failure: ApiFailure };
 
-export type ClearResult = { status: 'ok'; cleared: number } | { status: 'error'; message: string };
+export type ClearResult =
+	{ status: 'ok'; cleared: number } | { status: 'error'; failure: ApiFailure };
 
 const levelsUrl = (guildId: string): string => `${apiBaseUrl()}/guilds/${guildId}/levels`;
 
-async function failureOf(response: Response): Promise<string> {
+async function failureOf(response: Response): Promise<ApiFailure> {
 	const body = (await response.json().catch(() => ({}))) as ErrorBody;
 
-	return describeFailure(body, response.status);
+	return failureFrom(body, response.status);
 }
 
-function unreachable(error: unknown): string {
-	return error instanceof Error ? error.message : 'The API could not be reached';
-}
-
-async function call(url: string, init?: RequestInit): Promise<Response | string> {
+async function call(url: string, init?: RequestInit): Promise<Response | ApiFailure> {
 	try {
 		return await fetch(url, { credentials: 'include', ...init });
 	} catch (error) {
@@ -33,9 +30,9 @@ async function call(url: string, init?: RequestInit): Promise<Response | string>
 export async function loadRewards(guildId: string): Promise<RewardsResult> {
 	const response = await call(`${levelsUrl(guildId)}/rewards`);
 
-	if (typeof response === 'string') return { status: 'error', message: response };
+	if (!(response instanceof Response)) return { status: 'error', failure: response };
 
-	if (!response.ok) return { status: 'error', message: await failureOf(response) };
+	if (!response.ok) return { status: 'error', failure: await failureOf(response) };
 
 	const body = (await response.json()) as { rewards: LevelRewardDto[] };
 
@@ -52,9 +49,9 @@ export async function saveRewards(
 		body: JSON.stringify({ rewards })
 	});
 
-	if (typeof response === 'string') return { status: 'error', message: response };
+	if (!(response instanceof Response)) return { status: 'error', failure: response };
 
-	if (!response.ok) return { status: 'error', message: await failureOf(response) };
+	if (!response.ok) return { status: 'error', failure: await failureOf(response) };
 
 	const body = (await response.json()) as { rewards: LevelRewardDto[] };
 
@@ -64,9 +61,9 @@ export async function saveRewards(
 export async function loadLeaderboard(guildId: string, limit = 10): Promise<BoardResult> {
 	const response = await call(`${levelsUrl(guildId)}/leaderboard?limit=${String(limit)}`);
 
-	if (typeof response === 'string') return { status: 'error', message: response };
+	if (!(response instanceof Response)) return { status: 'error', failure: response };
 
-	if (!response.ok) return { status: 'error', message: await failureOf(response) };
+	if (!response.ok) return { status: 'error', failure: await failureOf(response) };
 
 	return { status: 'ok', board: (await response.json()) as LeaderboardDto };
 }
@@ -74,9 +71,9 @@ export async function loadLeaderboard(guildId: string, limit = 10): Promise<Boar
 export async function clearLevels(guildId: string): Promise<ClearResult> {
 	const response = await call(`${levelsUrl(guildId)}/members`, { method: 'DELETE' });
 
-	if (typeof response === 'string') return { status: 'error', message: response };
+	if (!(response instanceof Response)) return { status: 'error', failure: response };
 
-	if (!response.ok) return { status: 'error', message: await failureOf(response) };
+	if (!response.ok) return { status: 'error', failure: await failureOf(response) };
 
 	const body = (await response.json()) as { cleared: number };
 

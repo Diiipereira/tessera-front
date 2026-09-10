@@ -30,6 +30,7 @@ import { guildHref } from '@/lib/navigation';
 import { useRelativeTime } from '@/lib/hooks/useRelativeTime';
 import type { TeamRole } from '@/lib/types/management';
 import { cn } from '@/lib/utils/cn';
+import { useApiFailure } from '@/lib/hooks/useApiFailure';
 
 type TeamScreenProps = {
 	guildId: string;
@@ -40,6 +41,7 @@ type TeamScreenProps = {
 
 export function TeamScreen({ guildId, catalog, team, now }: TeamScreenProps) {
 	const t = useTranslations('team');
+	const describe = useApiFailure();
 	const common = useTranslations('common');
 	const names = useTranslations('capabilities');
 	const router = useRouter();
@@ -68,7 +70,7 @@ export function TeamScreen({ guildId, catalog, team, now }: TeamScreenProps) {
 		setBusy(null);
 
 		if (result.status === 'error') {
-			toast.error(result.message);
+			toast.error(describe(result.failure));
 			return;
 		}
 
@@ -82,7 +84,7 @@ export function TeamScreen({ guildId, catalog, team, now }: TeamScreenProps) {
 		setBusy(null);
 
 		if (result.status === 'error') {
-			toast.error(result.message);
+			toast.error(describe(result.failure));
 			return;
 		}
 
@@ -96,7 +98,7 @@ export function TeamScreen({ guildId, catalog, team, now }: TeamScreenProps) {
 		setBusy(null);
 
 		if (result.status === 'error') {
-			toast.error(result.message);
+			toast.error(describe(result.failure));
 			return;
 		}
 

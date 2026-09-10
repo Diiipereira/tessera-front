@@ -1,15 +1,15 @@
 import { apiBaseUrl } from '@/lib/api-url';
-import { describeFailure, type ErrorBody } from '@/lib/module-client';
+import { failureFrom, unreachable, type ApiFailure, type ErrorBody } from '@/lib/api-errors';
 import type { GiveawayDto, GiveawaysDto, StartGiveawayPayload } from '@/lib/modules/giveaways';
 import type { GiveawayState } from '@/lib/types/module-configs';
 
 export type GiveawaysResult =
-	{ status: 'ok'; page: GiveawaysDto } | { status: 'error'; message: string };
+	{ status: 'ok'; page: GiveawaysDto } | { status: 'error'; failure: ApiFailure };
 
 export type GiveawayResult =
-	{ status: 'ok'; giveaway: GiveawayDto } | { status: 'error'; message: string };
+	{ status: 'ok'; giveaway: GiveawayDto } | { status: 'error'; failure: ApiFailure };
 
-export type RemovalResult = { status: 'ok' } | { status: 'error'; message: string };
+export type RemovalResult = { status: 'ok' } | { status: 'error'; failure: ApiFailure };
 
 const giveawaysUrl = (guildId: string): string => `${apiBaseUrl()}/guilds/${guildId}/giveaways`;
 
@@ -31,17 +31,13 @@ export const giveawayQuery = (
 	return params.toString();
 };
 
-async function failureOf(response: Response): Promise<string> {
+async function failureOf(response: Response): Promise<ApiFailure> {
 	const body = (await response.json().catch(() => ({}))) as ErrorBody;
 
-	return describeFailure(body, response.status);
+	return failureFrom(body, response.status);
 }
 
-function unreachable(error: unknown): string {
-	return error instanceof Error ? error.message : 'The API could not be reached';
-}
-
-async function call(url: string, init?: RequestInit): Promise<Response | string> {
+async function call(url: string, init?: RequestInit): Promise<Response | ApiFailure> {
 	try {
 		return await fetch(url, { credentials: 'include', ...init });
 	} catch (error) {
@@ -52,9 +48,9 @@ async function call(url: string, init?: RequestInit): Promise<Response | string>
 async function one(url: string, init?: RequestInit): Promise<GiveawayResult> {
 	const response = await call(url, init);
 
-	if (typeof response === 'string') return { status: 'error', message: response };
+	if (!(response instanceof Response)) return { status: 'error', failure: response };
 
-	if (!response.ok) return { status: 'error', message: await failureOf(response) };
+	if (!response.ok) return { status: 'error', failure: await failureOf(response) };
 
 	return { status: 'ok', giveaway: (await response.json()) as GiveawayDto };
 }
@@ -66,9 +62,9 @@ export async function loadGiveaways(
 ): Promise<GiveawaysResult> {
 	const response = await call(`${giveawaysUrl(guildId)}?${giveawayQuery(statuses, limit)}`);
 
-	if (typeof response === 'string') return { status: 'error', message: response };
+	if (!(response instanceof Response)) return { status: 'error', failure: response };
 
-	if (!response.ok) return { status: 'error', message: await failureOf(response) };
+	if (!response.ok) return { status: 'error', failure: await failureOf(response) };
 
 	return { status: 'ok', page: (await response.json()) as GiveawaysDto };
 }
@@ -95,9 +91,9 @@ export async function rerollGiveaway(guildId: string, giveawayId: string): Promi
 export async function removeGiveaway(guildId: string, giveawayId: string): Promise<RemovalResult> {
 	const response = await call(`${giveawaysUrl(guildId)}/${giveawayId}`, { method: 'DELETE' });
 
-	if (typeof response === 'string') return { status: 'error', message: response };
+	if (!(response instanceof Response)) return { status: 'error', failure: response };
 
-	if (!response.ok) return { status: 'error', message: await failureOf(response) };
+	if (!response.ok) return { status: 'error', failure: await failureOf(response) };
 
 	return { status: 'ok' };
 }

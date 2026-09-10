@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import { redirect } from 'next/navigation';
 import { LoggingSkeleton } from '@/components/skeletons/LoggingSkeleton';
 import { apiGet } from '@/lib/api';
@@ -8,7 +10,11 @@ import { toLoggingConfig, type LogDestinationDto } from '@/lib/modules/logging';
 import type { GuildPageProps } from '@/lib/types/page';
 import { LoggingScreen } from './LoggingScreen';
 
-export const metadata = { title: 'Logging' };
+export async function generateMetadata(): Promise<Metadata> {
+	const t = await getTranslations('modules.logging');
+
+	return { title: t('title') };
+}
 
 export default async function Page({ params, searchParams }: GuildPageProps) {
 	const [{ guildId }, query] = await Promise.all([params, searchParams]);

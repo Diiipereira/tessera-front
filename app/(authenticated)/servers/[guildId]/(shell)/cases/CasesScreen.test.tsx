@@ -214,7 +214,10 @@ describe('CasesScreen', () => {
 
 	it('says the read failed instead of blanking the table', async () => {
 		const user = userEvent.setup();
-		listCases.mockResolvedValue({ status: 'error', message: 'No dashboard access' });
+		listCases.mockResolvedValue({
+			status: 'error',
+			failure: { code: 'FORBIDDEN', fallback: 'No dashboard access' }
+		});
 		paint([entry()], '44');
 
 		await user.click(screen.getByRole('button', { name: 'Load older cases' }));
@@ -497,7 +500,10 @@ describe('undoing a case from the drawer', () => {
 	});
 
 	it('says what went wrong instead of pretending it worked', async () => {
-		revokeCase.mockResolvedValue({ status: 'error', message: 'Discord refused the action' });
+		revokeCase.mockResolvedValue({
+			status: 'error',
+			failure: { code: 'DISCORD_REFUSED', fallback: 'Discord refused the action' }
+		});
 
 		const user = await open({ type: 'ban', expiresAt: null });
 

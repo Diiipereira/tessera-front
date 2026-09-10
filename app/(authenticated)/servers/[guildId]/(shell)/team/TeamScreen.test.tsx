@@ -199,7 +199,10 @@ describe('TeamScreen writes', () => {
 	});
 
 	it('keeps the row and reports the reason when the API refuses', async () => {
-		deleteSeat.mockResolvedValue({ status: 'error', message: 'You cannot change your own seat' });
+		deleteSeat.mockResolvedValue({
+			status: 'error',
+			failure: { code: 'SEAT_NOT_ASSIGNABLE', fallback: 'You cannot change your own seat' }
+		});
 		renderScreen();
 
 		await userEvent.click(
@@ -209,7 +212,7 @@ describe('TeamScreen writes', () => {
 		);
 
 		await waitFor(() => {
-			expect(toastError).toHaveBeenCalledWith('You cannot change your own seat');
+			expect(toastError).toHaveBeenCalledWith('That seat cannot be changed from here.');
 		});
 		expect(refresh).not.toHaveBeenCalled();
 	});
@@ -275,7 +278,10 @@ describe('TeamScreen adds someone by id', () => {
 	});
 
 	it('keeps the dialog open and says why when the API refuses the id', async () => {
-		putSeat.mockResolvedValue({ status: 'error', message: 'No Discord user with that id' });
+		putSeat.mockResolvedValue({
+			status: 'error',
+			failure: { code: 'NOT_FOUND', fallback: 'No Discord user with that id' }
+		});
 		renderScreen();
 		await openDialog();
 
@@ -283,7 +289,7 @@ describe('TeamScreen adds someone by id', () => {
 		await userEvent.click(submitButton());
 
 		await waitFor(() => {
-			expect(toastError).toHaveBeenCalledWith('No Discord user with that id');
+			expect(toastError).toHaveBeenCalledWith('That is gone, or never existed.');
 		});
 		expect(screen.getByRole('textbox')).toBeDefined();
 		expect(refresh).not.toHaveBeenCalled();

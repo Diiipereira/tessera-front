@@ -19,12 +19,13 @@ import { avatarLimitLabel, avatarTypesLabel, readAsDataUri, refusalFor } from '@
 import { BRAND } from '@/lib/brand';
 import { EMBED_SWATCHES } from '@/lib/discord-colors';
 import { removeBot, resetAllModules } from '@/lib/guild-bot-client';
-import { useConfigDraft, type SaveOutcome } from '@/lib/hooks/useConfigDraft';
+import { ConfigSaveError, useConfigDraft, type SaveOutcome } from '@/lib/hooks/useConfigDraft';
 import { SUPPORTED_LOCALES } from '@/lib/locale';
 import { toEditableSettings } from '@/lib/settings';
 import { patchSettings } from '@/lib/settings-client';
 import { timezoneOptions } from '@/lib/timezones';
 import type { GuildSettings } from '@/lib/types/management';
+import { useApiFailure } from '@/lib/hooks/useApiFailure';
 
 type SettingsScreenProps = {
 	guildId: string;
@@ -42,6 +43,7 @@ export function SettingsScreen({
 	botAvatarUrl
 }: SettingsScreenProps) {
 	const t = useTranslations('settings');
+	const describe = useApiFailure();
 	const localeNames = useTranslations('locales');
 	const save = useCallback(
 		async (next: GuildSettings): Promise<SaveOutcome<GuildSettings>> => {
@@ -49,7 +51,7 @@ export function SettingsScreen({
 
 			return result.status === 'saved'
 				? { status: 'saved', saved: toEditableSettings(result.settings) }
-				: { status: 'error', message: result.message };
+				: { status: 'error', failure: result.failure };
 		},
 		[guildId]
 	);
@@ -73,14 +75,14 @@ export function SettingsScreen({
 			setSendingAvatar(false);
 
 			if (result.status === 'error') {
-				toast.error(result.message);
+				toast.error(describe(result.failure));
 				return;
 			}
 
 			setAvatarUrl(result.settings.botAvatarUrl);
 			toast.success(t(botAvatar === null ? 'appearance.avatarRemoved' : 'appearance.avatarSaved'));
 		},
-		[guildId, t]
+		[guildId, t, describe]
 	);
 
 	const chooseAvatar = useCallback(
@@ -116,7 +118,7 @@ export function SettingsScreen({
 			(result) => {
 				if (result.status === 'error') {
 					setRemoving(false);
-					toast.error(t('danger.removeFailed'), { description: result.message });
+					toast.error(t('danger.removeFailed'), { description: describe(result.failure) });
 
 					return;
 				}
@@ -129,11 +131,12 @@ export function SettingsScreen({
 			(error: unknown) => {
 				setRemoving(false);
 				toast.error(t('danger.removeFailed'), {
-					description: error instanceof Error ? error.message : t('unknownFailure')
+					description:
+						error instanceof ConfigSaveError ? describe(error.failure) : t('unknownFailure')
 				});
 			}
 		);
-	}, [guildId, guildName, router, t]);
+	}, [guildId, guildName, router, t, describe]);
 
 	const [confirmingReset, setConfirmingReset] = useState(false);
 	const [resetting, setResetting] = useState(false);
@@ -146,7 +149,7 @@ export function SettingsScreen({
 				setResetting(false);
 
 				if (result.status === 'error') {
-					toast.error(t('danger.resetFailed'), { description: result.message });
+					toast.error(t('danger.resetFailed'), { description: describe(result.failure) });
 
 					return;
 				}
@@ -158,11 +161,12 @@ export function SettingsScreen({
 			(error: unknown) => {
 				setResetting(false);
 				toast.error(t('danger.resetFailed'), {
-					description: error instanceof Error ? error.message : t('unknownFailure')
+					description:
+						error instanceof ConfigSaveError ? describe(error.failure) : t('unknownFailure')
 				});
 			}
 		);
-	}, [guildId, router, t]);
+	}, [guildId, router, t, describe]);
 
 	return (
 		<div className="flex min-h-full w-full flex-col p-6 sm:p-8">
@@ -415,7 +419,8 @@ export function SettingsScreen({
 						},
 						(error: unknown) => {
 							toast.error(t('saveFailed'), {
-								description: error instanceof Error ? error.message : t('unknownFailure')
+								description:
+									error instanceof ConfigSaveError ? describe(error.failure) : t('unknownFailure')
 							});
 						}
 					);

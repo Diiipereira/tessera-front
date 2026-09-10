@@ -221,7 +221,10 @@ describe('WelcomeScreen', () => {
 
 	it('tells the member what went wrong instead of claiming it saved', async () => {
 		const user = userEvent.setup();
-		patchModule.mockResolvedValue({ status: 'error', message: 'message: Too big' });
+		patchModule.mockResolvedValue({
+			status: 'error',
+			failure: { code: 'CONFIG_INVALID', fallback: 'message: Too big' }
+		});
 
 		renderScreen();
 
@@ -229,7 +232,7 @@ describe('WelcomeScreen', () => {
 		await user.click(saveButton());
 
 		await waitFor(() => {
-			expect(failure).toHaveBeenCalledWith(copy.saveFailed, 'message: Too big');
+			expect(failure).toHaveBeenCalledWith(copy.saveFailed, 'A field did not pass validation.');
 		});
 		expect(success).not.toHaveBeenCalled();
 	});

@@ -47,6 +47,7 @@ import {
 import type { Channel, Role } from '@/lib/types/discord';
 import type { Giveaway, GiveawayState, GiveawaysConfig } from '@/lib/types/module-configs';
 import { formatCount } from '@/lib/utils/format';
+import { useApiFailure } from '@/lib/hooks/useApiFailure';
 
 const TAB_KEY = { active: 'Active', ended: 'Ended' } as const;
 
@@ -70,6 +71,7 @@ export function GiveawaysScreen({
 	now
 }: GiveawaysScreenProps) {
 	const t = useTranslations('modules.giveaways');
+	const describe = useApiFailure();
 	const relativeTime = useRelativeTime();
 	const rightNow = new Date(now);
 	const versionRef = useRef(version);
@@ -120,7 +122,7 @@ export function GiveawaysScreen({
 			void run()
 				.then((result) => {
 					if (result.status === 'error') {
-						toast.error(result.message);
+						toast.error(describe(result.failure));
 						return;
 					}
 
@@ -220,7 +222,7 @@ export function GiveawaysScreen({
 									void removeGiveaway(guildId, giveaway.id)
 										.then((result) => {
 											if (result.status === 'error') {
-												toast.error(result.message);
+												toast.error(describe(result.failure));
 												return;
 											}
 
@@ -406,6 +408,7 @@ function NewGiveawayDialog({
 }: NewGiveawayDialogProps) {
 	const t = useTranslations('modules.giveaways.create');
 	const shared = useTranslations('common');
+	const describe = useApiFailure();
 	const [channelId, setChannelId] = useState<string | null>(null);
 	const [prize, setPrize] = useState('');
 	const [description, setDescription] = useState('');
@@ -449,7 +452,7 @@ function NewGiveawayDialog({
 							void startGiveaway(guildId, payload)
 								.then((result) => {
 									if (result.status === 'error') {
-										toast.error(result.message);
+										toast.error(describe(result.failure));
 										return;
 									}
 

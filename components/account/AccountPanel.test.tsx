@@ -164,7 +164,10 @@ describe('AccountPanel', () => {
 		});
 
 		it('keeps the session on screen when the API refused', async () => {
-			revokeSession.mockResolvedValue({ status: 'error', message: 'The API answered 500' });
+			revokeSession.mockResolvedValue({
+				status: 'error',
+				failure: { code: 'INTERNAL_SERVER_ERROR', fallback: 'The API answered 500' }
+			});
 
 			const user = await openSessions();
 			const before = screen.getAllByRole('button', { name: enUS.account.sessions.revoke });
@@ -173,7 +176,7 @@ describe('AccountPanel', () => {
 
 			await waitFor(() => {
 				expect(failure).toHaveBeenCalledWith(enUS.account.sessions.revokeFailed, {
-					description: 'The API answered 500'
+					description: 'Something broke on our side.'
 				});
 			});
 			expect(screen.getAllByRole('button', { name: enUS.account.sessions.revoke })).toHaveLength(

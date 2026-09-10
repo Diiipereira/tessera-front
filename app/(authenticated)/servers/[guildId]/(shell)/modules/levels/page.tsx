@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import { redirect } from 'next/navigation';
 import { LevelsSkeleton } from '@/components/skeletons/LevelsSkeleton';
 import { apiGet } from '@/lib/api';
@@ -15,7 +17,11 @@ import type { GuildPageProps } from '@/lib/types/page';
 import type { GuildSettings } from '@/lib/types/management';
 import { LevelsScreen } from './LevelsScreen';
 
-export const metadata = { title: 'Levels' };
+export async function generateMetadata(): Promise<Metadata> {
+	const t = await getTranslations('modules.levels');
+
+	return { title: t('title') };
+}
 
 const EMPTY_BOARD: LeaderboardDto = { entries: [], members: 0 };
 

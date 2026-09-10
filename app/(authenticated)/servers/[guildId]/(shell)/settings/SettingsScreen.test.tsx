@@ -138,7 +138,10 @@ describe('SettingsScreen', () => {
 	});
 
 	it('says the reset failed instead of claiming the modules are clean', async () => {
-		resetAllModules.mockResolvedValue({ status: 'error', message: 'The API answered 403' });
+		resetAllModules.mockResolvedValue({
+			status: 'error',
+			failure: { code: 'FORBIDDEN', fallback: 'The API answered 403' }
+		});
 
 		const user = userEvent.setup();
 		setup();
@@ -190,14 +193,17 @@ describe('SettingsScreen', () => {
 		});
 
 		it('never says the bot left when the API refused', async () => {
-			removeBot.mockResolvedValue({ status: 'error', message: 'Only the owner can do that' });
+			removeBot.mockResolvedValue({
+				status: 'error',
+				failure: { code: 'FORBIDDEN', fallback: 'Only the owner can do that' }
+			});
 
 			setup();
 			await confirmRemoval();
 
 			await waitFor(() => {
 				expect(toastError).toHaveBeenCalledWith(copy.danger.removeFailed, {
-					description: 'Only the owner can do that'
+					description: 'You do not have access to this server.'
 				});
 			});
 			expect(toastSuccess).not.toHaveBeenCalled();

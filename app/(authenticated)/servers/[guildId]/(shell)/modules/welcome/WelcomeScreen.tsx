@@ -15,7 +15,7 @@ import { RolePicker } from '@/components/discord/RolePicker';
 import { Button } from '@/components/ui/Button';
 import { Field } from '@/components/ui/Field';
 import { Select } from '@/components/ui/Select';
-import { useConfigDraft, type SaveOutcome } from '@/lib/hooks/useConfigDraft';
+import { ConfigSaveError, useConfigDraft, type SaveOutcome } from '@/lib/hooks/useConfigDraft';
 import { MODULE_HELP } from '@/lib/module-help';
 import { patchModule, sendModuleTest } from '@/lib/module-client';
 import {
@@ -28,6 +28,7 @@ import {
 import type { Channel, Role } from '@/lib/types/discord';
 import type { MessageVariable, WelcomeConfig, WelcomePingMode } from '@/lib/types/modules';
 import { toast } from 'sonner';
+import { useApiFailure } from '@/lib/hooks/useApiFailure';
 
 const PING_MODES: WelcomePingMode[] = ['none', 'inline', 'ghost'];
 
@@ -64,6 +65,7 @@ export function WelcomeScreen({
 	botAvatarUrl
 }: WelcomeScreenProps) {
 	const t = useTranslations('modules.welcome');
+	const describe = useApiFailure();
 	const previewText = useTranslations('modules.preview');
 	const switchText = useTranslations('channelSwitch');
 	const versionRef = useRef(version);
@@ -98,7 +100,7 @@ export function WelcomeScreen({
 		setTesting(false);
 
 		if (result.status === 'error') {
-			toast.error(t('test.failed'), { description: result.message });
+			toast.error(t('test.failed'), { description: describe(result.failure) });
 			return;
 		}
 
@@ -108,7 +110,7 @@ export function WelcomeScreen({
 		}
 
 		toast.warning(t(result.outcome === 'not-ready' ? 'test.notReady' : 'test.channelRefused'));
-	}, [guildId, t]);
+	}, [guildId, t, describe]);
 	const draft = form.draft;
 	const switching = channelSwitch(form.saved.channelId, draft.channelId, channels);
 
@@ -168,7 +170,8 @@ export function WelcomeScreen({
 							},
 							(error: unknown) => {
 								toast.error(t('saveFailed'), {
-									description: error instanceof Error ? error.message : t('unknownFailure')
+									description:
+										error instanceof ConfigSaveError ? describe(error.failure) : t('unknownFailure')
 								});
 							}
 						);

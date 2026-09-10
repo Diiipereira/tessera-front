@@ -25,6 +25,7 @@ import { readAudit } from '@/lib/audit-client';
 import { useRelativeTime } from '@/lib/hooks/useRelativeTime';
 import { AUDIT_SOURCES, type AuditEntry, type AuditSource } from '@/lib/types/management';
 import { cn } from '@/lib/utils/cn';
+import { useApiFailure } from '@/lib/hooks/useApiFailure';
 
 const SOURCE_VARIANTS: Record<AuditSource, BadgeVariant> = {
 	web: 'primary',
@@ -53,6 +54,7 @@ export type AuditScreenProps = {
 
 export function AuditScreen({ guildId, entries, nextCursor, moduleKeys, now }: AuditScreenProps) {
 	const t = useTranslations('audit');
+	const describe = useApiFailure();
 	const relativeTime = useRelativeTime();
 	const at = useMemo(() => new Date(now), [now]);
 
@@ -108,7 +110,7 @@ export function AuditScreen({ guildId, entries, nextCursor, moduleKeys, now }: A
 			});
 
 			if (result.status === 'error') {
-				toast.error(t('failed'), { description: result.message });
+				toast.error(t('failed'), { description: describe(result.failure) });
 				return;
 			}
 

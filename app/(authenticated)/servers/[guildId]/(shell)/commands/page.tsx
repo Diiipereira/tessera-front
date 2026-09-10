@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import { redirect } from 'next/navigation';
 import { CommandsSkeleton } from '@/components/skeletons/CommandsSkeleton';
 import { apiGet, type ApiResult } from '@/lib/api';
@@ -6,7 +8,11 @@ import { ApiUnreachableError } from '@/lib/guild-access';
 import type { GuildPageProps } from '@/lib/types/page';
 import { CommandsScreen } from './CommandsScreen';
 
-export const metadata = { title: 'Commands' };
+export async function generateMetadata(): Promise<Metadata> {
+	const t = await getTranslations('commands');
+
+	return { title: t('title') };
+}
 
 function unwrap<T>(result: ApiResult<T>): T {
 	if (result.status === 'unauthenticated') redirect('/login');

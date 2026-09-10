@@ -158,13 +158,16 @@ describe('ModulesScreen', () => {
 	it('puts the switch back when the API refuses', async () => {
 		const user = userEvent.setup();
 
-		patchModule.mockResolvedValue({ status: 'error', message: 'The API answered 400' });
+		patchModule.mockResolvedValue({
+			status: 'error',
+			failure: { code: 'BAD_REQUEST', fallback: 'The API answered 400' }
+		});
 		renderScreen();
 
 		await user.click(within(cardFor('Welcome')).getByRole('switch'));
 
 		await waitFor(() => {
-			expect(failure).toHaveBeenCalledWith('The API answered 400');
+			expect(failure).toHaveBeenCalledWith('The server refused what this screen sent.');
 		});
 		expect(within(cardFor('Welcome')).getByText('Active')).toBeInTheDocument();
 	});

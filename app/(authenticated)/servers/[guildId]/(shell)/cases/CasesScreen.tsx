@@ -27,6 +27,7 @@ import {
 	type TeamRole
 } from '@/lib/types/management';
 import { CaseDrawer } from './CaseDrawer';
+import { useApiFailure } from '@/lib/hooks/useApiFailure';
 
 const TYPE_VARIANTS: Record<InfractionType, BadgeVariant> = {
 	note: 'neutral',
@@ -68,6 +69,7 @@ export function CasesScreen({
 	now
 }: CasesScreenProps) {
 	const t = useTranslations('cases');
+	const describe = useApiFailure();
 	const relativeTime = useRelativeTime();
 	const at = useMemo(() => new Date(now), [now]);
 
@@ -98,7 +100,7 @@ export function CasesScreen({
 			});
 
 			if (result.status === 'error') {
-				toast.error(t('failed'), { description: result.message });
+				toast.error(t('failed'), { description: describe(result.failure) });
 				return;
 			}
 

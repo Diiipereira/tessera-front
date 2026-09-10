@@ -1,5 +1,5 @@
 import { apiBaseUrl } from '@/lib/api-url';
-import { describeFailure, type ErrorBody } from '@/lib/module-client';
+import { failureFrom, unreachable, type ApiFailure, type ErrorBody } from '@/lib/api-errors';
 import {
 	KINDS_OF,
 	type LedgerDto,
@@ -9,11 +9,13 @@ import {
 import type { TransactionKind } from '@/lib/types/module-configs';
 
 export type ShopResult =
-	{ status: 'ok'; items: ShopItemDto[] } | { status: 'error'; message: string };
+	{ status: 'ok'; items: ShopItemDto[] } | { status: 'error'; failure: ApiFailure };
 
-export type LedgerResult = { status: 'ok'; page: LedgerDto } | { status: 'error'; message: string };
+export type LedgerResult =
+	{ status: 'ok'; page: LedgerDto } | { status: 'error'; failure: ApiFailure };
 
-export type ClearResult = { status: 'ok'; cleared: number } | { status: 'error'; message: string };
+export type ClearResult =
+	{ status: 'ok'; cleared: number } | { status: 'error'; failure: ApiFailure };
 
 const economyUrl = (guildId: string): string => `${apiBaseUrl()}/guilds/${guildId}/economy`;
 
@@ -29,17 +31,13 @@ export const ledgerQuery = (kind: TransactionKind | 'all', limit: number): strin
 	return params.toString();
 };
 
-async function failureOf(response: Response): Promise<string> {
+async function failureOf(response: Response): Promise<ApiFailure> {
 	const body = (await response.json().catch(() => ({}))) as ErrorBody;
 
-	return describeFailure(body, response.status);
+	return failureFrom(body, response.status);
 }
 
-function unreachable(error: unknown): string {
-	return error instanceof Error ? error.message : 'The API could not be reached';
-}
-
-async function call(url: string, init?: RequestInit): Promise<Response | string> {
+async function call(url: string, init?: RequestInit): Promise<Response | ApiFailure> {
 	try {
 		return await fetch(url, { credentials: 'include', ...init });
 	} catch (error) {
@@ -50,9 +48,9 @@ async function call(url: string, init?: RequestInit): Promise<Response | string>
 export async function loadShop(guildId: string): Promise<ShopResult> {
 	const response = await call(`${economyUrl(guildId)}/shop`);
 
-	if (typeof response === 'string') return { status: 'error', message: response };
+	if (!(response instanceof Response)) return { status: 'error', failure: response };
 
-	if (!response.ok) return { status: 'error', message: await failureOf(response) };
+	if (!response.ok) return { status: 'error', failure: await failureOf(response) };
 
 	const body = (await response.json()) as { items: ShopItemDto[] };
 
@@ -69,9 +67,9 @@ export async function saveShop(
 		body: JSON.stringify({ items })
 	});
 
-	if (typeof response === 'string') return { status: 'error', message: response };
+	if (!(response instanceof Response)) return { status: 'error', failure: response };
 
-	if (!response.ok) return { status: 'error', message: await failureOf(response) };
+	if (!response.ok) return { status: 'error', failure: await failureOf(response) };
 
 	const body = (await response.json()) as { items: ShopItemDto[] };
 
@@ -85,9 +83,9 @@ export async function loadTransactions(
 ): Promise<LedgerResult> {
 	const response = await call(`${economyUrl(guildId)}/transactions?${ledgerQuery(kind, limit)}`);
 
-	if (typeof response === 'string') return { status: 'error', message: response };
+	if (!(response instanceof Response)) return { status: 'error', failure: response };
 
-	if (!response.ok) return { status: 'error', message: await failureOf(response) };
+	if (!response.ok) return { status: 'error', failure: await failureOf(response) };
 
 	return { status: 'ok', page: (await response.json()) as LedgerDto };
 }
@@ -95,9 +93,9 @@ export async function loadTransactions(
 export async function clearWallets(guildId: string): Promise<ClearResult> {
 	const response = await call(`${economyUrl(guildId)}/wallets`, { method: 'DELETE' });
 
-	if (typeof response === 'string') return { status: 'error', message: response };
+	if (!(response instanceof Response)) return { status: 'error', failure: response };
 
-	if (!response.ok) return { status: 'error', message: await failureOf(response) };
+	if (!response.ok) return { status: 'error', failure: await failureOf(response) };
 
 	const body = (await response.json()) as { cleared: number };
 

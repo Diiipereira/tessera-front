@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import { redirect } from 'next/navigation';
 import { EconomySkeleton } from '@/components/skeletons/EconomySkeleton';
 import { apiGet } from '@/lib/api';
@@ -13,7 +15,11 @@ import {
 import type { GuildPageProps } from '@/lib/types/page';
 import { EconomyScreen } from './EconomyScreen';
 
-export const metadata = { title: 'Economy' };
+export async function generateMetadata(): Promise<Metadata> {
+	const t = await getTranslations('modules.economy');
+
+	return { title: t('title') };
+}
 
 const EMPTY_LEDGER: LedgerDto = { entries: [], nextCursor: null };
 

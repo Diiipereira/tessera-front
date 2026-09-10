@@ -39,6 +39,7 @@ import type { MessageVariable } from '@/lib/types/modules';
 import { cn } from '@/lib/utils/cn';
 import { newId } from '@/lib/utils/id';
 import { formatCount } from '@/lib/utils/format';
+import { useApiFailure } from '@/lib/hooks/useApiFailure';
 
 const LevelCurveChart = dynamic(
 	() => import('@/components/modules/LevelCurveChart').then((module) => module.LevelCurveChart),
@@ -71,6 +72,7 @@ export function LevelsScreen({
 	leaderboard
 }: LevelsScreenProps) {
 	const t = useTranslations('modules.levels');
+	const describe = useApiFailure();
 	const versionRef = useRef(version);
 	const [clearing, setClearing] = useState(false);
 
@@ -502,7 +504,7 @@ export function LevelsScreen({
 											setClearing(false);
 
 											if (result.status === 'error') {
-												toast.error(result.message);
+												toast.error(describe(result.failure));
 												return;
 											}
 

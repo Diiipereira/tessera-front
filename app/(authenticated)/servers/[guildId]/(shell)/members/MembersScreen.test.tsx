@@ -228,14 +228,17 @@ describe('MembersScreen', () => {
 	it('keeps the rows on screen when the API refuses', async () => {
 		const user = userEvent.setup();
 
-		loadMembers.mockResolvedValue({ status: 'error', message: 'The API answered 500' });
+		loadMembers.mockResolvedValue({
+			status: 'error',
+			failure: { code: 'INTERNAL_SERVER_ERROR', fallback: 'The API answered 500' }
+		});
 		renderScreen();
 
 		await user.click(screen.getAllByRole('combobox')[0] as HTMLElement);
 		await user.click(await screen.findByRole('option', { name: enUS.members.standing.banned }));
 
 		await waitFor(() => {
-			expect(failure).toHaveBeenCalledWith(enUS.members.loadFailed, 'The API answered 500');
+			expect(failure).toHaveBeenCalledWith(enUS.members.loadFailed, 'Something broke on our side.');
 		});
 		expect(screen.getByText('Alice')).toBeInTheDocument();
 	});

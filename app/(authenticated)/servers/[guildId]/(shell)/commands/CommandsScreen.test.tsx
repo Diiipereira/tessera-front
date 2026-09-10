@@ -173,13 +173,19 @@ describe('CommandsScreen', () => {
 	it('keeps the rows on screen when the API refuses', async () => {
 		const user = userEvent.setup();
 
-		loadCommands.mockResolvedValue({ status: 'error', message: 'The API answered 500' });
+		loadCommands.mockResolvedValue({
+			status: 'error',
+			failure: { code: 'INTERNAL_SERVER_ERROR', fallback: 'The API answered 500' }
+		});
 		renderScreen();
 
 		await user.click(screen.getByRole('button', { name: '30d' }));
 
 		await waitFor(() => {
-			expect(failure).toHaveBeenCalledWith(enUS.commands.loadFailed, 'The API answered 500');
+			expect(failure).toHaveBeenCalledWith(
+				enUS.commands.loadFailed,
+				'Something broke on our side.'
+			);
 		});
 		expect(screen.getByRole('button', { name: '/warn' })).toBeInTheDocument();
 	});

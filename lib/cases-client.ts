@@ -1,5 +1,5 @@
 import { apiBaseUrl } from '@/lib/api-url';
-import { describeFailure, type ErrorBody } from '@/lib/module-client';
+import { failureFrom, unreachable, type ApiFailure, type ErrorBody } from '@/lib/api-errors';
 import type {
 	CasePage,
 	CaseStatusFilter,
@@ -17,10 +17,10 @@ export type CaseQuery = {
 };
 
 export type CaseListResult =
-	{ status: 'ok'; page: CasePage } | { status: 'error'; message: string };
+	{ status: 'ok'; page: CasePage } | { status: 'error'; failure: ApiFailure };
 
 export type CaseReadResult =
-	{ status: 'ok'; entry: ModerationCase } | { status: 'error'; message: string };
+	{ status: 'ok'; entry: ModerationCase } | { status: 'error'; failure: ApiFailure };
 
 export function casesUrl(guildId: string, query: CaseQuery): string {
 	const search = new URLSearchParams();
@@ -36,16 +36,13 @@ export function casesUrl(guildId: string, query: CaseQuery): string {
 	return `${apiBaseUrl()}/guilds/${guildId}/cases${suffix}`;
 }
 
-const unreachable = (error: unknown): string =>
-	error instanceof Error ? error.message : 'The API could not be reached';
-
 export async function listCases(guildId: string, query: CaseQuery): Promise<CaseListResult> {
 	let response: Response;
 
 	try {
 		response = await fetch(casesUrl(guildId, query), { credentials: 'include' });
 	} catch (error) {
-		return { status: 'error', message: unreachable(error) };
+		return { status: 'error', failure: unreachable(error) };
 	}
 
 	if (response.ok) {
@@ -54,7 +51,7 @@ export async function listCases(guildId: string, query: CaseQuery): Promise<Case
 
 	const failure = (await response.json().catch(() => ({}))) as ErrorBody;
 
-	return { status: 'error', message: describeFailure(failure, response.status) };
+	return { status: 'error', failure: failureFrom(failure, response.status) };
 }
 
 export async function readCase(guildId: string, number: number): Promise<CaseReadResult> {
@@ -65,7 +62,7 @@ export async function readCase(guildId: string, number: number): Promise<CaseRea
 			credentials: 'include'
 		});
 	} catch (error) {
-		return { status: 'error', message: unreachable(error) };
+		return { status: 'error', failure: unreachable(error) };
 	}
 
 	if (response.ok) {
@@ -74,11 +71,11 @@ export async function readCase(guildId: string, number: number): Promise<CaseRea
 
 	const failure = (await response.json().catch(() => ({}))) as ErrorBody;
 
-	return { status: 'error', message: describeFailure(failure, response.status) };
+	return { status: 'error', failure: failureFrom(failure, response.status) };
 }
 
 export type CaseRevokeResult =
-	{ status: 'ok'; revoked: RevokedCase } | { status: 'error'; message: string };
+	{ status: 'ok'; revoked: RevokedCase } | { status: 'error'; failure: ApiFailure };
 
 export async function revokeCase(
 	guildId: string,
@@ -95,7 +92,7 @@ export async function revokeCase(
 			body: JSON.stringify(reason === null ? {} : { reason })
 		});
 	} catch (error) {
-		return { status: 'error', message: unreachable(error) };
+		return { status: 'error', failure: unreachable(error) };
 	}
 
 	if (response.ok) {
@@ -104,5 +101,5 @@ export async function revokeCase(
 
 	const failure = (await response.json().catch(() => ({}))) as ErrorBody;
 
-	return { status: 'error', message: describeFailure(failure, response.status) };
+	return { status: 'error', failure: failureFrom(failure, response.status) };
 }

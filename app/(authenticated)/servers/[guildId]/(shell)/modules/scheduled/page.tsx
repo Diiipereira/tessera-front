@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import { redirect } from 'next/navigation';
 import { ScheduledSkeleton } from '@/components/skeletons/ScheduledSkeleton';
 import { apiGet } from '@/lib/api';
@@ -13,7 +15,11 @@ import type { GuildSettings } from '@/lib/types/management';
 import type { GuildPageProps } from '@/lib/types/page';
 import { ScheduledScreen } from './ScheduledScreen';
 
-export const metadata = { title: 'Scheduled messages' };
+export async function generateMetadata(): Promise<Metadata> {
+	const t = await getTranslations('modules.scheduled');
+
+	return { title: t('title') };
+}
 
 export default async function Page({ params, searchParams }: GuildPageProps) {
 	const [{ guildId }, query] = await Promise.all([params, searchParams]);

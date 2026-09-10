@@ -67,7 +67,7 @@ describe('loadCommands', () => {
 		const result = await loadCommands(GUILD_ID, 7);
 
 		expect(result).toMatchObject({ status: 'error' });
-		expect(result.status === 'error' && result.message).toBe(
+		expect(result.status === 'error' && result.failure.fallback).toBe(
 			'The window has to be 7, 30 or 90 days'
 		);
 	});
@@ -80,7 +80,7 @@ describe('loadCommands', () => {
 
 		await expect(loadCommands(GUILD_ID, 7)).resolves.toEqual({
 			status: 'error',
-			message: 'offline'
+			failure: { code: 'UNREACHABLE', fallback: 'offline' }
 		});
 	});
 });

@@ -77,7 +77,7 @@ describe('putSeat', () => {
 
 		await expect(putSeat(GUILD_ID, USER_ID, 'viewer')).resolves.toEqual({
 			status: 'error',
-			message: 'You cannot change your own seat'
+			failure: { code: 'SEAT_NOT_ASSIGNABLE', fallback: 'You cannot change your own seat' }
 		});
 	});
 
@@ -86,7 +86,7 @@ describe('putSeat', () => {
 
 		await expect(putSeat(GUILD_ID, USER_ID, 'viewer')).resolves.toEqual({
 			status: 'error',
-			message: 'fetch failed'
+			failure: { code: 'UNREACHABLE', fallback: 'fetch failed' }
 		});
 	});
 });
@@ -131,7 +131,7 @@ describe('deleteSeat', () => {
 
 		await expect(deleteSeat(GUILD_ID, USER_ID)).resolves.toEqual({
 			status: 'error',
-			message: 'User holds no seat in guild'
+			failure: { code: 'NOT_FOUND', fallback: 'User holds no seat in guild' }
 		});
 	});
 });

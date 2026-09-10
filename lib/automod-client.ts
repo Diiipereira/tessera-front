@@ -1,23 +1,19 @@
 import { apiBaseUrl } from '@/lib/api-url';
-import { describeFailure, type ErrorBody } from '@/lib/module-client';
+import { failureFrom, unreachable, type ApiFailure, type ErrorBody } from '@/lib/api-errors';
 import type { AutomodReading, AutomodRuleDto, AutomodRulePayload } from '@/lib/modules/automod';
 
 export type RulesResult =
-	{ status: 'ok'; rules: AutomodRuleDto[] } | { status: 'error'; message: string };
+	{ status: 'ok'; rules: AutomodRuleDto[] } | { status: 'error'; failure: ApiFailure };
 
 export type ReadingResult =
-	{ status: 'ok'; reading: AutomodReading } | { status: 'error'; message: string };
+	{ status: 'ok'; reading: AutomodReading } | { status: 'error'; failure: ApiFailure };
 
 const rulesUrl = (guildId: string): string => `${apiBaseUrl()}/guilds/${guildId}/automod`;
 
-async function failureOf(response: Response): Promise<string> {
+async function failureOf(response: Response): Promise<ApiFailure> {
 	const body = (await response.json().catch(() => ({}))) as ErrorBody;
 
-	return describeFailure(body, response.status);
-}
-
-function unreachable(error: unknown): string {
-	return error instanceof Error ? error.message : 'The API could not be reached';
+	return failureFrom(body, response.status);
 }
 
 export async function loadRules(guildId: string): Promise<RulesResult> {
@@ -26,10 +22,10 @@ export async function loadRules(guildId: string): Promise<RulesResult> {
 	try {
 		response = await fetch(rulesUrl(guildId), { credentials: 'include' });
 	} catch (error) {
-		return { status: 'error', message: unreachable(error) };
+		return { status: 'error', failure: unreachable(error) };
 	}
 
-	if (!response.ok) return { status: 'error', message: await failureOf(response) };
+	if (!response.ok) return { status: 'error', failure: await failureOf(response) };
 
 	const body = (await response.json()) as { rules: AutomodRuleDto[] };
 
@@ -50,10 +46,10 @@ export async function saveRules(
 			body: JSON.stringify({ rules })
 		});
 	} catch (error) {
-		return { status: 'error', message: unreachable(error) };
+		return { status: 'error', failure: unreachable(error) };
 	}
 
-	if (!response.ok) return { status: 'error', message: await failureOf(response) };
+	if (!response.ok) return { status: 'error', failure: await failureOf(response) };
 
 	const body = (await response.json()) as { rules: AutomodRuleDto[] };
 
@@ -77,10 +73,10 @@ export async function testMessage(
 			signal
 		});
 	} catch (error) {
-		return { status: 'error', message: unreachable(error) };
+		return { status: 'error', failure: unreachable(error) };
 	}
 
-	if (!response.ok) return { status: 'error', message: await failureOf(response) };
+	if (!response.ok) return { status: 'error', failure: await failureOf(response) };
 
 	return { status: 'ok', reading: (await response.json()) as AutomodReading };
 }

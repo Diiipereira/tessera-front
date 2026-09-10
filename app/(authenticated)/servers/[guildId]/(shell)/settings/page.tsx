@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import { redirect } from 'next/navigation';
 import { SettingsSkeleton } from '@/components/skeletons/SettingsSkeleton';
 import { apiGet } from '@/lib/api';
@@ -7,7 +9,11 @@ import { toEditableSettings } from '@/lib/settings';
 import type { GuildSettingsDto } from '@/lib/types/management';
 import { SettingsScreen } from './SettingsScreen';
 
-export const metadata = { title: 'Settings' };
+export async function generateMetadata(): Promise<Metadata> {
+	const t = await getTranslations('settings');
+
+	return { title: t('title') };
+}
 
 export default async function Page({ params, searchParams }: GuildPageProps) {
 	const [{ guildId }, query] = await Promise.all([params, searchParams]);

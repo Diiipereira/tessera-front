@@ -1,32 +1,32 @@
 import { apiBaseUrl } from '@/lib/api-url';
-import { describeFailure, type ErrorBody } from '@/lib/module-client';
+import { failureFrom, unreachable, type ApiFailure, type ErrorBody } from '@/lib/api-errors';
 import type { ScheduledMessagePayload, ScheduledMessagesDto } from '@/lib/modules/scheduled';
 
 export type ScheduledResult =
-	{ status: 'ok'; page: ScheduledMessagesDto } | { status: 'error'; message: string };
+	{ status: 'ok'; page: ScheduledMessagesDto } | { status: 'error'; failure: ApiFailure };
 
 const scheduledUrl = (guildId: string): string => `${apiBaseUrl()}/guilds/${guildId}/scheduled`;
 
-async function failureOf(response: Response): Promise<string> {
+async function failureOf(response: Response): Promise<ApiFailure> {
 	const body = (await response.json().catch(() => ({}))) as ErrorBody;
 
-	return describeFailure(body, response.status);
+	return failureFrom(body, response.status);
 }
 
-async function call(url: string, init?: RequestInit): Promise<Response | string> {
+async function call(url: string, init?: RequestInit): Promise<Response | ApiFailure> {
 	try {
 		return await fetch(url, { credentials: 'include', ...init });
 	} catch (error) {
-		return error instanceof Error ? error.message : 'The API could not be reached';
+		return unreachable(error);
 	}
 }
 
 async function page(url: string, init?: RequestInit): Promise<ScheduledResult> {
 	const response = await call(url, init);
 
-	if (typeof response === 'string') return { status: 'error', message: response };
+	if (!(response instanceof Response)) return { status: 'error', failure: response };
 
-	if (!response.ok) return { status: 'error', message: await failureOf(response) };
+	if (!response.ok) return { status: 'error', failure: await failureOf(response) };
 
 	return { status: 'ok', page: (await response.json()) as ScheduledMessagesDto };
 }

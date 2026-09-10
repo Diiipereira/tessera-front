@@ -1,7 +1,7 @@
 import { apiBaseUrl } from '@/lib/api-url';
-import { describeFailure, type ErrorBody } from '@/lib/module-client';
+import { failureFrom, unreachable, type ApiFailure, type ErrorBody } from '@/lib/api-errors';
 
-export type BotRemovalResult = { status: 'removed' } | { status: 'error'; message: string };
+export type BotRemovalResult = { status: 'removed' } | { status: 'error'; failure: ApiFailure };
 
 const botUrl = (guildId: string): string => `${apiBaseUrl()}/guilds/${guildId}/bot`;
 
@@ -13,7 +13,7 @@ export async function removeBot(guildId: string): Promise<BotRemovalResult> {
 	} catch (error) {
 		return {
 			status: 'error',
-			message: error instanceof Error ? error.message : 'The API could not be reached'
+			failure: unreachable(error)
 		};
 	}
 
@@ -21,10 +21,10 @@ export async function removeBot(guildId: string): Promise<BotRemovalResult> {
 
 	const failure = (await response.json().catch(() => ({}))) as ErrorBody;
 
-	return { status: 'error', message: describeFailure(failure, response.status) };
+	return { status: 'error', failure: failureFrom(failure, response.status) };
 }
 
-export type ConfigResetResult = { status: 'reset' } | { status: 'error'; message: string };
+export type ConfigResetResult = { status: 'reset' } | { status: 'error'; failure: ApiFailure };
 
 const resetUrl = (guildId: string): string => `${apiBaseUrl()}/guilds/${guildId}/modules/reset`;
 
@@ -36,7 +36,7 @@ export async function resetAllModules(guildId: string): Promise<ConfigResetResul
 	} catch (error) {
 		return {
 			status: 'error',
-			message: error instanceof Error ? error.message : 'The API could not be reached'
+			failure: unreachable(error)
 		};
 	}
 
@@ -44,5 +44,5 @@ export async function resetAllModules(guildId: string): Promise<ConfigResetResul
 
 	const failure = (await response.json().catch(() => ({}))) as ErrorBody;
 
-	return { status: 'error', message: describeFailure(failure, response.status) };
+	return { status: 'error', failure: failureFrom(failure, response.status) };
 }

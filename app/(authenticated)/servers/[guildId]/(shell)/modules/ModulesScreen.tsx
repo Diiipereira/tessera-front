@@ -17,6 +17,7 @@ import {
 	type ModuleSummary
 } from '@/lib/types/modules';
 import { cn } from '@/lib/utils/cn';
+import { useApiFailure } from '@/lib/hooks/useApiFailure';
 
 const CATEGORIES: (ModuleCategory | 'all')[] = ['all', ...MODULE_CATEGORIES];
 
@@ -29,6 +30,7 @@ type ModulesScreenProps = {
 
 export function ModulesScreen({ modules, guildId }: ModulesScreenProps) {
 	const t = useTranslations('modulesList');
+	const describe = useApiFailure();
 	const catalog = useTranslations('catalog');
 	const names = useTranslations('nav');
 	const [items, setItems] = useState(modules);
@@ -66,7 +68,7 @@ export function ModulesScreen({ modules, guildId }: ModulesScreenProps) {
 
 		if (result.status === 'error') {
 			replace(id, { status: current.status });
-			toast.error(result.message);
+			toast.error(describe(result.failure));
 			return;
 		}
 

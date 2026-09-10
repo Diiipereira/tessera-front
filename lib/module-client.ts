@@ -1,37 +1,16 @@
 import { apiBaseUrl, type GuildModuleStateDto } from '@/lib/api-url';
+import { failureFrom, unreachable, type ApiFailure, type ErrorBody } from '@/lib/api-errors';
 
 export type ModuleWriteResult =
 	| { status: 'saved'; state: GuildModuleStateDto }
 	| { status: 'conflict'; state: GuildModuleStateDto }
-	| { status: 'error'; message: string };
+	| { status: 'error'; failure: ApiFailure };
 
 export type ModulePatchBody = {
 	version: number;
 	enabled?: boolean;
 	config?: Record<string, unknown>;
 };
-
-type ValidationIssue = { path?: string; message?: string };
-
-export type ErrorBody = {
-	error?: {
-		code?: string;
-		message?: string;
-		details?: { issues?: ValidationIssue[] };
-	};
-};
-
-export function describeFailure(body: ErrorBody, status: number): string {
-	const issues = body.error?.details?.issues ?? [];
-
-	if (issues.length > 0) {
-		return issues
-			.map((issue) => `${issue.path ?? 'config'}: ${issue.message ?? 'is not valid'}`)
-			.join('; ');
-	}
-
-	return body.error?.message ?? `The API answered ${String(status)}`;
-}
 
 const moduleUrl = (guildId: string, moduleKey: string): string =>
 	`${apiBaseUrl()}/guilds/${guildId}/modules/${moduleKey}`;
@@ -67,7 +46,7 @@ export async function patchModule(
 	} catch (error) {
 		return {
 			status: 'error',
-			message: error instanceof Error ? error.message : 'The API could not be reached'
+			failure: unreachable(error)
 		};
 	}
 
@@ -81,19 +60,19 @@ export async function patchModule(
 		const current = await readModule(guildId, moduleKey);
 
 		if (current === null) {
-			return { status: 'error', message: describeFailure(failure, response.status) };
+			return { status: 'error', failure: failureFrom(failure, response.status) };
 		}
 
 		return { status: 'conflict', state: current };
 	}
 
-	return { status: 'error', message: describeFailure(failure, response.status) };
+	return { status: 'error', failure: failureFrom(failure, response.status) };
 }
 
 export type ModuleTestOutcome = 'sent' | 'not-ready' | 'channel-refused';
 
 export type ModuleTestResult =
-	{ status: 'ok'; outcome: ModuleTestOutcome } | { status: 'error'; message: string };
+	{ status: 'ok'; outcome: ModuleTestOutcome } | { status: 'error'; failure: ApiFailure };
 
 export async function sendModuleTest(
 	guildId: string,
@@ -109,14 +88,14 @@ export async function sendModuleTest(
 	} catch (error) {
 		return {
 			status: 'error',
-			message: error instanceof Error ? error.message : 'The API could not be reached'
+			failure: unreachable(error)
 		};
 	}
 
 	if (!response.ok) {
 		const failure = (await response.json().catch(() => ({}))) as ErrorBody;
 
-		return { status: 'error', message: describeFailure(failure, response.status) };
+		return { status: 'error', failure: failureFrom(failure, response.status) };
 	}
 
 	const body = (await response.json()) as { outcome: ModuleTestOutcome };

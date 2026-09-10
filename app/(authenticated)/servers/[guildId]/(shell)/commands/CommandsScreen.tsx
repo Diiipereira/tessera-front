@@ -29,6 +29,7 @@ import { loadCommands } from '@/lib/commands-client';
 import { useRelativeTime } from '@/lib/hooks/useRelativeTime';
 import { formatCount } from '@/lib/utils/format';
 import { CommandDrawer } from './CommandDrawer';
+import { useApiFailure } from '@/lib/hooks/useApiFailure';
 
 type CommandsScreenProps = {
 	guildId: string;
@@ -38,6 +39,7 @@ type CommandsScreenProps = {
 
 export function CommandsScreen({ guildId, report, now }: CommandsScreenProps) {
 	const t = useTranslations('commands');
+	const describe = useApiFailure();
 	const moduleNames = useTranslations('nav');
 	const relativeTime = useRelativeTime();
 	const at = new Date(now);
@@ -61,7 +63,7 @@ export function CommandsScreen({ guildId, report, now }: CommandsScreenProps) {
 			if (dropped) return;
 
 			if (result.status === 'error') {
-				toast.error(t('loadFailed'), { description: result.message });
+				toast.error(t('loadFailed'), { description: describe(result.failure) });
 
 				return;
 			}
@@ -72,7 +74,7 @@ export function CommandsScreen({ guildId, report, now }: CommandsScreenProps) {
 		return () => {
 			dropped = true;
 		};
-	}, [guildId, days, t]);
+	}, [guildId, days, t, describe]);
 
 	const commands = loaded.commands;
 	const visible = [...filterCommands(commands, filters)].sort(byUses);

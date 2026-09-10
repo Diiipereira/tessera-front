@@ -180,7 +180,10 @@ describe('SetupWizard', () => {
 	it('never says the setup is done when a module write failed', async () => {
 		const user = userEvent.setup();
 
-		patchModule.mockResolvedValue({ status: 'error', message: 'The API answered 400' });
+		patchModule.mockResolvedValue({
+			status: 'error',
+			failure: { code: 'BAD_REQUEST', fallback: 'The API answered 400' }
+		});
 		renderWizard();
 
 		await stepTo(user, 3);
@@ -196,14 +199,17 @@ describe('SetupWizard', () => {
 	it('never touches the modules when the settings write failed', async () => {
 		const user = userEvent.setup();
 
-		patchSettings.mockResolvedValue({ status: 'error', message: 'The API answered 500' });
+		patchSettings.mockResolvedValue({
+			status: 'error',
+			failure: { code: 'INTERNAL_SERVER_ERROR', fallback: 'The API answered 500' }
+		});
 		renderWizard();
 
 		await stepTo(user, 3);
 		await user.click(screen.getByRole('button', { name: new RegExp(enUS.setup.finish) }));
 
 		await waitFor(() => {
-			expect(failure).toHaveBeenCalledWith(enUS.setup.failed, 'The API answered 500');
+			expect(failure).toHaveBeenCalledWith(enUS.setup.failed, 'Something broke on our side.');
 		});
 		expect(patchModule).not.toHaveBeenCalled();
 	});

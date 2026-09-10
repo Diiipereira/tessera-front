@@ -32,6 +32,7 @@ import type { Guild } from '@/lib/types/guild';
 import type { GuildSettings } from '@/lib/types/management';
 import type { ModuleId } from '@/lib/types/modules';
 import { cn } from '@/lib/utils/cn';
+import { useApiFailure } from '@/lib/hooks/useApiFailure';
 
 const STEPS = ['basics', 'modules', 'channels', 'done'] as const;
 
@@ -54,6 +55,7 @@ type SetupWizardProps = {
 
 export function SetupWizard({ guild, settings, modules, channels, roles }: SetupWizardProps) {
 	const t = useTranslations('setup');
+	const describe = useApiFailure();
 	const catalog = useTranslations('catalog');
 	const names = useTranslations('nav');
 	const localeNames = useTranslations('locales');
@@ -95,7 +97,7 @@ export function SetupWizard({ guild, settings, modules, channels, roles }: Setup
 
 		if (written.status === 'error') {
 			setSaving(false);
-			toast.error(t('failed'), { description: written.message });
+			toast.error(t('failed'), { description: describe(written.failure) });
 			return;
 		}
 
@@ -108,7 +110,9 @@ export function SetupWizard({ guild, settings, modules, channels, roles }: Setup
 
 			if (result.status === 'error') {
 				setSaving(false);
-				toast.error(t('failed'), { description: `${names(write.id)}: ${result.message}` });
+				toast.error(t('failed'), {
+					description: `${names(write.id)}: ${describe(result.failure)}`
+				});
 				return;
 			}
 		}
@@ -118,7 +122,7 @@ export function SetupWizard({ guild, settings, modules, channels, roles }: Setup
 		setSaving(false);
 
 		if (done.status === 'error') {
-			toast.error(t('failed'), { description: done.message });
+			toast.error(t('failed'), { description: describe(done.failure) });
 			return;
 		}
 

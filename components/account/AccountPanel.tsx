@@ -34,6 +34,7 @@ import type { AccountPreferences, AccountSession } from '@/lib/types/account';
 import type { Guild } from '@/lib/types/guild';
 import type { SessionUser } from '@/lib/types/session';
 import { cn } from '@/lib/utils/cn';
+import { useApiFailure } from '@/lib/hooks/useApiFailure';
 
 const TABS = [
 	{ id: 'profile', icon: User },
@@ -77,6 +78,7 @@ export function AccountPanel({
 	now
 }: AccountPanelProps) {
 	const t = useTranslations('account');
+	const describe = useApiFailure();
 	const shared = useTranslations('common');
 	const form = useConfigDraft<AccountPreferences>(preferences);
 	const draft = form.draft;
@@ -95,7 +97,7 @@ export function AccountPanel({
 			setRevoking(false);
 
 			if (result.status === 'error') {
-				toast.error(t('sessions.revokeFailed'), { description: result.message });
+				toast.error(t('sessions.revokeFailed'), { description: describe(result.failure) });
 				return;
 			}
 
@@ -111,7 +113,7 @@ export function AccountPanel({
 			setRevoking(false);
 
 			if (result.status === 'error') {
-				toast.error(t('sessions.revokeFailed'), { description: result.message });
+				toast.error(t('sessions.revokeFailed'), { description: describe(result.failure) });
 				return;
 			}
 

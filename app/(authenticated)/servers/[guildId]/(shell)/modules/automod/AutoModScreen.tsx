@@ -54,6 +54,7 @@ import type {
 import type { Channel, Role } from '@/lib/types/discord';
 import { cn } from '@/lib/utils/cn';
 import { newId } from '@/lib/utils/id';
+import { useApiFailure } from '@/lib/hooks/useApiFailure';
 
 const TRIGGERS: { id: AutoModTrigger; icon: LucideIcon }[] = [
 	{ id: 'spam', icon: MessageSquareWarning },
@@ -105,6 +106,7 @@ type AutoModScreenProps = {
 
 export function AutoModScreen({ guildId, config, version, channels, roles }: AutoModScreenProps) {
 	const t = useTranslations('modules.automod');
+	const describe = useApiFailure();
 	const versionRef = useRef(version);
 
 	const save = useCallback(
@@ -159,7 +161,7 @@ export function AutoModScreen({ guildId, config, version, channels, roles }: Aut
 				if (controller.signal.aborted) return;
 
 				if (result.status === 'error') {
-					setProblem(result.message);
+					setProblem(describe(result.failure));
 					return;
 				}
 
@@ -172,7 +174,7 @@ export function AutoModScreen({ guildId, config, version, channels, roles }: Aut
 			clearTimeout(timer);
 			controller.abort();
 		};
-	}, [guildId, sample, rules]);
+	}, [guildId, sample, rules, describe]);
 
 	function summaryFor(rule: AutoModRule): string {
 		return t(`summary.${rule.trigger}`, {

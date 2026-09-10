@@ -28,6 +28,7 @@ import type { Role } from '@/lib/types/discord';
 import type { Member, MemberStanding } from '@/lib/types/management';
 import { formatCount } from '@/lib/utils/format';
 import { MemberDrawer } from './MemberDrawer';
+import { useApiFailure } from '@/lib/hooks/useApiFailure';
 
 const STANDING_VARIANTS: Record<MemberStanding, BadgeVariant> = {
 	clean: 'success',
@@ -56,6 +57,7 @@ export function MembersScreen({
 	now
 }: MembersScreenProps) {
 	const t = useTranslations('members');
+	const describe = useApiFailure();
 	const relativeTime = useRelativeTime();
 	const money = currency ?? t('currency');
 	const [query, setQuery] = useState<MemberQuery>(blankMemberQuery);
@@ -79,7 +81,7 @@ export function MembersScreen({
 				setLoading(false);
 
 				if (result.status === 'error') {
-					toast.error(t('loadFailed'), { description: result.message });
+					toast.error(t('loadFailed'), { description: describe(result.failure) });
 					return;
 				}
 
@@ -91,7 +93,7 @@ export function MembersScreen({
 			dropped = true;
 			clearTimeout(timer);
 		};
-	}, [guildId, query, t]);
+	}, [guildId, query, t, describe]);
 
 	function change(patch: Partial<MemberQuery>) {
 		setQuery((current) => ({ ...current, page: 0, ...patch }));
