@@ -1,30 +1,92 @@
 ---
 title: Mensagens agendadas
-summary: Publique por horário, sem ninguém precisar lembrar.
+summary: Mensagens que o Tessera publica na hora que você marcar, no fuso do servidor.
 ---
 
-Um agendamento é uma mensagem, um canal e um horário. Todo agendamento roda no fuso do servidor, definido uma vez nas Configurações e não por mensagem.
+Uma mensagem agendada é um texto ou embed, um canal, e um horário: uma data única, ou dias da semana
+com uma hora. O relógio é o **fuso do servidor**, não o do navegador de quem configurou.
 
-**Permissões:** `Ver Canal`, `Enviar Mensagens`, `Inserir Links`
+<Facts
+	items={[
+		{ label: 'Dispara em', value: 'Uma varredura a cada 15 segundos' },
+		{ label: 'Precisa de', value: 'Enviar Mensagens e Inserir Links no canal de destino' },
+		{ label: 'Escreve em', value: 'O canal de cada mensagem' },
+		{ label: 'Portas', value: '/config scheduled enabled; tela de Mensagens agendadas no painel' },
+		{ label: 'Fuso', value: 'O do servidor, definido em Configurações' }
+	]}
+/>
 
-## Configurando
+## O horário é local, e isso dá trabalho
 
-<Steps>
-	<Step title="Escreva a mensagem">
-		Texto ou embed, o mesmo compositor que os outros módulos usam.
-	</Step>
-	<Step title="Escolha os dias e a hora">
-		Dias da semana mais um horário. O fuso do servidor decide o que aquele horário significa.
-	</Step>
-	<Step title="Deixe rodando">
-		Uma mensagem que perdeu o horário por mais de uma hora é descartada em vez de sair atrasada.
-	</Step>
-</Steps>
+"Nove da manhã" não é um instante: é um horário local que vira um UTC diferente conforme o horário
+de verão. O Tessera resolve o instante, mede o deslocamento do fuso naquele ponto, corrige, e
+**mede de novo** — porque a primeira medida pode cair do lado errado de uma virada.
+
+| Situação                      | O que acontece                  |
+| ----------------------------- | ------------------------------- |
+| A hora não existe naquele dia | A mensagem sai na hora seguinte |
+| A hora acontece duas vezes    | A mensagem sai na **primeira**  |
+
+É a convenção do cron e do RFC 5545. Sem essa regra, o dia da virada mandaria a mensagem uma hora
+antes do pedido, que parece defeito.
+
+## Enviar, no máximo uma vez
+
+<Flow
+	steps={[
+		{ title: 'Acha a vencida', note: 'Varredura de 15s' },
+		{ title: 'Reserva', note: 'Empurra para a próxima ocorrência' },
+		{ title: 'Publica', note: 'Só depois de reservar' }
+	]}
+	caption="Reservar antes de enviar dá a garantia de no máximo uma vez. Enviar primeiro e marcar depois daria pelo menos uma vez — e mensagem repetida no canal é pior que mensagem faltando."
+/>
+
+Se o envio falhar, a mensagem daquele dia se perde e fica registrada no log. É uma troca
+deliberada.
+
+<Callout tone="warning" title="Mensagem atrasada mais de uma hora não é enviada">
+	Depois de uma queda longa, o horário fica no passado e o varredor acharia a mensagem vencida —
+	mandar "bom dia" às três da tarde é pior que não mandar. A janela de uma hora é folgada o bastante
+	para atravessar um reinício e curta o bastante para nada chegar na parte errada do dia.
+</Callout>
+
+O próximo horário é calculado a partir de **agora**, não da ocorrência perdida. É o que impede a
+mensagem diária de disparar vinte e quatro vezes seguidas para "alcançar" um dia de queda.
+
+## O anúncio
+
+<Message
+	content="@Membros bom dia! O evento de hoje começa às 20h."
+	caption="Cargo e pessoa citados são notificados. Um @everyone colado no texto não notifica ninguém — numa mensagem que repete toda manhã, isso seria uma máquina de ping geral."
+/>
+
+## Editar sem perder o relógio
+
+A lista inteira é salva de uma vez, mas cada mensagem é gravada pelo id dela. Apagar e reinserir
+perderia a data da última execução e a posição no relógio: editar o nome de uma mensagem não pode
+zerar o histórico dela.
+
+Data no passado é aceita na escrita — recusar impediria salvar a lista sempre que ela contivesse um
+agendamento único já executado. Em vez disso a mensagem aparece como **já enviada**, e não há falha
+silenciosa.
 
 ## Opções
 
 <Fields module="scheduled" />
 
+Tudo que este módulo configura é **por mensagem**, na tela. A única chave global é o interruptor:
+`/config scheduled enabled:false` desliga todas de uma vez sem apagar nada.
+
 ## Comandos
 
 <Commands module="scheduled" />
+
+## Quando não funciona
+
+| Sintoma                             | Causa provável                                                       |
+| ----------------------------------- | -------------------------------------------------------------------- |
+| A mensagem não sai                  | O módulo ou a mensagem está desligada, ou faltam permissões no canal |
+| Saiu uma hora antes ou depois       | O fuso do servidor está errado — ele fica em Configurações           |
+| Não saiu depois de o bot ficar fora | Ela atrasou mais de uma hora e foi descartada, com registro no log   |
+| A mensagem aparece como já enviada  | A data única dela já passou                                          |
+| Um dia da semana não dispara        | Ele não está marcado — os dias são conferidos no fuso do servidor    |

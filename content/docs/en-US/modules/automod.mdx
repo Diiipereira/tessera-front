@@ -1,28 +1,124 @@
 ---
 title: AutoMod
-summary: Rules that act before a human has to. Every hit is written to the case log.
+summary: Rules that read every message and act before a human has to.
 ---
 
-AutoMod watches messages as they arrive and acts on the ones that match a rule you wrote. It runs before any moderator sees the message, which is the point — the worst content is the content nobody had to read.
+AutoMod checks every message against the rules you wrote, in the order they sit in, and stops at
+the **first one that fires**. What happens next — delete, warn, punish, time out — is the rule's
+choice.
 
-**Permissions:** `Manage Messages`, `Moderate Members`, `View Audit Log`
+<Facts
+	items={[
+		{ label: 'Fires on', value: 'Every message sent in a channel the rule reaches' },
+		{
+			label: 'Needs',
+			value:
+				'Manage Messages to delete, Moderate Members to time out, View Audit Log to name who acted'
+		},
+		{
+			label: 'Writes to',
+			value: 'The message, the member, and the case table when the action is a punishment'
+		},
+		{ label: 'Doors', value: '/automod in Discord, the AutoMod screen in the dashboard' },
+		{ label: 'Rules live', value: 'In a table of their own — the module itself is only a switch' }
+	]}
+/>
 
-## Setting it up
+## How a message is judged
 
-<Steps>
-	<Step title="Add a rule">
-		Pick what it watches for — blocked words, invites, links, mentions, repeated text or caps — then
-		what happens when it fires.
-	</Step>
-	<Step title="Order the rules">
-		Rules are checked top to bottom and **the first rule that fires wins**. Put the narrow ones
-		above the broad ones.
-	</Step>
-	<Step title="Test it before you trust it">
-		Paste something a member might send into the sample box and the dashboard shows which rules
-		would catch it, in order.
-	</Step>
-</Steps>
+<Flow
+	steps={[
+		{ title: 'Exemptions', note: 'Exempt role or channel? It leaves' },
+		{ title: 'Unmask', note: 'Undoes the simple disguises' },
+		{ title: 'Rules', note: 'Top to bottom' },
+		{ title: 'First match', note: 'The rest are never read' },
+		{ title: 'Action', note: 'And a case, if it punishes' }
+	]}
+	caption="Specific rules on top, broad rules below — the order is what decides."
+/>
+
+Exempt roles and channels mean **"any of these"**, not "all of them": one listed role on the member,
+or one listed channel for the message, and the rule does not apply there.
+
+## The triggers
+
+| Trigger       | What it sees                                      | Countable |
+| ------------- | ------------------------------------------------- | --------- |
+| Blocked words | A list of yours, compared after unmasking         | No        |
+| Invites       | Discord invites, disguised ones included          | No        |
+| Links         | Addresses, with or without `https://` — see below | No        |
+| Mentions      | How many mentions in one message                  | Yes       |
+| Repeated text | The same message sent again in a row              | Yes       |
+| Caps          | The share of uppercase letters                    | Yes       |
+| Spam          | Many messages in a short window                   | Yes       |
+| Attachments   | Files that were uploaded                          | Yes       |
+
+A **countable** trigger carries a threshold you choose: five mentions, three repeats, 70% caps. The
+rest fire on the first occurrence.
+
+## The link trigger works in two tiers, and that is deliberate
+
+Looking only for `https://` catches almost nothing: people advertising a server write
+`discord.gg/x`. But treating any `word.tld` as a link would punish someone writing `deploy.sh` or
+`index.io` — on a server full of developers that is a warning on top of a legitimate conversation.
+
+<Compare
+	yesTitle="Counts as a link"
+	noTitle="Does not count as a link"
+	yes={[
+		'discord.gg/something — nobody uses .gg as a file extension',
+		'site.com, shop.shop, example.net',
+		'bit.ly/xyz — .ly with a slash',
+		'www.example.io — .io with www.',
+		'MEGA.NZ/file'
+	]}
+	no={['deploy.sh', 'index.io', 'script.py', 'notes.br with no slash and no www.']}
+/>
+
+## Disguises AutoMod undoes
+
+Before anything is compared, the text goes through a cleanup that undoes four common disguises:
+
+```text
+discord[.]gg/free     →  discord.gg/free
+site . com            →  site.com
+discord (dot) gg      →  discord.gg
+https: //example.com  →  https://example.com
+```
+
+<Callout tone="warning" title="This is not evasion-proof, and nothing is">
+	Cyrillic homoglyphs, zero-width characters and new shorteners still get through. Every round of
+	that race catches the previous one. What you buy is that the lazy path — which is the vast
+	majority — stops working.
+</Callout>
+
+## What goes out when a rule fires
+
+<Message
+	content="@spammer your message was removed."
+	embed={{
+		color: '#ed4245',
+		title: 'AutoMod · Invites',
+		description: 'Message removed in #general.',
+		fields: [
+			{ name: 'Rule', value: 'No invites', inline: true },
+			{ name: 'Action', value: 'Delete and warn', inline: true },
+			{ name: 'Content', value: 'come to my server discord[.]gg/xxxx', inline: false }
+		],
+		footer: 'Case #42'
+	}}
+	caption="When the action is a punishment it becomes a numbered case like any other — with AutoMod where the moderator would be."
+/>
+
+## Testing
+
+| Where                | Against what        | Why                                             |
+| -------------------- | ------------------- | ----------------------------------------------- |
+| The dashboard button | The draft on screen | You are editing and want to see before you save |
+| `/automod test`      | The **saved** rules | In Discord there is no draft to test            |
+
+Spam and attachments come back as untestable: judging either needs the channel's recent history and
+the message's files, and typed text has neither.
 
 ## Options
 
@@ -32,28 +128,29 @@ AutoMod watches messages as they arrive and acts on the ones that match a rule y
 
 <Commands module="automod" />
 
-Rules can be created, deleted and tried from Discord as well — not only from the panel.
+| Subcommand        | What it does                                                          |
+| ----------------- | --------------------------------------------------------------------- |
+| `/automod list`   | Shows every rule, with its trigger, action and whether it is on       |
+| `/automod add`    | Creates a rule: name, trigger, action, and the threshold if it counts |
+| `/automod edit`   | Opens Discord's own picker for the rule's lists                       |
+| `/automod remove` | Deletes a rule, chosen by name                                        |
+| `/automod test`   | Tests a piece of text against the saved rules                         |
 
-| Command           | What it does                                                              |
-| ----------------- | ------------------------------------------------------------------------- |
-| `/automod list`   | every rule, with its trigger, its action and whether it is on             |
-| `/automod add`    | create a rule: name, trigger, action, and the limit if the trigger counts |
-| `/automod edit`   | open Discord's own picker for the lists a rule holds                      |
-| `/automod remove` | delete a rule, chosen by name                                             |
-| `/automod test`   | try a text against the rules that are **saved**                           |
+`add` creates the rule with no exemptions. Exempt roles, exempt channels, the actions and the
+blocked words are edited through `/automod edit`, which opens a modal already ticked with what is
+configured.
 
-`add` creates the rule with no exemptions. The fields that hold a list — exempt roles, exempt
-channels, what happens when it fires, and the blocked words — are edited with `/automod edit`,
-which opens a modal carrying Discord's own picker, already ticked with what is configured.
-
-Creating a rule does not turn AutoMod on. With the module off the rule is stored and acts on
-nobody — `/automod add` says so when that is the case. Turning it on is
-`/config automod enabled:true`, or the module switch in the panel.
-
-<Callout tone="info" title="The test does not use a draft">
-	From Discord, `/automod test` runs against the rules that are saved. In the panel, the test button
-	uses what is on screen, including what you have not saved yet.
+<Callout tone="info" title="Creating a rule does not turn AutoMod on">
+	With the module off the rule is stored and acts on nobody — `/automod add` says so when that is
+	the case. Turning it on is `/config automod enabled:true`, or the switch in the dashboard.
 </Callout>
 
-Spam and attachment rules come back as untestable from `/automod test`: judging either one needs
-the channel's recent history and the message's files, and typed text has neither.
+## When it does not work
+
+| Symptom                             | Likely cause                                                    |
+| ----------------------------------- | --------------------------------------------------------------- |
+| The rule warns but never deletes    | **Manage Messages** is missing in that channel                  |
+| Nothing is read at all              | The **Message Content** intent is off in the Discord Portal     |
+| A broad rule eats the specific ones | First match wins — move the specific rule above it              |
+| Moderators get caught by the rules  | Their role is missing from the exempt list                      |
+| `deploy.sh` was treated as a link   | That only happens with a slash or `www.` — check the exact text |

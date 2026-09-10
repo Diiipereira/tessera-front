@@ -1,0 +1,147 @@
+---
+title: Embeds
+summary: What an embed can carry, where to build one, and how to move it between screens.
+---
+
+An embed is the coloured card Discord draws around a message. Tessera uses embeds in welcome
+messages, level announcements, ticket panels, reaction role panels, giveaways, logs and scheduled
+messages — and the form is the same in every one of them.
+
+<Facts
+	items={[
+		{
+			label: 'Where to build',
+			value: 'On the module screen, on the Embeds screen, or with /embed in Discord'
+		},
+		{
+			label: 'Needs',
+			value: 'Embed Links in the channel — without it Discord will not draw the card'
+		},
+		{
+			label: 'Stored as',
+			value: 'Part of the module configuration, or nowhere at all in the case of /embed'
+		}
+	]}
+/>
+
+## The parts of an embed
+
+<Message
+	embed={{
+		color: '#5865f2',
+		author: 'Author',
+		title: 'Title',
+		description: 'Description. It is the long part, and it takes line breaks.',
+		fields: [
+			{ name: 'Side-by-side field', value: 'Value', inline: true },
+			{ name: 'Another', value: 'Value', inline: true },
+			{ name: 'Full-width field', value: 'Value', inline: false }
+		],
+		image: 'Image (wide, at the bottom)',
+		footer: 'Footer · and the time, if it is on'
+	}}
+	caption="The coloured bar on the left is the colour. The thumbnail, which does not fit in this drawing, sits in the top right corner."
+/>
+
+| Part             | Discord limit    | Note                                                            |
+| ---------------- | ---------------- | --------------------------------------------------------------- |
+| Title            | 256 characters   | No line breaks                                                  |
+| Description      | 4,096 characters | The dashboard editor stops at 4,096; the Discord modal at 4,000 |
+| Field name       | 256 characters   | A field with no name **or** no value is not sent                |
+| Field value      | 1,024 characters |                                                                 |
+| Fields           | 25               | Up to three side by side per row                                |
+| Footer           | 2,048 characters |                                                                 |
+| Author           | 256 characters   | Can carry a small picture beside it                             |
+| Image, thumbnail | An http(s) link  | Discord fetches it; a broken link draws nothing                 |
+
+<Callout tone="warning" title="An empty embed is not sent">
+	An embed is only posted if it has an **author, title, description, image or at least one field**.
+	Colour, footer and timestamp on their own do not count: they decorate something, and there is
+	nothing to decorate.
+</Callout>
+
+## Three places to build one
+
+<Compare
+	yesTitle="The module screen"
+	noTitle="The Embeds screen and /embed"
+	yes={[
+		'It is where the embed is saved into the configuration',
+		'It carries that module’s variables',
+		'The preview shows the variables already filled with samples'
+	]}
+	no={[
+		'They save no module configuration at all',
+		'They exist to draw, look, and post once',
+		'The bridge to a module is copying and pasting the JSON'
+	]}
+/>
+
+### The Embeds screen
+
+Under **Management → Embeds**. You build, watch the preview beside it, pick a channel and post
+**one message, now**. It is also where you copy the JSON of a finished embed, and paste one that
+came from somewhere else.
+
+Members and roles named in the text are pinged; `@everyone` never is, on any path through Tessera.
+
+### `/embed`, in Discord
+
+Opens a step-by-step builder that only you can see. The builder message **is** the preview: every
+step you fill in redraws the embed right there, and what is drawn is exactly what gets posted.
+
+<Flow
+	steps={[
+		{ title: 'Text', note: 'The line above the embed' },
+		{ title: 'Body', note: 'Title, text and colour' },
+		{ title: 'Author', note: 'Name and picture' },
+		{ title: 'Images', note: 'Image and thumbnail' },
+		{ title: 'Footer', note: 'Text and timestamp' },
+		{ title: 'Fields', note: 'One at a time' }
+	]}
+	caption="Each button opens a small form. A Discord modal takes five boxes, which is why the editor works in steps."
+/>
+
+To remove a field, open it and clear **both the name and the text**: a field with neither is a field
+that goes. The builder expires after 15 idle minutes, and a bot restart closes it — the draft
+belongs to the process, not to the database.
+
+### `/config <module> edit:Embed`
+
+The same builder, bound to that module’s configuration: it opens with the embed that is already
+saved, and **Save** writes over it. It is the slash door for a field that does not fit in a command
+option.
+
+<Callout tone="info" title="Saving does not switch the embed on">
+	Each module has a separate switch — **Use embed** in Welcome, **Announce with an embed** in
+	Levels. Saving an embed while the switch is off stores an embed nobody sees, and the builder says
+	so when that is the case.
+</Callout>
+
+## Moving an embed from one place to another
+
+The **Copy this embed** button on the Embeds screen produces JSON in the Discord API format — the
+same one other tools write and read. **Apply** goes the other way, and takes both formats: Discord’s
+and the one Tessera stores.
+
+```json
+{
+	"title": "Rules",
+	"description": "Read before you post.",
+	"color": 5793266,
+	"fields": [{ "name": "Questions", "value": "#support", "inline": true }],
+	"footer": { "text": "Test Server" }
+}
+```
+
+Colour travels as a number in Discord’s JSON and as `#rrggbb` in the dashboard; the conversion runs
+both ways. Pasting a whole message works too: if the JSON has an `embeds` list, the first item is
+what comes in.
+
+## Variables inside an embed
+
+Where a module has variables, they apply to **every** part of the embed, not just the description.
+Anything unrecognised stays written as it is.
+
+The Embeds screen and `/embed` substitute nothing: they post the literal text. A `{user}` built
+there is meant to be copied into a module screen, where it means something.

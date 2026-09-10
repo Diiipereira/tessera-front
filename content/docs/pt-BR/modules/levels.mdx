@@ -1,27 +1,112 @@
 ---
 title: Níveis
-summary: XP por conversar, ranques para mostrar, e cargos entregues pelo caminho.
+summary: XP por conversar e por estar em call, uma curva que você escolhe, e cargos entregues no caminho.
 ---
 
-Os Níveis dão uma quantidade aleatória de XP por mensagem, no máximo uma vez por intervalo, e entregam cargos quando um membro atravessa um nível que você escolheu. A aleatoriedade e o intervalo juntos são o que impede o módulo de premiar spam.
+Os Níveis dão uma quantidade **aleatória** de XP por mensagem, no máximo uma vez por intervalo, e
+entregam cargos quando o membro atravessa um nível da escada. A aleatoriedade e o intervalo juntos
+são o que impede o módulo de premiar spam.
 
-**Permissões:** `Ver Canal`, `Enviar Mensagens`, `Gerenciar Cargos`
+<Facts
+	items={[
+		{
+			label: 'Dispara em',
+			value: 'Cada mensagem que passa pelo intervalo, e a cada minuto para quem está em call'
+		},
+		{
+			label: 'Precisa de',
+			value: 'Gerenciar Cargos para a escada; Enviar Mensagens no canal de anúncio'
+		},
+		{ label: 'Escreve em', value: 'O XP do membro, os cargos dele, e o canal de anúncio' },
+		{
+			label: 'Portas',
+			value: '/config levels, /rank, /leaderboard, /xp; tela de Níveis no painel'
+		},
+		{ label: 'Não conta', value: 'Bots, e canais e cargos que você isentar' }
+	]}
+/>
 
-## Configurando
+## A curva
 
-<Steps>
-	<Step title="Defina a faixa de XP">
-		Uma quantidade aleatória entre o mínimo e o máximo é dada por mensagem, no máximo uma vez por
-		intervalo.
-	</Step>
-	<Step title="Escolha a curva">
-		A curva é o quanto cada nível é mais difícil que o anterior. O gráfico da página do módulo
-		mostra quanto custam os primeiros níveis.
-	</Step>
-	<Step title="Monte a escada de cargos">
-		Entregues quando o membro alcança o nível. Cargos acima do bot na lista não podem ser entregues.
-	</Step>
-</Steps>
+O custo de um nível é **`arredondar(curva × nível²)`** em XP acumulado. A curva é o único número que
+você mexe; o gráfico da tela mostra os primeiros cinquenta níveis para o valor escolhido.
+
+| Curva | Nível 5 | Nível 10 | Nível 25 | Nível 50 |
+| ----- | ------- | -------- | -------- | -------- |
+| 50    | 1.250   | 5.000    | 31.250   | 125.000  |
+| 100   | 2.500   | 10.000   | 62.500   | 250.000  |
+| 200   | 5.000   | 20.000   | 125.000  | 500.000  |
+
+<Callout tone="info" title="Mudar a curva não reescreve ninguém">
+	O nível é sempre calculado a partir do XP e da curva atual. Baixar a curva promove todo mundo na
+	hora; subir rebaixa. Nada é recalculado no banco, porque não precisa ser — a conta é a verdade.
+</Callout>
+
+## Ganhar XP conversando
+
+<Flow
+	steps={[
+		{ title: 'Mensagem', note: 'De um humano' },
+		{ title: 'Canal e cargo', note: 'Isento? Não paga' },
+		{ title: 'Intervalo', note: 'Uma vez por janela' },
+		{ title: 'XP aleatório', note: 'Entre o mínimo e o máximo' },
+		{ title: 'Subiu?', note: 'Cargo e anúncio' }
+	]}
+/>
+
+O intervalo é por membro e por servidor. Trinta mensagens num minuto contam **uma**, e é por isso
+que o número que a tela de Membros mostra se chama _Msgs c/ XP_ e não _mensagens_: ele nunca foi o
+total falado.
+
+Com o intervalo em zero, toda mensagem paga.
+
+## Ganhar XP em call
+
+Uma varredura de 60 segundos olha quem está em canal de voz e paga. Não é um cronômetro de sessão:
+guardar o instante de entrada em memória perderia tudo num reinício e não pagaria quem fica seis
+horas em call.
+
+<Compare
+	yesTitle="Ganha XP de voz"
+	noTitle="Não ganha"
+	yes={[
+		'Quem está com o microfone mudo — ouvir é participar',
+		'Quem está em call com pelo menos mais um humano'
+	]}
+	no={[
+		'Bots',
+		'Quem está com o som desligado — quem não ouve não participa',
+		'Quem está no canal de ausente',
+		'Quem está sozinho no canal'
+	]}
+/>
+
+Um reinício custa no máximo um minuto de XP de voz, porque não há estado acumulado para perder.
+
+## A escada de cargos
+
+Cargos entregues quando o membro alcança o nível. A escada é substituída inteira quando você salva,
+e cada degrau pode remover o cargo do degrau anterior.
+
+<Callout tone="warning" title="Descer tira; subir dá">
+	Zerar ou reduzir o XP de alguém remove os cargos acima do nível novo — senão um `/xp reset`
+	deixaria o cargo de nível 40 na pessoa. O que **não** acontece é reconstruir a escada de baixo: um
+	cargo que foi substituído por um degrau acima não volta ao descer, porque a tabela não guarda qual
+	substituiu qual.
+</Callout>
+
+Cargo acima do Tessera na lista não é entregue.
+
+## O anúncio de nível
+
+<Message
+	content="Boa, @Lia! Você chegou ao nível 10."
+	caption="A menção notifica quem subiu. Um @everyone colado no texto não notifica ninguém — num servidor com 500 membros ativos isso viraria uma máquina de ping."
+/>
+
+O anúncio pode sair no canal onde a pessoa falou, ou num canal fixo. Com o texto vazio, o Tessera usa
+a frase padrão no idioma do servidor. Ligando **Anunciar com embed**, o anúncio vira um embed — que
+se edita na tela, ou por `/config levels edit:Embed do anúncio` dentro do Discord.
 
 ## Opções
 
@@ -30,3 +115,17 @@ Os Níveis dão uma quantidade aleatória de XP por mensagem, no máximo uma vez
 ## Comandos
 
 <Commands module="levels" />
+
+`/rank` e `/leaderboard` são de todo mundo: ver o próprio progresso não é administração. `/xp` é de
+quem tem Gerenciar Servidor, e recusa bot — bot não sobe de nível.
+
+## Quando não funciona
+
+| Sintoma                              | Causa provável                                                     |
+| ------------------------------------ | ------------------------------------------------------------------ |
+| Ninguém ganha XP                     | O módulo está desligado, ou a intent **Message Content** está off  |
+| Um canal não paga                    | Ele está na lista de canais isentos                                |
+| Um membro não ganha nada             | Um cargo dele está na lista de cargos isentos                      |
+| O cargo do nível não é entregue      | Ele está acima do Tessera, ou falta **Gerenciar Cargos**           |
+| Todo mundo mudou de nível de repente | A curva foi alterada — o nível é sempre recalculado a partir do XP |
+| Ninguém ganha XP de voz              | Está sozinho no canal, com o som desligado, ou no canal de ausente |

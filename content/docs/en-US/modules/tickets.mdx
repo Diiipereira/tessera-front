@@ -1,23 +1,99 @@
 ---
 title: Tickets
-summary: A button members press to open a private channel with your staff.
+summary: A button that opens a private channel between a member and your staff.
 ---
 
-A ticket panel is one message with one button. Pressing it opens a private channel between the member and your staff roles, and closing it can save a transcript.
+A ticket panel is a message with a button. Pressing it creates a private, numbered channel between
+whoever opened it and the staff roles. Closing deletes the channel and can keep the transcript as a
+file.
 
-**Permissions:** `Manage Channels`, `View Channel`, `Send Messages`, `Attach Files`
+<Facts
+	items={[
+		{ label: 'Fires on', value: 'The click on the panel button' },
+		{
+			label: 'Needs',
+			value:
+				'Manage Channels to create and delete, View Channel and Send Messages, Attach Files for the transcript'
+		},
+		{
+			label: 'Writes to',
+			value: 'A new channel inside the chosen category, and the transcript channel on close'
+		},
+		{
+			label: 'Doors',
+			value: '/ticket inside the ticket channel; the Tickets screen in the dashboard'
+		},
+		{ label: 'Numbering', value: 'Sequential per server, with no gaps' }
+	]}
+/>
 
-## Setting it up
+## Opening
 
-<Steps>
-	<Step title="Create a panel">
-		Each panel is one message with one button. What sits above the button is yours to write.
-	</Step>
-	<Step title="Point it at a category">
-		New ticket channels are created inside it, so the category permissions are the ones that matter.
-	</Step>
-	<Step title="Name your staff roles">They are added to every ticket the panel opens.</Step>
-</Steps>
+<Flow
+	steps={[
+		{ title: 'Click', note: 'On the panel button' },
+		{ title: 'Lock and count', note: 'Number and per-member limit' },
+		{ title: 'Create the channel', note: 'ticket-42, in the category' },
+		{ title: 'Record', note: 'Only then does the ticket exist' }
+	]}
+	caption="The number has to exist before the channel, because it is in the name. If Discord refuses to create the channel the whole transaction rolls back and the number is not spent."
+/>
+
+The per-member limit is counted **inside the same lock**. Reading how many are open, deciding and
+inserting as separate steps would let two simultaneous clicks both through.
+
+If the channel was created and the write failed — the one window that remains — Tessera deletes the
+channel. Without that you would be left with a private channel behind no ticket at all, which not
+even the close button could reach.
+
+## Who can see the channel
+
+| Who               | Sees it |
+| ----------------- | ------- |
+| `@everyone`       | No      |
+| Staff roles       | Yes     |
+| Whoever opened it | Yes     |
+| Anyone added      | Yes     |
+| Tessera           | Yes     |
+
+The bot is on the list because without it, it cannot read the channel to build the transcript.
+
+## What lives on the panel and what lives on the server
+
+<Compare
+	yesTitle="On the panel — read when opening"
+	noTitle="On the server — read later"
+	yes={['The category', 'The staff roles', 'The channel naming pattern', 'The per-member limit']}
+	no={['The transcript channel', 'Automatic closing', 'The rating request']}
+/>
+
+The split is not arbitrary: a panel can be deleted while tickets from it are still open. An orphan
+ticket still needs to know where to archive and when to close, so those three belong to the server.
+
+## Closing
+
+Closing is an act in two parts. `Closed` means _the conversation is over_; `archived` means _the
+channel is already gone_. Without both states there would be no way to know what had been cleaned
+up after a restart.
+
+<Callout tone="info" title="The button asks; the command does not">
+	Deleting a channel is irreversible, so the close button answers with a second, confirming button.
+	`/ticket close` does not ask: whoever typed the command with a reason has already decided.
+</Callout>
+
+Who can close is **whoever opened it, or the staff**. Who can claim is **staff only**. Manage Server
+always passes, even if the panel lists no roles at all.
+
+## The transcript
+
+It goes as a `.txt` attached to a message in the transcript channel, and the link to that message is
+stored on the ticket. Failing to build the transcript does **not** block the close: the ticket
+closes and the link stays empty.
+
+## The rating
+
+The rating request goes by DM, because the channel is about to disappear — buttons in a conversation
+deleted seconds later would be useless. Anyone who does not accept DMs is simply not asked.
 
 ## Options
 
@@ -26,3 +102,22 @@ A ticket panel is one message with one button. Pressing it opens a private chann
 ## Commands
 
 <Commands module="tickets" />
+
+`/ticket` only works **inside** a ticket: it reads which ticket it is from the channel it was typed
+in, which is why it cannot act on the wrong one. Outside a ticket the answer is _this channel is not
+a ticket_.
+
+## What does not exist in this version
+
+An opening form. The column exists in the database, but the screen has no field editor yet, and a
+modal of questions with nowhere to configure them would be code with no door.
+
+## When it does not work
+
+| Symptom                            | Likely cause                                                          |
+| ---------------------------------- | --------------------------------------------------------------------- |
+| The button says it failed          | **Manage Channels** is missing, or the category is full (50 channels) |
+| The staff cannot see the ticket    | Their role is not on **that panel's** staff role list                 |
+| An old button does nothing         | The panel was deleted; publish the panel again                        |
+| The transcript is never saved      | **Attach Files** is missing, or no transcript channel is set          |
+| The ticket never closes on its own | Automatic closing is at zero, which means off                         |

@@ -1,23 +1,84 @@
 ---
 title: Cargos por reação
-summary: Os membros escolhem os próprios cargos, sem pedir para a equipe.
+summary: Painéis onde o próprio membro pega e larga cargos, por botão ou por reação.
 ---
 
-Um painel é uma mensagem e uma linha por cargo que o membro pode escolher. Botões são o padrão porque são mais claros e não somem por acidente.
+Um painel é uma mensagem publicada no canal que você escolher, com uma opção por cargo. Clicar num
+botão — ou reagir com um emoji — entrega ou devolve o cargo, conforme o modo do painel.
 
-**Permissões:** `Gerenciar Cargos`, `Enviar Mensagens`, `Adicionar Reações`
+<Facts
+	items={[
+		{ label: 'Dispara em', value: 'O clique num botão, ou a reação com o emoji da opção' },
+		{
+			label: 'Precisa de',
+			value: 'Gerenciar Cargos; Adicionar Reações se o painel for por reação'
+		},
+		{ label: 'Escreve em', value: 'Os cargos do membro' },
+		{ label: 'Portas', value: 'Tela de Cargos por reação no painel' },
+		{ label: 'Limites', value: '25 painéis por servidor, 25 opções por painel' }
+	]}
+/>
 
-## Configurando
+## Os quatro modos
 
-<Steps>
-	<Step title="Escreva o painel">Uma mensagem, publicada no canal que você escolher.</Step>
-	<Step title="Adicione os cargos">
-		Uma linha por cargo que o membro pode escolher, cada uma com emoji e rótulo.
-	</Step>
-	<Step title="Escolha botões ou reações">
-		Botões são mais claros e não somem por acidente. Reações parecem mais familiares.
-	</Step>
-</Steps>
+| Modo          | Clicar sem ter o cargo             | Clicar já tendo o cargo |
+| ------------- | ---------------------------------- | ----------------------- |
+| **Alternar**  | Entrega                            | Devolve                 |
+| **Único**     | Entrega e tira os outros do painel | Não faz nada            |
+| **Verificar** | Entrega                            | Não faz nada            |
+| **Largar**    | Não faz nada                       | Devolve                 |
+
+**Único** é para escolha exclusiva — uma cor, um time, um fuso. **Verificar** é para o botão de
+regras: entra e não sai. **Largar** é o inverso, um painel que só remove.
+
+## O que é publicado
+
+<Message
+	content="Escolha as suas notificações."
+	embed={{
+		color: '#5865f2',
+		title: 'Avisos',
+		description: 'Pegue só o que você quer receber.'
+	}}
+	buttons={[
+		{ label: '📣 Anúncios', style: 'primary' },
+		{ label: '🎮 Eventos', style: 'primary' },
+		{ label: '🎁 Sorteios', style: 'primary' }
+	]}
+	caption="Com o painel por reação, no lugar dos botões vão as reações na própria mensagem."
+/>
+
+<Callout tone="info" title="O nome do painel é só para você">
+	Ele serve para achar o painel nesta tela. O que o servidor lê é a **mensagem** e o **embed** do
+	painel, escritos no mesmo formulário dos outros módulos. Painel antigo, criado antes de a mensagem
+	existir, continua publicando o nome — é só escrever a mensagem para isso mudar.
+</Callout>
+
+## Publicar e editar
+
+Um painel é publicado quando está **ligado, com canal e com pelo menos uma opção**. Editar e salvar
+reescreve a mensagem já publicada em vez de publicar outra: o painel é salvo por id, e é o id da
+mensagem que liga o botão ao painel.
+
+Trocar o canal do painel publica uma mensagem nova no canal novo. A antiga não é apagada
+automaticamente.
+
+## Botão ou reação
+
+<Compare
+	yesTitle="Botão"
+	noTitle="Reação"
+	yes={[
+		'Rótulo com texto, e emoji opcional',
+		'O clique é privado — ninguém vê quem pegou o quê',
+		'Não exige Adicionar Reações'
+	]}
+	no={[
+		'Só o emoji, sem rótulo',
+		'Quem reagiu fica visível para o servidor',
+		'Funciona com emoji do próprio servidor'
+	]}
+/>
 
 ## Opções
 
@@ -26,3 +87,13 @@ Um painel é uma mensagem e uma linha por cargo que o membro pode escolher. Bot�
 ## Comandos
 
 <Commands module="reaction-roles" />
+
+## Quando não funciona
+
+| Sintoma                            | Causa provável                                                                 |
+| ---------------------------------- | ------------------------------------------------------------------------------ |
+| O cargo não é entregue             | Ele está acima do Tessera, ou falta **Gerenciar Cargos**                       |
+| O painel não aparece no canal      | Está desligado, sem canal, ou sem nenhuma opção                                |
+| Um botão antigo não responde       | O painel foi apagado — a mensagem fica, o painel não                           |
+| A reação não faz nada              | Falta **Adicionar Reações**, ou o emoji não é de um servidor que o bot enxerga |
+| Clicar de novo não devolve o cargo | O painel está em **Verificar**, que só entrega                                 |

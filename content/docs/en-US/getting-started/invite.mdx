@@ -1,38 +1,90 @@
 ---
 title: Adding the bot
-summary: The OAuth screen, what it asks for, and what to do when the bot is quiet.
+summary: The OAuth screen, the role position, and why a freshly added bot sits quiet.
 ---
 
-Adding Tessera is one OAuth screen. Discord asks you which server, and which permissions to
-grant; Tessera asks for nothing else.
+Adding Tessera is one OAuth screen. Discord asks which server and which permissions to grant;
+Tessera asks for nothing else.
 
-<Callout tone="info" title="You need Manage Server">
-	Discord only lists servers where you hold **Manage Server**. If a server is missing from the
-	picker, that permission is why.
-</Callout>
+<Facts
+	items={[
+		{ label: 'You need', value: 'Manage Server on the Discord server' },
+		{
+			label: 'The bot asks for',
+			value: 'The union of what the ten modules use, and nothing beyond it'
+		},
+		{
+			label: 'After it joins',
+			value: 'The server shows up in the dashboard picker within seconds'
+		},
+		{ label: 'Starting state', value: 'Every module off' }
+	]}
+/>
 
 ## The steps
 
 <Steps>
 	<Step title="Press Add to Discord">
-		From the landing page, or from the server picker in the dashboard.
+		From the home page, or from the server picker inside the dashboard.
 	</Step>
-	<Step title="Choose the server">Only servers where you have Manage Server appear.</Step>
+	<Step title="Pick the server">
+		Only servers where you have **Manage Server** are listed. If a server is missing, that
+		permission is why.
+	</Step>
 	<Step title="Leave the permissions alone">
 		The defaults are the union of what the modules need. Removing one here does not break the bot —
-		the module that needs it simply refuses to save, and says which permission is missing.
+		the module that needs it refuses to save, and says which one is missing.
+	</Step>
+	<Step title="Drag the role up">
+		Server Settings → Roles. Tessera's role has to sit **above** every role it will hand out or
+		manage. It is the step most people skip.
 	</Step>
 	<Step title="Open the dashboard">
-		The server appears in the picker within a few seconds of the bot joining.
+		The server shows up in the picker a few seconds after the bot joins.
 	</Step>
 </Steps>
 
-## The bot joined but does nothing
+## Role position beats permission
 
-That is expected. Every module is off until you turn it on. A freshly added bot sits in the
+A bot never acts on a member whose highest role sits above its own, and never hands out a role above
+its own — whatever permissions it holds. No Discord permission overrides that.
+
+```text
+Owner
+Admin
+Tessera          ← everything below this line can be managed and handed out
+Moderator
+Member
+Muted
+```
+
+<Callout tone="danger" title="Administrator is not a shortcut">
+	Granting Administrator does **not** lift the hierarchy rule, and hands over far more than any
+	module uses. Position the role instead.
+</Callout>
+
+If the commands work on ordinary members and fail on moderators, this is it — and it is the most
+common report of all.
+
+## The bot joined and does nothing
+
+That is expected. Every module starts off until you turn it on; a freshly added bot sits in the
 member list and waits.
 
-<Callout tone="warning" title="Role position matters more than permissions">
-	A bot cannot act on a member whose highest role sits above its own, whatever permissions it has.
-	If commands work on regular members and fail on moderators, drag the Tessera role up.
+<Flow
+	steps={[
+		{ title: 'Joined', note: 'And does nothing' },
+		{ title: 'Role positioned', note: 'Above what it manages' },
+		{ title: 'One module on', note: 'Welcome is usually first' },
+		{ title: 'Working', note: 'From the next message on' }
+	]}
+/>
+
+## Removing the bot
+
+From Discord, kick it like any member. From the dashboard, it is the button under **Settings**.
+
+<Callout tone="info" title="Leaving does not erase the configuration">
+	The server's row is kept, and adding the bot back restores everything as it was — modules on,
+	texts, roles, panels. A 30-day grace period is what actually deletes it.
 </Callout>

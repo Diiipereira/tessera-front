@@ -1,7 +1,11 @@
 import type { MDXComponents } from 'mdx/types';
 import { Callout } from './Callout';
 import { DocsCommands } from './DocsCommands';
+import { DocsCompare } from './DocsCompare';
+import { DocsFacts } from './DocsFacts';
 import { DocsFields } from './DocsFields';
+import { DocsFlow } from './DocsFlow';
+import { DocsMessage } from './DocsMessage';
 import { docCellHead } from '@/lib/docs/styles';
 import { Anchor, Fence, Heading } from './MdxElements';
 import { Step, Steps } from './Steps';
@@ -48,5 +52,9 @@ export const MDX_COMPONENTS: MDXComponents = {
 	Steps,
 	Step,
 	Fields: DocsFields,
-	Commands: DocsCommands
+	Commands: DocsCommands,
+	Facts: DocsFacts,
+	Flow: DocsFlow,
+	Message: DocsMessage,
+	Compare: DocsCompare
 };

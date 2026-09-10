@@ -12,7 +12,7 @@ export const DOC_NAV: { id: DocGroupId; slugs: string[] }[] = [
 			'getting-started/first-module'
 		]
 	},
-	{ id: 'concepts', slugs: ['concepts/config'] },
+	{ id: 'concepts', slugs: ['concepts/config', 'concepts/embeds'] },
 	{
 		id: 'modules',
 		slugs: [

@@ -1,26 +1,157 @@
 ---
 title: Moderation
-summary: Warns, timeouts, mutes and bans — every one of them written to the case log.
+summary: Warn, timeout, mute, kick and ban — each one becoming a numbered case.
 ---
 
-Moderation is the case log plus the commands that write to it. Every punishment opens a case, whether it came from a slash command, the dashboard, or an escalation rule firing on its own.
+Every punishment in Tessera becomes a **case**: a per-server sequential number carrying the type,
+the target, the moderator, the reason and the date. The number is handed out inside the same
+transaction that writes the case, so it never has a gap and never points at something that did not
+happen.
 
-**Permissions:** `Kick Members`, `Ban Members`, `Moderate Members`, `Manage Roles`
+<Facts
+	items={[
+		{
+			label: 'Who can use it',
+			value:
+				'Whoever Discord allows — the commands are hidden from anyone without Manage Server, Kick or Ban'
+		},
+		{
+			label: 'Needs',
+			value:
+				'Moderate Members for timeouts, Kick Members, Ban Members, Manage Roles for the mute role'
+		},
+		{
+			label: 'Writes to',
+			value: 'The member on Discord, the case table, and the log channel if logging is on'
+		},
+		{ label: 'Doors', value: 'Commands in Discord; the Cases screen reads and revokes' }
+	]}
+/>
 
-## Setting it up
+## The order things happen in
 
-<Steps>
-	<Step title="Protect the roles that matter">
-		A protected role cannot be actioned by the bot, so a moderator cannot ban an admin by mistake.
-	</Step>
-	<Step title="Decide what the member is told">
-		The DM is sent **before** the punishment lands, so a ban still reaches them.
-	</Step>
-	<Step title="Set the escalation ladder">
-		Points build up per warning, and a threshold applies the punishment you chose. Only warns,
-		timeouts and mutes count towards it.
-	</Step>
-</Steps>
+<Flow
+	steps={[
+		{ title: 'Approve', note: 'Hierarchy, protected role, reason' },
+		{ title: 'Notify', note: 'The DM goes out first' },
+		{ title: 'Act', note: 'On Discord' },
+		{ title: 'Record', note: 'The case gets its number' }
+	]}
+	caption="If Discord refuses the action, nothing is recorded and the number is not spent."
+/>
+
+The DM goes out **before** the action because a bot can only reach someone who shares a server with
+it: after the kick it is too late. That is why the kick DM carries no case number — it does not
+exist yet. The warn DM does, because there it can.
+
+## The two hierarchies
+
+A punishment passes two different checks, and each has its own message because _"you cannot"_ and
+_"I cannot"_ are different problems to fix.
+
+| Check                      | Enforced by | What it says                                             |
+| -------------------------- | ----------- | -------------------------------------------------------- |
+| Moderator above the target | Tessera     | A tie does not pass. The server owner is untouchable.    |
+| Bot above the target       | Discord     | Tessera's role must sit higher, and carry the permission |
+
+Protected roles are checked **before** the hierarchy, deliberately: the refusal names the role
+instead of saying you cannot reach the person, which would not tell anyone what to do about it.
+
+## What each command does
+
+| Command      | Acts on Discord                     | Stands after | Counts points |
+| ------------ | ----------------------------------- | ------------ | ------------- |
+| `/warn`      | Nothing — records and DMs           | Yes          | Yes           |
+| `/note`      | Nothing, and tells nobody           | No           | No            |
+| `/timeout`   | Discord timeout                     | Yes          | Yes           |
+| `/mute`      | Mute role + timeout                 | Yes          | Yes           |
+| `/kick`      | Kicks                               | No           | No            |
+| `/ban`       | Bans                                | Yes          | No            |
+| `/softban`   | Bans and unbans at once             | No           | No            |
+| `/untimeout` | Clears the timeout, keeps the role  | —            | —             |
+| `/unmute`    | Clears the role **and** the timeout | —            | —             |
+| `/unban`     | Unbans                              | —            | —             |
+
+**Stands after** means there is something left to lift later. Kick and softban leave nothing — in a
+softban the ban falls in the same instant. Lifting a punishment is not a punishment either, so it
+is recorded already closed.
+
+**A note is its text.** `/note` requires it, sends no DM, does nothing on Discord and checks no
+hierarchy — it does nothing to the person it talks about.
+
+## Banning someone who is not in the server
+
+`/ban` takes an ID. With no member present there is no role to compare, so the hierarchy check is
+skipped — and the DM is still attempted, because the bot reaches anyone who shares **any** server
+with it, and someone banned by ID is usually exactly that person.
+
+Kick and softban do not take an absent target: there is nothing to remove.
+
+<Callout tone="info" title="Banning again is a refusal, not a new case">
+	Discord's ban `PUT` is idempotent: banning twice would succeed twice. `/ban` checks first and
+	refuses if the person is already banned, so it never records a second case for the same state.
+</Callout>
+
+## Deleting messages when banning
+
+| Command    | Default | Why                                                                   |
+| ---------- | ------- | --------------------------------------------------------------------- |
+| `/ban`     | 0 days  | The person is already gone; wiping a week by accident is irreversible |
+| `/softban` | 1 day   | Deleting **is** the point of a softban                                |
+
+Both are configurable per server. The window you chose goes in the ephemeral reply to whoever ran
+the command and is **not** stored on the case: the dashboard reads cases from the database and could
+not reproduce it, so showing it in the log would create a figure nobody can check.
+
+## Softban
+
+<Flow
+	steps={[
+		{ title: 'Ban', note: 'With the delete window' },
+		{ title: 'Unban', note: 'In the same instant' },
+		{ title: 'Record', note: 'As a softban' }
+	]}
+	caption="If the unban fails the person stays banned — and the case is recorded as a ban, because that is what happened."
+/>
+
+The softban DM does not say "banned", because it is not true: someone softbanned can come back, and
+the text says so.
+
+## Revoking a case
+
+Revoking always clears the record. For `ban`, `mute` and `timeout` it also **acts on Discord** —
+unbans, removes the role, clears the timeout — and records a fresh `unban` or `unmute`. In the
+dashboard the button names the act: _Revoke case_ clears the record; _Unban_ and _Give speech back_
+touch Discord right now.
+
+`/case revoke` checks **the target**, not just the number: Discord does not bind anyone to the
+autocomplete suggestions, and naming the wrong person is the worse of the two mistakes.
+
+## The escalation ladder
+
+Warnings carry points, and the ladder fires on its own when a member crosses a threshold.
+
+| Severity | Points |
+| -------- | ------ |
+| Low      | 1      |
+| Medium   | 3      |
+| High     | 6      |
+| Severe   | 10     |
+
+<Callout tone="info" title="One step per infraction">
+	With thresholds at 2, 5 and 10, someone going from 4 to 7 fires **only the 5**: the 2 is behind
+	them and the 10 is not there yet. A heavy infraction that jumps several steps at once fires only
+	the highest.
+</Callout>
+
+An automatic step sends no DM of its own — it runs through the same path as a manual command and
+sends **the DM of the punishment it applies**, with the reason written in the server's language. A
+target with a protected role is never punished automatically, even if the action is on the ladder.
+If Discord refuses the step, Tessera posts a call for the staff with the suggestion instead of
+failing silently.
+
+The counting window is read-only: nothing is rewritten when a deadline passes, so widening it from
+30 to 60 days brings back what had fallen out.
 
 ## Options
 
@@ -29,3 +160,13 @@ Moderation is the case log plus the commands that write to it. Every punishment 
 ## Commands
 
 <Commands module="moderation" />
+
+## When it does not work
+
+| Symptom                                 | Likely cause                                                                 |
+| --------------------------------------- | ---------------------------------------------------------------------------- |
+| The command is invisible to a moderator | Discord hides it by permission — adjust in Server Settings → Integrations    |
+| "I cannot do that"                      | Tessera's role sits below the target, or the verb's permission is missing    |
+| The mute does not silence               | The mute role does not deny speaking in the channels, or it outranks Tessera |
+| The DM never arrives                    | The person blocked server DMs — the punishment still happens                 |
+| No case shows up in the dashboard       | Discord refused the action; nothing was recorded, by design                  |

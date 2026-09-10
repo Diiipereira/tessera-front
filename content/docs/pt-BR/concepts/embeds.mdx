@@ -1,0 +1,144 @@
+---
+title: Embeds
+summary: O que um embed pode carregar, onde montá-lo, e como levá-lo de uma tela para outra.
+---
+
+Embed é o cartão colorido que o Discord desenha em volta de uma mensagem. O Tessera usa embed em
+boas-vindas, anúncio de nível, painéis de ticket, cargos por reação, sorteios, registros e mensagens
+agendadas — e o formulário é o mesmo em todos eles.
+
+<Facts
+	items={[
+		{
+			label: 'Onde monta',
+			value: 'Na tela do módulo, na tela de Embeds, ou por /embed no Discord'
+		},
+		{
+			label: 'Precisa de',
+			value: 'Inserir Links no canal — sem ela o Discord não desenha o cartão'
+		},
+		{ label: 'Guardado como', value: 'Parte da configuração do módulo, ou nada, no caso de /embed' }
+	]}
+/>
+
+## As partes de um embed
+
+<Message
+	embed={{
+		color: '#5865f2',
+		author: 'Autor',
+		title: 'Título',
+		description: 'Descrição. É a parte maior, e aceita quebra de linha.',
+		fields: [
+			{ name: 'Campo lado a lado', value: 'Valor', inline: true },
+			{ name: 'Outro', value: 'Valor', inline: true },
+			{ name: 'Campo de linha inteira', value: 'Valor', inline: false }
+		],
+		image: 'Imagem (larga, embaixo)',
+		footer: 'Rodapé · e a hora, se ligada'
+	}}
+	caption="A barra colorida à esquerda é a cor. A miniatura, que não cabe neste desenho, fica no canto superior direito."
+/>
+
+| Parte             | Limite do Discord | Observação                                                     |
+| ----------------- | ----------------- | -------------------------------------------------------------- |
+| Título            | 256 caracteres    | Não aceita quebra de linha                                     |
+| Descrição         | 4.096 caracteres  | O editor do painel para em 4.096; o modal do Discord, em 4.000 |
+| Nome do campo     | 256 caracteres    | Campo sem nome **ou** sem valor não é enviado                  |
+| Valor do campo    | 1.024 caracteres  |                                                                |
+| Campos            | 25                | Até três lado a lado por linha                                 |
+| Rodapé            | 2.048 caracteres  |                                                                |
+| Autor             | 256 caracteres    | Pode levar uma imagem pequena ao lado                          |
+| Imagem, miniatura | Um link http(s)   | O Discord baixa a imagem; link quebrado não desenha nada       |
+
+<Callout tone="warning" title="Embed vazio não é enviado">
+	Um embed só é publicado se tiver **autor, título, descrição, imagem ou pelo menos um campo**. Cor,
+	rodapé e hora sozinhos não contam: eles decoram algo, e não há o que decorar.
+</Callout>
+
+## Três lugares para montar
+
+<Compare
+	yesTitle="Tela do módulo"
+	noTitle="Tela de Embeds e /embed"
+	yes={[
+		'É onde o embed é salvo na configuração',
+		'Tem as variáveis daquele módulo',
+		'A prévia mostra as variáveis já substituídas por exemplos'
+	]}
+	no={[
+		'Não salvam configuração de módulo nenhuma',
+		'Servem para desenhar, ver e publicar uma vez',
+		'A ponte para o módulo é copiar e colar o JSON'
+	]}
+/>
+
+### A tela de Embeds
+
+Em **Gerenciamento → Embeds**. Você monta, vê a prévia ao lado, escolhe um canal e publica **uma
+mensagem, agora**. Também é ali que se copia o JSON de um embed pronto e se cola um vindo de fora.
+
+Membros e cargos citados no texto são notificados; `@everyone` nunca é, em nenhum caminho do
+Tessera.
+
+### `/embed`, no Discord
+
+Abre um construtor em etapas, visível só para você. A mensagem do construtor **é** a prévia: cada
+etapa que você preenche redesenha o embed ali mesmo, e o que está desenhado é exatamente o que vai
+ser publicado.
+
+<Flow
+	steps={[
+		{ title: 'Texto', note: 'A linha acima do embed' },
+		{ title: 'Corpo', note: 'Título, texto e cor' },
+		{ title: 'Autor', note: 'Nome e foto' },
+		{ title: 'Imagens', note: 'Imagem e miniatura' },
+		{ title: 'Rodapé', note: 'Texto e hora' },
+		{ title: 'Campos', note: 'Um por vez' }
+	]}
+	caption="Cada botão abre um formulário pequeno. Um modal do Discord aceita cinco caixas, e é por isso que o editor é por etapas."
+/>
+
+Para remover um campo, abra ele e apague **o nome e o texto**: campo sem os dois é campo que sai.
+O construtor expira em 15 minutos sem uso, e é fechado por um reinício do bot — o rascunho é dele,
+não do banco.
+
+### `/config <módulo> edit:Embed`
+
+O mesmo construtor, ligado à configuração daquele módulo: ele abre com o embed que já está salvo, e
+o botão **Salvar** grava por cima. É a porta do slash para um campo que não cabe numa opção de
+comando.
+
+<Callout tone="info" title="Salvar não liga o embed">
+	Cada módulo tem um interruptor separado — **Usar embed** no Boas-vindas, **Anunciar com embed**
+	nos Níveis. Salvar um embed com o interruptor desligado grava um embed que ninguém vê, e o
+	construtor avisa quando é esse o caso.
+</Callout>
+
+## Levando um embed de um lugar para outro
+
+O botão **Copiar este embed**, na tela de Embeds, produz o JSON no formato da API do Discord — o
+mesmo que outras ferramentas geram e leem. **Aplicar** faz o caminho inverso, e aceita os dois
+formatos: o do Discord e o que o próprio Tessera guarda.
+
+```json
+{
+	"title": "Regras",
+	"description": "Leia antes de falar.",
+	"color": 5793266,
+	"fields": [{ "name": "Dúvidas", "value": "#suporte", "inline": true }],
+	"footer": { "text": "Servidor de Testes" }
+}
+```
+
+A cor vai como número no JSON do Discord e como `#rrggbb` no painel; a conversão é feita nos dois
+sentidos. Colar uma mensagem inteira também funciona: se o JSON tiver uma lista `embeds`, o primeiro
+item é o que entra.
+
+## Variáveis dentro de um embed
+
+Onde o módulo tem variáveis, elas valem em **todas** as partes do embed, não só na descrição. O que
+não for reconhecido fica escrito como está.
+
+A tela de Embeds e o `/embed` não substituem variável nenhuma: eles publicam o texto literal. Um
+`{user}` montado ali é para ser copiado para a tela de um módulo, onde ele significa alguma coisa.

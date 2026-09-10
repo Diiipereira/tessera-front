@@ -1,24 +1,126 @@
 ---
 title: Logging
-summary: Write server events to a channel. Turn on only what you will actually read.
+summary: Fifteen server events, each with its own channel, its own embed and its own template.
 ---
 
-Logging writes what happened to a channel you choose. The temptation is to turn everything on; the advice is not to, because a log nobody reads is worse than no log — it looks like coverage.
+Logging listens for things happening in the server and posts an embed in the channel you chose
+**for that event**. Every event has its own channel: messages can go one way and moderation
+another, or everything to the same place.
 
-**Permissions:** `View Channel`, `Send Messages`, `Embed Links`, `View Audit Log`
+<Facts
+	items={[
+		{ label: 'Fires on', value: 'Fifteen Discord events, listed below' },
+		{
+			label: 'Needs',
+			value:
+				'Send Messages and Embed Links in the target channel; View Audit Log to name who caused it'
+		},
+		{ label: 'Writes to', value: 'Each event’s channel' },
+		{ label: 'Doors', value: '/logging in Discord, the Logging screen in the dashboard' },
+		{ label: 'Template', value: 'Optional — empty means Tessera’s default embed' }
+	]}
+/>
 
-## Setting it up
+## The fifteen events
 
-<Steps>
-	<Step title="Pick the channel">Make it staff-only. Deleted message content ends up here.</Step>
-	<Step title="Choose the events">
-		Start with joins, leaves, deletes and moderation actions. Add more when you find yourself
-		wishing you had them.
-	</Step>
-	<Step title="Exclude the noise">
-		Ignored channels are absolute — nothing from them is ever logged, whatever the events say.
-	</Step>
-</Steps>
+| Group      | Events                                                        |
+| ---------- | ------------------------------------------------------------- |
+| Messages   | Message deleted, message edited, bulk delete                  |
+| Members    | Join, leave, nickname changed, roles changed                  |
+| Moderation | Ban, unban, timeout                                           |
+| Server     | Channel changed, role changed, thread changed, server changed |
+| Voice      | Joined a voice channel                                        |
+
+An event is only posted when **the module is on, the event is on, and it has a channel**. Miss any
+of the three and nothing goes out — and the dashboard test says which of the three is missing
+instead of failing quietly.
+
+## Who did what
+
+Discord does not say, in the event itself, who caused it: a deleted message arrives without telling
+you whether it was the author or a moderator. What knows that is Discord's own audit log, and it
+arrives in a separate message — sometimes before the event, sometimes after.
+
+<Flow
+	steps={[
+		{ title: 'Event arrives', note: 'With no actor' },
+		{ title: 'Waits 1.5s', note: 'For the audit entry' },
+		{ title: 'Matches on the key', note: 'Not just the type' },
+		{ title: 'Posts', note: 'With an actor, or without' }
+	]}
+	caption="The wait only happens where a log is actually going out — a server that logs no deletions pays no timer at all."
+/>
+
+The match is on **the key that changed**, not just the type: a nickname and a timeout are the same
+audit entry on Discord, and what separates them is which member field moved.
+
+<Callout tone="info" title="A ban does not become two lines">
+	Banning also emits a member leave. When the leave finds a ban in the audit log it stays quiet —
+	the ban event tells the story. A kick, on the other hand, shows up as a leave **with** a
+	moderator.
+</Callout>
+
+Without **View Audit Log** the record still goes out, only without a name. It never stops going out
+over this.
+
+## What lands in the channel
+
+<Message
+	embed={{
+		color: '#ed4245',
+		author: 'Lia',
+		title: 'Message deleted',
+		description: 'A message from @Lia was deleted in #general by @Moderator.',
+		fields: [{ name: 'Content', value: 'the text of the message that was deleted', inline: false }],
+		footer: 'ID 512345678901234567'
+	}}
+	caption="The embed is a sentence, not a pile of fields: a Discord field spends two lines saying what a sentence says in one."
+/>
+
+Fields are kept for what is genuinely long — content, before and after, roles, reason. The author
+block carries the name and picture of whoever the record is about; the footer carries the id, which
+is what you copy to investigate.
+
+## Templates
+
+Every event takes a template of its own: an embed you build, with that event's variables. An empty
+template means the default embed — nothing has to be written for the module to work.
+
+The `{line}` variable is the **whole default sentence**, available as a variable. That lets you
+customise around it without rewriting what was already fine:
+
+```text
+{line}
+
+If this was a mistake, ask the staff in #support.
+```
+
+Which variables exist is decided by the event itself: the screen offers exactly the ones that will
+be substituted in that record, and the list changes from event to event.
+
+## Preview and test
+
+| Where               | Against what           | What it does                         |
+| ------------------- | ---------------------- | ------------------------------------ |
+| Preview on screen   | The draft              | Draws the embed, sends nothing       |
+| The **Test** button | The **saved** template | Really posts in that event's channel |
+
+The preview is built **by the same code that sends**, with sample data and in the server's language
+— it is not a parallel drawing that can drift from the real one.
+
+The test goes through the same door as a real record: module off, event off or event with no channel
+answer _not ready_ without writing anything. It is disabled while the screen has unsaved changes,
+because what goes out is the saved template.
+
+<Callout tone="info" title="The test message says it is a test">
+	A log channel is evidence, and a "Member banned" identical to a real one planted there would
+	mislead whoever read it later. The test carries a line above the embed naming whoever asked for
+	it, and that mention appears without notifying anyone.
+</Callout>
+
+Whoever clicks joins the sample cast: the test swaps the member and the moderator for you, the
+channel for the destination channel, and picks a real role from the server — otherwise the Roles
+field would come out empty in exactly the two events that exist to show roles.
 
 ## Options
 
@@ -27,3 +129,22 @@ Logging writes what happened to a channel you choose. The temptation is to turn 
 ## Commands
 
 <Commands module="logging" />
+
+## What was left out, and why
+
+| Not logged                   | Reason                                                              |
+| ---------------------------- | ------------------------------------------------------------------- |
+| Avatar and username changes  | Discord does not list that event in the intents documentation       |
+| Invites created and used     | Needs the `GUILD_INVITES` intent, which we do not ask for           |
+| Reactions                    | Needs the `GUILD_MESSAGE_REACTIONS` intent, which we do not ask for |
+| Channel and role permissions | The expensive part is diffing an overwrite readably, not listening  |
+
+## When it does not work
+
+| Symptom                           | Likely cause                                                  |
+| --------------------------------- | ------------------------------------------------------------- |
+| Nothing is logged                 | The module is off, or the event has no channel                |
+| The record has no actor           | **View Audit Log** is missing                                 |
+| A deleted message has no content  | Discord does not cache old messages — only recent ones        |
+| A moderator gets the wrong credit | The correlation window is 10s; near-simultaneous actions blur |
+| The template does not show up     | It is saved on another event — templates are per event        |

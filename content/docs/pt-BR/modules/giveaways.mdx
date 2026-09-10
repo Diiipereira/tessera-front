@@ -1,25 +1,100 @@
 ---
 title: Sorteios
-summary: Sorteios com prazo e requisitos de entrada, e um novo sorteio quando o ganhador some.
+summary: Um prêmio, um botão para entrar, e um sorteio ponderado sem reposição.
 ---
 
-Um sorteio começa no instante em que você o cria e sorteia quando o prazo acaba. Os requisitos são conferidos quando o membro entra, e quem já ganhou nunca volta para o chapéu.
+Um sorteio é uma mensagem publicada com um botão. Quem clica entra; quando o prazo vence, o Tessera
+sorteia, edita a mensagem com o resultado e anuncia os ganhadores.
 
-**Permissões:** `Ver Canal`, `Enviar Mensagens`, `Inserir Links`
+<Facts
+	items={[
+		{
+			label: 'Dispara em',
+			value: 'O clique no botão, e a varredura a cada 15 segundos para encerrar'
+		},
+		{ label: 'Precisa de', value: 'Enviar Mensagens e Inserir Links no canal do sorteio' },
+		{ label: 'Escreve em', value: 'A mensagem do sorteio e a lista de participantes' },
+		{ label: 'Portas', value: '/giveaway start|end|reroll|list; tela de Sorteios no painel' },
+		{ label: 'Duração', value: 'De minutos a um mês' }
+	]}
+/>
 
-## Configurando
+## O que é publicado
 
-<Steps>
-	<Step title="Descreva o prêmio">
-		Ele começa no instante em que você cria, então escreva antes de salvar.
-	</Step>
-	<Step title="Defina os requisitos">
-		Cargos exigidos e um nível mínimo, conferidos quando o membro aperta para entrar.
-	</Step>
-	<Step title="Sorteie, ou resorteie">
-		Um resorteio exclui os ganhadores anteriores e escolhe de novo entre quem ainda pode ganhar.
-	</Step>
-</Steps>
+<Message
+	embed={{
+		color: '#eb459e',
+		title: '🎉 Nitro por um mês',
+		description: 'Clique em **Entrar** para participar.\nEncerra em 2 dias.',
+		fields: [
+			{ name: 'Ganhadores', value: '2', inline: true },
+			{ name: 'Participantes', value: '48', inline: true },
+			{ name: 'Exige', value: 'um de @Membro, @Booster', inline: false }
+		],
+		footer: 'Encerra'
+	}}
+	buttons={[{ label: '🎉 Entrar', style: 'primary' }]}
+	caption="A contagem de participantes é atualizada no máximo a cada cinco segundos — editar a mensagem a cada clique estouraria o limite de edições do Discord."
+/>
+
+A mensagem é escrita por **uma função só**, porque dois processos a enviam: o bot pelo gateway e a
+API pelo painel. Se cada um montasse o próprio texto, o mesmo sorteio teria duas aparências.
+
+## Quem pode entrar
+
+| Condição        | Como ela é lida                                        |
+| --------------- | ------------------------------------------------------ |
+| Cargos exigidos | **Um destes**, não todos                               |
+| Nível exigido   | Só é consultado quando o sorteio realmente exige nível |
+| Entradas bônus  | Cargos que valem mais de uma entrada                   |
+
+O peso é **congelado na entrada**. Reconferir os cargos na hora do sorteio faria alguém perder o
+peso por ter trocado de cargo depois de entrar, e obrigaria a buscar todo mundo no Discord no
+momento mais caro.
+
+## O sorteio
+
+<Flow
+	steps={[
+		{ title: 'Trava', note: 'Um encerramento por vez' },
+		{ title: 'Monta o chapéu', note: 'Só quem ainda não ganhou' },
+		{ title: 'Sorteia', note: 'Ponderado, sem reposição' },
+		{ title: 'Grava', note: 'Os ganhadores' },
+		{ title: 'Anuncia', note: 'Mensagem, canal e DM' }
+	]}
+	caption="O sorteio é gravado primeiro e anunciado depois: se o Discord cair no meio, os ganhadores estão salvos e aparecem na tela."
+/>
+
+**Sem reposição** quer dizer que quem já foi sorteado sai do chapéu antes da próxima escolha, e o
+total é refeito a cada volta. Sortear dois ganhadores usando o total da primeira volta daria um
+resultado diferente — e errado.
+
+<Callout tone="info" title="Quem já ganhou nunca volta ao chapéu">
+	Um resorteio substitui a lista de ganhadores, então sem memória do que já foi ganho o segundo
+	resorteio poderia devolver o prêmio ao primeiro ganhador. Se não sobrar ninguém elegível, o
+	resorteio é **recusado** — a lista antiga fica de pé, em vez de a tela dizer que ninguém ganhou um
+	sorteio que teve ganhador.
+</Callout>
+
+## Encerramento automático
+
+Uma varredura a cada 15 segundos pega os sorteios vencidos. Não há temporizador acompanhando: um
+sorteio pode durar um mês, e o teto de um `setTimeout` é de cerca de 25 dias — o timer seria um
+caminho a mais que ainda precisaria da varredura.
+
+Sorteio vencido é encerrado **mesmo se o bot não está mais no servidor**: o resultado é verdade e
+fica gravado; só a parte do Discord é pulada.
+
+## O aviso ao ganhador
+
+A DM leva um **link para a mensagem do sorteio**, não o nome do servidor: ela chega fora de qualquer
+servidor, então precisa dizer de onde veio — e o link diz de onde veio **e** leva de volta.
+
+## O que não existe nesta versão
+
+Sorteio agendado. A tela nunca teve onde escolher a hora de início, e a aba "Agendados" só podia
+ficar vazia para sempre. Hoje um sorteio está **de pé** ou **encerrado**, e é só isso que as colunas
+sabem dizer.
 
 ## Opções
 
@@ -28,3 +103,16 @@ Um sorteio começa no instante em que você o cria e sorteia quando o prazo acab
 ## Comandos
 
 <Commands module="giveaways" />
+
+`/giveaway end` confere o **servidor**, não só o id: o Discord não prende ninguém às sugestões do
+autocomplete, e sem a conferência daria para colar o id de um sorteio de outro servidor.
+
+## Quando não funciona
+
+| Sintoma                              | Causa provável                                                                  |
+| ------------------------------------ | ------------------------------------------------------------------------------- |
+| O sorteio não é publicado            | Falta **Enviar Mensagens** ou **Inserir Links** no canal                        |
+| O botão diz que o sorteio não existe | Ele foi apagado, ou a publicação saiu e a gravação falhou                       |
+| Ninguém consegue entrar              | Os cargos exigidos, ou o nível exigido, barram todo mundo                       |
+| A contagem parece atrasada           | Ela é atualizada a cada cinco segundos; o encerramento reescreve o número final |
+| O resorteio foi recusado             | Todo mundo que entrou já ganhou este prêmio                                     |

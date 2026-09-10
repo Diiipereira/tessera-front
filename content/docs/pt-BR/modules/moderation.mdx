@@ -1,27 +1,155 @@
 ---
 title: Moderação
-summary: Advertências, castigos, silenciamentos e banimentos — todos escritos no log de casos.
+summary: Advertência, castigo, mudo, expulsão e banimento — cada um virando um caso numerado.
 ---
 
-A Moderação é o log de casos mais os comandos que escrevem nele. Toda punição abre um caso, venha ela de um comando de barra, do painel, ou de uma regra de escalonamento disparando sozinha.
+Toda punição do Tessera vira um **caso**: um número sequencial por servidor, com tipo, alvo,
+moderador, motivo e data. O número é dado dentro da mesma transação que grava o caso, então ele
+nunca tem buraco e nunca aponta para algo que não aconteceu.
 
-**Permissões:** `Expulsar Membros`, `Banir Membros`, `Moderar Membros`, `Gerenciar Cargos`
+<Facts
+	items={[
+		{
+			label: 'Quem pode usar',
+			value:
+				'Quem o Discord deixa — os comandos são escondidos de quem não tem Gerenciar Servidor, Expulsar ou Banir'
+		},
+		{
+			label: 'Precisa de',
+			value:
+				'Moderar Membros para castigo, Expulsar Membros, Banir Membros, Gerenciar Cargos para o mudo'
+		},
+		{
+			label: 'Escreve em',
+			value: 'O membro no Discord, a tabela de casos, e o canal de registro se ele estiver ligado'
+		},
+		{ label: 'Portas', value: 'Comandos no Discord; a tela de Casos no painel lê e anula' }
+	]}
+/>
 
-## Configurando
+## A ordem em que as coisas acontecem
 
-<Steps>
-	<Step title="Proteja os cargos que importam">
-		Um cargo protegido não pode ser alcançado pelo bot, então um moderador não bane um admin por
-		engano.
-	</Step>
-	<Step title="Decida o que o membro ouve">
-		A DM sai **antes** de a punição cair, então um banimento ainda chega até ele.
-	</Step>
-	<Step title="Monte a escada de escalonamento">
-		Os pontos somam por advertência, e um limiar aplica a punição que você escolheu. Só advertência,
-		castigo e silenciamento contam.
-	</Step>
-</Steps>
+<Flow
+	steps={[
+		{ title: 'Aprova', note: 'Hierarquia, cargo protegido, motivo' },
+		{ title: 'Avisa', note: 'A DM sai antes da ação' },
+		{ title: 'Age', note: 'No Discord' },
+		{ title: 'Grava', note: 'O caso ganha número' }
+	]}
+	caption="Se o Discord recusar a ação, nada é gravado e o número não é gasto."
+/>
+
+A DM sai **antes** da ação porque um bot só alcança quem compartilha um servidor com ele: depois da
+expulsão é tarde. É por isso que a DM de expulsão não leva número de caso — ele ainda não existe.
+A de advertência leva, porque ali dá.
+
+## As duas hierarquias
+
+Uma punição passa por duas checagens diferentes, e cada uma tem a sua mensagem porque _"você não
+pode"_ e _"eu não posso"_ são problemas diferentes de resolver.
+
+| Checagem                | Quem impõe | O que ela diz                                                   |
+| ----------------------- | ---------- | --------------------------------------------------------------- |
+| Moderador acima do alvo | O Tessera  | Empate não passa. O dono do servidor é intocável.               |
+| Bot acima do alvo       | O Discord  | O cargo do Tessera precisa estar acima, e ter a permissão certa |
+
+Cargos protegidos são conferidos **antes** da hierarquia, de propósito: a recusa nomeia o cargo em
+vez de dizer que você não alcança a pessoa, que não ajudaria ninguém a agir.
+
+## O que cada comando faz
+
+| Comando      | Age no Discord                    | Nasce de pé | Conta pontos |
+| ------------ | --------------------------------- | ----------- | ------------ |
+| `/warn`      | Nada — só registra e avisa por DM | Sim         | Sim          |
+| `/note`      | Nada, e não avisa ninguém         | Não         | Não          |
+| `/timeout`   | Castigo do Discord                | Sim         | Sim          |
+| `/mute`      | Cargo de mudo + castigo           | Sim         | Sim          |
+| `/kick`      | Expulsa                           | Não         | Não          |
+| `/ban`       | Bane                              | Sim         | Não          |
+| `/softban`   | Bane e desbane na hora            | Não         | Não          |
+| `/untimeout` | Tira o castigo, mantém o cargo    | —           | —            |
+| `/unmute`    | Tira o cargo **e** o castigo      | —           | —            |
+| `/unban`     | Desbane                           | —           | —            |
+
+**Nasce de pé** quer dizer que há algo para levantar depois. Expulsão e softban não deixam nada em
+pé — no softban o banimento cai no mesmo instante. Reversão também não é punição, então ela nasce
+já encerrada.
+
+**Anotação é o texto dela.** `/note` exige o texto, não manda DM, não age no Discord e não confere
+hierarquia — ele não faz nada com a pessoa de quem fala.
+
+## Banir alguém que não está no servidor
+
+`/ban` aceita o alvo por ID. Sem membro presente não há cargo para comparar, então a checagem de
+hierarquia é pulada — e a DM continua sendo tentada, porque o bot alcança quem compartilha
+**qualquer** servidor com ele, e quem se bane por ID costuma ser exatamente essa pessoa.
+
+Expulsão e softban não aceitam ausente: não há o que expulsar.
+
+<Callout tone="info" title="Banir de novo é recusa, não caso novo">
+	O `PUT` de banimento do Discord é idempotente: banir duas vezes daria sucesso as duas. O `/ban`
+	consulta antes e recusa se a pessoa já está banida, para não gravar um segundo caso do mesmo
+	estado.
+</Callout>
+
+## Apagar mensagens ao banir
+
+| Comando    | Padrão | Por quê                                                      |
+| ---------- | ------ | ------------------------------------------------------------ |
+| `/ban`     | 0 dias | A pessoa já foi; apagar uma semana sem querer é irreversível |
+| `/softban` | 1 dia  | Apagar **é** o objetivo do softban                           |
+
+Os dois são configuráveis por servidor. A janela escolhida vai na resposta efêmera de quem rodou o
+comando e **não** é guardada no caso: o painel lê o caso do banco e não conseguiria reproduzi-la,
+então mostrá-la no registro criaria um dado que não se pode conferir.
+
+## Softban
+
+<Flow
+	steps={[
+		{ title: 'Bane', note: 'Com a janela de exclusão' },
+		{ title: 'Desbane', note: 'No mesmo instante' },
+		{ title: 'Grava', note: 'Como softban' }
+	]}
+	caption="Se o desbanimento falhar, a pessoa continua banida — e o caso é gravado como ban, porque é isso que aconteceu."
+/>
+
+A DM do softban não diz "banido", porque não é verdade: quem levou softban pode voltar, e o texto
+diz isso.
+
+## Anular um caso
+
+Anular sempre limpa o registro. Para `ban`, `mute` e `timeout`, anular também **age no Discord** —
+desbane, tira o cargo, limpa o castigo — e grava um `unban` ou `unmute` novo. Pelo painel o botão
+nomeia o ato: _Anular caso_ limpa; _Desbanir_ e _Devolver a fala_ mexem no Discord agora.
+
+`/case revoke` confere **o alvo**, não só o número: o Discord não prende ninguém às sugestões do
+autocomplete, e nomear a pessoa errada é o engano mais grave dos dois.
+
+## A escada de escalonamento
+
+Advertências valem pontos, e a escada dispara sozinha quando um membro atravessa um limiar.
+
+| Gravidade | Pontos |
+| --------- | ------ |
+| Leve      | 1      |
+| Média     | 3      |
+| Grave     | 6      |
+| Severa    | 10     |
+
+<Callout tone="info" title="Um degrau por infração">
+	Com limiares em 2, 5 e 10, alguém que sai de 4 para 7 dispara **só o 5**: o 2 já passou e o 10
+	ainda não chegou. Uma infração pesada que pula vários degraus de uma vez dispara apenas o mais
+	alto.
+</Callout>
+
+O degrau automático não manda uma DM própria — ele passa pelo mesmo caminho de um comando manual e
+manda **a DM da punição que aplica**, com o motivo montado no idioma do servidor. Alvo com cargo
+protegido nunca é punido automaticamente, mesmo que a ação esteja na escada. Se o Discord recusar o
+degrau, o Tessera posta um chamado para a equipe com a sugestão, em vez de falhar em silêncio.
+
+A janela de contagem é só consulta: nada é reescrito quando um prazo passa, então mudar a janela de
+30 para 60 dias volta a contar o que estava fora.
 
 ## Opções
 
@@ -30,3 +158,13 @@ A Moderação é o log de casos mais os comandos que escrevem nele. Toda puniç�
 ## Comandos
 
 <Commands module="moderation" />
+
+## Quando não funciona
+
+| Sintoma                                | Causa provável                                                                      |
+| -------------------------------------- | ----------------------------------------------------------------------------------- |
+| O comando não aparece para o moderador | O Discord esconde por permissão — ajuste em Configurações do Servidor → Integrações |
+| "Eu não posso fazer isso"              | O cargo do Tessera está abaixo do alvo, ou falta a permissão do verbo               |
+| O mudo não silencia                    | O cargo de mudo não nega falar nos canais, ou está acima do Tessera                 |
+| A DM nunca chega                       | A pessoa bloqueou DMs do servidor — a punição acontece do mesmo jeito               |
+| O caso não aparece no painel           | A ação foi recusada pelo Discord; nada foi gravado, por desenho                     |

@@ -1,31 +1,40 @@
 ---
 title: Permissões
-summary: Para que serve cada permissão, e qual módulo para de funcionar sem ela.
+summary: Para que serve cada permissão, qual módulo para sem ela, e as duas armadilhas que não são permissão.
 ---
 
-O Tessera pede a união do que os módulos dele precisam, e nada além. Esta página existe para
-você entregar a quem tem que aprovar o convite.
+O Tessera pede a união do que os módulos dele precisam, e nada além. Esta página existe para você
+entregar a quem tem que aprovar o convite.
 
-| Permissão                   | Usada por                                        | Sem ela                                           |
-| --------------------------- | ------------------------------------------------ | ------------------------------------------------- |
-| `Ver Canal`                 | Todo módulo                                      | O bot não lê nem publica em lugar nenhum          |
-| `Enviar Mensagens`          | Todo módulo                                      | Nada é publicado                                  |
-| `Inserir Links`             | Boas-vindas, Registros, Sorteios                 | As mensagens caem para texto puro                 |
-| `Gerenciar Cargos`          | Boas-vindas, Níveis, Cargos por reação, Economia | Nenhum cargo é entregue                           |
-| `Moderar Membros`           | Moderação, AutoMod                               | Os castigos falham                                |
-| `Expulsar Membros`          | Moderação                                        | O comando de expulsar é recusado                  |
-| `Banir Membros`             | Moderação                                        | O comando de banir é recusado                     |
-| `Gerenciar Mensagens`       | AutoMod                                          | As regras avisam e registram, mas nunca apagam    |
-| `Gerenciar Canais`          | Tickets                                          | Nenhum canal de ticket pode ser criado            |
-| `Anexar Arquivos`           | Tickets                                          | Os históricos não são guardados                   |
-| `Ver Registro de Auditoria` | Registros                                        | Os eventos não podem ser ligados a quem os causou |
-| `Adicionar Reações`         | Cargos por reação, Sorteios                      | Os painéis por reação não funcionam               |
+<Facts
+	items={[
+		{ label: 'Administrador', value: 'Não é pedido, e não resolve a hierarquia' },
+		{ label: 'Onde revisar', value: 'Configurações do Servidor → Cargos → Tessera' },
+		{ label: 'Por canal', value: 'Uma permissão do cargo pode ser negada num canal específico' }
+	]}
+/>
 
-## Hierarquia de cargos
+## O que cada uma faz
 
-As permissões do Discord são só metade da história. Um bot nunca age sobre um membro, nem
-entrega um cargo, que esteja **acima do cargo mais alto dele** — nenhuma permissão passa por
-cima disso. A maioria dos relatos de "o bot ignora meus moderadores" é isto.
+| Permissão                   | Usada por                                        | Sem ela                                        |
+| --------------------------- | ------------------------------------------------ | ---------------------------------------------- |
+| `Ver Canal`                 | Todo módulo                                      | O bot não lê nem publica em lugar nenhum       |
+| `Enviar Mensagens`          | Todo módulo                                      | Nada é publicado                               |
+| `Inserir Links`             | Boas-vindas, Registros, Sorteios, Níveis         | As mensagens caem para texto puro              |
+| `Gerenciar Cargos`          | Boas-vindas, Níveis, Cargos por reação, Economia | Nenhum cargo é entregue                        |
+| `Moderar Membros`           | Moderação, AutoMod                               | Os castigos falham                             |
+| `Expulsar Membros`          | Moderação                                        | O comando de expulsar é recusado               |
+| `Banir Membros`             | Moderação                                        | O comando de banir é recusado                  |
+| `Gerenciar Mensagens`       | AutoMod                                          | As regras avisam e registram, mas nunca apagam |
+| `Gerenciar Canais`          | Tickets                                          | Nenhum canal de ticket pode ser criado         |
+| `Anexar Arquivos`           | Tickets                                          | Os históricos não são guardados                |
+| `Ver Registro de Auditoria` | Registros                                        | Os eventos saem sem dizer quem os causou       |
+| `Adicionar Reações`         | Cargos por reação, Sorteios                      | Os painéis por reação não funcionam            |
+
+## A primeira armadilha: hierarquia de cargos
+
+As permissões do Discord são só metade da história. Um bot nunca age sobre um membro, nem entrega um
+cargo, que esteja **acima do cargo mais alto dele** — nenhuma permissão passa por cima disso.
 
 ```text
 Dono
@@ -40,3 +49,37 @@ Silenciado
 	Dar Administrador não levanta a regra da hierarquia, e concede muito mais do que qualquer módulo
 	usa. Posicione o cargo em vez disso.
 </Callout>
+
+A maioria dos relatos de _"o bot ignora meus moderadores"_ é isto.
+
+## A segunda armadilha: permissão por canal
+
+Uma permissão concedida ao **cargo** pode ser negada num **canal** específico. O bot pode ter
+Enviar Mensagens no servidor inteiro e não conseguir escrever justamente no canal que você
+configurou.
+
+<Compare
+	yesTitle="O que a prévia prova"
+	noTitle="O que só o teste prova"
+	yes={['O formato da mensagem', 'As variáveis substituídas', 'O embed desenhado']}
+	no={[
+		'Que o bot enxerga o canal',
+		'Que o bot pode escrever nele',
+		'Que o cargo automático pode ser entregue'
+	]}
+/>
+
+Por isso os módulos que enviam mensagem têm botão de teste: ele publica de verdade, e é a única
+coisa que responde essa pergunta.
+
+## Se você hospeda o bot
+
+Duas intents privilegiadas precisam estar ligadas no Portal do Desenvolvedor do Discord, em
+**Bot → Privileged Gateway Intents**:
+
+| Intent            | Sem ela                                                       |
+| ----------------- | ------------------------------------------------------------- |
+| `Server Members`  | O evento de entrada nunca chega — Boas-vindas não dispara     |
+| `Message Content` | O conteúdo das mensagens chega vazio — AutoMod e Níveis param |
+
+A falha é **silenciosa**: o gateway conecta normalmente e os eventos simplesmente não chegam.

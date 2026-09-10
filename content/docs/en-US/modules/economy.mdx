@@ -1,25 +1,99 @@
 ---
 title: Economy
-summary: A currency members earn by showing up, and something to spend it on.
+summary: A server currency, two ways to earn it, and a shop to spend it in.
 ---
 
-Economy is a currency, two ways to earn it, and a shop to spend it in. It is the module that most rewards being left alone for a few weeks — the numbers only mean something once people have been earning for a while.
+Economy is one currency per server, with a wallet per member. It is earned by a daily claim and by
+working, transferred between members, and spent in a shop you build.
 
-**Permissions:** `View Channel`, `Send Messages`, `Manage Roles`
+<Facts
+	items={[
+		{ label: 'Fires on', value: 'Commands — the economy never acts on its own' },
+		{ label: 'Needs', value: 'Manage Roles, if any shop item hands out a role' },
+		{ label: 'Writes to', value: 'The member’s wallet, the transaction ledger and the inventory' },
+		{
+			label: 'Doors',
+			value: '/balance, /daily, /work, /pay, /richest, /shop, /inventory, /eco; the Economy screen'
+		},
+		{ label: 'Public', value: '/balance, /shop view, /inventory and /richest answer the channel' }
+	]}
+/>
 
-## Setting it up
+## The name and the symbol
 
-<Steps>
-	<Step title="Name the currency">
-		A name and a symbol. One character reads best as the symbol.
-	</Step>
-	<Step title="Set what it hands out">
-		A daily claim with a streak bonus, and a work command on a shorter cooldown.
-	</Step>
-	<Step title="Fill the shop">
-		What the currency actually buys. An item can grant a role, and can have limited stock.
-	</Step>
-</Steps>
+The symbol has a default; the name does not. A name is prose — it starts empty and Tessera uses the
+default word for the server's language until you write your own. A symbol reads the same in every
+language, so it is a real default.
+
+| Symbol | How it is written | Why                                 |
+| ------ | ----------------- | ----------------------------------- |
+| `$`    | `$100`            | An ASCII symbol sits on the number  |
+| `🪙`   | `🪙 100`          | An emoji needs the space to breathe |
+
+## Earning
+
+<Flow
+	steps={[
+		{ title: '/daily', note: 'Once a day, with a streak bonus' },
+		{ title: '/work', note: 'Shorter cooldown, smaller amount' },
+		{ title: '/pay', note: 'From one member to another' },
+		{ title: '/eco', note: 'Staff give, take or set' }
+	]}
+/>
+
+The starting balance is given **once**. Anyone who already has a wallet is never gifted again, even
+if you raise the amount later — otherwise every `/balance` from someone at zero would hand out the
+gift again.
+
+When a member can try again travels as a Discord timestamp, not as text: each person's client
+writes _"in 3 hours"_ in their own language.
+
+## Transferring
+
+A transfer touches two wallets, and both are locked inside the same transaction. The locks are
+taken in a deterministic order — without that, you paying someone while they pay you would deadlock
+both forever.
+
+<Callout tone="warning" title="Server money is trimmed; member money is refused">
+	A `/daily` that would break the wallet ceiling is **trimmed**, because the server is what prints
+	that money. A transfer that would break the receiver's ceiling is **refused**, because trimming
+	there would evaporate money that already belonged to someone.
+</Callout>
+
+## The ledger records what moved
+
+`/eco take 500` from someone holding 100 records **−100**, not −500. The balance floors at zero and
+the ledger line comes from the real movement — otherwise summing the ledger would give a balance
+that never existed.
+
+## The shop
+
+<Message
+	embed={{
+		color: '#fee75c',
+		title: 'Server shop',
+		description: 'Buy with `/shop buy`.',
+		fields: [
+			{ name: '🪙 500 · VIP role', value: 'Hands out @VIP. 3 left.', inline: false },
+			{ name: '🪙 120 · Nickname change', value: 'No stock limit.', inline: false }
+		]
+	}}
+	caption="An item can hand out a role, carry limited stock, and cap how many one member may own."
+/>
+
+The shop is saved item by item, not wiped and rewritten: deleting and reinserting on every save
+**would delete what everyone bought**, because an inventory row dies with its item. Editing an
+item's price does not touch anyone who already owns it.
+
+## What does not exist in this version
+
+| Missing            | Why                                                                            |
+| ------------------ | ------------------------------------------------------------------------------ |
+| A bank, `/deposit` | Inventing one brings interest, robbery and a second balance to explain forever |
+| Gambling           | Same reason: it is a whole game, not a command                                 |
+
+`/richest` already sums wallet **plus** bank, so the day a bank exists the list stays correct with
+nothing to change.
 
 ## Options
 
@@ -28,3 +102,17 @@ Economy is a currency, two ways to earn it, and a shop to spend it in. It is the
 ## Commands
 
 <Commands module="economy" />
+
+Seeing a balance is server information, so `/balance`, `/shop view`, `/inventory` and `/richest`
+answer in the channel. Being paid is wallet business: `/daily`, `/work`, `/pay` and `/shop buy`
+answer only the person who typed them.
+
+## When it does not work
+
+| Symptom                             | Likely cause                                                        |
+| ----------------------------------- | ------------------------------------------------------------------- |
+| "The economy is off"                | The module is off — the rules exist but nothing runs                |
+| The item does not hand out the role | The role sits above Tessera, or **Manage Roles** is missing         |
+| A member cannot buy                 | No funds, no stock, or they already hold the per-member maximum     |
+| The starting balance never arrives  | It is given once; an existing wallet is never gifted again          |
+| The currency name looks translated  | It is empty — Tessera uses the default word for the server language |

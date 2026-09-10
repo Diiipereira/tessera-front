@@ -1,15 +1,22 @@
 ---
 title: Adicionando o bot
-summary: A tela de OAuth, o que ela pede, e o que fazer quando o bot fica quieto.
+summary: A tela de OAuth, a posição do cargo, e por que um bot recém-adicionado fica quieto.
 ---
 
 Adicionar o Tessera é uma tela de OAuth. O Discord pergunta em qual servidor e quais permissões
 conceder; o Tessera não pede mais nada.
 
-<Callout tone="info" title="Você precisa de Gerenciar Servidor">
-	O Discord só lista servidores onde você tem **Gerenciar Servidor**. Se um servidor não aparece no
-	seletor, é por causa dessa permissão.
-</Callout>
+<Facts
+	items={[
+		{ label: 'Você precisa de', value: 'Gerenciar Servidor no servidor do Discord' },
+		{ label: 'O bot pede', value: 'A união do que os dez módulos usam, e nada além' },
+		{
+			label: 'Depois de entrar',
+			value: 'O servidor aparece no seletor do painel em poucos segundos'
+		},
+		{ label: 'Estado inicial', value: 'Todos os módulos desligados' }
+	]}
+/>
 
 ## Os passos
 
@@ -18,24 +25,63 @@ conceder; o Tessera não pede mais nada.
 		Na página inicial, ou pelo seletor de servidores dentro do painel.
 	</Step>
 	<Step title="Escolha o servidor">
-		Só aparecem os servidores onde você tem Gerenciar Servidor.
+		Só aparecem os servidores onde você tem **Gerenciar Servidor**. Se um servidor não está na
+		lista, é por causa dessa permissão.
 	</Step>
 	<Step title="Não mexa nas permissões">
 		Os padrões são a união do que os módulos precisam. Tirar uma aqui não quebra o bot — o módulo
-		que precisa dela simplesmente recusa a salvar, e diz qual permissão está faltando.
+		que precisa dela recusa a salvar, e diz qual está faltando.
+	</Step>
+	<Step title="Arraste o cargo para cima">
+		Configurações do Servidor → Cargos. O cargo do Tessera precisa estar **acima** de todo cargo que
+		ele vai entregar ou gerenciar. É o passo que mais gente pula.
 	</Step>
 	<Step title="Abra o painel">
 		O servidor aparece no seletor poucos segundos depois de o bot entrar.
 	</Step>
 </Steps>
 
+## A posição do cargo pesa mais que a permissão
+
+Um bot nunca age sobre um membro cujo cargo mais alto está acima do dele, nem entrega um cargo
+acima do dele — tenha a permissão que tiver. Nenhuma permissão do Discord passa por cima disso.
+
+```text
+Dono
+Admin
+Tessera          ← tudo abaixo desta linha pode ser gerenciado e entregue
+Moderador
+Membro
+Silenciado
+```
+
+<Callout tone="danger" title="Administrador não é atalho">
+	Dar Administrador **não** levanta a regra da hierarquia, e concede muito mais do que qualquer
+	módulo usa. Posicione o cargo em vez disso.
+</Callout>
+
+Se os comandos funcionam com membros comuns e falham com moderadores, é isto — e é o relato mais
+comum de todos.
+
 ## O bot entrou e não faz nada
 
-Isso é o esperado. Todo módulo começa desligado até você ligar. Um bot recém-adicionado fica na
+Isso é o esperado. Todo módulo começa desligado até você ligar; um bot recém-adicionado fica na
 lista de membros e espera.
 
-<Callout tone="warning" title="A posição do cargo pesa mais que a permissão">
-	Um bot não age sobre um membro cujo cargo mais alto está acima do dele, tenha a permissão que
-	tiver. Se os comandos funcionam com membros comuns e falham com moderadores, arraste o cargo da
-	Tessera para cima.
+<Flow
+	steps={[
+		{ title: 'Entrou', note: 'E não faz nada' },
+		{ title: 'Cargo posicionado', note: 'Acima do que ele gerencia' },
+		{ title: 'Um módulo ligado', note: 'Boas-vindas costuma ser o primeiro' },
+		{ title: 'Funcionando', note: 'A partir da próxima mensagem' }
+	]}
+/>
+
+## Tirar o bot
+
+Pelo Discord, é expulsar como qualquer membro. Pelo painel, é o botão em **Configurações**.
+
+<Callout tone="info" title="Sair não apaga a configuração">
+	A linha do servidor é preservada e readicionar o bot devolve tudo como estava — módulos ligados,
+	textos, cargos, painéis. É uma carência de 30 dias que apaga de verdade.
 </Callout>

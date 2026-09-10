@@ -1,71 +1,151 @@
 ---
 title: Boas-vindas
-summary: Receba os membros novos e dê a eles os primeiros cargos.
+summary: A mensagem que sai quando alguém entra, e os cargos que a pessoa já recebe na porta.
 ---
 
-O Boas-vindas publica uma mensagem no instante em que alguém entra, e pode entregar um cargo já
-na porta. É o módulo que a maioria dos servidores liga primeiro, porque é o que os membros
-percebem.
+O Boas-vindas escuta a entrada de membros e faz duas coisas, nesta ordem: entrega os cargos
+automáticos e publica uma mensagem no canal escolhido. É o único módulo com um campo obrigatório —
+sem canal, ele não liga.
 
-**Permissões:** `Ver Canal`, `Enviar Mensagens`, `Inserir Links`, `Gerenciar Cargos`
+<Facts
+	items={[
+		{ label: 'Dispara em', value: 'Um membro entra no servidor' },
+		{
+			label: 'Precisa de',
+			value:
+				'Ver Canal e Enviar Mensagens no canal; Inserir Links se a mensagem for embed; Gerenciar Cargos para os cargos automáticos'
+		},
+		{ label: 'Escreve em', value: 'O canal configurado e os cargos do membro' },
+		{ label: 'Portas', value: '/config welcome no Discord, tela de Boas-vindas no painel' },
+		{ label: 'Obrigatório', value: 'Canal — o módulo não liga sem ele' }
+	]}
+/>
 
-## Configurando
+## O que acontece quando alguém entra
 
-<Steps>
-	<Step title="Escolha o canal">
-		Onde a saudação é publicada. O bot precisa de **Enviar Mensagens** ali, e de **Inserir Links**
-		também se a mensagem for um embed.
-	</Step>
-	<Step title="Escreva a mensagem">
-		Texto puro ou embed. Os dois aceitam as mesmas variáveis — `{user}` e `{server}`.
-	</Step>
-	<Step title="Ligue">
-		O módulo fica desligado até você ligar, e não pode ser ligado sem um canal. Nada é publicado
-		enquanto ele está desligado.
-	</Step>
-</Steps>
+<Flow
+	steps={[
+		{ title: 'Entrada', note: 'O Discord avisa o bot' },
+		{ title: 'Cargos', note: 'Os automáticos são aplicados' },
+		{ title: 'Menção', note: 'Só no modo fantasma' },
+		{ title: 'Mensagem', note: 'Texto ou embed' },
+		{ title: 'Apagamento', note: 'Se houver prazo' }
+	]}
+	caption="Os cargos vêm antes da mensagem: se a mensagem falhar, a pessoa já entrou com o cargo."
+/>
+
+Cada passo é independente do anterior. Um cargo que não pôde ser entregue não impede a mensagem, e
+uma mensagem que não pôde ser publicada não desfaz o cargo. As duas falhas vão para o log do bot
+com o motivo.
+
+### Cargos que o bot não alcança
+
+Um cargo só é entregue se estiver **abaixo** do cargo do Tessera na lista do servidor e o bot tiver
+**Gerenciar Cargos**. O que não passa é registrado nominalmente no log — o módulo não silencia a
+falha, mas também não deixa de entregar os outros.
+
+## O que sai no canal
+
+Em texto puro, com menção em linha:
+
+<Message
+	content="Bem-vindo ao Servidor de Testes, @novato! Passa no #regras antes de falar."
+	time="hoje às 14:02"
+/>
+
+Em embed, com o mesmo conteúdo:
+
+<Message
+	embed={{
+		color: '#5865f2',
+		title: 'Bem-vindo ao Servidor de Testes',
+		description: 'Você é o membro número 431.\nPassa no #regras antes de falar.',
+		fields: [
+			{ name: 'Comece por', value: '#apresentacoes', inline: true },
+			{ name: 'Dúvidas', value: '#suporte', inline: true }
+		],
+		footer: 'Entrou agora'
+	}}
+	time="hoje às 14:02"
+/>
+
+<Callout tone="warning" title="Embed ligado significa embed só">
+	Com **Usar embed** ligado, o texto puro **não** é enviado junto — a mensagem é só o embed. Se
+	quiser uma linha acima do embed, ela precisa ser o próprio texto do embed ou uma menção fantasma.
+</Callout>
+
+## Variáveis
+
+Duas, e valem em todo campo de texto do módulo — o texto puro e cada parte do embed: título,
+descrição, nome e valor de campo, autor e rodapé.
+
+| Variável   | Vira                                         |
+| ---------- | -------------------------------------------- |
+| `{user}`   | O membro que entrou (menção ou nome, abaixo) |
+| `{server}` | O nome do servidor                           |
+
+O que o bot não reconhece fica escrito como está, em vez de sumir: um `{usuario}` digitado errado
+aparece na mensagem, e é assim que se percebe o erro.
+
+## Os três modos de menção
+
+| Modo         | O que o membro recebe             | O que `{user}` vira no seu texto |
+| ------------ | --------------------------------- | -------------------------------- |
+| **Nenhuma**  | Nada                              | O nome                           |
+| **Em linha** | A menção dentro da mensagem       | A menção                         |
+| **Fantasma** | Uma menção separada, apagada logo | O nome                           |
+
+A menção fantasma existe para notificar sem deixar um ping permanente na mensagem: o bot publica a
+menção sozinha, apaga, e só então publica a saudação. Nesse modo o `{user}` do texto vira o nome —
+senão a pessoa seria mencionada duas vezes e só uma delas sumiria.
+
+## Apagar a mensagem depois
+
+O prazo é em segundos, de 1 a 86.400 (um dia). Zero e vazio significam a mesma coisa: não apaga.
+
+<Callout tone="info" title="O prazo é contado pelo processo do bot">
+	Se o bot reiniciar antes de o prazo vencer, a mensagem daquela pessoa fica no canal. É a única
+	consequência de um reinício aqui, e ela é visível — não há registro perdido.
+</Callout>
 
 ## Opções
 
 <Fields module="welcome" />
 
-## Variáveis
-
-Todo campo de mensagem deste módulo aceita as mesmas duas. Isso inclui cada parte de um embed —
-título, descrição e campos. O que o bot não conseguir resolver fica como foi escrito em vez de
-sumir, então um erro de digitação aparece em vez de ficar invisível.
-
-| Variável   | Vira                |
-| ---------- | ------------------- |
-| `{user}`   | O membro que entrou |
-| `{server}` | O nome do servidor  |
-
-Se `{user}` vira uma menção de verdade ou só o nome é decidido pela configuração de menção do
-módulo, não pela variável.
-
-<Callout tone="info" title="A menção fantasma é uma mensagem separada">
-	Com a menção em *fantasma*, o bot publica o ping sozinho e o apaga logo depois, então o membro é
-	notificado sem a saudação carregar uma menção. Nesse modo o `{user}` do seu texto vira o nome, não
-	um ping — senão o membro seria mencionado duas vezes e só uma delas sumiria.
-</Callout>
-
 ## Comandos
 
 <Commands module="welcome" />
 
+O embed não cabe numa opção de comando, então ele tem porta própria: `/config welcome edit:Embed`
+abre um construtor em etapas dentro do Discord, com botões para corpo, autor, imagens, rodapé e
+campos. A prévia é a própria mensagem do construtor. Veja [Embeds](/docs/concepts/embeds).
+
 ## Testando sem esperar alguém entrar
 
-Não é preciso expulsar e readicionar um membro para ver como a mensagem fica. O botão
-**Enviar teste**, no topo da tela de Boas-vindas, publica a saudação no canal configurado usando
-você como quem acabou de entrar. Pelo Discord, o mesmo teste é `/test module:Boas-vindas`.
+O botão **Enviar teste**, no topo da tela, publica a saudação no canal configurado usando você como
+quem acabou de entrar. Pelo Discord é `/test module:Boas-vindas`.
 
-O teste usa a configuração **em vigor** — o texto, o embed, o modo de menção e o prazo de
-apagamento que estão salvos. Ele não entrega os cargos automáticos: teste não dá cargo a
-moderador.
+<Compare
+	yesTitle="O teste faz"
+	noTitle="O teste não faz"
+	yes={[
+		'Usa o texto, o embed, o modo de menção e o prazo que estão salvos',
+		'Publica no canal configurado, visível para o servidor',
+		'Substitui as variáveis com os seus dados'
+	]}
+	no={['Entregar os cargos automáticos', 'Usar o rascunho na tela — ele lê o que está salvo']}
+/>
 
-<Callout tone="info" title="Salve antes de testar">
-	O botão fica desativado enquanto houver alteração pendente. O teste lê o que está salvo, e testar
-	uma configuração diferente da que está na tela seria enganoso.
-</Callout>
+O botão fica desativado enquanto houver alteração pendente: testar uma configuração diferente da
+que está na tela seria enganoso. Com o módulo desligado ou sem canal, nada é enviado e o painel diz
+qual dos dois é.
 
-Se o módulo estiver desligado, ou ainda sem canal, nada é enviado e o painel diz qual dos dois é.
+## Quando não funciona
+
+| Sintoma                             | Causa provável                                                              |
+| ----------------------------------- | --------------------------------------------------------------------------- |
+| Ninguém é saudado                   | O módulo está desligado, ou a intent **Server Members** está off            |
+| A mensagem não sai, mas o cargo vem | O bot não tem **Enviar Mensagens** no canal, ou o canal foi apagado         |
+| O embed sai vazio                   | Todos os campos do embed estão em branco — embed sem conteúdo não é enviado |
+| O cargo não é entregue              | O cargo está acima do Tessera na lista, ou falta **Gerenciar Cargos**       |
+| `{user}` aparece escrito            | Está fora de um campo do módulo, ou o modo de menção é outro                |

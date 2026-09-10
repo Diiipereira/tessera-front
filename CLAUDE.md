@@ -1241,6 +1241,50 @@ em vez de _1.234_ — são 22 chamadas em 11 telas, e o conserto é passar o loc
 17 skeletons passam `label="Levels"` e viram `aria-label` de "Loading {label}": texto só de
 leitor de tela, em inglês, nas duas línguas.
 
+## A documentação é referência, não tutorial
+
+Em 10/09/2026 as dezoito páginas de `content/docs/` foram reescritas nos dois idiomas, de ~710
+linhas para ~2.020 por idioma. O que elas eram: um parágrafo, uma linha de permissões, três passos
+de "Configurando" e as duas tabelas geradas. O que faltava não era volume — era **o que o módulo
+decide**, que é o que alguém abre a documentação para descobrir.
+
+**A forma de uma página de módulo, e por que cada parte existe:**
+
+| Seção                 | O que ela responde                                              |
+| --------------------- | --------------------------------------------------------------- |
+| Parágrafo de abertura | O que o módulo faz, numa respiração                             |
+| `<Facts>`             | Dispara em quê, precisa de quê, escreve onde, por quais portas  |
+| Como funciona         | As regras, com `<Flow>` para a ordem em que as coisas acontecem |
+| O que sai no Discord  | `<Message>` — o cartão desenhado como o Discord desenha         |
+| Opções / Comandos     | As duas tabelas geradas do registry, que já existiam            |
+| Limites               | Números do Discord e nossos, numa tabela                        |
+| Quando não funciona   | Sintoma → causa provável, que é como a pessoa chega             |
+
+**Quatro componentes novos em `components/docs/`, e todos recebem texto por prop.** `Fields` e
+`Commands` usam `getTranslations` porque leem o registry; `Message`, `Flow`, `Facts` e `Compare`
+**não podem**, porque o MDX que os invoca já é por idioma. Passar texto por prop é o que mantém as
+duas versões independentes de verdade.
+
+**`<Message>` é um só componente com tudo em props**, não uma árvore de `<Embed>` e `<Field>`
+aninhados: `embed={{...}}`, `buttons={[...]}`, `reactions={[...]}`. MDX aceita objeto e array em
+prop sem cerimônia, e a alternativa exigiria seis componentes para escrever um exemplo.
+
+**`BOT` virou constante nomeada por causa do teste de i18n.** O `tests/i18n-coverage.test.ts` acusa
+prosa solta no meio do JSX, e não tem como saber que `BOT` é o selo do Discord e não uma frase.
+Nomear a constante é a resposta honesta — ela diz que aquilo é literal do Discord, não texto nosso.
+
+**As cores do Discord moram em `lib/discord-colors.ts`, e o eslint impõe.** A regra
+`house/no-raw-color` recusa hex em componente. O `DISCORD_BUTTON` (primário, secundário, sucesso,
+perigo) entrou lá junto com o `BLURPLE`, porque são cores **do Discord**, não do nosso tema — e é
+exatamente o que a mensagem da regra manda fazer.
+
+**`RegExp` global guarda estado entre chamadas de `test()`.** O realce de menção do `<Message>`
+usava a mesma regex com `g` para `split` e para `test`, e o `lastIndex` fazia a segunda mensagem da
+página perder o realce. São duas regexes agora, e há teste com duas mensagens seguidas.
+
+**`concepts/embeds` é página nova**, e é onde mora o desenho do construtor em etapas, os limites do
+Discord por parte do embed, e a ponte de JSON entre a tela de Embeds e as telas de módulo.
+
 ## A tela de Embeds é um ateliê, e de propósito não escreve config
 
 `/servers/[guildId]/embeds` monta um embed, mostra a prévia e **publica uma vez** num canal. Ela

@@ -1,42 +1,84 @@
 ---
 title: Permissions
-summary: What each permission is for, and which module stops working without it.
+summary: What each permission is for, which module stops without it, and the two traps that are not permissions.
 ---
 
-Tessera asks for the union of what its modules need, and nothing beyond it. This page exists so
-you can hand it to whoever has to approve the invite.
+Tessera asks for the union of what its modules need, and nothing beyond it. This page exists so you
+can hand it to whoever has to approve the invite.
 
-| Permission         | Used by                                  | Without it                                     |
-| ------------------ | ---------------------------------------- | ---------------------------------------------- |
-| `View Channel`     | Every module                             | The bot cannot read or post anywhere           |
-| `Send Messages`    | Every module                             | Nothing is ever posted                         |
-| `Embed Links`      | Welcome, Logging, Giveaways              | Messages fall back to plain text               |
-| `Manage Roles`     | Welcome, Levels, Reaction roles, Economy | Roles are never granted                        |
-| `Moderate Members` | Moderation, AutoMod                      | Timeouts fail                                  |
-| `Kick Members`     | Moderation                               | The kick command is refused                    |
-| `Ban Members`      | Moderation                               | The ban command is refused                     |
-| `Manage Messages`  | AutoMod                                  | Rules can warn and log but never delete        |
-| `Manage Channels`  | Tickets                                  | No ticket channel can be created               |
-| `Attach Files`     | Tickets                                  | Transcripts are not saved                      |
-| `View Audit Log`   | Logging                                  | Events cannot be attributed to who caused them |
-| `Add Reactions`    | Reaction roles, Giveaways                | Reaction-based panels do not work              |
+<Facts
+	items={[
+		{ label: 'Administrator', value: 'Not requested, and does not solve the hierarchy' },
+		{ label: 'Where to review', value: 'Server Settings → Roles → Tessera' },
+		{ label: 'Per channel', value: 'A role permission can be denied in one specific channel' }
+	]}
+/>
 
-## Role hierarchy
+## What each one does
 
-Discord permissions are only half of it. A bot can never act on a member, or grant a role, that
-sits **above its own highest role** — no permission overrides that. Most "the bot ignores my
-moderators" reports are this.
+| Permission         | Used by                                  | Without it                                   |
+| ------------------ | ---------------------------------------- | -------------------------------------------- |
+| `View Channel`     | Every module                             | The bot neither reads nor posts anywhere     |
+| `Send Messages`    | Every module                             | Nothing is posted                            |
+| `Embed Links`      | Welcome, Logging, Giveaways, Levels      | Messages fall back to plain text             |
+| `Manage Roles`     | Welcome, Levels, Reaction roles, Economy | No role is ever handed out                   |
+| `Moderate Members` | Moderation, AutoMod                      | Timeouts fail                                |
+| `Kick Members`     | Moderation                               | The kick command is refused                  |
+| `Ban Members`      | Moderation                               | The ban command is refused                   |
+| `Manage Messages`  | AutoMod                                  | Rules warn and log, but never delete         |
+| `Manage Channels`  | Tickets                                  | No ticket channel can be created             |
+| `Attach Files`     | Tickets                                  | Transcripts are not kept                     |
+| `View Audit Log`   | Logging                                  | Events go out without saying who caused them |
+| `Add Reactions`    | Reaction roles, Giveaways                | Reaction panels do not work                  |
+
+## The first trap: role hierarchy
+
+Discord permissions are only half the story. A bot never acts on a member, nor hands out a role,
+that sits **above its own highest role** — no permission overrides that.
 
 ```text
 Owner
 Admin
-Tessera          ← everything below this line can be actioned and granted
+Tessera          ← everything below this line can be managed and handed out
 Moderator
 Member
 Muted
 ```
 
 <Callout tone="danger" title="Administrator is not a shortcut">
-	Granting Administrator does not lift the hierarchy rule, and it grants far more than any module
+	Granting Administrator does not lift the hierarchy rule, and hands over far more than any module
 	uses. Position the role instead.
 </Callout>
+
+Most reports of _"the bot ignores my moderators"_ are this.
+
+## The second trap: per-channel permissions
+
+A permission granted to the **role** can be denied in a specific **channel**. The bot can have Send
+Messages across the whole server and still be unable to write in exactly the channel you configured.
+
+<Compare
+	yesTitle="What the preview proves"
+	noTitle="What only the test proves"
+	yes={['The shape of the message', 'The variables substituted', 'The embed as drawn']}
+	no={[
+		'That the bot can see the channel',
+		'That the bot can write in it',
+		'That the automatic role can be handed out'
+	]}
+/>
+
+That is why the modules that send messages have a test button: it really posts, and it is the only
+thing that answers that question.
+
+## If you host the bot yourself
+
+Two privileged intents have to be enabled in Discord's Developer Portal, under **Bot → Privileged
+Gateway Intents**:
+
+| Intent            | Without it                                              |
+| ----------------- | ------------------------------------------------------- |
+| `Server Members`  | The join event never arrives — Welcome never fires      |
+| `Message Content` | Message content arrives empty — AutoMod and Levels stop |
+
+The failure is **silent**: the gateway connects normally and the events simply do not arrive.

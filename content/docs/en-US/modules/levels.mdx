@@ -1,27 +1,114 @@
 ---
 title: Levels
-summary: XP for talking, ranks to show for it, and roles handed out along the way.
+summary: XP for talking and for sitting in voice, a curve you choose, and roles handed out along the way.
 ---
 
-Levels gives a random amount of XP per message, at most once per cooldown, and hands out roles when a member crosses a level you picked. The randomness and the cooldown together are what stop it from rewarding spam.
+Levels hand out a **random** amount of XP per message, at most once per cooldown, and give roles
+when a member crosses a step on the ladder. The randomness and the cooldown together are what stop
+the module from rewarding spam.
 
-**Permissions:** `View Channel`, `Send Messages`, `Manage Roles`
+<Facts
+	items={[
+		{
+			label: 'Fires on',
+			value: 'Every message that clears the cooldown, and once a minute for anyone in voice'
+		},
+		{
+			label: 'Needs',
+			value: 'Manage Roles for the ladder; Send Messages in the announcement channel'
+		},
+		{ label: 'Writes to', value: 'The member’s XP, their roles, and the announcement channel' },
+		{
+			label: 'Doors',
+			value: '/config levels, /rank, /leaderboard, /xp; the Levels screen in the dashboard'
+		},
+		{ label: 'Never counts', value: 'Bots, and any channel or role you exempt' }
+	]}
+/>
 
-## Setting it up
+## The curve
 
-<Steps>
-	<Step title="Set the XP range">
-		A random amount between the minimum and maximum is granted per message, at most once per
-		cooldown.
-	</Step>
-	<Step title="Choose a curve">
-		The curve is how much harder each level is than the one before it. The chart on the module page
-		shows what the first levels cost.
-	</Step>
-	<Step title="Add role rewards">
-		Given when a member reaches the level. Roles above the bot in the list cannot be granted.
-	</Step>
-</Steps>
+A level costs **`round(curve × level²)`** in total XP. The curve is the only number you touch; the
+chart on the screen draws the first fifty levels for whatever value you pick.
+
+| Curve | Level 5 | Level 10 | Level 25 | Level 50 |
+| ----- | ------- | -------- | -------- | -------- |
+| 50    | 1,250   | 5,000    | 31,250   | 125,000  |
+| 100   | 2,500   | 10,000   | 62,500   | 250,000  |
+| 200   | 5,000   | 20,000   | 125,000  | 500,000  |
+
+<Callout tone="info" title="Changing the curve rewrites nobody">
+	A level is always worked out from the XP and the current curve. Lowering the curve promotes
+	everyone at once; raising it demotes. Nothing is recalculated in the database, because it does not
+	need to be — the formula is the truth.
+</Callout>
+
+## Earning XP by talking
+
+<Flow
+	steps={[
+		{ title: 'Message', note: 'From a human' },
+		{ title: 'Channel and role', note: 'Exempt? No pay' },
+		{ title: 'Cooldown', note: 'Once per window' },
+		{ title: 'Random XP', note: 'Between the min and the max' },
+		{ title: 'Levelled up?', note: 'Role and announcement' }
+	]}
+/>
+
+The cooldown is per member, per server. Thirty messages in a minute count as **one**, which is why
+the number on the Members screen is called _XP messages_ and not _messages_: it was never the total
+someone said.
+
+With the cooldown at zero, every message pays.
+
+## Earning XP in voice
+
+A 60-second sweep looks at who is in a voice channel and pays them. It is not a session timer:
+holding the join instant in memory would lose everything on a restart, and would never pay someone
+who sits in a call for six hours.
+
+<Compare
+	yesTitle="Earns voice XP"
+	noTitle="Does not earn"
+	yes={[
+		'Anyone muted — listening is taking part',
+		'Anyone in a call with at least one other human'
+	]}
+	no={[
+		'Bots',
+		'Anyone deafened — you cannot take part in what you cannot hear',
+		'Anyone in the AFK channel',
+		'Anyone alone in the channel'
+	]}
+/>
+
+A restart costs at most a minute of voice XP, because there is no accumulated state to lose.
+
+## The role ladder
+
+Roles handed out when a member reaches the level. The whole ladder is replaced when you save, and
+each step can remove the role from the step below it.
+
+<Callout tone="warning" title="Going down takes; going up gives">
+	Zeroing or lowering someone's XP removes the roles above their new level — otherwise `/xp reset`
+	would leave the level-40 role on them. What does **not** happen is rebuilding the ladder from the
+	bottom: a role replaced by a step above never comes back on the way down, because the table does
+	not record which replaced which.
+</Callout>
+
+A role above Tessera in the list is never given.
+
+## The level-up announcement
+
+<Message
+	content="Nice one, @Lia! You reached level 10."
+	caption="The mention notifies whoever levelled up. An @everyone pasted into the text notifies nobody — on a server with 500 active members that would be a ping machine."
+/>
+
+The announcement can go out in the channel where the person spoke, or in a fixed channel. With the
+text empty, Tessera uses the default sentence in the server's language. Turning on **Announce with
+an embed** makes it an embed — edited on the screen, or with
+`/config levels edit:Announcement embed` inside Discord.
 
 ## Options
 
@@ -30,3 +117,17 @@ Levels gives a random amount of XP per message, at most once per cooldown, and h
 ## Commands
 
 <Commands module="levels" />
+
+`/rank` and `/leaderboard` are for everyone: seeing your own progress is not administration. `/xp`
+belongs to whoever has Manage Server, and refuses bots — bots do not level up.
+
+## When it does not work
+
+| Symptom                          | Likely cause                                                    |
+| -------------------------------- | --------------------------------------------------------------- |
+| Nobody earns XP                  | The module is off, or the **Message Content** intent is off     |
+| One channel never pays           | It is on the exempt channels list                               |
+| One member earns nothing         | One of their roles is on the exempt roles list                  |
+| The level role is never given    | It sits above Tessera, or **Manage Roles** is missing           |
+| Everyone's level changed at once | The curve was edited — a level is always recomputed from the XP |
+| Nobody earns voice XP            | Alone in the channel, deafened, or in the AFK channel           |

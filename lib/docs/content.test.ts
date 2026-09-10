@@ -34,7 +34,11 @@ describe('documentation content', () => {
 			(page) => portuguese.find((other) => other.slug === page.slug)?.title === page.title
 		);
 
-		expect(shared.map((page) => page.slug)).toEqual(['modules/automod', 'modules/tickets']);
+		expect(shared.map((page) => page.slug)).toEqual([
+			'concepts/embeds',
+			'modules/automod',
+			'modules/tickets'
+		]);
 	});
 
 	it('documents every module the dashboard can open', () => {

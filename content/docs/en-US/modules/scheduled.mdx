@@ -1,28 +1,93 @@
 ---
 title: Scheduled messages
-summary: Post on a timer, without anyone having to remember.
+summary: Messages Tessera posts on the clock you set, in the server's timezone.
 ---
 
-A schedule is a message, a channel and a time. Every schedule runs in the server timezone, which is set once in Settings rather than per message.
+A scheduled message is a text or an embed, a channel, and a time: either one date, or weekdays with
+an hour. The clock is the **server's timezone**, not the browser of whoever set it up.
 
-**Permissions:** `View Channel`, `Send Messages`, `Embed Links`
+<Facts
+	items={[
+		{ label: 'Fires on', value: 'A sweep every 15 seconds' },
+		{ label: 'Needs', value: 'Send Messages and Embed Links in the target channel' },
+		{ label: 'Writes to', value: 'Each message’s channel' },
+		{ label: 'Doors', value: '/config scheduled enabled; the Scheduled messages screen' },
+		{ label: 'Timezone', value: 'The server’s, set under Settings' }
+	]}
+/>
 
-## Setting it up
+## The hour is local, and that takes work
 
-<Steps>
-	<Step title="Write the message">Text or an embed, the same composer the other modules use.</Step>
-	<Step title="Pick the days and the time">
-		Days of the week plus one time of day. The server timezone decides what that time means.
-	</Step>
-	<Step title="Leave it running">
-		A message that missed its slot by more than an hour is skipped rather than posted late.
-	</Step>
-</Steps>
+"Nine in the morning" is not an instant: it is a local time that becomes a different UTC depending
+on daylight saving. Tessera works out the instant, measures the timezone offset at that point,
+corrects it, and **measures again** — because the first measurement can land on the wrong side of a
+shift.
+
+| Situation                        | What happens                            |
+| -------------------------------- | --------------------------------------- |
+| The hour does not exist that day | The message goes out the following hour |
+| The hour happens twice           | The message goes out on the **first**   |
+
+That is the convention of cron and RFC 5545. Without it, the day of the shift would send the message
+an hour early, which looks like a bug.
+
+## Sending, at most once
+
+<Flow
+	steps={[
+		{ title: 'Find the due one', note: '15-second sweep' },
+		{ title: 'Reserve', note: 'Pushes it to the next occurrence' },
+		{ title: 'Post', note: 'Only after reserving' }
+	]}
+	caption="Reserving before sending gives at-most-once. Sending first and marking after would give at-least-once — and a repeated message in the channel is worse than a missing one."
+/>
+
+If the send fails, that day's message is lost and the reason goes to the log. It is a deliberate
+trade.
+
+<Callout tone="warning" title="A message more than an hour late is not sent">
+	After a long outage the scheduled time is in the past and the sweep would find it due — posting
+	"good morning" at three in the afternoon is worse than not posting. The one-hour window is loose
+	enough to survive a restart and tight enough that nothing lands in the wrong part of the day.
+</Callout>
+
+The next time is computed from **now**, not from the missed occurrence. That is what stops a daily
+message firing twenty-four times in a row to "catch up" on a day of downtime.
+
+## The announcement
+
+<Message
+	content="@Members good morning! Today's event starts at 8pm."
+	caption="A named role or person is notified. An @everyone pasted into the text notifies nobody — in a message that repeats every morning, that would be a server-wide ping machine."
+/>
+
+## Editing without losing the clock
+
+The whole list is saved at once, but each message is written by its own id. Deleting and reinserting
+would lose the last-run date and the position on the clock: renaming a message must not wipe its
+history.
+
+A past date is accepted on write — refusing would block saving the list whenever it held a one-off
+schedule that had already run. Instead the message shows as **already sent**, and there is no silent
+failure.
 
 ## Options
 
 <Fields module="scheduled" />
 
+Everything this module configures is **per message**, on the screen. The only global key is the
+switch: `/config scheduled enabled:false` turns all of them off at once without deleting anything.
+
 ## Commands
 
 <Commands module="scheduled" />
+
+## When it does not work
+
+| Symptom                           | Likely cause                                                      |
+| --------------------------------- | ----------------------------------------------------------------- |
+| The message never goes out        | The module or the message is off, or permissions are missing      |
+| It went out an hour early or late | The server timezone is wrong — it lives under Settings            |
+| Nothing after the bot was offline | It fell more than an hour behind and was dropped, with a log line |
+| The message shows as already sent | Its one-off date has passed                                       |
+| One weekday never fires           | It is not ticked — the days are read in the server's timezone     |

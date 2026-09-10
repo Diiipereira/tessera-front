@@ -1,23 +1,82 @@
 ---
 title: Reaction roles
-summary: Members pick their own roles, without asking staff.
+summary: Panels where members take and drop roles themselves, by button or by reaction.
 ---
 
-A panel is one message and one row per role a member can pick. Buttons are the default because they are clearer and cannot be removed by accident.
+A panel is a message posted in the channel you choose, with one option per role. Clicking a button —
+or reacting with an emoji — hands the role out or takes it back, according to the panel's mode.
 
-**Permissions:** `Manage Roles`, `Send Messages`, `Add Reactions`
+<Facts
+	items={[
+		{ label: 'Fires on', value: 'A button click, or a reaction with the option’s emoji' },
+		{ label: 'Needs', value: 'Manage Roles; Add Reactions if the panel uses reactions' },
+		{ label: 'Writes to', value: 'The member’s roles' },
+		{ label: 'Doors', value: 'The Reaction roles screen in the dashboard' },
+		{ label: 'Limits', value: '25 panels per server, 25 options per panel' }
+	]}
+/>
 
-## Setting it up
+## The four modes
 
-<Steps>
-	<Step title="Write the panel">One message, posted in the channel you choose.</Step>
-	<Step title="Add the roles">
-		One row per role a member can pick, each with an emoji and a label.
-	</Step>
-	<Step title="Choose buttons or reactions">
-		Buttons are clearer and cannot be removed by accident. Reactions look more familiar.
-	</Step>
-</Steps>
+| Mode       | Clicking without the role               | Clicking while holding it |
+| ---------- | --------------------------------------- | ------------------------- |
+| **Toggle** | Gives it                                | Takes it back             |
+| **Unique** | Gives it and removes the panel's others | Does nothing              |
+| **Verify** | Gives it                                | Does nothing              |
+| **Drop**   | Does nothing                            | Takes it back             |
+
+**Unique** is for an exclusive choice — a colour, a team, a timezone. **Verify** is the rules
+button: in and never out. **Drop** is the inverse, a panel that only removes.
+
+## What gets posted
+
+<Message
+	content="Pick your notifications."
+	embed={{
+		color: '#5865f2',
+		title: 'Alerts',
+		description: 'Take only what you want to hear about.'
+	}}
+	buttons={[
+		{ label: '📣 Announcements', style: 'primary' },
+		{ label: '🎮 Events', style: 'primary' },
+		{ label: '🎁 Giveaways', style: 'primary' }
+	]}
+	caption="On a reaction panel, reactions on the message itself take the place of the buttons."
+/>
+
+<Callout tone="info" title="The panel name is only for you">
+	It exists so you can find the panel on this screen. What the server reads is the panel's
+	**message** and **embed**, written in the same form as the other modules. An old panel, made
+	before the message existed, still posts its name — writing the message is all it takes to change
+	that.
+</Callout>
+
+## Posting and editing
+
+A panel is posted when it is **on, has a channel, and has at least one option**. Editing and saving
+rewrites the message that is already out there instead of posting another: the panel is saved by id,
+and it is the message id that binds a button to its panel.
+
+Changing a panel's channel posts a fresh message in the new channel. The old one is not deleted
+automatically.
+
+## Button or reaction
+
+<Compare
+	yesTitle="Button"
+	noTitle="Reaction"
+	yes={[
+		'A text label, with an optional emoji',
+		'The click is private — nobody sees who took what',
+		'Does not need Add Reactions'
+	]}
+	no={[
+		'Emoji only, no label',
+		'Who reacted is visible to the server',
+		'Works with the server’s own custom emoji'
+	]}
+/>
 
 ## Options
 
@@ -26,3 +85,13 @@ A panel is one message and one row per role a member can pick. Buttons are the d
 ## Commands
 
 <Commands module="reaction-roles" />
+
+## When it does not work
+
+| Symptom                           | Likely cause                                                                   |
+| --------------------------------- | ------------------------------------------------------------------------------ |
+| The role is never given           | It sits above Tessera, or **Manage Roles** is missing                          |
+| The panel never shows up          | It is off, has no channel, or has no options                                   |
+| An old button does nothing        | The panel was deleted — the message stays, the panel does not                  |
+| The reaction does nothing         | **Add Reactions** is missing, or the emoji is from a server the bot cannot see |
+| Clicking again does not remove it | The panel is on **Verify**, which only gives                                   |

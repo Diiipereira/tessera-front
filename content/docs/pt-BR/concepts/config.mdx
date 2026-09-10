@@ -1,43 +1,94 @@
 ---
 title: Como a config é guardada
-summary: Um escritor, duas portas — e por que isso molda todo o resto.
+summary: Um escritor, duas portas — e as regras que decorrem disso.
 ---
 
-Um campo de configuração no Tessera é declarado **uma vez**. Essa declaração única produz a
-opção do comando de barra, o controle do formulário no painel, a validação que a API roda e o
-formato em que ele é guardado. Nada é escrito duas vezes, que é o único jeito confiável de
-impedir as duas portas de discordarem.
+Um campo de configuração no Tessera é declarado **uma vez**. Essa declaração única produz a opção do
+comando de barra, o controle do formulário no painel, a validação que a API roda e o formato em que
+o valor é guardado. Nada é escrito duas vezes, que é o único jeito confiável de impedir as duas
+portas de discordarem.
+
+<Facts
+	items={[
+		{ label: 'Onde mora', value: 'Uma linha por módulo e por servidor, com a config em JSON' },
+		{ label: 'Quem valida', value: 'A mesma declaração, para as duas portas' },
+		{ label: 'Quem anota', value: 'O log de auditoria, na mesma transação da gravação' },
+		{ label: 'Isolamento', value: 'Por servidor — config nunca é copiada entre servidores' }
+	]}
+/>
 
 ## O que decorre disso
 
-- Um comando de barra e o painel nunca aceitam valores diferentes para o mesmo campo, porque a
-  validação é o mesmo objeto.
+- Um comando de barra e o painel nunca aceitam valores diferentes para o mesmo campo.
 - Um campo acrescentado a um módulo aparece nos dois lugares de uma vez, ou em nenhum.
-- As tabelas de opções desta documentação também são lidas dessa declaração, então elas não
-  conseguem descrever uma configuração que o bot não tem.
+- As tabelas de opções desta documentação são lidas da mesma declaração.
 - Não existe passo de importar, exportar ou sincronizar em lugar nenhum do produto.
+
+## Ligado e obrigatório não são a mesma pergunta
+
+O tipo de um campo **sempre** vale: um canal precisa ser um canal, um número precisa estar na faixa.
+Ser obrigatório só vale **na hora de ligar** o módulo.
+
+O motivo é concreto: o canal do Boas-vindas é obrigatório e nasce vazio. A linha pode existir sem
+canal — o que não pode é o módulo ficar **ligado** sem canal. Com uma regra só, ou o padrão seria
+inválido, ou o obrigatório não seria obrigatório.
+
+<Callout tone="info" title="Restaurar padrões desliga o módulo">
+	Voltar ao estado não configurado devolve os campos obrigatórios ao vazio, e não configurado com
+	campo obrigatório vazio não pode ficar ligado.
+</Callout>
+
+## Campo desconhecido e campo aposentado
+
+São duas fronteiras diferentes, e a diferença é de propósito.
+
+<Compare
+	yesTitle="No que você manda — erro"
+	noTitle="No que vai para o banco — silêncio"
+	yes={[
+		'Uma chave que a declaração não conhece é recusada com 400',
+		'Quem digitou chanel-id em vez de channel-id precisa saber disso'
+	]}
+	no={[
+		'Uma chave que a declaração não conhece mais é descartada ao gravar',
+		'Assim remover um campo não trava o servidor que ainda tem a chave velha guardada'
+	]}
+/>
 
 ## O que acontece quando você salva
 
-<Steps>
-	<Step title="A escrita é validada">Pelas mesmas regras que o comando de barra usa.</Step>
-	<Step title="A versão é conferida">
-		Se outra pessoa salvou o mesmo módulo enquanto sua página estava aberta, sua gravação é recusada
-		em vez de sobrescrever a dela em silêncio.
-	</Step>
-	<Step title="O bot é avisado">
-		O processo do gateway larga a cópia em cache na hora, então a próxima mensagem já é tratada com
-		a config nova — não por temporizador.
-	</Step>
-</Steps>
+<Flow
+	steps={[
+		{ title: 'Valida', note: 'Pelas regras da declaração' },
+		{ title: 'Confere a versão', note: 'Alguém salvou antes de você?' },
+		{ title: 'Grava', note: 'Config e auditoria na mesma transação' },
+		{ title: 'Avisa o bot', note: 'Ele larga a cópia em cache na hora' }
+	]}
+/>
 
-<Callout tone="warning" title="Duas pessoas editando um módulo">
-	A segunda gravação é recusada com uma mensagem dizendo isso. Recarregue, veja o que mudou e salve
-	de novo. Nada se perde, mas nada é mesclado por você também.
+<Callout tone="warning" title="Duas pessoas editando o mesmo módulo">
+	A segunda gravação é **recusada**, com uma mensagem dizendo isso. Recarregue, veja o que mudou e
+	salve de novo. Nada se perde, mas nada é mesclado por você também.
 </Callout>
+
+O painel sempre leu antes de escrever, então ele manda a versão que leu — omitir só poderia ser
+defeito de cliente, e sobrescrever em silêncio é exatamente o que essa recusa existe para impedir.
+O comando de barra escreve sem ter lido, e por isso ele não é recusado assim: ele altera só os
+campos que você citou.
+
+## O cache
+
+A config é lida do cache, não do banco, a cada mensagem que o bot precisa julgar. Gravar publica um
+aviso e o processo do bot **larga a cópia na hora** — não há temporizador esperando expirar. Uma
+config nova vale a partir da próxima mensagem.
 
 ## Tudo fica anotado
 
-Toda gravação é registrada com quem fez, por qual porta entrou, e o antes e o depois exatos de
-cada campo. O log de auditoria do painel é esse registro, e é o mesmo registro venha a mudança
-de um comando de barra, do painel ou da API.
+Toda gravação é registrada com quem fez, por qual porta entrou, e o antes e o depois exatos de cada
+campo. O log de auditoria do painel é esse registro, e ele é o mesmo venha a mudança de um comando
+de barra, do painel ou da API.
+
+<Callout tone="info" title="Config nunca é copiada entre servidores">
+	Não há template, não há "aplicar em todos", não há herança. Cada servidor se configura sozinho,
+	com 5 servidores ou com 100. O isolamento é o produto, não um efeito colateral dele.
+</Callout>

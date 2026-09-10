@@ -1,43 +1,94 @@
 ---
 title: How config is stored
-summary: One writer, two doors — and why that shapes everything else.
+summary: One writer, two doors — and the rules that follow from it.
 ---
 
-A configuration field in Tessera is declared **once**. That single declaration produces the
-slash command option, the dashboard form control, the validation the API runs, and the shape it
-is stored in. Nothing is written twice, which is the only reliable way to stop the two doors
+A configuration field in Tessera is declared **once**. That single declaration produces the slash
+command option, the form control in the dashboard, the validation the API runs and the shape the
+value is stored in. Nothing is written twice, which is the only reliable way to keep the two doors
 from disagreeing.
 
-## What follows from that
+<Facts
+	items={[
+		{ label: 'Where it lives', value: 'One row per module per server, with the config as JSON' },
+		{ label: 'What validates', value: 'The same declaration, for both doors' },
+		{ label: 'What records it', value: 'The audit log, in the same transaction as the write' },
+		{ label: 'Isolation', value: 'Per server — config is never copied between servers' }
+	]}
+/>
 
-- A slash command and the dashboard can never accept different values for the same field,
-  because the validation is the same object.
-- A field added to a module appears in both places at once, or in neither.
-- The option tables in this documentation are read from that declaration too, so they cannot
-  describe a setting the bot does not have.
+## What follows from it
+
+- A slash command and the dashboard never accept different values for the same field.
+- A field added to a module shows up in both places at once, or in neither.
+- The options tables in these docs are read from that same declaration.
 - There is no import, export or sync step anywhere in the product.
+
+## On and required are not the same question
+
+A field's type **always** applies: a channel has to be a channel, a number has to be in range. Being
+required only applies **when turning the module on**.
+
+The reason is concrete: the Welcome channel is required and starts empty. The row can exist without
+a channel — what cannot happen is the module being **on** without one. With a single rule, either
+the default would be invalid or the required field would not be required.
+
+<Callout tone="info" title="Restoring defaults turns the module off">
+	Going back to the unconfigured state empties the required fields again, and unconfigured with an
+	empty required field cannot stay on.
+</Callout>
+
+## An unknown field and a retired field
+
+Two different borders, and the difference is deliberate.
+
+<Compare
+	yesTitle="In what you send — an error"
+	noTitle="In what goes to the database — silence"
+	yes={[
+		'A key the declaration does not know is refused with a 400',
+		'Whoever typed chanel-id instead of channel-id needs to know'
+	]}
+	no={[
+		'A key the declaration no longer knows is dropped on write',
+		'So removing a field does not lock out a server that still holds the old key'
+	]}
+/>
 
 ## What happens when you save
 
-<Steps>
-	<Step title="The write is validated">Against the same rules the slash command uses.</Step>
-	<Step title="The version is checked">
-		If someone else saved the same module while you had the page open, your save is refused rather
-		than silently overwriting theirs.
-	</Step>
-	<Step title="The bot is told">
-		The gateway process drops its cached copy immediately, so the next message is handled with the
-		new config — not on a timer.
-	</Step>
-</Steps>
+<Flow
+	steps={[
+		{ title: 'Validate', note: 'By the declaration’s rules' },
+		{ title: 'Check the version', note: 'Did someone save before you?' },
+		{ title: 'Write', note: 'Config and audit in one transaction' },
+		{ title: 'Tell the bot', note: 'It drops its cached copy at once' }
+	]}
+/>
 
-<Callout tone="warning" title="Two people editing one module">
-	The second save is refused with a message saying so. Reload, look at what changed, and save again.
-	Nothing is lost, but nothing is merged for you either.
+<Callout tone="warning" title="Two people editing the same module">
+	The second write is **refused**, with a message saying so. Reload, look at what changed and save
+	again. Nothing is lost, but nothing is merged for you either.
 </Callout>
 
-## Everything is written down
+The dashboard always read before writing, so it sends the version it read — omitting it could only
+be a client bug, and silently overwriting is exactly what this refusal exists to prevent. The slash
+command writes without having read, which is why it is not refused this way: it only changes the
+fields you named.
 
-Every write is recorded with who made it, which door they came through, and the exact before
-and after of each field. The audit log in the dashboard is that record, and it is the same
-record whether the change came from a slash command, the dashboard or the API.
+## The cache
+
+Config is read from a cache, not the database, on every message the bot has to judge. A write
+publishes a notice and the bot process **drops its copy at once** — there is no timer waiting to
+expire. New config applies from the next message on.
+
+## Everything is recorded
+
+Every write is logged with who made it, which door it came through, and the exact before and after
+of each field. The dashboard's audit log is that record, and it is the same one whether the change
+came from a slash command, the dashboard or the API.
+
+<Callout tone="info" title="Config is never copied between servers">
+	There is no template, no "apply to all", no inheritance. Each server configures itself, with 5
+	servers or with 100. The isolation is the product, not a side effect of it.
+</Callout>

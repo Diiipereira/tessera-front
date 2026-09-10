@@ -3,33 +3,82 @@ title: Seu primeiro módulo
 summary: Ligando o Boas-vindas de ponta a ponta, incluindo a parte que todo mundo erra.
 ---
 
-Boas-vindas costuma ser o primeiro módulo porque o resultado aparece na hora. Isto percorre a
-coisa toda, de desligado até uma saudação que os membros realmente veem.
+Boas-vindas costuma ser o primeiro módulo porque o resultado aparece na hora. Isto percorre a coisa
+toda, de desligado até uma saudação que os membros realmente veem — e toda página de módulo funciona
+como esta, então aprender uma vez basta.
+
+<Facts
+	items={[
+		{ label: 'Tempo', value: 'Dois minutos, se o cargo já estiver posicionado' },
+		{
+			label: 'Você precisa de',
+			value: 'Acesso ao painel do servidor, ou Gerenciar Servidor no Discord'
+		},
+		{ label: 'O que sai', value: 'Uma mensagem no canal que você escolher, quando alguém entra' }
+	]}
+/>
+
+## Pelo painel
 
 <Steps>
-	<Step title="Abra o módulo">
-		Painel → **Módulos** → Boas-vindas. Toda página de módulo é como esta, então aprender uma vez
-		basta.
-	</Step>
-	<Step title="Ligue">
-		O botão no canto superior direito. Tudo abaixo dele continua editável enquanto está desligado,
-		então dá para configurar antes de entrar no ar.
-	</Step>
+	<Step title="Abra o módulo">Painel → **Módulos** → Boas-vindas.</Step>
 	<Step title="Escolha o canal">
-		Onde a saudação é publicada. O módulo não pode ser ligado sem um, então este é o campo que
-		decide se o botão funciona.
+		Onde a saudação é publicada. É o único campo obrigatório do produto inteiro — o interruptor não
+		liga sem ele.
 	</Step>
 	<Step title="Escreva a mensagem">
-		Use `{user}` para o membro que entrou e `{server}` para o nome do servidor. A prévia atualiza
-		enquanto você digita.
+		Use `{user}` para quem entrou e `{server}` para o nome do servidor. A prévia ao lado atualiza
+		enquanto você digita, com dados de exemplo.
 	</Step>
-	<Step title="Confira com uma entrada de verdade">
-		Convide uma segunda conta, ou peça para alguém entrar de novo. A prévia mostra o formato, mas só
-		uma entrada real prova que o bot tem as permissões de que precisa naquele canal.
+	<Step title="Salve">
+		A barra embaixo mostra quantos campos mudaram. Enquanto houver alteração pendente, o botão de
+		testar fica desativado.
+	</Step>
+	<Step title="Ligue">
+		O interruptor no canto superior direito. Nada é publicado enquanto ele está desligado, mas tudo
+		continua editável — dá para configurar inteiro antes de entrar no ar.
+	</Step>
+	<Step title="Teste">
+		O botão **Enviar teste** publica a saudação no canal de verdade, usando você como quem acabou de
+		entrar. É a prova de que o bot tem as permissões que precisa **naquele** canal.
 	</Step>
 </Steps>
 
-<Callout tone="info" title="A mesma coisa pelo Discord">
-	Todo passo acima tem um comando de barra. `/config welcome channel-id:#geral` faz o terceiro, e o
-	painel mostra no instante em que você roda.
+## Pelo Discord
+
+Todo passo acima tem um comando. Estes três fazem a mesma coisa:
+
+```
+/config welcome channel-id:#geral
+/config welcome message:Bem-vindo ao {server}, {user}!
+/config welcome enabled:true
+```
+
+<Callout tone="info" title="O painel mostra no instante em que você roda">
+	Não há sincronizar. Se a página estiver aberta, recarregue — o valor novo já está lá.
 </Callout>
+
+O comando altera **só** os campos que você citar. `/config welcome message:...` não desliga o
+módulo nem apaga o canal.
+
+## O que você deve ver
+
+<Message
+	content="Bem-vindo ao Servidor de Testes, @novato!"
+	time="agora mesmo"
+	caption="Com a menção em linha. Com a menção em nenhuma, sai o nome sem o ping."
+/>
+
+## Se nada aparecer
+
+| Sintoma                         | O que conferir                                                  |
+| ------------------------------- | --------------------------------------------------------------- |
+| O interruptor não liga          | Falta o canal — é o único campo obrigatório                     |
+| O teste diz que não está pronto | O módulo está desligado, ou ainda sem canal                     |
+| O teste falha no canal          | O bot não tem **Enviar Mensagens** ali; a prévia não prova isso |
+| O cargo automático não vem      | Ele está acima do Tessera na lista de cargos                    |
+
+## Depois disto
+
+Cada módulo funciona sozinho, e a ordem é sua. [Registros](/docs/modules/logging) costuma ser o
+segundo, porque ele mostra o que está acontecendo enquanto você configura o resto.

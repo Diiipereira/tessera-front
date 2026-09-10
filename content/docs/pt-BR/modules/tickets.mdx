@@ -1,23 +1,95 @@
 ---
 title: Tickets
-summary: Um botão que os membros apertam para abrir um canal privado com a sua equipe.
+summary: Um botão que abre um canal privado entre o membro e a sua equipe.
 ---
 
-Um painel de ticket é uma mensagem com um botão. Apertá-lo abre um canal privado entre o membro e os cargos da sua equipe, e fechá-lo pode guardar um histórico.
+Um painel de ticket é uma mensagem com um botão. Apertá-lo cria um canal privado, numerado, entre
+quem abriu e os cargos da equipe. Fechar apaga o canal e pode guardar o histórico como arquivo.
 
-**Permissões:** `Gerenciar Canais`, `Ver Canal`, `Enviar Mensagens`, `Anexar Arquivos`
+<Facts
+	items={[
+		{ label: 'Dispara em', value: 'O clique no botão do painel' },
+		{
+			label: 'Precisa de',
+			value:
+				'Gerenciar Canais para criar e apagar, Ver Canal e Enviar Mensagens, Anexar Arquivos para o histórico'
+		},
+		{
+			label: 'Escreve em',
+			value: 'Um canal novo dentro da categoria escolhida, e o canal de histórico ao fechar'
+		},
+		{ label: 'Portas', value: '/ticket dentro do canal do ticket; tela de Tickets no painel' },
+		{ label: 'Numeração', value: 'Sequencial por servidor, sem buraco' }
+	]}
+/>
 
-## Configurando
+## Abrir
 
-<Steps>
-	<Step title="Crie um painel">
-		Cada painel é uma mensagem com um botão. O que fica acima do botão é você quem escreve.
-	</Step>
-	<Step title="Aponte para uma categoria">
-		Os canais de ticket são criados dentro dela, então as permissões da categoria são as que valem.
-	</Step>
-	<Step title="Nomeie os cargos da equipe">Eles entram em todo ticket que o painel abrir.</Step>
-</Steps>
+<Flow
+	steps={[
+		{ title: 'Clique', note: 'No botão do painel' },
+		{ title: 'Trava e conta', note: 'Número e limite por membro' },
+		{ title: 'Cria o canal', note: 'ticket-42, na categoria' },
+		{ title: 'Grava', note: 'Só então o ticket existe' }
+	]}
+	caption="O número precisa existir antes do canal, porque ele está no nome. Se o Discord recusar criar o canal, a transação inteira volta e o número não é gasto."
+/>
+
+O limite por membro é contado **dentro da mesma trava**. Ler quantos estão abertos, decidir e
+inserir em passos separados deixaria dois cliques simultâneos passarem os dois.
+
+Se o canal nasceu e a gravação falhou — a única janela que sobra — o Tessera apaga o canal. Sem
+isso ficaria um canal privado sem ticket nenhum por trás, que nem o botão de fechar alcançaria.
+
+## Quem enxerga o canal
+
+| Quem                | Enxerga |
+| ------------------- | ------- |
+| `@everyone`         | Não     |
+| Cargos da equipe    | Sim     |
+| Quem abriu          | Sim     |
+| Quem foi adicionado | Sim     |
+| O Tessera           | Sim     |
+
+O bot entra na lista porque sem isso ele não lê o canal para montar o histórico.
+
+## O que fica no painel e o que fica no servidor
+
+<Compare
+	yesTitle="No painel — lido na hora de abrir"
+	noTitle="No servidor — lido depois"
+	yes={['A categoria', 'Os cargos da equipe', 'O padrão de nome do canal', 'O limite por membro']}
+	no={['O canal de histórico', 'O fechamento automático', 'O pedido de nota']}
+/>
+
+A divisão não é arbitrária: um painel pode ser apagado enquanto tickets dele ainda estão abertos. Um
+ticket órfão ainda precisa saber onde arquivar e quando fechar, então essas três são configuração do
+servidor.
+
+## Fechar
+
+Fechar é um ato em duas partes. `Fechado` quer dizer _a conversa acabou_; `arquivado` quer dizer _o
+canal já foi apagado_. Sem os dois estados não haveria como saber o que já foi limpo depois de um
+reinício.
+
+<Callout tone="info" title="O botão pergunta; o comando não">
+	Apagar um canal é irreversível, então o botão de fechar responde com um segundo botão de
+	confirmação. O `/ticket close` não pergunta: quem digitou o comando com um motivo já decidiu.
+</Callout>
+
+Quem pode fechar é **quem abriu ou a equipe**. Quem pode assumir é **só a equipe**. Gerenciar
+Servidor sempre passa, mesmo que o painel não liste cargo nenhum.
+
+## O histórico
+
+Vai como arquivo `.txt` anexado a uma mensagem no canal de histórico, e o link dessa mensagem fica
+guardado no ticket. Falhar em montar o histórico **não** impede o fechamento: o ticket fecha e o
+link fica vazio.
+
+## A nota
+
+O pedido de nota vai por DM, porque o canal está prestes a sumir — botões numa conversa que é
+apagada em segundos não serviriam para nada. Quem não aceita DM simplesmente não é perguntado.
 
 ## Opções
 
@@ -26,3 +98,22 @@ Um painel de ticket é uma mensagem com um botão. Apertá-lo abre um canal priv
 ## Comandos
 
 <Commands module="tickets" />
+
+`/ticket` só funciona **dentro** de um ticket: ele lê qual ticket é pelo canal em que foi digitado,
+e por isso não tem como agir no ticket errado. Fora de um ticket, a resposta é _este canal não é um
+ticket_.
+
+## O que não existe nesta versão
+
+Formulário de abertura. A coluna existe no banco, mas a tela ainda não tem editor de campos, e um
+modal de perguntas sem onde configurá-las seria código sem porta.
+
+## Quando não funciona
+
+| Sintoma                       | Causa provável                                                       |
+| ----------------------------- | -------------------------------------------------------------------- |
+| O botão diz que não deu       | Falta **Gerenciar Canais**, ou a categoria está cheia (50 canais)    |
+| A equipe não enxerga o ticket | O cargo não está na lista de cargos da equipe **daquele painel**     |
+| O botão antigo não responde   | O painel foi apagado; publique o painel de novo                      |
+| O histórico não é guardado    | Falta **Anexar Arquivos**, ou o canal de histórico não está definido |
+| O ticket não fecha sozinho    | O fechamento automático está em zero, que significa desligado        |

@@ -1,28 +1,124 @@
 ---
 title: AutoMod
-summary: Regras que agem antes de um humano precisar. Toda ocorrência vai para o log de casos.
+summary: Regras que leem cada mensagem e agem antes de um humano precisar.
 ---
 
-O AutoMod observa as mensagens conforme elas chegam e age nas que casam com uma regra que você escreveu. Ele roda antes de qualquer moderador ver a mensagem, e é esse o ponto — o pior conteúdo é o que ninguém precisou ler.
+O AutoMod confere toda mensagem contra as regras que você escreveu, na ordem em que elas estão, e
+para na **primeira que dispara**. O que ele faz depois — apagar, avisar, advertir, castigar — é
+escolha da regra.
 
-**Permissões:** `Gerenciar Mensagens`, `Moderar Membros`, `Ver Registro de Auditoria`
+<Facts
+	items={[
+		{ label: 'Dispara em', value: 'Cada mensagem enviada num canal que a regra alcança' },
+		{
+			label: 'Precisa de',
+			value:
+				'Gerenciar Mensagens para apagar, Moderar Membros para castigar, Ver Registro de Auditoria para nomear quem agiu'
+		},
+		{
+			label: 'Escreve em',
+			value: 'A mensagem, o membro, e a tabela de casos quando a ação é uma punição'
+		},
+		{ label: 'Portas', value: '/automod no Discord, tela de AutoMod no painel' },
+		{ label: 'Regras moram', value: 'Em tabela própria — o módulo em si só tem o interruptor' }
+	]}
+/>
 
-## Configurando
+## Como uma mensagem é julgada
 
-<Steps>
-	<Step title="Crie uma regra">
-		Escolha o que ela observa — palavras bloqueadas, convites, links, menções, texto repetido ou
-		caixa alta — e o que acontece quando ela dispara.
-	</Step>
-	<Step title="Ordene as regras">
-		As regras são conferidas de cima para baixo e **a primeira que dispara vence**. Ponha as
-		específicas acima das amplas.
-	</Step>
-	<Step title="Teste antes de confiar">
-		Cole no campo de exemplo algo que um membro poderia mandar e o painel mostra quais regras
-		pegariam, em ordem.
-	</Step>
-</Steps>
+<Flow
+	steps={[
+		{ title: 'Isenções', note: 'Cargo ou canal isento? Sai' },
+		{ title: 'Desofusca', note: 'Desfaz disfarces simples' },
+		{ title: 'Regras', note: 'De cima para baixo' },
+		{ title: 'Primeira que bate', note: 'As outras nem são olhadas' },
+		{ title: 'Ação', note: 'E o caso, se for punição' }
+	]}
+	caption="Regra específica em cima, regra ampla embaixo — a ordem é o que decide."
+/>
+
+Cargos e canais isentos são **"um destes"**, não "todos": basta o membro ter um dos cargos listados,
+ou a mensagem estar num dos canais listados, para a regra não valer ali.
+
+## Os gatilhos
+
+| Gatilho             | O que ele vê                                   | Contável |
+| ------------------- | ---------------------------------------------- | -------- |
+| Palavras bloqueadas | Uma lista sua, comparada depois de desofuscar  | Não      |
+| Convites            | Convites do Discord, inclusive disfarçados     | Não      |
+| Links               | Endereços, com ou sem `https://` — veja abaixo | Não      |
+| Menções             | Quantas menções numa mensagem só               | Sim      |
+| Texto repetido      | A mesma mensagem repetida em sequência         | Sim      |
+| Caixa alta          | A proporção de maiúsculas                      | Sim      |
+| Spam                | Muitas mensagens numa janela curta             | Sim      |
+| Anexos              | Arquivos enviados                              | Sim      |
+
+Gatilho **contável** tem um limite que você escolhe: cinco menções, três repetições, 70% de
+maiúsculas. Os outros disparam na primeira ocorrência.
+
+## O gatilho de link tem dois níveis, e isso é de propósito
+
+Procurar só por `https://` pega quase nada: quem divulga servidor escreve `discord.gg/x`. Mas tratar
+qualquer `palavra.tld` como link puniria quem escreve `deploy.sh` ou `index.io` — num servidor de
+gente que programa, isso é advertência em cima de conversa legítima.
+
+<Compare
+	yesTitle="Conta como link"
+	noTitle="Não conta como link"
+	yes={[
+		'discord.gg/algo — .gg ninguém usa como extensão',
+		'site.com, loja.shop, exemplo.net',
+		'bit.ly/xyz — .ly com barra',
+		'www.exemplo.io — .io com www.',
+		'MEGA.NZ/arquivo'
+	]}
+	no={['deploy.sh', 'index.io', 'script.py', 'notas.br sem barra e sem www.']}
+/>
+
+## Disfarces que o AutoMod desfaz
+
+Antes de comparar, o texto passa por uma limpeza. Ela desfaz quatro disfarces comuns:
+
+```text
+discord[.]gg/free     →  discord.gg/free
+site . com            →  site.com
+discord (dot) gg      →  discord.gg
+https: //exemplo.com  →  https://exemplo.com
+```
+
+<Callout tone="warning" title="Isto não é à prova de evasão, e nada é">
+	Homóglifo cirílico, caractere de largura zero e encurtador novo continuam passando. Cada volta
+	dessa corrida pega a rodada anterior. O que se ganha é que o caminho preguiçoso — que é a
+	esmagadora maioria — para de funcionar.
+</Callout>
+
+## O que sai quando uma regra dispara
+
+<Message
+	content="@spammer sua mensagem foi removida."
+	embed={{
+		color: '#ed4245',
+		title: 'AutoMod · Convites',
+		description: 'Mensagem removida em #geral.',
+		fields: [
+			{ name: 'Regra', value: 'Sem convites', inline: true },
+			{ name: 'Ação', value: 'Apagar e advertir', inline: true },
+			{ name: 'Conteúdo', value: 'vem pro meu server discord[.]gg/xxxx', inline: false }
+		],
+		footer: 'Caso #42'
+	}}
+	caption="Quando a ação é uma punição, ela vira caso numerado como qualquer outra — com o AutoMod no lugar do moderador."
+/>
+
+## Testando
+
+| Onde            | Contra o quê                | Por quê                                       |
+| --------------- | --------------------------- | --------------------------------------------- |
+| Botão no painel | O rascunho que está na tela | Você está editando e quer ver antes de gravar |
+| `/automod test` | As regras **salvas**        | No Discord não existe rascunho para testar    |
+
+Spam e anexos aparecem como não testáveis: julgar os dois exige o histórico recente do canal e os
+arquivos da mensagem, e um texto digitado não tem nenhum dos dois.
 
 ## Opções
 
@@ -32,28 +128,28 @@ O AutoMod observa as mensagens conforme elas chegam e age nas que casam com uma 
 
 <Commands module="automod" />
 
-As regras se criam, se apagam e se testam pelo Discord também — não só pelo painel.
-
-| Comando           | O que faz                                                           |
+| Subcomando        | O que faz                                                           |
 | ----------------- | ------------------------------------------------------------------- |
-| `/automod list`   | mostra todas as regras, com gatilho, ação e se estão ligadas        |
-| `/automod add`    | cria uma regra: nome, gatilho, ação, e o limite se o gatilho contar |
-| `/automod edit`   | abre o seletor nativo do Discord para as listas da regra            |
-| `/automod remove` | apaga uma regra, escolhendo pelo nome                               |
-| `/automod test`   | testa um texto contra as regras **salvas**                          |
+| `/automod list`   | Mostra todas as regras, com gatilho, ação e se estão ligadas        |
+| `/automod add`    | Cria uma regra: nome, gatilho, ação, e o limite se o gatilho contar |
+| `/automod edit`   | Abre o seletor do próprio Discord para as listas da regra           |
+| `/automod remove` | Apaga uma regra, escolhida pelo nome                                |
+| `/automod test`   | Testa um texto contra as regras salvas                              |
 
-O `add` cria a regra sem isenções. Os campos que guardam lista — cargos isentos, canais isentos,
-o que acontece ao disparar, e as palavras bloqueadas — se editam pelo `/automod edit`, que abre um
-modal com o seletor do próprio Discord, já marcado com o que está configurado.
+O `add` cria a regra sem isenções. Cargos isentos, canais isentos, as ações e as palavras
+bloqueadas se editam pelo `/automod edit`, que abre um modal já marcado com o que está configurado.
 
-Criar uma regra não liga o AutoMod. Com o módulo desligado a regra fica gravada e não age em
-ninguém — o `/automod add` avisa quando é esse o caso. Ligar é `/config automod enabled:true`, ou o
-interruptor do módulo no painel.
-
-<Callout tone="info" title="O teste não usa rascunho">
-	Pelo Discord, o `/automod test` roda contra as regras que estão salvas. No painel, o botão de
-	testar usa o que está na tela, inclusive o que você ainda não salvou.
+<Callout tone="info" title="Criar uma regra não liga o AutoMod">
+	Com o módulo desligado a regra fica gravada e não age em ninguém — o `/automod add` avisa quando é
+	esse o caso. Ligar é `/config automod enabled:true`, ou o interruptor no painel.
 </Callout>
 
-Regras de spam e de anexos aparecem como não testáveis pelo `/automod test`: julgar as duas exige
-o histórico recente do canal e os arquivos da mensagem, e um texto digitado não tem nenhum dos dois.
+## Quando não funciona
+
+| Sintoma                             | Causa provável                                                      |
+| ----------------------------------- | ------------------------------------------------------------------- |
+| A regra avisa mas nunca apaga       | Falta **Gerenciar Mensagens** no canal                              |
+| Nada é lido                         | A intent **Message Content** está desligada no Portal do Discord    |
+| Uma regra ampla come as específicas | A primeira que bate vence — mova a específica para cima             |
+| Moderadores são pegos pelas regras  | Falta o cargo deles na lista de isentos                             |
+| `deploy.sh` foi tratado como link   | Só acontece com barra ou `www.` — confira o texto exato da mensagem |

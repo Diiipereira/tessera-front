@@ -1,35 +1,81 @@
 ---
 title: Your first module
-summary: Turning on Welcome, end to end, including the part people get wrong.
+summary: Turning Welcome on end to end, including the part everyone gets wrong.
 ---
 
-Welcome is the usual first module because the result is immediately visible. This walks the
-whole thing, from off to a greeting members actually see.
+Welcome is usually the first module because the result shows up straight away. This walks the whole
+thing, from off to a greeting members actually see — and every module page works like this one, so
+learning it once is enough.
+
+<Facts
+	items={[
+		{ label: 'Time', value: 'Two minutes, if the role is already positioned' },
+		{ label: 'You need', value: 'Dashboard access to the server, or Manage Server in Discord' },
+		{ label: 'What goes out', value: 'A message in the channel you choose, when someone joins' }
+	]}
+/>
+
+## From the dashboard
 
 <Steps>
-	<Step title="Open the module">
-		Dashboard → **Modules** → Welcome. Every module page looks like this one, so learning it once is
-		enough.
-	</Step>
-	<Step title="Turn it on">
-		The switch at the top right. Everything below it stays editable while it is off, so you can set
-		it up before it goes live.
-	</Step>
+	<Step title="Open the module">Dashboard → **Modules** → Welcome.</Step>
 	<Step title="Pick the channel">
-		Where the greeting goes. The module cannot be turned on without one, so this is the field that
-		decides whether the switch works.
+		Where the greeting is posted. It is the only required field in the whole product — the switch
+		will not turn on without it.
 	</Step>
 	<Step title="Write the message">
-		Use `{user}` for the member who joined and `{server}` for the server name. The preview updates
-		as you type.
+		Use `{user}` for whoever joined and `{server}` for the server name. The preview beside it
+		updates as you type, with sample data.
 	</Step>
-	<Step title="Check it with a real join">
-		Invite a second account, or ask someone to rejoin. The preview shows the layout, but only a real
-		join proves the bot has the permissions it needs in that channel.
+	<Step title="Save">
+		The bar at the bottom says how many fields changed. While a change is pending, the test button
+		stays disabled.
+	</Step>
+	<Step title="Turn it on">
+		The switch in the top right. Nothing is posted while it is off, but everything stays editable —
+		you can configure the whole thing before going live.
+	</Step>
+	<Step title="Test">
+		The **Send test** button posts the greeting in the real channel, using you as the person who
+		just joined. It is the proof that the bot has the permissions it needs in **that** channel.
 	</Step>
 </Steps>
 
-<Callout tone="info" title="The same thing from Discord">
-	Every step above has a slash command. `/config welcome channel-id:#general` does the third one,
-	and the dashboard shows it the moment you run it.
+## From Discord
+
+Every step above has a command. These three do the same thing:
+
+```
+/config welcome channel-id:#general
+/config welcome message:Welcome to {server}, {user}!
+/config welcome enabled:true
+```
+
+<Callout tone="info" title="The dashboard shows it the moment you run it">
+	There is no syncing. If the page is open, reload — the new value is already there.
 </Callout>
+
+The command changes **only** the fields you named. `/config welcome message:...` does not turn the
+module off or clear the channel.
+
+## What you should see
+
+<Message
+	content="Welcome to Test Server, @newcomer!"
+	time="just now"
+	caption="With the inline ping. With the ping set to none, the name goes out without the ping."
+/>
+
+## If nothing shows up
+
+| Symptom                        | What to check                                                          |
+| ------------------------------ | ---------------------------------------------------------------------- |
+| The switch will not turn on    | The channel is missing — it is the only required field                 |
+| The test says it is not ready  | The module is off, or still has no channel                             |
+| The test fails in the channel  | The bot lacks **Send Messages** there; the preview does not prove that |
+| The automatic role never comes | It sits above Tessera in the role list                                 |
+
+## After this
+
+Each module works on its own, and the order is yours. [Logging](/docs/modules/logging) is often
+second, because it shows you what is happening while you configure the rest.

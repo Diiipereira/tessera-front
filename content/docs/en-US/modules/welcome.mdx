@@ -1,72 +1,152 @@
 ---
 title: Welcome
-summary: Greet new members and give them their first roles.
+summary: The message that goes out when someone joins, and the roles they get at the door.
 ---
 
-Welcome posts a message the moment someone joins and can hand them a role on the way in. It is
-the module most servers turn on first, because it is the one members notice.
+Welcome listens for members joining and does two things, in this order: it applies the automatic
+roles, then posts a message in the channel you chose. It is the only module with a required field —
+without a channel it will not turn on.
 
-**Permissions:** `View Channel`, `Send Messages`, `Embed Links`, `Manage Roles`
+<Facts
+	items={[
+		{ label: 'Fires on', value: 'A member joins the server' },
+		{
+			label: 'Needs',
+			value:
+				'View Channel and Send Messages in the channel; Embed Links if the message is an embed; Manage Roles for the automatic roles'
+		},
+		{ label: 'Writes to', value: 'The chosen channel and the member’s roles' },
+		{ label: 'Doors', value: '/config welcome in Discord, the Welcome screen in the dashboard' },
+		{ label: 'Required', value: 'Channel — the module will not turn on without one' }
+	]}
+/>
 
-## Setting it up
+## What happens when someone joins
 
-<Steps>
-	<Step title="Pick the channel">
-		Where the greeting is posted. The bot needs **Send Messages** there, and **Embed Links** as well
-		if you send an embed.
-	</Step>
-	<Step title="Write the message">
-		Plain text or an embed. Both accept the same variables — `{user}` and `{server}`.
-	</Step>
-	<Step title="Turn it on">
-		The module stays off until you enable it, and it cannot be enabled without a channel. Nothing is
-		posted while it is off.
-	</Step>
-</Steps>
+<Flow
+	steps={[
+		{ title: 'Join', note: 'Discord tells the bot' },
+		{ title: 'Roles', note: 'The automatic ones are applied' },
+		{ title: 'Ping', note: 'Ghost mode only' },
+		{ title: 'Message', note: 'Text or embed' },
+		{ title: 'Deletion', note: 'If a delay is set' }
+	]}
+	caption="Roles come before the message: if the message fails, the member is already in with their role."
+/>
+
+Each step stands on its own. A role that could not be given does not stop the message, and a
+message that could not be posted does not undo the role. Both failures reach the bot log with the
+reason.
+
+### Roles the bot cannot reach
+
+A role is only given if it sits **below** Tessera’s role in the server list and the bot has
+**Manage Roles**. Whatever fails is named in the log — the module does not swallow it, and it still
+delivers the rest.
+
+## What lands in the channel
+
+Plain text, with an inline ping:
+
+<Message
+	content="Welcome to Test Server, @newcomer! Read #rules before you post."
+	time="today at 2:02 PM"
+/>
+
+An embed carrying the same thing:
+
+<Message
+	embed={{
+		color: '#5865f2',
+		title: 'Welcome to Test Server',
+		description: 'You are member number 431.\nRead #rules before you post.',
+		fields: [
+			{ name: 'Start at', value: '#introductions', inline: true },
+			{ name: 'Questions', value: '#support', inline: true }
+		],
+		footer: 'Joined just now'
+	}}
+	time="today at 2:02 PM"
+/>
+
+<Callout tone="warning" title="Embed on means embed only">
+	With **Use embed** on, the plain text is **not** sent alongside — the message is the embed. A line
+	above the embed has to be part of the embed itself, or a ghost ping.
+</Callout>
+
+## Variables
+
+Two of them, and they work in every text field of this module — the plain message and every part of
+an embed: title, description, field names and values, author and footer.
+
+| Variable   | Becomes                                     |
+| ---------- | ------------------------------------------- |
+| `{user}`   | The member who joined (ping or name, below) |
+| `{server}` | The name of the server                      |
+
+Anything the bot does not recognise stays written as it is instead of disappearing: a mistyped
+`{usr}` shows up in the message, and that is how you notice.
+
+## The three ping modes
+
+| Mode       | What the member gets             | What `{user}` becomes in your text |
+| ---------- | -------------------------------- | ---------------------------------- |
+| **None**   | Nothing                          | The name                           |
+| **Inline** | The ping inside the message      | The ping                           |
+| **Ghost**  | A separate ping, deleted at once | The name                           |
+
+The ghost ping exists to notify without leaving a permanent ping in the message: the bot posts the
+mention alone, deletes it, and only then posts the greeting. In that mode `{user}` in your text
+becomes the name — otherwise the member would be pinged twice and only one of them would vanish.
+
+## Deleting the message later
+
+The delay is in seconds, from 1 to 86,400 (one day). Zero and empty mean the same thing: it stays.
+
+<Callout tone="info" title="The delay is counted by the bot process">
+	If the bot restarts before the delay is up, that person’s message stays in the channel. It is the
+	only consequence of a restart here, and it is a visible one — no record is lost.
+</Callout>
 
 ## Options
 
 <Fields module="welcome" />
 
-## Variables
-
-Every message field in this module accepts the same two. That includes each part of an embed —
-its title, its description and its fields. Anything the bot cannot resolve is left as written
-rather than blanked, so a typo is visible instead of invisible.
-
-| Variable   | Becomes               |
-| ---------- | --------------------- |
-| `{user}`   | The member who joined |
-| `{server}` | The server name       |
-
-Whether `{user}` becomes a real ping or just a name is decided by the module's mention setting,
-not by the variable.
-
-<Callout tone="info" title="Ghost mentions are a separate message">
-	With the mention set to *ghost*, the bot posts the ping on its own and deletes it a moment later,
-	so the member is notified without the greeting carrying a mention. In that mode `{user}` in your
-	text becomes the name, not a ping — otherwise the member would be pinged twice and only one of
-	them would disappear.
-</Callout>
-
 ## Commands
 
 <Commands module="welcome" />
 
+An embed does not fit in a command option, so it has a door of its own:
+`/config welcome edit:Embed` opens a step-by-step builder inside Discord, with buttons for body,
+author, images, footer and fields. The preview is the builder message itself. See
+[Embeds](/docs/concepts/embeds).
+
 ## Testing without waiting for someone to join
 
-You do not have to kick and re-add a member to see how the message looks. The **Send a test**
-button, at the top of the Welcome screen, posts the greeting in the configured channel using you
-as the member who just arrived. From Discord, the same test is `/test module:Welcome`.
+The **Send test** button at the top of the screen posts the greeting in the configured channel using
+you as the person who just joined. In Discord it is `/test module:Welcome`.
 
-The test uses the settings **in force** — the text, the embed, the mention mode and the delete
-delay that are saved. It does not hand out the automatic roles: a test does not give a moderator
-a role.
+<Compare
+	yesTitle="The test does"
+	noTitle="The test does not"
+	yes={[
+		'Use the saved text, embed, ping mode and deletion delay',
+		'Post in the configured channel, where the server can see it',
+		'Fill the variables with your own details'
+	]}
+	no={['Give out the automatic roles', 'Use the draft on screen — it reads what is saved']}
+/>
 
-<Callout tone="info" title="Save before testing">
-	The button is disabled while a change is pending. The test reads what is saved, and testing a
-	configuration different from the one on screen would be misleading.
-</Callout>
+The button is disabled while there are unsaved changes: testing a configuration different from the
+one on screen would be misleading. With the module off, or with no channel, nothing is sent and the
+dashboard says which of the two it is.
 
-If the module is off, or still has no channel, nothing is sent and the panel says which of the
-two it is.
+## When it does not work
+
+| Symptom                          | Likely cause                                                            |
+| -------------------------------- | ----------------------------------------------------------------------- |
+| Nobody gets greeted              | The module is off, or the **Server Members** intent is not enabled      |
+| No message, but the role arrives | The bot lacks **Send Messages** there, or the channel is gone           |
+| The embed comes out empty        | Every embed field is blank — an embed with no content is not sent       |
+| The role is never given          | The role sits above Tessera in the list, or **Manage Roles** is missing |
+| `{user}` shows up written out    | It is outside a module field, or the ping mode is a different one       |

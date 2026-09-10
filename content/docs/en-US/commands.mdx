@@ -45,6 +45,23 @@ of the field is enforced by the picker rather than by an error afterwards.
 	away, and accepting both would drop the other option in silence.
 </Callout>
 
+## Settings that are an embed
+
+An embed has ten fields plus up to 25 rows, and a Discord modal takes five boxes. That is why `edit`
+on an embed field does not open a modal: it opens a **step-by-step builder**, an ephemeral message
+with one button per part of the embed.
+
+```
+/config welcome edit:Embed
+```
+
+The builder message is the preview: every step you fill redraws the embed right there. **Save**
+writes it into the module, through the same writer the dashboard uses. The detail is in
+[Embeds](/docs/concepts/embeds).
+
+`/embed` opens the same builder **without** being bound to any module: there you build and post a
+one-off message in whatever channel you choose.
+
 ## What language the commands appear in
 
 Two different things decide the language, and they are easy to confuse.

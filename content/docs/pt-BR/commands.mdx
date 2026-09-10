@@ -43,6 +43,23 @@ do campo é imposto pelo seletor, não por uma mensagem de erro depois.
 	aceitar as duas coisas faria a outra opção ser descartada em silêncio.
 </Callout>
 
+## Configurações que são um embed
+
+Um embed tem dez campos mais até 25 linhas, e um modal do Discord aceita cinco caixas. Por isso o
+`edit` de um campo de embed não abre um modal: ele abre um **construtor em etapas**, uma mensagem
+efêmera com um botão por parte do embed.
+
+```
+/config welcome edit:Embed
+```
+
+A mensagem do construtor é a prévia: cada etapa preenchida redesenha o embed ali mesmo. O botão
+**Salvar** grava no módulo, pelo mesmo escritor que o painel usa. O detalhe está em
+[Embeds](/docs/concepts/embeds).
+
+O `/embed` abre o mesmo construtor **sem** ficar preso a módulo nenhum: ali você monta e publica uma
+mensagem avulsa no canal que escolher.
+
 ## Em que idioma os comandos aparecem
 
 Duas coisas diferentes decidem o idioma, e confundir as duas é fácil.

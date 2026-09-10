@@ -1,26 +1,126 @@
 ---
 title: Registros
-summary: Escreva os eventos do servidor num canal. Ligue só o que você vai realmente ler.
+summary: Quinze eventos do servidor, cada um com o seu canal, o seu embed e o seu modelo.
 ---
 
-Os Registros escrevem o que aconteceu num canal que você escolhe. A tentação é ligar tudo; o conselho é não ligar, porque um log que ninguém lê é pior que log nenhum — ele parece cobertura.
+Os Registros escutam o que acontece no servidor e publicam um embed no canal que você escolheu
+**para aquele evento**. Cada evento tem canal próprio: mensagens podem ir para um canal e moderação
+para outro, ou tudo para o mesmo.
 
-**Permissões:** `Ver Canal`, `Enviar Mensagens`, `Inserir Links`, `Ver Registro de Auditoria`
+<Facts
+	items={[
+		{ label: 'Dispara em', value: 'Quinze eventos do Discord, listados abaixo' },
+		{
+			label: 'Precisa de',
+			value:
+				'Enviar Mensagens e Inserir Links no canal de destino; Ver Registro de Auditoria para nomear quem causou'
+		},
+		{ label: 'Escreve em', value: 'O canal de cada evento' },
+		{ label: 'Portas', value: '/logging no Discord, tela de Registros no painel' },
+		{ label: 'Modelo', value: 'Opcional — vazio significa o embed padrão do Tessera' }
+	]}
+/>
 
-## Configurando
+## Os quinze eventos
 
-<Steps>
-	<Step title="Escolha o canal">
-		Deixe só para a equipe. O conteúdo de mensagens apagadas vai parar aqui.
-	</Step>
-	<Step title="Escolha os eventos">
-		Comece por entradas, saídas, exclusões e ações de moderação. Acrescente mais quando sentir
-		falta.
-	</Step>
-	<Step title="Tire o barulho">
-		Canais ignorados são absolutos — nada vindo deles é registrado, digam os eventos o que disserem.
-	</Step>
-</Steps>
+| Grupo     | Eventos                                                            |
+| --------- | ------------------------------------------------------------------ |
+| Mensagens | Mensagem apagada, mensagem editada, exclusão em massa              |
+| Membros   | Entrada, saída, apelido alterado, cargos alterados                 |
+| Moderação | Banimento, desbanimento, castigo                                   |
+| Servidor  | Canal alterado, cargo alterado, tópico alterado, servidor alterado |
+| Voz       | Entrada em canal de voz                                            |
+
+Um evento só é publicado quando **o módulo está ligado, o evento está ligado e ele tem um canal**.
+Faltando qualquer um dos três, nada sai — e o teste no painel diz qual dos três está faltando em vez
+de falhar em silêncio.
+
+## Quem causou o quê
+
+O Discord não conta, no evento, quem o causou: uma mensagem apagada chega sem dizer se foi o autor
+ou um moderador. Quem sabe isso é o registro de auditoria do próprio Discord, e ele chega numa
+mensagem separada — às vezes antes do evento, às vezes depois.
+
+<Flow
+	steps={[
+		{ title: 'Evento chega', note: 'Sem autor' },
+		{ title: 'Espera 1,5s', note: 'Pela entrada de auditoria' },
+		{ title: 'Casa pela chave', note: 'Não só pelo tipo' },
+		{ title: 'Publica', note: 'Com autor, ou sem' }
+	]}
+	caption="A espera só acontece onde o registro realmente vai sair — servidor que não registra exclusão não paga temporizador nenhum."
+/>
+
+O casamento é pela **chave que mudou**, não só pelo tipo: apelido e castigo são a mesma entrada de
+auditoria no Discord, e o que os separa é qual campo do membro mudou.
+
+<Callout tone="info" title="Banir não vira duas linhas">
+	Banir também emite uma saída de membro. Quando a saída encontra um banimento na auditoria, ela se
+	cala — quem conta a história é o evento de banimento. Expulsão, essa, aparece como saída **com**
+	moderador.
+</Callout>
+
+Sem a permissão **Ver Registro de Auditoria** o registro continua saindo, só que sem nome. Ele nunca
+deixa de sair por causa disso.
+
+## O que sai no canal
+
+<Message
+	embed={{
+		color: '#ed4245',
+		author: 'Lia',
+		title: 'Mensagem apagada',
+		description: 'Mensagem de @Lia apagada em #geral por @Moderador.',
+		fields: [{ name: 'Conteúdo', value: 'texto da mensagem que foi apagada', inline: false }],
+		footer: 'ID 512345678901234567'
+	}}
+	caption="O embed é uma frase, não uma pilha de campos: campo do Discord gasta duas linhas para dizer o que a frase diz em uma."
+/>
+
+Sobrou campo só para o que é longo de verdade — conteúdo, antes e depois, cargos, motivo. O bloco de
+autor leva o nome e a foto de quem o registro fala; o rodapé leva o id, que é o que se copia para
+investigar.
+
+## Modelos
+
+Cada evento aceita um modelo próprio: um embed montado por você, com as variáveis daquele evento.
+Modelo vazio significa o embed padrão — não é preciso escrever nada para o módulo funcionar.
+
+A variável `{line}` é a **frase padrão inteira**, disponível como variável. Isso permite personalizar
+em volta sem reescrever o que já estava bom:
+
+```text
+{line}
+
+Se isso foi engano, chame a equipe em #suporte.
+```
+
+Quais variáveis existem quem diz é o próprio evento: a tela mostra exatamente as que vão ser
+substituídas naquele registro, e a lista muda de evento para evento.
+
+## Prévia e teste
+
+| Onde             | Contra o quê       | O que ele faz                              |
+| ---------------- | ------------------ | ------------------------------------------ |
+| Prévia na tela   | O rascunho         | Desenha o embed, sem enviar nada           |
+| Botão **Testar** | O modelo **salvo** | Publica de verdade no canal daquele evento |
+
+A prévia é montada **pelo mesmo código que envia**, com dados de exemplo e no idioma do servidor —
+não é um desenho paralelo que pode divergir do real.
+
+O teste passa pela mesma porta do registro de verdade: módulo desligado, evento desligado ou evento
+sem canal respondem _não está pronto_ sem escrever nada. Ele fica desabilitado enquanto a tela está
+suja, porque o que vai é o modelo salvo.
+
+<Callout tone="info" title="A mensagem de teste diz que é teste">
+	Canal de registro é prova, e um "Membro banido" idêntico ao real plantado ali enganaria quem fosse
+	ler depois. O teste vai com uma linha acima do embed nomeando quem pediu, e essa menção aparece
+	sem notificar ninguém.
+</Callout>
+
+Quem clica entra no elenco do exemplo: o teste troca membro e moderador por você, o canal pelo canal
+de destino, e pega um cargo real do servidor — senão o campo Cargos sairia vazio justamente nos dois
+eventos que existem para mostrar cargo.
 
 ## Opções
 
@@ -29,3 +129,22 @@ Os Registros escrevem o que aconteceu num canal que você escolhe. A tentação 
 ## Comandos
 
 <Commands module="logging" />
+
+## O que ficou de fora, e por quê
+
+| Não registrado                | Motivo                                                                  |
+| ----------------------------- | ----------------------------------------------------------------------- |
+| Foto e nome de usuário        | O Discord não lista esse evento na doc de intents                       |
+| Convites criados e usados     | Exige a intent `GUILD_INVITES`, que não pedimos                         |
+| Reações                       | Exige a intent `GUILD_MESSAGE_REACTIONS`, que não pedimos               |
+| Permissão de canal e de cargo | O caro é diffar sobreposição de permissão de forma legível, não escutar |
+
+## Quando não funciona
+
+| Sintoma                            | Causa provável                                                         |
+| ---------------------------------- | ---------------------------------------------------------------------- |
+| Nada é registrado                  | O módulo está desligado, ou o evento está sem canal                    |
+| O registro sai sem quem causou     | Falta **Ver Registro de Auditoria**                                    |
+| Mensagem apagada sai sem conteúdo  | O Discord não guarda mensagem antiga em cache — só as recentes         |
+| Um moderador leva o crédito errado | A janela de correlação é de 10 s; ações quase simultâneas se confundem |
+| O modelo não aparece               | Ele está salvo em outro evento — o modelo é por evento                 |

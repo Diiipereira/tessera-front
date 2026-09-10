@@ -7,6 +7,17 @@ export const DISCORD = {
 	muted: '#949ba4'
 } as const;
 
+export const BLURPLE = '#5865f2';
+
+export const DISCORD_BUTTON = {
+	primary: BLURPLE,
+	secondary: DISCORD.button,
+	success: '#248046',
+	danger: '#da373c'
+} as const;
+
+export type DiscordButtonStyle = keyof typeof DISCORD_BUTTON;
+
 export const MENTION = {
 	fill: 'rgba(88, 101, 242, 0.3)',
 	text: '#dee0fc'

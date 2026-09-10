@@ -1,25 +1,101 @@
 ---
 title: Giveaways
-summary: Timed draws with entry requirements, and a reroll when a winner goes quiet.
+summary: A prize, a button to enter, and a weighted draw without replacement.
 ---
 
-A giveaway starts the moment you create it and draws when the timer runs out. Requirements are checked when a member enters, and someone who already won is never put back in the hat.
+A giveaway is a posted message with a button. Whoever clicks is in; when the deadline passes,
+Tessera draws, edits the message with the result and announces the winners.
 
-**Permissions:** `View Channel`, `Send Messages`, `Embed Links`
+<Facts
+	items={[
+		{ label: 'Fires on', value: 'The button click, and a sweep every 15 seconds to close them' },
+		{ label: 'Needs', value: 'Send Messages and Embed Links in the giveaway channel' },
+		{ label: 'Writes to', value: 'The giveaway message and the entrant list' },
+		{
+			label: 'Doors',
+			value: '/giveaway start|end|reroll|list; the Giveaways screen in the dashboard'
+		},
+		{ label: 'Length', value: 'From minutes to a month' }
+	]}
+/>
 
-## Setting it up
+## What gets posted
 
-<Steps>
-	<Step title="Describe the prize">
-		It starts the moment you create it, so write it before you save.
-	</Step>
-	<Step title="Set the requirements">
-		Required roles and a minimum level, checked when the member presses enter.
-	</Step>
-	<Step title="Draw, or reroll">
-		A reroll excludes the previous winners and picks again from everyone still eligible.
-	</Step>
-</Steps>
+<Message
+	embed={{
+		color: '#eb459e',
+		title: '🎉 A month of Nitro',
+		description: 'Press **Enter** to take part.\nCloses in 2 days.',
+		fields: [
+			{ name: 'Winners', value: '2', inline: true },
+			{ name: 'Entrants', value: '48', inline: true },
+			{ name: 'Requires', value: 'one of @Member, @Booster', inline: false }
+		],
+		footer: 'Closes'
+	}}
+	buttons={[{ label: '🎉 Enter', style: 'primary' }]}
+	caption="The entrant count refreshes at most every five seconds — editing the message on every click would blow past Discord's edit limit."
+/>
+
+The message is written by **one function**, because two processes send it: the bot over the gateway
+and the API from the dashboard. If each built its own text, the same giveaway would have two
+appearances.
+
+## Who can enter
+
+| Condition      | How it is read                                         |
+| -------------- | ------------------------------------------------------ |
+| Required roles | **Any of these**, not all of them                      |
+| Required level | Only looked up when the giveaway actually requires one |
+| Bonus entries  | Roles that are worth more than one entry               |
+
+The weight is **frozen at entry**. Re-checking roles at draw time would cost someone their weight
+for having changed roles after entering, and would force fetching everyone from Discord at the most
+expensive moment.
+
+## The draw
+
+<Flow
+	steps={[
+		{ title: 'Lock', note: 'One closing at a time' },
+		{ title: 'Fill the hat', note: 'Only those who have not won' },
+		{ title: 'Draw', note: 'Weighted, without replacement' },
+		{ title: 'Record', note: 'The winners' },
+		{ title: 'Announce', note: 'Message, channel and DM' }
+	]}
+	caption="The draw is recorded first and announced after: if Discord goes down midway, the winners are saved and show up on the screen."
+/>
+
+**Without replacement** means whoever is drawn leaves the hat before the next pick, and the total is
+rebuilt each round. Drawing two winners using the first round's total would give a different — and
+wrong — result.
+
+<Callout tone="info" title="A past winner never goes back in the hat">
+	A reroll replaces the winner list, so with no memory of who already won, a second reroll could
+	hand the prize back to the first winner. If nobody eligible is left, the reroll is **refused** —
+	the old list stands, instead of the screen claiming nobody won a giveaway that had a winner.
+</Callout>
+
+## Closing on its own
+
+A sweep every 15 seconds picks up expired giveaways. There is no accompanying timer: a giveaway can
+run for a month, and a `setTimeout` tops out around 25 days — the timer would be one more path that
+would still need the sweep.
+
+An expired giveaway is closed **even if the bot has left the server**: the result is true and gets
+recorded; only the Discord half is skipped.
+
+## Telling the winner
+
+The DM carries a **link to the giveaway message**, not the server name: it arrives outside any
+server, so it has to say where it came from — and the link says where it came from **and** takes
+them back.
+
+## What does not exist in this version
+
+Scheduled giveaways. The screen never had anywhere to pick a start time, and the "Scheduled" tab
+could only ever be empty. Today a giveaway is **running** or **closed**, and that is all the columns
+can say.
 
 ## Options
 
@@ -28,3 +104,17 @@ A giveaway starts the moment you create it and draws when the timer runs out. Re
 ## Commands
 
 <Commands module="giveaways" />
+
+`/giveaway end` checks the **server**, not only the id: Discord does not bind anyone to the
+autocomplete suggestions, and without the check you could paste the id of a giveaway from another
+server.
+
+## When it does not work
+
+| Symptom                              | Likely cause                                                       |
+| ------------------------------------ | ------------------------------------------------------------------ |
+| The giveaway is never posted         | **Send Messages** or **Embed Links** is missing in the channel     |
+| The button says the giveaway is gone | It was deleted, or it posted and the write failed                  |
+| Nobody can enter                     | The required roles, or the required level, shut everyone out       |
+| The count looks stale                | It refreshes every five seconds; closing rewrites the final number |
+| The reroll was refused               | Everyone who entered has already won this prize                    |

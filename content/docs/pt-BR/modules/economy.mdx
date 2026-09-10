@@ -1,25 +1,100 @@
 ---
 title: Economia
-summary: Uma moeda que os membros ganham por aparecer, e algo em que gastá-la.
+summary: Uma moeda do servidor, dois jeitos de ganhá-la, e uma loja onde gastá-la.
 ---
 
-A Economia é uma moeda, dois jeitos de ganhá-la e uma loja para gastá-la. É o módulo que mais recompensa ser deixado quieto por algumas semanas — os números só significam alguma coisa depois que as pessoas ganharam por um tempo.
+A Economia é uma moeda por servidor, com carteira por membro. Ela é ganha por resgate diário e por
+trabalho, transferida entre membros, e gasta numa loja que você monta.
 
-**Permissões:** `Ver Canal`, `Enviar Mensagens`, `Gerenciar Cargos`
+<Facts
+	items={[
+		{ label: 'Dispara em', value: 'Comandos — a economia não age sozinha' },
+		{ label: 'Precisa de', value: 'Gerenciar Cargos, se algum item da loja entregar cargo' },
+		{ label: 'Escreve em', value: 'A carteira do membro, o razão de transações e o inventário' },
+		{
+			label: 'Portas',
+			value: '/balance, /daily, /work, /pay, /richest, /shop, /inventory, /eco; tela de Economia'
+		},
+		{
+			label: 'Público',
+			value: '/balance, /shop view, /inventory e /richest respondem para o canal'
+		}
+	]}
+/>
 
-## Configurando
+## O nome e o símbolo
 
-<Steps>
-	<Step title="Dê nome à moeda">
-		Um nome e um símbolo. Um caractere só é o que lê melhor como símbolo.
-	</Step>
-	<Step title="Defina o que ela entrega">
-		Um resgate diário com bônus de sequência, e um comando de trabalho num intervalo mais curto.
-	</Step>
-	<Step title="Encha a loja">
-		O que a moeda realmente compra. Um item pode entregar um cargo, e pode ter estoque limitado.
-	</Step>
-</Steps>
+Símbolo tem padrão; nome não tem. O nome é prosa — ele nasce vazio e o Tessera usa a palavra padrão
+do idioma do servidor até você escrever a sua. O símbolo é igual em toda língua, então ele é padrão
+de verdade.
+
+| Símbolo | Como é escrito | Por quê                               |
+| ------- | -------------- | ------------------------------------- |
+| `$`     | `$100`         | Símbolo ASCII cola no número          |
+| `🪙`    | `🪙 100`       | Emoji precisa do espaço para respirar |
+
+## Ganhar
+
+<Flow
+	steps={[
+		{ title: '/daily', note: 'Uma vez por dia, com bônus de sequência' },
+		{ title: '/work', note: 'Intervalo mais curto, valor menor' },
+		{ title: '/pay', note: 'De um membro para outro' },
+		{ title: '/eco', note: 'A staff dá, tira ou define' }
+	]}
+/>
+
+O saldo inicial é dado **uma vez**. Quem já tem carteira nunca é presenteado de novo, mesmo que você
+aumente o valor depois — senão todo `/balance` de quem está zerado devolveria o presente.
+
+Quando o membro pode tentar de novo vai como carimbo de hora do Discord, não como texto: o cliente
+de cada pessoa escreve _"em 3 horas"_ no idioma dela.
+
+## Transferir
+
+Uma transferência mexe em duas carteiras, e as duas são travadas na mesma transação. As travas são
+tomadas em ordem determinística — sem isso, você pagando alguém enquanto essa pessoa te paga
+travaria os dois para sempre.
+
+<Callout tone="warning" title="Dinheiro do servidor é aparado; dinheiro de membro é recusado">
+	Um `/daily` que estouraria o teto da carteira é **aparado**, porque é o servidor que imprime esse
+	dinheiro. Uma transferência que estouraria o teto de quem recebe é **recusada**, porque aparar ali
+	evaporaria dinheiro que já era de alguém.
+</Callout>
+
+## O razão registra o que moveu
+
+`/eco take 500` de quem tem 100 grava **−100**, não −500. O saldo é limitado em zero e a linha do
+razão sai do movimento real — senão somar o razão daria um saldo que nunca existiu.
+
+## A loja
+
+<Message
+	embed={{
+		color: '#fee75c',
+		title: 'Loja do servidor',
+		description: 'Compre com `/shop buy`.',
+		fields: [
+			{ name: '🪙 500 · Cargo VIP', value: 'Entrega o cargo @VIP. Restam 3.', inline: false },
+			{ name: '🪙 120 · Trocar apelido', value: 'Sem estoque limitado.', inline: false }
+		]
+	}}
+	caption="Um item pode entregar um cargo, ter estoque limitado, e ter limite por membro."
+/>
+
+A loja é salva por item, não apagada e reescrita: apagar e reinserir a cada salvamento **apagaria o
+que todo mundo comprou**, porque a linha de inventário morre junto com o item. Editar o preço de um
+item não mexe em quem já comprou.
+
+## O que não existe nesta versão
+
+| Não existe         | Por quê                                                                     |
+| ------------------ | --------------------------------------------------------------------------- |
+| Banco e `/deposit` | Inventar um traz junto juros, roubo e um segundo saldo para explicar sempre |
+| Aposta             | Mesma razão: é um jogo inteiro, não um comando                              |
+
+O `/richest` já soma carteira **mais** banco, então no dia em que o banco existir a lista continua
+certa sem tocar em nada.
 
 ## Opções
 
@@ -28,3 +103,17 @@ A Economia é uma moeda, dois jeitos de ganhá-la e uma loja para gastá-la. É 
 ## Comandos
 
 <Commands module="economy" />
+
+Ver saldo é informação de servidor, então `/balance`, `/shop view`, `/inventory` e `/richest`
+respondem no canal. Receber pagamento é conversa de carteira: `/daily`, `/work`, `/pay` e
+`/shop buy` respondem só para quem digitou.
+
+## Quando não funciona
+
+| Sintoma                           | Causa provável                                                        |
+| --------------------------------- | --------------------------------------------------------------------- |
+| "A economia está desligada"       | O módulo está desligado — as regras existem mas nada roda             |
+| O item não entrega o cargo        | O cargo está acima do Tessera, ou falta **Gerenciar Cargos**          |
+| Um membro não consegue comprar    | Sem saldo, sem estoque, ou já tem o máximo permitido por membro       |
+| O saldo inicial não chega         | Ele é dado uma vez só; quem já tem carteira não é presenteado de novo |
+| O nome da moeda aparece traduzido | Ele está vazio — o Tessera usa a palavra padrão do idioma do servidor |
