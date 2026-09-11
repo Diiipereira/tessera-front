@@ -6,6 +6,7 @@ import { CommandsSkeleton } from './CommandsSkeleton';
 import { CustomCommandsSkeleton } from './CustomCommandsSkeleton';
 import { EconomySkeleton } from './EconomySkeleton';
 import { EmbedWorkshopSkeleton } from './EmbedWorkshopSkeleton';
+import { GameAlertsSkeleton } from './GameAlertsSkeleton';
 import { GiveawaysSkeleton } from './GiveawaysSkeleton';
 import { LevelsSkeleton } from './LevelsSkeleton';
 import { LoggingSkeleton } from './LoggingSkeleton';
@@ -38,6 +39,7 @@ const byRoute: Record<string, ReactNode> = {
 	'modules/giveaways': <GiveawaysSkeleton />,
 	'modules/custom-commands': <CustomCommandsSkeleton />,
 	'modules/scheduled': <ScheduledSkeleton />,
+	'modules/game-alerts': <GameAlertsSkeleton />,
 	embeds: <EmbedWorkshopSkeleton />,
 	commands: <CommandsSkeleton />,
 	members: <MembersSkeleton />,

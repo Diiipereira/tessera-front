@@ -135,46 +135,55 @@ export function FieldRowSkeleton({ fields }: { fields: { width: string; help?: n
 	);
 }
 
-export function ComposerSkeleton({ embed = false }: { embed?: boolean }) {
+export function ComposerSkeleton({
+	embed = false,
+	chips = ROW_WIDTHS
+}: {
+	embed?: boolean;
+	chips?: readonly string[];
+}) {
 	return (
 		<div className="flex flex-col gap-4">
 			<div className="flex flex-wrap items-center gap-3">
 				<Skeleton className="h-8.5 w-44 rounded-md" />
 			</div>
 
-			<div className="flex flex-wrap items-center gap-1.5">
-				<TextSkeleton line="caption" width="w-12" />
-				{ROW_WIDTHS.map((width, index) => (
-					<Skeleton key={`${width}-${String(index)}`} className={cn('h-6 rounded-sm', width)} />
-				))}
-			</div>
+			{chips.length === 0 ? null : (
+				<div className="flex flex-wrap items-center gap-1.5">
+					<TextSkeleton line="caption" width="w-12" />
+					{chips.map((width, index) => (
+						<Skeleton key={`${width}-${String(index)}`} className={cn('h-6 rounded-sm', width)} />
+					))}
+				</div>
+			)}
 
 			{embed ? (
 				<div className="flex flex-col gap-5">
+					<FieldSkeleton hint />
 					<FieldSkeleton />
 					<div className="flex flex-col">
 						<TextSkeleton line="body-sm" width="w-24" className="mb-1.5" />
 						<Skeleton className="h-24 w-full rounded-md" />
 						<TextSkeleton line="caption" width="w-16" className="mt-1.5 justify-end" />
 					</div>
-					<FieldSkeleton />
+					<div className="flex flex-col">
+						<TextSkeleton line="body-sm" width="w-16" className="mb-0.5" />
+						<TextSkeleton line="caption" width="w-80 max-w-full" className="mb-1.5" />
+						<div className="flex items-center gap-2">
+							<Skeleton className="size-9 shrink-0 rounded-md" />
+							<Skeleton className="h-9 w-32 rounded-md" />
+						</div>
+					</div>
 					<div className="flex flex-col gap-3">
 						<div className="flex h-8 items-center gap-3">
-							<TextSkeleton line="caption" width="w-16" />
+							<TextSkeleton line="overline" width="w-16" />
 							<Skeleton className="h-px flex-1" />
-							<Skeleton className="h-8 w-28 rounded-md" />
+							<Skeleton className="h-8 w-28 shrink-0 rounded-md" />
 						</div>
-						{[0, 1].map((index) => (
-							<div
-								key={index}
-								className="flex flex-col gap-2 rounded-md border border-border bg-surface-sunken p-3"
-							>
-								<Skeleton className="h-9 w-full rounded-md" />
-								<Skeleton className="h-19 w-full rounded-md" />
-								<SwitchSkeleton description={false} />
-							</div>
-						))}
+						<TextSkeleton line="body-sm" width="w-72 max-w-full" />
 					</div>
+					<FieldSkeleton hint />
+					<FieldSkeleton hint />
 					<FieldSkeleton />
 					<SwitchSkeleton />
 				</div>
@@ -205,6 +214,38 @@ export function PreviewSkeleton() {
 			</div>
 
 			<TextSkeleton line="caption" width="w-2/3" />
+		</div>
+	);
+}
+
+export function DiscordPreviewSkeleton({ embed = false }: { embed?: boolean }) {
+	return (
+		<div className="rounded-lg bg-surface-sunken p-4">
+			<div className="flex gap-3">
+				<Skeleton className="size-10 shrink-0 rounded-full" />
+				<div className="min-w-0 flex-1">
+					<TextSkeleton line="body-sm" width="w-40" />
+					{embed ? (
+						<div className="mt-1 flex max-w-108 overflow-hidden rounded-xs bg-surface">
+							<Skeleton className="w-1 shrink-0 rounded-none" />
+							<div className="min-w-0 flex-1 px-4 py-3">
+								<TextSkeleton line="body" width="w-36" />
+								<div className="mt-2">
+									<TextSkeleton line="body-sm" />
+									<TextSkeleton line="body-sm" width="w-1/2" />
+								</div>
+								<Skeleton className="mt-3 h-40 w-full rounded-xs" />
+								<TextSkeleton line="caption" width="w-28" className="mt-2" />
+							</div>
+						</div>
+					) : (
+						<div className="mt-0.5">
+							<TextSkeleton line="body" />
+							<TextSkeleton line="body" width="w-2/3" />
+						</div>
+					)}
+				</div>
+			</div>
 		</div>
 	);
 }

@@ -1,0 +1,102 @@
+---
+title: Free games
+summary: Tessera announces the games the Epic Games Store gives away — once per server, with the store picture.
+---
+
+Every week the Epic Games Store gives one or two games away. With this module on, Tessera posts each of
+them in the channel you pick, with the store picture, the moment the offer ends and a link to claim it.
+
+<Facts
+	items={[
+		{ label: 'Stores', value: 'Epic Games Store' },
+		{ label: 'Checks the store', value: 'Every ten minutes' },
+		{ label: 'Announces', value: 'Each game once, in each server' },
+		{ label: 'Needs', value: 'View Channel, Send Messages and Embed Links in the channel' },
+		{ label: 'Doors', value: '/config game-alerts; the Free games screen in the dashboard' }
+	]}
+/>
+
+## How a game reaches your channel
+
+<Flow
+	steps={[
+		{ title: 'Reads the store', note: 'Every 10 minutes' },
+		{ title: 'Keeps the offer', note: 'One row per window' },
+		{ title: 'Reserves the server', note: 'Before posting' },
+		{ title: 'Posts', note: 'One card per game' }
+	]}
+	caption="Reserving before posting means each server gets each game at most once — even if the bot restarts halfway through an announcement."
+/>
+
+Epic usually swaps its free games on Thursdays at 15:00 UTC. The next game is already stored before the
+swap, so the announcement goes out on the first sweep after it — within a minute.
+
+## The announcement
+
+<Message
+	content={'@Gamers\nNext up: **Mindcop** and **Shogun Showdown**, in 7 days.'}
+	embed={{
+		title: 'Astral Ascent',
+		description:
+			'Free on Epic Games Store until September 17, 2026 3:00 PM.\n[Get it on the store]',
+		image: 'Game picture, from the store',
+		footer: 'Epic Games Store'
+	}}
+	caption="The roles you pick are notified. @everyone never is, even when it is written in the text."
+/>
+
+When Epic gives two games in the same week, **one** message goes out with a card for each. The
+"Next up" line only appears once the store has announced what comes next, and it can be turned off.
+
+<Callout title="Turned the module on in the middle of the week?">
+	The game that is still free is announced on the next sweep. There is no waiting for the next
+	Thursday.
+</Callout>
+
+## What counts as a free game
+
+Epic mixes free games, ordinary discounts, DLC and bundles in the same list. Tessera announces only what
+is actually free:
+
+| Announced                                                 | Left out                            |
+| --------------------------------------------------------- | ----------------------------------- |
+| A game whose final price is zero, inside the offer window | An ordinary discount, of any size   |
+| A free bundle                                             | Free DLC for a game you may not own |
+| The next free game, as a line in the post                 | An offer that has not started yet   |
+
+The price is not shown. It changes from country to country, and the server language does not say where
+its members are.
+
+## Customizing the message
+
+With the card on, each game becomes a card with the store picture. With the card off, each game becomes
+a line of text. Leave it blank and Tessera writes its own, in the server language.
+
+| Variable  | Becomes                                        |
+| --------- | ---------------------------------------------- |
+| `{game}`  | The name of the game                           |
+| `{store}` | The name of the store                          |
+| `{until}` | When the offer ends, in the reader's time zone |
+| `{url}`   | The link to the game page on the store         |
+
+## Testing
+
+**Send a test** posts the current announcement to the saved channel, with a line naming who asked. The
+test notifies nobody: the roles show up in the message, but no one gets pinged. If nothing is free at
+the moment, the test shows the next game instead.
+
+## Options
+
+<Fields module="game-alerts" />
+
+Everything can be set from Discord as well: `/config game-alerts` for the simple fields, and
+`/config game-alerts edit:` for the roles, the stores and the card.
+
+## When it does not work
+
+| Symptom                             | Likely cause                                                        |
+| ----------------------------------- | ------------------------------------------------------------------- |
+| The module will not switch on       | No channel has been picked                                          |
+| Nothing was posted on Thursday      | The bot cannot see or write in the channel, or lacks Embed Links    |
+| The test says there is no game      | The store has no free game and has not announced the next one       |
+| A game showed up again months later | The store gave it away again, in a new window — that is a new offer |

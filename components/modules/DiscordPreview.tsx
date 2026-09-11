@@ -6,7 +6,7 @@ import { BRAND } from '@/lib/brand';
 import { DISCORD, EMBED_SWATCHES, MENTION, VARIABLE } from '@/lib/discord-colors';
 import { toFieldRows } from '@/lib/embed-fields';
 import { looksLikeMention, toSegments, type MessageSegment } from '@/lib/message-variables';
-import type { MessageDraft, MessageVariable } from '@/lib/types/modules';
+import type { EmbedDraft, MessageDraft, MessageVariable } from '@/lib/types/modules';
 import { cn } from '@/lib/utils/cn';
 
 type DiscordPreviewProps = {
@@ -16,6 +16,8 @@ type DiscordPreviewProps = {
 	botName?: string;
 	botAvatarUrl?: string | null;
 	footer?: ReactNode;
+	lead?: string;
+	moreEmbeds?: EmbedDraft[];
 };
 
 const initialsOf = (name: string): string => name.slice(0, 2).toUpperCase();
@@ -93,13 +95,115 @@ function Line({ text, variables }: { text: string; variables: MessageVariable[] 
 	);
 }
 
+type EmbedCardProps = {
+	embed: EmbedDraft;
+	variables: MessageVariable[];
+	stamp: string;
+};
+
+function EmbedCard({ embed, variables, stamp }: EmbedCardProps) {
+	return (
+		<div
+			className="max-w-108 overflow-hidden rounded-xs"
+			style={{ backgroundColor: DISCORD.embed }}
+		>
+			<div className="flex">
+				<span
+					aria-hidden="true"
+					className="w-1 shrink-0"
+					style={{ backgroundColor: embed.color }}
+				/>
+				<div className="min-w-0 flex-1 px-4 py-3">
+					<div className="flex gap-4">
+						<div className="min-w-0 flex-1">
+							{embed.authorName === '' ? null : (
+								<p className="mb-1 flex items-center gap-2 text-[14px] font-semibold text-white">
+									{embed.authorIconUrl === undefined || embed.authorIconUrl === '' ? null : (
+										<img
+											src={embed.authorIconUrl}
+											alt=""
+											className="size-6 shrink-0 rounded-full object-cover"
+										/>
+									)}
+									<Text text={embed.authorName} variables={variables} />
+								</p>
+							)}
+
+							{embed.title === '' ? null : (
+								<p className="text-[16px] font-semibold text-white">
+									<Text text={embed.title} variables={variables} />
+								</p>
+							)}
+
+							{embed.description === '' ? null : (
+								<div className="mt-2 text-[14px] wrap-break-word whitespace-pre-wrap">
+									<Line text={embed.description} variables={variables} />
+								</div>
+							)}
+
+							{embed.fields.length > 0 ? (
+								<div className="mt-2 flex flex-col gap-4">
+									{toFieldRows(embed.fields).map((row) => (
+										<div
+											key={row.map((field) => field.id).join('+')}
+											data-embed-row=""
+											className="flex gap-4"
+										>
+											{row.map((field) => (
+												<div key={field.id} className="min-w-0 flex-1">
+													<p className="text-[14px] font-semibold text-white">
+														<Text text={field.name} variables={variables} />
+													</p>
+													<p className="text-[14px] wrap-break-word whitespace-pre-wrap">
+														<Text text={field.value} variables={variables} />
+													</p>
+												</div>
+											))}
+										</div>
+									))}
+								</div>
+							) : null}
+						</div>
+
+						{embed.thumbnailUrl === '' ? null : (
+							<PreviewImage
+								src={embed.thumbnailUrl}
+								frame="size-20 shrink-0 rounded-xs"
+								fit="object-cover"
+							/>
+						)}
+					</div>
+
+					{embed.imageUrl === '' ? null : (
+						<PreviewImage
+							src={embed.imageUrl}
+							frame="mt-3 h-40 w-full rounded-xs"
+							fit="object-cover"
+						/>
+					)}
+
+					{embed.footerText === '' && !embed.timestamp ? null : (
+						<p className="mt-2 text-[12px]" style={{ color: DISCORD.muted }}>
+							<Text text={embed.footerText} variables={variables} />
+							{embed.footerText !== '' && embed.timestamp ? ' • ' : ''}
+							{embed.timestamp ? stamp : ''}
+						</p>
+					)}
+				</div>
+			</div>
+		</div>
+	);
+}
+
 export function DiscordPreview({
 	message,
 	variables,
 	timestampLabel,
 	botName,
 	botAvatarUrl,
-	footer
+	footer,
+	lead = '',
+	moreEmbeds = []
 }: DiscordPreviewProps) {
 	const t = useTranslations('modules.preview');
 	const shown = botName === undefined || botName === '' ? BRAND.botName : botName;
@@ -146,6 +250,12 @@ export function DiscordPreview({
 						</span>
 					</div>
 
+					{message.mode === 'embed' && lead !== '' ? (
+						<div className="mt-0.5 wrap-break-word whitespace-pre-wrap">
+							<Line text={lead} variables={variables} />
+						</div>
+					) : null}
+
 					{message.mode === 'text' ? (
 						<div className="mt-0.5 wrap-break-word whitespace-pre-wrap">
 							{message.text === '' ? (
@@ -159,95 +269,11 @@ export function DiscordPreview({
 							{t('embedEmpty')}
 						</div>
 					) : (
-						<div
-							className="mt-1 max-w-108 overflow-hidden rounded-xs"
-							style={{ backgroundColor: DISCORD.embed }}
-						>
-							<div className="flex">
-								<span
-									aria-hidden="true"
-									className="w-1 shrink-0"
-									style={{ backgroundColor: embed.color }}
-								/>
-								<div className="min-w-0 flex-1 px-4 py-3">
-									<div className="flex gap-4">
-										<div className="min-w-0 flex-1">
-											{embed.authorName === '' ? null : (
-												<p className="mb-1 flex items-center gap-2 text-[14px] font-semibold text-white">
-													{embed.authorIconUrl === undefined ||
-													embed.authorIconUrl === '' ? null : (
-														<img
-															src={embed.authorIconUrl}
-															alt=""
-															className="size-6 shrink-0 rounded-full object-cover"
-														/>
-													)}
-													<Text text={embed.authorName} variables={variables} />
-												</p>
-											)}
-
-											{embed.title === '' ? null : (
-												<p className="text-[16px] font-semibold text-white">
-													<Text text={embed.title} variables={variables} />
-												</p>
-											)}
-
-											{embed.description === '' ? null : (
-												<div className="mt-2 text-[14px] wrap-break-word whitespace-pre-wrap">
-													<Line text={embed.description} variables={variables} />
-												</div>
-											)}
-
-											{embed.fields.length > 0 ? (
-												<div className="mt-2 flex flex-col gap-4">
-													{toFieldRows(embed.fields).map((row) => (
-														<div
-															key={row.map((field) => field.id).join('+')}
-															data-embed-row=""
-															className="flex gap-4"
-														>
-															{row.map((field) => (
-																<div key={field.id} className="min-w-0 flex-1">
-																	<p className="text-[14px] font-semibold text-white">
-																		<Text text={field.name} variables={variables} />
-																	</p>
-																	<p className="text-[14px] wrap-break-word whitespace-pre-wrap">
-																		<Text text={field.value} variables={variables} />
-																	</p>
-																</div>
-															))}
-														</div>
-													))}
-												</div>
-											) : null}
-										</div>
-
-										{embed.thumbnailUrl === '' ? null : (
-											<PreviewImage
-												src={embed.thumbnailUrl}
-												frame="size-20 shrink-0 rounded-xs"
-												fit="object-cover"
-											/>
-										)}
-									</div>
-
-									{embed.imageUrl === '' ? null : (
-										<PreviewImage
-											src={embed.imageUrl}
-											frame="mt-3 h-40 w-full rounded-xs"
-											fit="object-cover"
-										/>
-									)}
-
-									{embed.footerText === '' && !embed.timestamp ? null : (
-										<p className="mt-2 text-[12px]" style={{ color: DISCORD.muted }}>
-											<Text text={embed.footerText} variables={variables} />
-											{embed.footerText !== '' && embed.timestamp ? ' • ' : ''}
-											{embed.timestamp ? stamp : ''}
-										</p>
-									)}
-								</div>
-							</div>
+						<div className="mt-1 flex flex-col gap-1">
+							<EmbedCard embed={embed} variables={variables} stamp={stamp} />
+							{moreEmbeds.map((extra, index) => (
+								<EmbedCard key={index} embed={extra} variables={variables} stamp={stamp} />
+							))}
 						</div>
 					)}
 

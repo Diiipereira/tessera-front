@@ -19,7 +19,7 @@ export function EmbedWorkshopSkeleton() {
 			<div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_440px]">
 				<div className="flex min-w-0 flex-col gap-6">
 					<SectionSkeleton>
-						<ComposerSkeleton embed />
+						<ComposerSkeleton embed chips={[]} />
 					</SectionSkeleton>
 
 					<SectionSkeleton>

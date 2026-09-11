@@ -101,6 +101,7 @@
 		"giveaways": "Sorteios",
 		"custom-commands": "Comandos personalizados",
 		"scheduled": "Mensagens agendadas",
+		"game-alerts": "Jogos grátis",
 		"embeds": "Embeds",
 		"commands": "Comandos",
 		"members": "Membros",
@@ -681,7 +682,8 @@
 			"reaction-roles": "Os membros escolhem os próprios cargos.",
 			"giveaways": "Sorteios com prazo e requisitos de entrada.",
 			"custom-commands": "Seus próprios comandos de barra, sem código.",
-			"scheduled": "Publica por horário ou por cron."
+			"scheduled": "Publica por horário ou por cron.",
+			"game-alerts": "Jogos grátis das lojas, anunciados uma vez."
 		}
 	},
 	"members": {
@@ -1009,7 +1011,11 @@
 				"logCreated": "Quando a conta foi criada",
 				"logUntil": "Até quando vale",
 				"logFrom": "O canal de onde veio",
-				"logLink": "Um link de volta para a mensagem"
+				"logLink": "Um link de volta para a mensagem",
+				"game": "O jogo grátis",
+				"store": "A loja que está dando",
+				"until": "Quando a oferta acaba",
+				"url": "O link da página na loja"
 			}
 		},
 		"composer": {
@@ -1794,6 +1800,59 @@
 				"fri": "S",
 				"sat": "S",
 				"sun": "D"
+			}
+		},
+		"gameAlerts": {
+			"title": "Jogos grátis",
+			"description": "Anuncia os jogos que uma loja dá de graça — uma vez por servidor, com a imagem da loja.",
+			"saved": "Configurações de jogos grátis salvas",
+			"saveFailed": "Não foi possível salvar",
+			"test": {
+				"action": "Enviar teste",
+				"dirty": "Salve as alterações antes de enviar um teste.",
+				"sent": "Teste enviado ao canal",
+				"notReady": "Nada foi enviado: o módulo está desligado ou ainda não tem canal.",
+				"noOffer": "A loja não tem jogo grátis para mostrar agora.",
+				"channelRefused": "Não consegui escrever no canal — confira se ele existe e se eu posso publicar lá.",
+				"failed": "Não foi possível enviar o teste"
+			},
+			"channel": {
+				"title": "Onde",
+				"description": "O canal que recebe o anúncio.",
+				"label": "Canal",
+				"hint": "Obrigatório para ligar o módulo."
+			},
+			"stores": {
+				"title": "Lojas",
+				"description": "Quais lojas são acompanhadas. Cada uma é lida a cada dez minutos.",
+				"epic": "Os jogos grátis costumam trocar às quintas, ao meio-dia de Brasília."
+			},
+			"mention": {
+				"title": "Menção",
+				"description": "Cargos avisados junto com o anúncio. O @everyone nunca é notificado.",
+				"label": "Cargos"
+			},
+			"message": {
+				"title": "Mensagem",
+				"description": "Um card por jogo, com a imagem da loja — ou uma linha por jogo.",
+				"emptyText": "Deixe em branco e o bot escreve a linha dele, no idioma do servidor.",
+				"emptyEmbed": "Deixe o card vazio e o bot envia o dele, com a imagem da loja."
+			},
+			"upcoming": {
+				"label": "Mostrar o próximo",
+				"hint": "Acrescenta uma linha com os próximos jogos grátis quando a loja já anunciou."
+			},
+			"preview": {
+				"note": "Desenhada pelo mesmo código que publica, com os jogos grátis que a loja tem agora.",
+				"none": "A loja não tem jogo grátis agora. A prévia aparece assim que tiver.",
+				"nextSample": "Nada está grátis agora, então a prévia mostra o próximo.",
+				"failed": "Não foi possível desenhar a prévia.",
+				"unknownRole": "cargo desconhecido"
+			},
+			"sample": {
+				"game": "Nome do jogo",
+				"until": "o fim da oferta",
+				"url": "link da loja"
 			}
 		},
 		"customCommands": {
@@ -3009,6 +3068,11 @@
 			"5m": "5 minutos",
 			"60s": "60 segundos"
 		},
+		"game-alerts": {
+			"store": {
+				"epic": "Epic Games Store"
+			}
+		},
 		"moderation": {
 			"label": {
 				"ban": "Banimento",
@@ -3065,6 +3129,40 @@
 					}
 				},
 				"label": "Economia"
+			},
+			"game-alerts": {
+				"description": "Avisa o servidor quando uma loja dá um jogo de graça",
+				"label": "Jogos grátis",
+				"fields": {
+					"channelId": {
+						"label": "Canal",
+						"description": "Onde os jogos grátis são anunciados"
+					},
+					"stores": {
+						"label": "Lojas",
+						"description": "Quais lojas são acompanhadas"
+					},
+					"pingRoleIds": {
+						"label": "Cargos a mencionar",
+						"description": "Cargos avisados quando um jogo fica grátis"
+					},
+					"showUpcoming": {
+						"label": "Mostrar o próximo",
+						"description": "Acrescenta uma linha com os próximos grátis quando a loja já anunciou"
+					},
+					"message": {
+						"label": "Mensagem",
+						"description": "A linha enviada para cada jogo quando o card está desligado"
+					},
+					"useEmbed": {
+						"label": "Enviar como card",
+						"description": "Publica um card por jogo, com a imagem da loja"
+					},
+					"embed": {
+						"label": "Card",
+						"description": "O card enviado para cada jogo grátis"
+					}
+				}
 			},
 			"giveaways": {
 				"description": "Prêmios em que os membros entram por um botão",

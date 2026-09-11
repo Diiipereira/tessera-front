@@ -241,3 +241,14 @@ export type ScheduledConfig = {
 	timezone: string;
 	messages: ScheduledMessage[];
 };
+
+export type GameStoreId = 'epic';
+
+export type GameAlertsConfig = {
+	enabled: boolean;
+	channelId: string | null;
+	stores: GameStoreId[];
+	pingRoleIds: string[];
+	showUpcoming: boolean;
+	message: MessageDraft;
+};

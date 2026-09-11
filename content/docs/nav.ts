@@ -25,7 +25,8 @@ export const DOC_NAV: { id: DocGroupId; slugs: string[] }[] = [
 			'modules/tickets',
 			'modules/reaction-roles',
 			'modules/giveaways',
-			'modules/scheduled'
+			'modules/scheduled',
+			'modules/game-alerts'
 		]
 	},
 	{ id: 'reference', slugs: ['commands', 'troubleshooting'] }

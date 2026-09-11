@@ -153,3 +153,31 @@ describe('the face on the preview', () => {
 		expect(screen.getByText('TE')).toBeInTheDocument();
 	});
 });
+
+describe('DiscordPreview with text above several cards', () => {
+	const cards = (lead: string) =>
+		render(
+			<DiscordPreview
+				message={embedDraft({ title: 'Luftrausers' })}
+				lead={lead}
+				moreEmbeds={[{ ...emptyEmbedDraft(), title: 'Astral Ascent' }]}
+				variables={variables}
+			/>,
+			{ wrapper: Translated }
+		);
+
+	it('shows the text Discord puts above the cards, and every card', () => {
+		cards('Next up: Mindcop');
+
+		expect(screen.getByText('Next up: Mindcop')).toBeInTheDocument();
+		expect(screen.getByText('Luftrausers')).toBeInTheDocument();
+		expect(screen.getByText('Astral Ascent')).toBeInTheDocument();
+	});
+
+	it('draws a single card exactly as before when nobody passes more', () => {
+		show(embedDraft({ title: 'Only one' }));
+
+		expect(screen.getByText('Only one')).toBeInTheDocument();
+		expect(screen.queryByText('Astral Ascent')).not.toBeInTheDocument();
+	});
+});

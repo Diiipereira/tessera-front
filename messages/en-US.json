@@ -101,6 +101,7 @@
 		"giveaways": "Giveaways",
 		"custom-commands": "Custom commands",
 		"scheduled": "Scheduled messages",
+		"game-alerts": "Free games",
 		"embeds": "Embeds",
 		"commands": "Commands",
 		"members": "Members",
@@ -681,7 +682,8 @@
 			"reaction-roles": "Members pick their own roles.",
 			"giveaways": "Timed draws with entry requirements.",
 			"custom-commands": "Your own slash commands, no code.",
-			"scheduled": "Post on a timer or a cron."
+			"scheduled": "Post on a timer or a cron.",
+			"game-alerts": "Free games from the stores, announced once."
 		}
 	},
 	"members": {
@@ -1009,7 +1011,11 @@
 				"logCreated": "When the account was created",
 				"logUntil": "When it ends",
 				"logFrom": "The channel they came from",
-				"logLink": "A link back to the message"
+				"logLink": "A link back to the message",
+				"game": "The free game",
+				"store": "The store giving it away",
+				"until": "When the offer ends",
+				"url": "The link to the store page"
 			}
 		},
 		"composer": {
@@ -1794,6 +1800,59 @@
 				"fri": "F",
 				"sat": "S",
 				"sun": "S"
+			}
+		},
+		"gameAlerts": {
+			"title": "Free games",
+			"description": "Announce the games a store gives away — once per server, with the store picture.",
+			"saved": "Free games settings saved",
+			"saveFailed": "Could not save",
+			"test": {
+				"action": "Send a test",
+				"dirty": "Save your changes before sending a test.",
+				"sent": "Test sent to the channel",
+				"notReady": "Nothing was sent: the module is off, or it still has no channel.",
+				"noOffer": "The store has no free game to show right now.",
+				"channelRefused": "I could not write in the channel — check that it exists and that I can post there.",
+				"failed": "Could not send the test"
+			},
+			"channel": {
+				"title": "Where",
+				"description": "The channel that gets the announcement.",
+				"label": "Channel",
+				"hint": "Required before the module can be switched on."
+			},
+			"stores": {
+				"title": "Stores",
+				"description": "Which stores are watched. Each one is read every ten minutes.",
+				"epic": "New free games usually arrive on Thursdays at 15:00 UTC."
+			},
+			"mention": {
+				"title": "Mention",
+				"description": "Roles notified with the announcement. @everyone is never pinged.",
+				"label": "Roles"
+			},
+			"message": {
+				"title": "Message",
+				"description": "One card per game, with the store picture — or one line per game.",
+				"emptyText": "Leave it blank and the bot writes its own line, in the server language.",
+				"emptyEmbed": "Leave the card empty and the bot sends its own, with the store picture."
+			},
+			"upcoming": {
+				"label": "Show what comes next",
+				"hint": "Adds a line with the next free games once the store has announced them."
+			},
+			"preview": {
+				"note": "Drawn by the same code that posts, from the free games the store has right now.",
+				"none": "The store has no free game right now. The preview shows up as soon as it has one.",
+				"nextSample": "Nothing is free right now, so the preview shows the next one.",
+				"failed": "Could not draw the preview.",
+				"unknownRole": "unknown role"
+			},
+			"sample": {
+				"game": "Game name",
+				"until": "the end of the offer",
+				"url": "store link"
 			}
 		},
 		"customCommands": {
@@ -3009,6 +3068,11 @@
 			"5m": "5 minutes",
 			"60s": "60 seconds"
 		},
+		"game-alerts": {
+			"store": {
+				"epic": "Epic Games Store"
+			}
+		},
 		"moderation": {
 			"label": {
 				"ban": "Ban",
@@ -3065,6 +3129,40 @@
 					}
 				},
 				"label": "Economy"
+			},
+			"game-alerts": {
+				"description": "Tells the server when a store gives a game away",
+				"label": "Free games",
+				"fields": {
+					"channelId": {
+						"label": "Channel",
+						"description": "Where the free games are announced"
+					},
+					"stores": {
+						"label": "Stores",
+						"description": "Which stores are watched"
+					},
+					"pingRoleIds": {
+						"label": "Roles to mention",
+						"description": "Roles notified when a game goes free"
+					},
+					"showUpcoming": {
+						"label": "Show what comes next",
+						"description": "Adds a line with the next free games when the store has announced them"
+					},
+					"message": {
+						"label": "Message",
+						"description": "The line sent for each game when the card is off"
+					},
+					"useEmbed": {
+						"label": "Send as a card",
+						"description": "Posts one card per game, with the store picture"
+					},
+					"embed": {
+						"label": "Card",
+						"description": "The card sent for each free game"
+					}
+				}
 			},
 			"giveaways": {
 				"description": "Prizes members enter for with a button",

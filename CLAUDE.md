@@ -764,7 +764,7 @@ embed. Na mesma varredura apareceu que o `EconomySkeleton` desenhava cinco pain�
 de seis — faltava a zona de perigo, que é incondicional; entrou.
 
 **There are two skeleton vocabularies, one per page shape, and each lives beside the component it
-mirrors.** `components/modules/ModuleSkeleton.tsx` sits with `ModulePage` and covers the eleven
+mirrors.** `components/modules/ModuleSkeleton.tsx` sits with `ModulePage` and covers the twelve
 module screens; `components/management/PageSkeleton.tsx` sits with `PageHeader` and covers the
 management ones. The second exports `ManagementPageSkeleton` (the h1 + description header, with an
 optional action), `PanelSkeleton` (the `rounded-lg border bg-surface shadow-1` card both the tables
@@ -829,8 +829,8 @@ click time the navigation has landed and the value falls back to `null`. Derivin
 here — `react-hooks/set-state-in-effect` rejects the effect version, and it would cost a cascading
 render on every navigation. `NavItem` calls `start(href)` from `onClick`, which is an event
 handler and free to write state. `AppShell`'s `ShellMain` swaps `children` for
-`routeSkeleton(pendingHref)`, and `routeSkeleton` returns `null` for the three screens without
-one, so those keep the old behaviour of holding the previous page. `SidebarNav` and `Breadcrumbs`
+`routeSkeleton(pendingHref)`, and `routeSkeleton` returns `null` for billing, the one screen
+without one, so it keeps the old behaviour of holding the previous page. `SidebarNav` and `Breadcrumbs`
 read `pendingHref ?? pathname` so the highlight and the trail name the screen that is loading
 rather than the one being replaced.
 
@@ -851,6 +851,30 @@ the scaffolding was imitating.
 skeleton outright when the query is present, so the frozen preview stays instant and stays the way
 to inspect a skeleton while editing one. A screen whose layout changes has to have its skeleton
 changed in the same edit, and that preview is how you check.
+
+**Jogos grátis subiu sem skeleton nenhum, e os dois testes deixaram passar.** A rota não tinha
+`loading.tsx` nem entrada no `byRoute`, e o `RouteSkeleton.test` só percorria as rotas que **já
+tinham** `loading.tsx` — uma rota que esquecesse as duas coisas passava. Em dev quem pinta é o
+shell, então o clique segurava a tela anterior e a única coisa pulsando era o quadro da prévia. O
+teste agora parte dos `page.tsx`: toda tela do shell resolve um skeleton, e toda tela sem tela
+abaixo dela tem `loading.tsx`. `(shell)` e `modules` saem da segunda regra por cálculo, porque têm
+filhas e usam `<Suspense>`; `billing` é a única exceção declarada, numa lista que o próprio teste
+confere.
+
+**O skeleton desenhava o modo texto, e a tela abre no embed.** É a regra do welcome no sentido
+contrário: o padrão da API para jogos grátis é `useEmbed: true`, então desenhar o modo padrão é
+desenhar o construtor de embed. E o ramo `embed` do `ComposerSkeleton` estava velho diante do
+`MessageComposer` — dois cards de campo que um rascunho vazio nunca tem, e nada de cor, miniatura e
+rodapé. Ele agora é o rascunho vazio, que é como os dois usuários dele abrem (jogos grátis e o
+ateliê de embeds), e o `chips` diz quantas variáveis a tela oferece — o ateliê não tem nenhuma,
+então a fileira some. O `GameAlertsSkeleton.test` prende o que muda a altura: painéis, switches, a
+amostra de cor e os chips, contados na tela real.
+
+**`DiscordPreviewSkeleton` é a mensagem sozinha, sem o rótulo e a legenda do `PreviewSkeleton`.** O
+aside dos jogos grátis não tem nenhum dos dois, e a tela esperava a prévia da API com o quadro
+genérico de três linhas antes de receber um card com imagem de 160px. O skeleton da rota e a tela
+usam a mesma peça, com o card quando o rascunho está em embed. Nada disso foi medido no navegador:
+as alturas saem somadas das classes, pelo mesmo motivo do welcome.
 
 ## Typed routes
 
@@ -1461,3 +1485,28 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
+
+## Jogos grátis: o que a tela nova mudou nas peças compartilhadas
+
+**A prévia do Discord ganhou texto acima dos cards e mais de um card.** O anúncio de jogos grátis tem
+cargos mencionados e a linha "A seguir" no conteúdo **mais** um card por jogo. O `DiscordPreview`
+escondia o texto em modo embed e desenhava um card só. O card virou o `EmbedCard` interno, e duas props
+opcionais — `lead` e `moreEmbeds` — cobrem o caso. Sem elas o componente desenha exatamente o que
+desenhava, e há teste que confere isso.
+
+**A prévia da tela vem da API, não do cliente.** `POST /guilds/:id/game-alerts/preview` devolve o corpo
+montado pelo mesmo código que publica, com o jogo real da semana — a mesma regra da prévia do registro.
+As marcas do Discord que sobram no corpo (`<@&id>`, `<t:…:f>`, `<t:…:R>`) viram variáveis de prévia pelo
+`discordTokens`, que nomeia o cargo pela lista de cargos da guild e formata a data no idioma de quem
+olha. O `previewVariables` do registro só entende `:R`, e por isso não serviu.
+
+**O wizard de setup oferece só o módulo que ele sabe ligar.** Ele listava todo módulo com tela, cada um
+com uma caixa de marcar; marcar "Jogos grátis" mandaria `enabled: true` sem canal, e o canal é
+obrigatório — 400 garantido. O `toSetupModules` agora deixa de fora o módulo que ainda não está
+`configured`, exceto os que o próprio wizard configura (`ASKED_BY_THE_WIZARD`, hoje só o welcome). Um
+módulo futuro com campo obrigatório cai na mesma regra sem mexer no wizard.
+
+**Os chips `{game}` `{store}` `{until}` `{url}` usam o jogo da semana como exemplo.** Sem jogo, caem nas
+palavras do dicionário. O rótulo de cada chip mora em `modules.variables.tokens`, e o módulo tem id
+`game-alerts` com hífen — o mesmo formato de `reaction-roles` —, com o dicionário da tela em
+`modules.gameAlerts`.

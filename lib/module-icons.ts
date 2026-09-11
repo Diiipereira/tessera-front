@@ -3,6 +3,7 @@ import {
 	CalendarClock,
 	Coins,
 	DoorOpen,
+	Gamepad2,
 	Gift,
 	ScrollText,
 	Shield,
@@ -26,7 +27,8 @@ export const moduleIcons: Record<ModuleId, LucideIcon> = {
 	'reaction-roles': Sticker,
 	giveaways: Gift,
 	'custom-commands': Terminal,
-	scheduled: CalendarClock
+	scheduled: CalendarClock,
+	'game-alerts': Gamepad2
 };
 
 export const fallbackModuleIcon: LucideIcon = Blocks;

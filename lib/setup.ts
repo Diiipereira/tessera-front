@@ -28,9 +28,11 @@ export type SetupWrite = {
 	config: Record<string, unknown>;
 };
 
+export const ASKED_BY_THE_WIZARD: readonly ModuleId[] = ['welcome'];
+
 export function toSetupModules(states: readonly GuildModuleStateDto[]): SetupModule[] {
 	return states.flatMap((state) =>
-		hasScreen(state.key)
+		hasScreen(state.key) && (state.configured || ASKED_BY_THE_WIZARD.includes(state.key))
 			? [{ id: state.key, version: state.version, enabled: state.enabled, config: state.config }]
 			: []
 	);

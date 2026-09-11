@@ -226,3 +226,29 @@ describe('needsWelcomeChannel', () => {
 		expect(needsWelcomeChannel(draft({ wanted: ['levels'] }))).toBe(false);
 	});
 });
+
+describe('toSetupModules and the settings the wizard never asks for', () => {
+	const needsChannel = {
+		key: 'game-alerts',
+		enabled: false,
+		configured: false,
+		config: {},
+		version: 1
+	};
+
+	it('leaves out a module that cannot be switched on without a setting the wizard never asks for', () => {
+		expect(toSetupModules([needsChannel])).toEqual([]);
+	});
+
+	it('offers it again once the setting exists, set from Discord or from its own screen', () => {
+		expect(
+			toSetupModules([{ ...needsChannel, configured: true }]).map((module) => module.id)
+		).toEqual(['game-alerts']);
+	});
+
+	it('keeps offering the welcome, because the wizard asks for its channel itself', () => {
+		expect(
+			toSetupModules([{ ...needsChannel, key: 'welcome' }]).map((module) => module.id)
+		).toEqual(['welcome']);
+	});
+});

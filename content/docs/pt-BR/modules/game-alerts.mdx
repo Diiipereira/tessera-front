@@ -1,0 +1,102 @@
+---
+title: Jogos grátis
+summary: O Tessera avisa quando a Epic Games Store dá um jogo de graça — uma vez por servidor, com a imagem da loja.
+---
+
+Toda semana a Epic Games Store dá um ou dois jogos de graça. Com este módulo ligado, o Tessera anuncia
+cada um no canal que você escolher, com a imagem da loja, a hora em que a oferta acaba e o link para
+resgatar.
+
+<Facts
+	items={[
+		{ label: 'Lojas', value: 'Epic Games Store' },
+		{ label: 'Confere a loja', value: 'A cada dez minutos' },
+		{ label: 'Anuncia', value: 'Cada jogo uma vez, em cada servidor' },
+		{ label: 'Precisa de', value: 'Ver canal, Enviar mensagens e Inserir links no canal' },
+		{ label: 'Portas', value: '/config game-alerts; tela Jogos grátis no painel' }
+	]}
+/>
+
+## Como um jogo chega ao seu canal
+
+<Flow
+	steps={[
+		{ title: 'Lê a loja', note: 'A cada 10 minutos' },
+		{ title: 'Guarda a oferta', note: 'Uma linha por janela' },
+		{ title: 'Reserva o servidor', note: 'Antes de publicar' },
+		{ title: 'Publica', note: 'Um card por jogo' }
+	]}
+	caption="Reservar antes de publicar garante que cada servidor recebe cada jogo no máximo uma vez — mesmo se o bot reiniciar no meio do anúncio."
+/>
+
+Os jogos da Epic costumam trocar às quintas, ao meio-dia de Brasília. O próximo jogo já fica guardado
+antes da troca, então o anúncio sai na primeira varredura depois dela — em menos de um minuto.
+
+## O anúncio
+
+<Message
+	content={'@Gamers\nA seguir: **Mindcop** e **Shogun Showdown**, em 7 dias.'}
+	embed={{
+		title: 'Astral Ascent',
+		description: 'Grátis na Epic Games Store até 17 de setembro de 2026 12:00.\n[Resgatar na loja]',
+		image: 'Imagem do jogo, vinda da loja',
+		footer: 'Epic Games Store'
+	}}
+	caption="Os cargos escolhidos são notificados. O @everyone nunca é, mesmo que esteja escrito no texto."
+/>
+
+Quando a Epic dá dois jogos na mesma semana, sai **uma** mensagem com um card para cada. A linha
+"A seguir" só aparece depois que a loja anuncia os próximos, e pode ser desligada.
+
+<Callout title="Ligou o módulo no meio da semana?">
+	O jogo que ainda está grátis é anunciado na varredura seguinte. Você não precisa esperar a próxima
+	quinta.
+</Callout>
+
+## O que conta como jogo grátis
+
+A Epic mistura, na mesma lista, jogos grátis, descontos comuns, DLCs e pacotes. O Tessera anuncia só o
+que é de graça de verdade:
+
+| Entra                                                 | Fica de fora                                |
+| ----------------------------------------------------- | ------------------------------------------- |
+| Jogo com preço final zero, dentro da janela da oferta | Desconto comum, de qualquer tamanho         |
+| Pacote grátis                                         | DLC grátis de um jogo que você pode não ter |
+| O próximo grátis, como uma linha no anúncio           | Oferta que ainda não começou                |
+
+O preço não aparece no anúncio. Ele muda de país para país, e o idioma do servidor não diz em qual
+país as pessoas estão.
+
+## Personalizar a mensagem
+
+Com o card ligado, cada jogo vira um card com a imagem da loja. Com o card desligado, cada jogo vira
+uma linha de texto. Deixe em branco para o Tessera usar o texto dele, no idioma do servidor.
+
+| Variável  | Vira                                      |
+| --------- | ----------------------------------------- |
+| `{game}`  | O nome do jogo                            |
+| `{store}` | O nome da loja                            |
+| `{until}` | Quando a oferta acaba, no fuso de quem lê |
+| `{url}`   | O link da página do jogo na loja          |
+
+## Testar
+
+**Enviar teste** manda o anúncio de agora para o canal salvo, com uma linha dizendo quem pediu. O teste
+não notifica ninguém: os cargos aparecem na mensagem, mas ninguém recebe o aviso. Se nada estiver
+grátis no momento, o teste mostra o próximo jogo.
+
+## Opções
+
+<Fields module="game-alerts" />
+
+Tudo também se configura pelo Discord: `/config game-alerts` para os campos simples, e
+`/config game-alerts edit:` para os cargos, as lojas e o card.
+
+## Quando não funciona
+
+| Sintoma                               | Causa provável                                                    |
+| ------------------------------------- | ----------------------------------------------------------------- |
+| O módulo não liga                     | Falta escolher o canal                                            |
+| Não saiu anúncio na quinta            | O bot não pode ver ou escrever no canal, ou não tem Inserir links |
+| O teste diz que não há jogo           | A loja está sem jogo grátis e sem o próximo anunciado             |
+| Um jogo apareceu de novo meses depois | A loja deu o jogo de novo, numa janela nova — é outra oferta      |

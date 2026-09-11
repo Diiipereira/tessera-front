@@ -5,6 +5,7 @@ import {
 	CreditCard,
 	DoorOpen,
 	FileClock,
+	Gamepad2,
 	Gavel,
 	Gift,
 	LayoutDashboard,
@@ -61,7 +62,8 @@ export const navGroups: NavGroup[] = [
 			{ id: 'reaction-roles', path: '/modules/reaction-roles', icon: Sticker },
 			{ id: 'giveaways', path: '/modules/giveaways', icon: Gift },
 			{ id: 'custom-commands', path: '/modules/custom-commands', icon: Terminal },
-			{ id: 'scheduled', path: '/modules/scheduled', icon: CalendarClock, premium: true }
+			{ id: 'scheduled', path: '/modules/scheduled', icon: CalendarClock, premium: true },
+			{ id: 'game-alerts', path: '/modules/game-alerts', icon: Gamepad2 }
 		]
 	},
 	{

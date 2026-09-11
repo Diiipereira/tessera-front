@@ -9,7 +9,8 @@ export const MODULE_IDS = [
 	'reaction-roles',
 	'giveaways',
 	'custom-commands',
-	'scheduled'
+	'scheduled',
+	'game-alerts'
 ] as const;
 
 export type ModuleId = (typeof MODULE_IDS)[number];

@@ -76,7 +76,8 @@ describe('WelcomeSkeleton', () => {
 
 	it('stands in for the message box the screen opens with, not the embed builder', () => {
 		const skeleton = render(<WelcomeSkeleton />).container;
+		const screen = renderScreen().container;
 
-		expect(boxes(skeleton, 'h-19')).toBe(0);
+		expect(boxes(skeleton, 'size-9')).toBe(screen.querySelectorAll('input[type="color"]').length);
 	});
 });

@@ -7,22 +7,52 @@ const SHELL = resolve(import.meta.dirname, '../../app/(authenticated)/servers/[g
 
 const LOADING = 'loading.tsx';
 
-function routesWithALoadingBoundary(): string[] {
+const PAGE = 'page.tsx';
+
+const WITHOUT_A_SKELETON = ['billing'];
+
+function routesWith(file: string): string[] {
 	return readdirSync(SHELL, { recursive: true })
 		.map((entry) => String(entry).replaceAll('\\', '/'))
-		.filter((entry) => entry.endsWith(LOADING))
-		.map((entry) => entry.slice(0, -LOADING.length).replace(/\/$/, ''));
+		.filter((entry) => entry === file || entry.endsWith(`/${file}`))
+		.map((entry) => entry.slice(0, -file.length).replace(/\/$/, ''));
 }
 
 const hrefFor = (route: string): string => (route === '' ? '/servers/1' : `/servers/1/${route}`);
 
+const holdsOthers = (route: string, routes: string[]): boolean =>
+	routes.some((other) => other !== route && (route === '' || other.startsWith(`${route}/`)));
+
 describe('routeSkeleton', () => {
 	it('finds every route that declares a loading boundary', () => {
-		const missing = routesWithALoadingBoundary().filter(
-			(route) => routeSkeleton(hrefFor(route)) === null
-		);
+		const missing = routesWith(LOADING).filter((route) => routeSkeleton(hrefFor(route)) === null);
 
 		expect(missing).toEqual([]);
+	});
+
+	it('has a skeleton for every screen in the shell, because in dev the shell is what paints it', () => {
+		const missing = routesWith(PAGE)
+			.filter((route) => !WITHOUT_A_SKELETON.includes(route))
+			.filter((route) => routeSkeleton(hrefFor(route)) === null);
+
+		expect(missing).toEqual([]);
+	});
+
+	it('gives every screen with nothing below it a loading boundary, which is what production shows', () => {
+		const pages = routesWith(PAGE);
+		const boundaries = new Set(routesWith(LOADING));
+		const missing = pages
+			.filter((route) => !holdsOthers(route, pages))
+			.filter((route) => !WITHOUT_A_SKELETON.includes(route))
+			.filter((route) => !boundaries.has(route));
+
+		expect(missing).toEqual([]);
+	});
+
+	it('keeps the list of screens without a skeleton to the ones that really have none', () => {
+		expect(WITHOUT_A_SKELETON.filter((route) => routeSkeleton(hrefFor(route)) !== null)).toEqual(
+			[]
+		);
 	});
 
 	it('reads the route out of a guild href, whatever the guild is', () => {
