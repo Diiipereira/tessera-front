@@ -1011,11 +1011,7 @@
 				"logCreated": "Quando a conta foi criada",
 				"logUntil": "Até quando vale",
 				"logFrom": "O canal de onde veio",
-				"logLink": "Um link de volta para a mensagem",
-				"game": "O jogo grátis",
-				"store": "A loja que está dando",
-				"until": "Quando a oferta acaba",
-				"url": "O link da página na loja"
+				"logLink": "Um link de volta para a mensagem"
 			}
 		},
 		"composer": {
@@ -1804,13 +1800,14 @@
 		},
 		"gameAlerts": {
 			"title": "Jogos grátis",
-			"description": "Anuncia os jogos que uma loja dá de graça — uma vez por servidor, com a imagem da loja.",
+			"description": "Anuncia os jogos que uma loja dá de graça — um por mensagem, com o nome Tessera Gaming.",
 			"saved": "Configurações de jogos grátis salvas",
 			"saveFailed": "Não foi possível salvar",
 			"test": {
 				"action": "Enviar teste",
 				"dirty": "Salve as alterações antes de enviar um teste.",
 				"sent": "Teste enviado ao canal",
+				"sentAsBot": "O teste saiu com o nome do bot, não como Tessera Gaming: o Tessera não conseguiu criar o webhook do canal. Confira se ele tem a permissão Gerenciar webhooks lá.",
 				"notReady": "Nada foi enviado: o módulo está desligado ou ainda não tem canal.",
 				"noOffer": "A loja não tem jogo grátis para mostrar agora.",
 				"channelRefused": "Não consegui escrever no canal — confira se ele existe e se eu posso publicar lá.",
@@ -1829,30 +1826,26 @@
 			},
 			"mention": {
 				"title": "Menção",
-				"description": "Cargos avisados junto com o anúncio. O @everyone nunca é notificado.",
-				"label": "Cargos"
+				"description": "Quem é avisado quando um jogo fica grátis.",
+				"label": "Cargos",
+				"everyone": "Mencionar @everyone",
+				"everyoneHint": "Avisa o servidor inteiro a cada jogo. O Tessera precisa da permissão Mencionar @everyone, @here e todos os cargos no canal."
 			},
-			"message": {
-				"title": "Mensagem",
-				"description": "Um card por jogo, com a imagem da loja — ou uma linha por jogo.",
-				"emptyText": "Deixe em branco e o bot escreve a linha dele, no idioma do servidor.",
-				"emptyEmbed": "Deixe o card vazio e o bot envia o dele, com a imagem da loja."
+			"announcement": {
+				"title": "Anúncio",
+				"description": "Cada jogo sai numa mensagem própria, com o nome Tessera Gaming, a imagem da loja e um botão para resgatar. O nome vem de um webhook que o Tessera cria no canal, e para isso ele precisa da permissão Gerenciar webhooks lá; sem ela, o anúncio sai com o nome do bot."
 			},
 			"upcoming": {
 				"label": "Mostrar o próximo",
-				"hint": "Acrescenta uma linha com os próximos jogos grátis quando a loja já anunciou."
+				"hint": "Mostra embaixo da imagem quais são os próximos jogos grátis e quando chegam, depois que a loja anuncia."
 			},
 			"preview": {
 				"note": "Desenhada pelo mesmo código que publica, com os jogos grátis que a loja tem agora.",
+				"spacing": "São {count} jogos grátis agora: cada um sai numa mensagem, {minutes} minutos depois do anterior.",
 				"none": "A loja não tem jogo grátis agora. A prévia aparece assim que tiver.",
 				"nextSample": "Nada está grátis agora, então a prévia mostra o próximo.",
 				"failed": "Não foi possível desenhar a prévia.",
 				"unknownRole": "cargo desconhecido"
-			},
-			"sample": {
-				"game": "Nome do jogo",
-				"until": "o fim da oferta",
-				"url": "link da loja"
 			}
 		},
 		"customCommands": {
@@ -3146,21 +3139,13 @@
 						"label": "Cargos a mencionar",
 						"description": "Cargos avisados quando um jogo fica grátis"
 					},
+					"pingEveryone": {
+						"label": "Mencionar @everyone",
+						"description": "Avisa o servidor inteiro a cada jogo"
+					},
 					"showUpcoming": {
 						"label": "Mostrar o próximo",
-						"description": "Acrescenta uma linha com os próximos grátis quando a loja já anunciou"
-					},
-					"message": {
-						"label": "Mensagem",
-						"description": "A linha enviada para cada jogo quando o card está desligado"
-					},
-					"useEmbed": {
-						"label": "Enviar como card",
-						"description": "Publica um card por jogo, com a imagem da loja"
-					},
-					"embed": {
-						"label": "Card",
-						"description": "O card enviado para cada jogo grátis"
+						"description": "Acrescenta ao card os próximos grátis quando a loja já anunciou"
 					}
 				}
 			},

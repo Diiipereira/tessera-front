@@ -1,18 +1,22 @@
 ---
 title: Jogos grátis
-summary: O Tessera avisa quando a Epic Games Store dá um jogo de graça — uma vez por servidor, com a imagem da loja.
+summary: O Tessera avisa quando a Epic Games Store dá um jogo de graça — um jogo por mensagem, com o nome Tessera Gaming.
 ---
 
 Toda semana a Epic Games Store dá um ou dois jogos de graça. Com este módulo ligado, o Tessera anuncia
-cada um no canal que você escolher, com a imagem da loja, a hora em que a oferta acaba e o link para
-resgatar.
+cada um numa mensagem própria, no canal que você escolher, com o nome Tessera Gaming, a imagem da loja,
+a hora em que a oferta acaba e um botão para resgatar.
 
 <Facts
 	items={[
 		{ label: 'Lojas', value: 'Epic Games Store' },
 		{ label: 'Confere a loja', value: 'A cada dez minutos' },
-		{ label: 'Anuncia', value: 'Cada jogo uma vez, em cada servidor' },
-		{ label: 'Precisa de', value: 'Ver canal, Enviar mensagens e Inserir links no canal' },
+		{ label: 'Anuncia', value: 'Cada jogo uma vez, em cada servidor, numa mensagem própria' },
+		{ label: 'Entre um jogo e o próximo', value: 'Cinco minutos' },
+		{
+			label: 'Precisa de',
+			value: 'Ver canal, Enviar mensagens, Inserir links e Gerenciar webhooks no canal'
+		},
 		{ label: 'Portas', value: '/config game-alerts; tela Jogos grátis no painel' }
 	]}
 />
@@ -22,36 +26,60 @@ resgatar.
 <Flow
 	steps={[
 		{ title: 'Lê a loja', note: 'A cada 10 minutos' },
-		{ title: 'Guarda a oferta', note: 'Uma linha por janela' },
-		{ title: 'Reserva o servidor', note: 'Antes de publicar' },
-		{ title: 'Publica', note: 'Um card por jogo' }
+		{ title: 'Reserva o servidor', note: 'Antes de enfileirar' },
+		{ title: 'Entra na fila', note: 'Um pedido por servidor' },
+		{ title: 'Publica', note: 'Um jogo por mensagem' }
 	]}
-	caption="Reservar antes de publicar garante que cada servidor recebe cada jogo no máximo uma vez — mesmo se o bot reiniciar no meio do anúncio."
+	caption="A fila publica no ritmo que o Discord aguenta, com todos os servidores na mesma fila. Reservar antes garante que cada servidor recebe cada jogo no máximo uma vez."
 />
 
 Os jogos da Epic costumam trocar às quintas, ao meio-dia de Brasília. O próximo jogo já fica guardado
-antes da troca, então o anúncio sai na primeira varredura depois dela — em menos de um minuto.
+antes da troca, então o anúncio entra na fila na primeira varredura depois dela — em menos de um
+minuto. Quando a semana tem dois jogos, o segundo sai cinco minutos depois do primeiro.
 
 ## O anúncio
 
 <Message
-	content={'@Gamers\nA seguir: **Mindcop** e **Shogun Showdown**, em 7 dias.'}
+	author="Tessera Gaming"
+	content="@Gamers"
 	embed={{
+		color: '#3B82F6',
 		title: 'Astral Ascent',
-		description: 'Grátis na Epic Games Store até 17 de setembro de 2026 12:00.\n[Resgatar na loja]',
+		description: 'Grátis na Epic Games Store até 17 de setembro de 2026 12:00.',
 		image: 'Imagem do jogo, vinda da loja',
-		footer: 'Epic Games Store'
+		footer: 'A seguir: Mindcop e Shogun Showdown • 17/09/2026 12:00'
 	}}
-	caption="Os cargos escolhidos são notificados. O @everyone nunca é, mesmo que esteja escrito no texto."
+	buttons={[{ label: 'Resgatar na Epic Games Store' }]}
+	caption="Os cargos escolhidos são notificados. O @everyone só entra quando você liga a opção."
 />
 
-Quando a Epic dá dois jogos na mesma semana, sai **uma** mensagem com um card para cada. A linha
-"A seguir" só aparece depois que a loja anuncia os próximos, e pode ser desligada.
+O card é sempre o mesmo: o nome do jogo, a borda azul, quando a oferta acaba e a imagem. Embaixo da
+imagem vem o "A seguir", com os próximos jogos e o dia em que chegam, e embaixo do card o botão que abre
+a página da loja. O "A seguir" só aparece depois que a loja anuncia os próximos, e pode ser desligado.
+As datas são escritas pelo próprio Discord, no fuso e no idioma de quem lê.
 
 <Callout title="Ligou o módulo no meio da semana?">
 	O jogo que ainda está grátis é anunciado na varredura seguinte. Você não precisa esperar a próxima
 	quinta.
 </Callout>
+
+## O nome Tessera Gaming
+
+O anúncio não sai com o nome do bot: ele sai como **Tessera Gaming**, com a foto do Tessera. Para isso
+o Tessera cria um webhook no canal na primeira vez que anuncia, e usa o mesmo nas vezes seguintes. Ele
+aparece em Editar canal → Integrações → Webhooks.
+
+Criar o webhook exige a permissão **Gerenciar webhooks** no canal. Sem ela o anúncio sai do mesmo jeito,
+só que com o nome do bot. Se alguém apagar o webhook, o Tessera cria outro no anúncio seguinte.
+
+## Quem é avisado
+
+Até cinco cargos, e o @everyone quando você liga a opção. Cada mensagem avisa de novo: numa semana com
+dois jogos, são dois avisos, cinco minutos um do outro.
+
+Para o @everyone notificar alguém, o Tessera precisa da permissão **Mencionar @everyone, @here e todos
+os cargos** no canal. Sem ela a menção aparece no texto e ninguém recebe o aviso. A mesma permissão vale
+para um cargo que não esteja marcado como mencionável.
 
 ## O que conta como jogo grátis
 
@@ -62,41 +90,39 @@ que é de graça de verdade:
 | ----------------------------------------------------- | ------------------------------------------- |
 | Jogo com preço final zero, dentro da janela da oferta | Desconto comum, de qualquer tamanho         |
 | Pacote grátis                                         | DLC grátis de um jogo que você pode não ter |
-| O próximo grátis, como uma linha no anúncio           | Oferta que ainda não começou                |
+| O próximo grátis, embaixo da imagem                   | Oferta que ainda não começou                |
 
 O preço não aparece no anúncio. Ele muda de país para país, e o idioma do servidor não diz em qual
 país as pessoas estão.
 
-## Personalizar a mensagem
-
-Com o card ligado, cada jogo vira um card com a imagem da loja. Com o card desligado, cada jogo vira
-uma linha de texto. Deixe em branco para o Tessera usar o texto dele, no idioma do servidor.
-
-| Variável  | Vira                                      |
-| --------- | ----------------------------------------- |
-| `{game}`  | O nome do jogo                            |
-| `{store}` | O nome da loja                            |
-| `{until}` | Quando a oferta acaba, no fuso de quem lê |
-| `{url}`   | O link da página do jogo na loja          |
-
 ## Testar
 
-**Enviar teste** manda o anúncio de agora para o canal salvo, com uma linha dizendo quem pediu. O teste
-não notifica ninguém: os cargos aparecem na mensagem, mas ninguém recebe o aviso. Se nada estiver
-grátis no momento, o teste mostra o próximo jogo.
+**Enviar teste** manda para o canal salvo o anúncio do primeiro jogo grátis de agora, com uma linha
+dizendo quem pediu. O teste não notifica ninguém: os cargos e o @everyone aparecem na mensagem, mas
+ninguém recebe o aviso. Se nada estiver grátis no momento, o teste mostra o próximo jogo. Se o teste
+sair com o nome do bot, o painel avisa: falta ao Tessera a permissão Gerenciar webhooks no canal.
+
+## O X que remove o card
+
+Quem tem a permissão Gerenciar mensagens vê um X sobre o card, e o Discord pergunta se é para remover
+os anexos da mensagem para todos. Isso é do próprio Discord, não do Tessera: a permissão deixa esconder
+o card de qualquer mensagem, de qualquer bot. Membros sem ela não veem o X, e nenhum bot consegue
+desligar esse botão.
 
 ## Opções
 
 <Fields module="game-alerts" />
 
-Tudo também se configura pelo Discord: `/config game-alerts` para os campos simples, e
-`/config game-alerts edit:` para os cargos, as lojas e o card.
+Tudo também se configura pelo Discord: `/config game-alerts` para o canal, o @everyone e o "A seguir",
+e `/config game-alerts edit:` para os cargos e as lojas.
 
 ## Quando não funciona
 
-| Sintoma                               | Causa provável                                                    |
-| ------------------------------------- | ----------------------------------------------------------------- |
-| O módulo não liga                     | Falta escolher o canal                                            |
-| Não saiu anúncio na quinta            | O bot não pode ver ou escrever no canal, ou não tem Inserir links |
-| O teste diz que não há jogo           | A loja está sem jogo grátis e sem o próximo anunciado             |
-| Um jogo apareceu de novo meses depois | A loja deu o jogo de novo, numa janela nova — é outra oferta      |
+| Sintoma                               | Causa provável                                                          |
+| ------------------------------------- | ----------------------------------------------------------------------- |
+| O módulo não liga                     | Falta escolher o canal                                                  |
+| Não saiu anúncio na quinta            | O bot não pode ver ou escrever no canal, ou não tem Inserir links       |
+| O anúncio saiu com o nome do bot      | Falta a permissão Gerenciar webhooks no canal                           |
+| O @everyone não avisou ninguém        | Falta a permissão Mencionar @everyone, @here e todos os cargos no canal |
+| O teste diz que não há jogo           | A loja está sem jogo grátis e sem o próximo anunciado                   |
+| Um jogo apareceu de novo meses depois | A loja deu o jogo de novo, numa janela nova — é outra oferta            |

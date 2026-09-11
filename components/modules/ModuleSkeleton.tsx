@@ -218,7 +218,13 @@ export function PreviewSkeleton() {
 	);
 }
 
-export function DiscordPreviewSkeleton({ embed = false }: { embed?: boolean }) {
+export function DiscordPreviewSkeleton({
+	embed = false,
+	link = false
+}: {
+	embed?: boolean;
+	link?: boolean;
+}) {
 	return (
 		<div className="rounded-lg bg-surface-sunken p-4">
 			<div className="flex gap-3">
@@ -244,6 +250,7 @@ export function DiscordPreviewSkeleton({ embed = false }: { embed?: boolean }) {
 							<TextSkeleton line="body" width="w-2/3" />
 						</div>
 					)}
+					{link ? <Skeleton className="mt-2 h-8 w-56 rounded-[3px]" /> : null}
 				</div>
 			</div>
 		</div>

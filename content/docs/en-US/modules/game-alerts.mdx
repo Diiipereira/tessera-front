@@ -1,17 +1,22 @@
 ---
 title: Free games
-summary: Tessera announces the games the Epic Games Store gives away — once per server, with the store picture.
+summary: Tessera announces the games the Epic Games Store gives away — one game per message, under the Tessera Gaming name.
 ---
 
 Every week the Epic Games Store gives one or two games away. With this module on, Tessera posts each of
-them in the channel you pick, with the store picture, the moment the offer ends and a link to claim it.
+them in a message of its own, in the channel you pick, under the Tessera Gaming name, with the store
+picture, the moment the offer ends and a button to claim it.
 
 <Facts
 	items={[
 		{ label: 'Stores', value: 'Epic Games Store' },
 		{ label: 'Checks the store', value: 'Every ten minutes' },
-		{ label: 'Announces', value: 'Each game once, in each server' },
-		{ label: 'Needs', value: 'View Channel, Send Messages and Embed Links in the channel' },
+		{ label: 'Announces', value: 'Each game once, in each server, in a message of its own' },
+		{ label: 'Between one game and the next', value: 'Five minutes' },
+		{
+			label: 'Needs',
+			value: 'View Channel, Send Messages, Embed Links and Manage Webhooks in the channel'
+		},
 		{ label: 'Doors', value: '/config game-alerts; the Free games screen in the dashboard' }
 	]}
 />
@@ -21,37 +26,61 @@ them in the channel you pick, with the store picture, the moment the offer ends 
 <Flow
 	steps={[
 		{ title: 'Reads the store', note: 'Every 10 minutes' },
-		{ title: 'Keeps the offer', note: 'One row per window' },
-		{ title: 'Reserves the server', note: 'Before posting' },
-		{ title: 'Posts', note: 'One card per game' }
+		{ title: 'Reserves the server', note: 'Before queueing' },
+		{ title: 'Joins the queue', note: 'One request per server' },
+		{ title: 'Posts', note: 'One game per message' }
 	]}
-	caption="Reserving before posting means each server gets each game at most once — even if the bot restarts halfway through an announcement."
+	caption="The queue posts at the pace Discord allows, with every server in the same line. Reserving first means each server gets each game at most once."
 />
 
 Epic usually swaps its free games on Thursdays at 15:00 UTC. The next game is already stored before the
-swap, so the announcement goes out on the first sweep after it — within a minute.
+swap, so the announcement joins the queue on the first sweep after it — within a minute. When the week
+has two games, the second one goes out five minutes after the first.
 
 ## The announcement
 
 <Message
-	content={'@Gamers\nNext up: **Mindcop** and **Shogun Showdown**, in 7 days.'}
+	author="Tessera Gaming"
+	content="@Gamers"
 	embed={{
+		color: '#3B82F6',
 		title: 'Astral Ascent',
-		description:
-			'Free on Epic Games Store until September 17, 2026 3:00 PM.\n[Get it on the store]',
+		description: 'Free on Epic Games Store until September 17, 2026 3:00 PM.',
 		image: 'Game picture, from the store',
-		footer: 'Epic Games Store'
+		footer: 'Next up: Mindcop and Shogun Showdown • 9/17/2026 3:00 PM'
 	}}
-	caption="The roles you pick are notified. @everyone never is, even when it is written in the text."
+	buttons={[{ label: 'Claim on Epic Games Store' }]}
+	caption="The roles you pick are notified. @everyone is only added when you turn the option on."
 />
 
-When Epic gives two games in the same week, **one** message goes out with a card for each. The
-"Next up" line only appears once the store has announced what comes next, and it can be turned off.
+The card is always the same: the game name, the blue edge, when the offer ends and the picture. Under
+the picture comes "Next up", with the next games and the day they arrive, and under the card the button
+that opens the store page. "Next up" only appears once the store has announced what comes next, and it
+can be turned off. Discord writes the dates itself, in the time zone and language of whoever reads.
 
 <Callout title="Turned the module on in the middle of the week?">
 	The game that is still free is announced on the next sweep. There is no waiting for the next
 	Thursday.
 </Callout>
+
+## The Tessera Gaming name
+
+The announcement does not go out under the bot's name: it goes out as **Tessera Gaming**, with Tessera's
+picture. To do that, Tessera creates a webhook in the channel the first time it announces, and reuses it
+after that. It shows up under Edit Channel → Integrations → Webhooks.
+
+Creating the webhook needs the **Manage Webhooks** permission in the channel. Without it the
+announcement still goes out, only under the bot's name. If someone deletes the webhook, Tessera creates
+a new one on the next announcement.
+
+## Who gets notified
+
+Up to five roles, and @everyone when you turn the option on. Each message notifies again: in a week with
+two games, that is two notifications, five minutes apart.
+
+For @everyone to notify anyone, Tessera needs the **Mention @everyone, @here, and All Roles** permission
+in the channel. Without it the mention shows in the text and nobody gets pinged. The same permission
+covers a role that is not marked as mentionable.
 
 ## What counts as a free game
 
@@ -62,41 +91,40 @@ is actually free:
 | --------------------------------------------------------- | ----------------------------------- |
 | A game whose final price is zero, inside the offer window | An ordinary discount, of any size   |
 | A free bundle                                             | Free DLC for a game you may not own |
-| The next free game, as a line in the post                 | An offer that has not started yet   |
+| The next free game, under the picture                     | An offer that has not started yet   |
 
 The price is not shown. It changes from country to country, and the server language does not say where
 its members are.
 
-## Customizing the message
-
-With the card on, each game becomes a card with the store picture. With the card off, each game becomes
-a line of text. Leave it blank and Tessera writes its own, in the server language.
-
-| Variable  | Becomes                                        |
-| --------- | ---------------------------------------------- |
-| `{game}`  | The name of the game                           |
-| `{store}` | The name of the store                          |
-| `{until}` | When the offer ends, in the reader's time zone |
-| `{url}`   | The link to the game page on the store         |
-
 ## Testing
 
-**Send a test** posts the current announcement to the saved channel, with a line naming who asked. The
-test notifies nobody: the roles show up in the message, but no one gets pinged. If nothing is free at
-the moment, the test shows the next game instead.
+**Send a test** posts the announcement of the first game that is free right now to the saved channel,
+with a line naming who asked. The test notifies nobody: the roles and @everyone show up in the message,
+but no one gets pinged. If nothing is free at the moment, the test shows the next game instead. If the
+test goes out under the bot's name, the dashboard says so: Tessera is missing Manage Webhooks in the
+channel.
+
+## The X that removes the card
+
+Anyone with the Manage Messages permission sees an X over the card, and Discord asks whether to remove
+the attachments from the message for everyone. That is Discord's own feature, not Tessera's: the
+permission lets them hide the card on any message, from any bot. Members without it do not see the X,
+and no bot can turn that button off.
 
 ## Options
 
 <Fields module="game-alerts" />
 
-Everything can be set from Discord as well: `/config game-alerts` for the simple fields, and
-`/config game-alerts edit:` for the roles, the stores and the card.
+Everything can be set from Discord as well: `/config game-alerts` for the channel, @everyone and "Next
+up", and `/config game-alerts edit:` for the roles and the stores.
 
 ## When it does not work
 
-| Symptom                             | Likely cause                                                        |
-| ----------------------------------- | ------------------------------------------------------------------- |
-| The module will not switch on       | No channel has been picked                                          |
-| Nothing was posted on Thursday      | The bot cannot see or write in the channel, or lacks Embed Links    |
-| The test says there is no game      | The store has no free game and has not announced the next one       |
-| A game showed up again months later | The store gave it away again, in a new window — that is a new offer |
+| Symptom                                      | Likely cause                                                        |
+| -------------------------------------------- | ------------------------------------------------------------------- |
+| The module will not switch on                | No channel has been picked                                          |
+| Nothing was posted on Thursday               | The bot cannot see or write in the channel, or lacks Embed Links    |
+| The announcement went out under the bot name | The Manage Webhooks permission is missing in the channel            |
+| @everyone did not notify anyone              | The Mention @everyone, @here, and All Roles permission is missing   |
+| The test says there is no game               | The store has no free game and has not announced the next one       |
+| A game showed up again months later          | The store gave it away again, in a new window — that is a new offer |

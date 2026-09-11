@@ -1,13 +1,12 @@
 'use client';
 
-import { Gamepad2 } from 'lucide-react';
+import { ExternalLink, Gamepad2 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { ChannelPicker } from '@/components/discord/ChannelPicker';
 import { RolePicker } from '@/components/discord/RolePicker';
 import { DiscordPreview } from '@/components/modules/DiscordPreview';
-import { MessageComposer } from '@/components/modules/MessageComposer';
 import { DiscordPreviewSkeleton } from '@/components/modules/ModuleSkeleton';
 import { ModulePage } from '@/components/modules/ModulePage';
 import { SaveBar } from '@/components/modules/SaveBar';
@@ -15,6 +14,7 @@ import { SettingsSection } from '@/components/modules/SettingsSection';
 import { Button } from '@/components/ui/Button';
 import { Field } from '@/components/ui/Field';
 import { Switch } from '@/components/ui/Switch';
+import { DISCORD } from '@/lib/discord-colors';
 import {
 	previewGameAlert,
 	sendGameAlertTest,
@@ -23,7 +23,6 @@ import {
 } from '@/lib/game-alerts-client';
 import { useApiFailure, useThrownFailure } from '@/lib/hooks/useApiFailure';
 import { useConfigDraft, type SaveOutcome } from '@/lib/hooks/useConfigDraft';
-import { useRelativeTime } from '@/lib/hooks/useRelativeTime';
 import { patchModule } from '@/lib/module-client';
 import {
 	GAME_ALERT_CHANNEL_KINDS,
@@ -31,14 +30,13 @@ import {
 	GAME_STORES,
 	STORE_NAMES,
 	discordTokens,
-	gameAlertVariables,
-	isBlankEmbed,
 	previewShape,
 	previewTextOf,
 	toGameAlertsConfig,
 	toGameAlertsPatch,
 	toPreviewBody,
-	toggleStore
+	toggleStore,
+	type PreviewLink
 } from '@/lib/modules/game-alerts';
 import type { Channel, Role } from '@/lib/types/discord';
 import type { GameAlertsConfig } from '@/lib/types/module-configs';
@@ -46,6 +44,7 @@ import type { GameAlertsConfig } from '@/lib/types/module-configs';
 const PREVIEW_DELAY_MS = 400;
 
 const TEST_WARNINGS: Record<Exclude<GameAlertTestOutcome, 'sent'>, string> = {
+	'sent-as-bot': 'test.sentAsBot',
 	'not-ready': 'test.notReady',
 	'no-offer': 'test.noOffer',
 	'channel-refused': 'test.channelRefused'
@@ -54,32 +53,43 @@ const TEST_WARNINGS: Record<Exclude<GameAlertTestOutcome, 'sent'>, string> = {
 type GameAlertsScreenProps = {
 	guildId: string;
 	config: GameAlertsConfig;
-	defaultColor: string;
 	version: number;
 	channels: Channel[];
 	roles: Role[];
-	botName: string;
-	botAvatarUrl: string | null;
-	now: string;
 };
+
+function ClaimLinks({ links }: { links: PreviewLink[] }) {
+	return (
+		<div className="flex flex-wrap gap-2">
+			{links.map((link) => (
+				<a
+					key={link.url}
+					href={link.url}
+					target="_blank"
+					rel="noreferrer"
+					className="inline-flex h-8 items-center gap-1.5 rounded-[3px] px-3 text-[14px] font-medium text-white"
+					style={{ backgroundColor: DISCORD.button }}
+				>
+					{link.label}
+					<ExternalLink aria-hidden="true" className="size-4" />
+				</a>
+			))}
+		</div>
+	);
+}
 
 export function GameAlertsScreen({
 	guildId,
 	config,
-	defaultColor,
 	version,
 	channels,
-	roles,
-	botName,
-	botAvatarUrl,
-	now
+	roles
 }: GameAlertsScreenProps) {
 	const t = useTranslations('modules.gameAlerts');
 	const previewText = useTranslations('modules.preview');
 	const locale = useLocale();
 	const describe = useApiFailure();
 	const explain = useThrownFailure();
-	const relative = useRelativeTime();
 	const versionRef = useRef(version);
 	const [preview, setPreview] = useState<GameAlertPreviewDto | null>(null);
 	const [previewFailed, setPreviewFailed] = useState(false);
@@ -98,10 +108,10 @@ export function GameAlertsScreen({
 			versionRef.current = result.state.version;
 
 			return result.status === 'saved'
-				? { status: 'saved', saved: toGameAlertsConfig(result.state, defaultColor) }
-				: { status: 'conflict', current: toGameAlertsConfig(result.state, defaultColor) };
+				? { status: 'saved', saved: toGameAlertsConfig(result.state) }
+				: { status: 'conflict', current: toGameAlertsConfig(result.state) };
 		},
-		[guildId, defaultColor]
+		[guildId]
 	);
 
 	const form = useConfigDraft<GameAlertsConfig>(config, { save });
@@ -146,26 +156,20 @@ export function GameAlertsScreen({
 		toast.warning(t(TEST_WARNINGS[result.outcome]));
 	}, [guildId, t, describe]);
 
-	const at = new Date(now);
 	const absolute = (moment: Date): string =>
 		new Intl.DateTimeFormat(locale, { dateStyle: 'long', timeStyle: 'short' }).format(moment);
-	const sample = preview?.running[0] ?? preview?.upcoming[0] ?? null;
-	const variables = gameAlertVariables(
-		sample,
-		{ game: t('sample.game'), until: t('sample.until'), url: t('sample.url') },
-		absolute
-	);
+	const footerStamp = (moment: Date): string =>
+		new Intl.DateTimeFormat(locale, { dateStyle: 'short', timeStyle: 'short' }).format(moment);
+	const shape = preview === null ? null : previewShape(preview);
 	const nothingFree = preview !== null && preview.running.length === 0;
-	const storeIsEmpty = nothingFree && preview.upcoming.length === 0;
-	const shape = preview === null || storeIsEmpty ? null : previewShape(preview);
+	const manyFree = preview !== null && preview.running.length > 1;
 	const tokens =
 		preview === null
 			? []
 			: discordTokens(previewTextOf(preview), {
 					roleName: (id) => roles.find((role) => role.id === id)?.name ?? null,
 					unknownRole: t('preview.unknownRole'),
-					absolute,
-					relative: (moment) => relative(moment.toISOString(), at)
+					absolute
 				});
 
 	const aside = (
@@ -178,36 +182,37 @@ export function GameAlertsScreen({
 			{previewFailed ? (
 				<p className="text-body-sm text-danger-fg">{t('preview.failed')}</p>
 			) : preview === null ? (
-				<DiscordPreviewSkeleton embed={draft.message.mode === 'embed'} />
+				<DiscordPreviewSkeleton embed link />
 			) : shape === null ? (
 				<p className="text-body-sm text-text-muted">{t('preview.none')}</p>
 			) : (
 				<DiscordPreview
 					message={shape.message}
 					lead={shape.lead}
-					moreEmbeds={shape.more}
 					variables={tokens}
-					botName={botName}
-					botAvatarUrl={botAvatarUrl}
+					botName={preview.sender.name}
+					botAvatarUrl={preview.sender.avatarUrl}
+					embedTimestampLabel={shape.nextUpAt === null ? null : footerStamp(shape.nextUpAt)}
+					footer={shape.links.length === 0 ? undefined : <ClaimLinks links={shape.links} />}
 				/>
 			)}
 
-			{nothingFree && !storeIsEmpty ? (
+			{nothingFree && shape !== null ? (
 				<p className="text-caption font-normal text-warning-fg">{t('preview.nextSample')}</p>
+			) : null}
+
+			{manyFree ? (
+				<p className="text-caption font-normal text-text-muted">
+					{t('preview.spacing', {
+						count: preview.running.length,
+						minutes: preview.spacingMinutes
+					})}
+				</p>
 			) : null}
 
 			<p className="text-caption font-normal text-text-muted">{t('preview.note')}</p>
 		</section>
 	);
-
-	const emptyHint =
-		draft.message.mode === 'text'
-			? draft.message.text.trim() === ''
-				? t('message.emptyText')
-				: null
-			: isBlankEmbed(draft.message.embed)
-				? t('message.emptyEmbed')
-				: null;
 
 	return (
 		<ModulePage
@@ -292,21 +297,18 @@ export function GameAlertsScreen({
 						}}
 					/>
 				</Field>
+
+				<Switch
+					checked={draft.pingEveryone}
+					onCheckedChange={(next) => {
+						form.set('pingEveryone', next);
+					}}
+					label={t('mention.everyone')}
+					description={t('mention.everyoneHint')}
+				/>
 			</SettingsSection>
 
-			<SettingsSection title={t('message.title')} description={t('message.description')}>
-				<MessageComposer
-					value={draft.message}
-					onChange={(next) => {
-						form.set('message', next);
-					}}
-					variables={variables}
-				/>
-
-				{emptyHint === null ? null : (
-					<p className="text-caption font-normal text-text-muted">{emptyHint}</p>
-				)}
-
+			<SettingsSection title={t('announcement.title')} description={t('announcement.description')}>
 				<Switch
 					checked={draft.showUpcoming}
 					onCheckedChange={(next) => {

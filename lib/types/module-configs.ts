@@ -249,6 +249,6 @@ export type GameAlertsConfig = {
 	channelId: string | null;
 	stores: GameStoreId[];
 	pingRoleIds: string[];
+	pingEveryone: boolean;
 	showUpcoming: boolean;
-	message: MessageDraft;
 };

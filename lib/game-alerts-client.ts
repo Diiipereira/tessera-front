@@ -12,9 +12,29 @@ export type GameAlertOfferDto = {
 	endsAt: string;
 };
 
+export type GameAlertSenderDto = {
+	name: string;
+	avatarUrl: string | null;
+};
+
+export type GameAlertLinkDto = {
+	type: number;
+	style: number;
+	label: string;
+	url: string;
+};
+
+export type GameAlertLinkRowDto = {
+	type: number;
+	components: GameAlertLinkDto[];
+};
+
 export type GameAlertPreviewDto = {
+	sender: GameAlertSenderDto;
 	content: string;
 	embeds: ApiEmbedDto[];
+	components: GameAlertLinkRowDto[];
+	spacingMinutes: number;
 	running: GameAlertOfferDto[];
 	upcoming: GameAlertOfferDto[];
 };
@@ -22,7 +42,8 @@ export type GameAlertPreviewDto = {
 export type GameAlertPreviewResult =
 	{ status: 'ok'; preview: GameAlertPreviewDto } | { status: 'error'; failure: ApiFailure };
 
-export type GameAlertTestOutcome = 'sent' | 'not-ready' | 'no-offer' | 'channel-refused';
+export type GameAlertTestOutcome =
+	'sent' | 'sent-as-bot' | 'not-ready' | 'no-offer' | 'channel-refused';
 
 export type GameAlertTestResult =
 	{ status: 'ok'; outcome: GameAlertTestOutcome } | { status: 'error'; failure: ApiFailure };

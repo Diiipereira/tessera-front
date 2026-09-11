@@ -1,5 +1,4 @@
 import {
-	ComposerSkeleton,
 	DiscordPreviewSkeleton,
 	FieldSkeleton,
 	ModulePageSkeleton,
@@ -7,8 +6,6 @@ import {
 	SwitchSkeleton
 } from '@/components/modules/ModuleSkeleton';
 import { TextSkeleton } from '@/components/ui/Skeleton';
-
-const VARIABLE_CHIPS = ['w-15', 'w-17', 'w-17', 'w-14'];
 
 export function GameAlertsSkeleton() {
 	return (
@@ -20,7 +17,7 @@ export function GameAlertsSkeleton() {
 				<div className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-4 shadow-1">
 					<TextSkeleton line="h4" width="w-24" />
 
-					<DiscordPreviewSkeleton embed />
+					<DiscordPreviewSkeleton embed link />
 
 					<div>
 						<TextSkeleton line="caption" />
@@ -39,11 +36,10 @@ export function GameAlertsSkeleton() {
 
 			<SectionSkeleton>
 				<FieldSkeleton />
+				<SwitchSkeleton />
 			</SectionSkeleton>
 
 			<SectionSkeleton>
-				<ComposerSkeleton embed chips={VARIABLE_CHIPS} />
-				<TextSkeleton line="caption" width="w-96 max-w-full" />
 				<SwitchSkeleton />
 			</SectionSkeleton>
 		</ModulePageSkeleton>

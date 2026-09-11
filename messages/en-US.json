@@ -1011,11 +1011,7 @@
 				"logCreated": "When the account was created",
 				"logUntil": "When it ends",
 				"logFrom": "The channel they came from",
-				"logLink": "A link back to the message",
-				"game": "The free game",
-				"store": "The store giving it away",
-				"until": "When the offer ends",
-				"url": "The link to the store page"
+				"logLink": "A link back to the message"
 			}
 		},
 		"composer": {
@@ -1804,13 +1800,14 @@
 		},
 		"gameAlerts": {
 			"title": "Free games",
-			"description": "Announce the games a store gives away — once per server, with the store picture.",
+			"description": "Announce the games a store gives away — one per message, under the Tessera Gaming name.",
 			"saved": "Free games settings saved",
 			"saveFailed": "Could not save",
 			"test": {
 				"action": "Send a test",
 				"dirty": "Save your changes before sending a test.",
 				"sent": "Test sent to the channel",
+				"sentAsBot": "The test went out under the bot's name, not as Tessera Gaming: Tessera could not create the channel webhook. Check that it has the Manage Webhooks permission there.",
 				"notReady": "Nothing was sent: the module is off, or it still has no channel.",
 				"noOffer": "The store has no free game to show right now.",
 				"channelRefused": "I could not write in the channel — check that it exists and that I can post there.",
@@ -1829,30 +1826,26 @@
 			},
 			"mention": {
 				"title": "Mention",
-				"description": "Roles notified with the announcement. @everyone is never pinged.",
-				"label": "Roles"
+				"description": "Who gets notified when a game goes free.",
+				"label": "Roles",
+				"everyone": "Mention @everyone",
+				"everyoneHint": "Notifies the whole server with each game. Tessera needs the Mention @everyone, @here, and All Roles permission in the channel."
 			},
-			"message": {
-				"title": "Message",
-				"description": "One card per game, with the store picture — or one line per game.",
-				"emptyText": "Leave it blank and the bot writes its own line, in the server language.",
-				"emptyEmbed": "Leave the card empty and the bot sends its own, with the store picture."
+			"announcement": {
+				"title": "Announcement",
+				"description": "Each game goes out in a message of its own, under the Tessera Gaming name, with the store picture and a button to claim it. The name comes from a webhook Tessera creates in the channel, which needs the Manage Webhooks permission there; without it, the announcement goes out under the bot's name."
 			},
 			"upcoming": {
 				"label": "Show what comes next",
-				"hint": "Adds a line with the next free games once the store has announced them."
+				"hint": "Shows under the picture which free games come next and when, once the store has announced them."
 			},
 			"preview": {
 				"note": "Drawn by the same code that posts, from the free games the store has right now.",
+				"spacing": "There are {count} free games right now: each goes out in its own message, {minutes} minutes after the one before.",
 				"none": "The store has no free game right now. The preview shows up as soon as it has one.",
 				"nextSample": "Nothing is free right now, so the preview shows the next one.",
 				"failed": "Could not draw the preview.",
 				"unknownRole": "unknown role"
-			},
-			"sample": {
-				"game": "Game name",
-				"until": "the end of the offer",
-				"url": "store link"
 			}
 		},
 		"customCommands": {
@@ -3146,21 +3139,13 @@
 						"label": "Roles to mention",
 						"description": "Roles notified when a game goes free"
 					},
+					"pingEveryone": {
+						"label": "Mention @everyone",
+						"description": "Notifies the whole server with each game"
+					},
 					"showUpcoming": {
 						"label": "Show what comes next",
-						"description": "Adds a line with the next free games when the store has announced them"
-					},
-					"message": {
-						"label": "Message",
-						"description": "The line sent for each game when the card is off"
-					},
-					"useEmbed": {
-						"label": "Send as a card",
-						"description": "Posts one card per game, with the store picture"
-					},
-					"embed": {
-						"label": "Card",
-						"description": "The card sent for each free game"
+						"description": "Adds the next free games to the card when the store has announced them"
 					}
 				}
 			},

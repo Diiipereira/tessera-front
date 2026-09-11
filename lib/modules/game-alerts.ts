@@ -1,8 +1,7 @@
-import { toEmbedDraft as fromApiEmbed, type ApiEmbedDto } from '@/lib/modules/log-preview';
-import { toEmbedDraft } from '@/lib/modules/welcome';
+import { toEmbedDraft, type ApiEmbedDto } from '@/lib/modules/log-preview';
 import type { ChannelKind } from '@/lib/types/discord';
 import type { GameAlertsConfig, GameStoreId } from '@/lib/types/module-configs';
-import type { EmbedDraft, MessageDraft, MessageVariable } from '@/lib/types/modules';
+import type { MessageDraft, MessageVariable } from '@/lib/types/modules';
 
 export const GAME_STORES: readonly GameStoreId[] = ['epic'];
 
@@ -12,48 +11,45 @@ export const GAME_ALERT_CHANNEL_KINDS: readonly ChannelKind[] = ['text', 'announ
 
 export const GAME_ALERT_PING_ROLES_MAX = 5;
 
+const EVERYONE = '@everyone';
+
 export type GameAlertDraftBody = {
 	stores: GameStoreId[];
 	pingRoleIds: string[];
+	pingEveryone: boolean;
 	showUpcoming: boolean;
-	message: string | null;
-	useEmbed: boolean;
-	embed: EmbedDraft;
-};
-
-export type OfferSample = {
-	title: string;
-	url: string;
-	endsAt: string;
-};
-
-export type VariableFallback = {
-	game: string;
-	until: string;
-	url: string;
 };
 
 export type TokenWords = {
 	roleName: (id: string) => string | null;
 	unknownRole: string;
 	absolute: (at: Date) => string;
-	relative: (at: Date) => string;
+};
+
+export type PreviewLink = {
+	label: string;
+	url: string;
 };
 
 export type PreviewShape = {
 	message: MessageDraft;
 	lead: string;
-	more: EmbedDraft[];
+	links: PreviewLink[];
+	nextUpAt: Date | null;
 };
 
-type PreviewBody = {
+type PreviewText = {
 	content: string;
 	embeds: ApiEmbedDto[];
 };
 
+type PreviewBody = PreviewText & {
+	components: { components: PreviewLink[] }[];
+};
+
 const ROLE_MENTION = /<@&(\d+)>/gu;
 
-const MOMENT = /<t:(\d+):([fR])>/gu;
+const MOMENT = /<t:(\d+):f>/gu;
 
 const isStore = (value: unknown): value is GameStoreId =>
 	GAME_STORES.some((store) => store === value);
@@ -61,10 +57,10 @@ const isStore = (value: unknown): value is GameStoreId =>
 const asIds = (value: unknown): string[] =>
 	Array.isArray(value) ? value.filter((entry): entry is string => typeof entry === 'string') : [];
 
-export function toGameAlertsConfig(
-	state: { enabled: boolean; config: Record<string, unknown> },
-	defaultColor?: string
-): GameAlertsConfig {
+export function toGameAlertsConfig(state: {
+	enabled: boolean;
+	config: Record<string, unknown>;
+}): GameAlertsConfig {
 	const { config } = state;
 
 	return {
@@ -72,25 +68,16 @@ export function toGameAlertsConfig(
 		channelId: typeof config.channelId === 'string' ? config.channelId : null,
 		stores: Array.isArray(config.stores) ? config.stores.filter(isStore) : [...GAME_STORES],
 		pingRoleIds: asIds(config.pingRoleIds),
-		showUpcoming: config.showUpcoming !== false,
-		message: {
-			mode: config.useEmbed === false ? 'text' : 'embed',
-			text: typeof config.message === 'string' ? config.message : '',
-			embed: toEmbedDraft(config.embed, defaultColor)
-		}
+		pingEveryone: config.pingEveryone === true,
+		showUpcoming: config.showUpcoming !== false
 	};
 }
-
-const lineOf = (message: MessageDraft): string | null =>
-	message.text.trim() === '' ? null : message.text;
 
 export const toPreviewBody = (config: GameAlertsConfig): GameAlertDraftBody => ({
 	stores: config.stores,
 	pingRoleIds: config.pingRoleIds,
-	showUpcoming: config.showUpcoming,
-	message: lineOf(config.message),
-	useEmbed: config.message.mode === 'embed',
-	embed: config.message.embed
+	pingEveryone: config.pingEveryone,
+	showUpcoming: config.showUpcoming
 });
 
 export const toGameAlertsPatch = (config: GameAlertsConfig): Record<string, unknown> => ({
@@ -111,32 +98,12 @@ export const toggleStore = (
 	return GAME_STORES.filter((one) => chosen.has(one));
 };
 
-export const isBlankEmbed = (embed: EmbedDraft): boolean =>
-	embed.authorName.trim() === '' &&
-	embed.title.trim() === '' &&
-	embed.description.trim() === '' &&
-	embed.fields.length === 0 &&
-	embed.imageUrl.trim() === '';
-
-export function gameAlertVariables(
-	sample: OfferSample | null,
-	fallback: VariableFallback,
-	formatUntil: (at: Date) => string
-): MessageVariable[] {
-	return [
-		{ token: '{game}', key: 'game', sample: sample?.title ?? fallback.game },
-		{ token: '{store}', key: 'store', sample: STORE_NAMES.epic },
-		{
-			token: '{until}',
-			key: 'until',
-			sample: sample === null ? fallback.until : formatUntil(new Date(sample.endsAt))
-		},
-		{ token: '{url}', key: 'url', sample: sample?.url ?? fallback.url }
-	];
-}
-
 export function discordTokens(text: string, words: TokenWords): MessageVariable[] {
 	const found = new Map<string, MessageVariable>();
+
+	if (text.includes(EVERYONE)) {
+		found.set(EVERYONE, { token: EVERYONE, key: 'everyone', sample: EVERYONE });
+	}
 
 	for (const match of text.matchAll(ROLE_MENTION)) {
 		const id = match[1] ?? '';
@@ -150,19 +117,18 @@ export function discordTokens(text: string, words: TokenWords): MessageVariable[
 
 	for (const match of text.matchAll(MOMENT)) {
 		const seconds = match[1] ?? '0';
-		const at = new Date(Number(seconds) * 1000);
 
 		found.set(match[0], {
 			token: match[0],
-			key: `moment.${seconds}.${match[2] ?? ''}`,
-			sample: match[2] === 'R' ? words.relative(at) : words.absolute(at)
+			key: `moment.${seconds}`,
+			sample: words.absolute(new Date(Number(seconds) * 1000))
 		});
 	}
 
 	return [...found.values()];
 }
 
-export const previewTextOf = (preview: PreviewBody): string =>
+export const previewTextOf = (preview: PreviewText): string =>
 	[
 		preview.content,
 		...preview.embeds.flatMap((embed) => [
@@ -172,20 +138,17 @@ export const previewTextOf = (preview: PreviewBody): string =>
 		])
 	].join('\n');
 
-export function previewShape(preview: PreviewBody): PreviewShape {
-	const [first, ...rest] = preview.embeds;
+export function previewShape(preview: PreviewBody): PreviewShape | null {
+	const [card] = preview.embeds;
 
-	if (first === undefined) {
-		return {
-			message: { mode: 'text', text: preview.content, embed: fromApiEmbed({}) },
-			lead: '',
-			more: []
-		};
-	}
+	if (card === undefined) return null;
 
 	return {
-		message: { mode: 'embed', text: '', embed: fromApiEmbed(first) },
+		message: { mode: 'embed', text: '', embed: toEmbedDraft(card) },
 		lead: preview.content,
-		more: rest.map(fromApiEmbed)
+		links: preview.components.flatMap((row) =>
+			row.components.map(({ label, url }) => ({ label, url }))
+		),
+		nextUpAt: card.timestamp === undefined ? null : new Date(card.timestamp)
 	};
 }

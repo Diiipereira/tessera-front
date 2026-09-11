@@ -13,11 +13,11 @@ type DiscordPreviewProps = {
 	message: MessageDraft;
 	variables: MessageVariable[];
 	timestampLabel?: string;
+	embedTimestampLabel?: string | null;
 	botName?: string;
 	botAvatarUrl?: string | null;
 	footer?: ReactNode;
 	lead?: string;
-	moreEmbeds?: EmbedDraft[];
 };
 
 const initialsOf = (name: string): string => name.slice(0, 2).toUpperCase();
@@ -199,11 +199,11 @@ export function DiscordPreview({
 	message,
 	variables,
 	timestampLabel,
+	embedTimestampLabel,
 	botName,
 	botAvatarUrl,
 	footer,
-	lead = '',
-	moreEmbeds = []
+	lead = ''
 }: DiscordPreviewProps) {
 	const t = useTranslations('modules.preview');
 	const shown = botName === undefined || botName === '' ? BRAND.botName : botName;
@@ -269,11 +269,8 @@ export function DiscordPreview({
 							{t('embedEmpty')}
 						</div>
 					) : (
-						<div className="mt-1 flex flex-col gap-1">
-							<EmbedCard embed={embed} variables={variables} stamp={stamp} />
-							{moreEmbeds.map((extra, index) => (
-								<EmbedCard key={index} embed={extra} variables={variables} stamp={stamp} />
-							))}
+						<div className="mt-1">
+							<EmbedCard embed={embed} variables={variables} stamp={embedTimestampLabel ?? stamp} />
 						</div>
 					)}
 

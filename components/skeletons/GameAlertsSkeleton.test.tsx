@@ -27,14 +27,10 @@ function renderBoth() {
 	const page = render(
 		<GameAlertsScreen
 			guildId="931562055025168435"
-			config={toGameAlertsConfig({ enabled: false, config: {} }, '#5865f2')}
-			defaultColor="#5865f2"
+			config={toGameAlertsConfig({ enabled: false, config: {} })}
 			version={0}
 			channels={[]}
 			roles={[]}
-			botName="Tessera Dev"
-			botAvatarUrl={null}
-			now="2026-09-11T12:00:00.000Z"
 		/>,
 		{ wrapper: Translated }
 	).container;
@@ -55,19 +51,12 @@ describe('GameAlertsSkeleton', () => {
 		expect(boxes(skeleton, 'h-5', 'w-9')).toBe(within(page).getAllByRole('switch').length);
 	});
 
-	it('opens on the embed builder, because a new guild has the card on', () => {
+	it('draws no text box, because the screen has nothing to write in', () => {
 		const { skeleton, page } = renderBoth();
 
-		expect(page.querySelectorAll('input[type="color"]')).toHaveLength(1);
-		expect(boxes(skeleton, 'size-9')).toBe(1);
-	});
-
-	it('draws one chip per variable the composer offers', () => {
-		const { skeleton, page } = renderBoth();
-
-		expect(boxes(skeleton, 'h-6', 'rounded-sm')).toBe(
-			within(page).getAllByRole('button', { name: /^\{\w+\}$/u }).length
-		);
+		expect(within(page).queryAllByRole('textbox')).toEqual([]);
+		expect(boxes(skeleton, 'h-28')).toBe(0);
+		expect(boxes(skeleton, 'h-24')).toBe(0);
 	});
 
 	it('waits for the preview with the same card the route skeleton draws', () => {
@@ -75,5 +64,12 @@ describe('GameAlertsSkeleton', () => {
 
 		expect(boxes(page, 'h-40')).toBe(1);
 		expect(boxes(skeleton, 'h-40')).toBe(1);
+	});
+
+	it('keeps room for the claim button under the card, so the preview does not grow when it loads', () => {
+		const { skeleton, page } = renderBoth();
+
+		expect(boxes(page, 'h-8', 'w-56')).toBe(1);
+		expect(boxes(skeleton, 'h-8', 'w-56')).toBe(1);
 	});
 });

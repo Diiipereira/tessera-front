@@ -154,30 +154,50 @@ describe('the face on the preview', () => {
 	});
 });
 
-describe('DiscordPreview with text above several cards', () => {
-	const cards = (lead: string) =>
+describe('DiscordPreview with text above the card', () => {
+	it('shows the text Discord puts above the card, and the card', () => {
 		render(
 			<DiscordPreview
 				message={embedDraft({ title: 'Luftrausers' })}
-				lead={lead}
-				moreEmbeds={[{ ...emptyEmbedDraft(), title: 'Astral Ascent' }]}
+				lead="@Gamers"
 				variables={variables}
 			/>,
 			{ wrapper: Translated }
 		);
 
-	it('shows the text Discord puts above the cards, and every card', () => {
-		cards('Next up: Mindcop');
-
-		expect(screen.getByText('Next up: Mindcop')).toBeInTheDocument();
+		expect(screen.getByText('@Gamers')).toBeInTheDocument();
 		expect(screen.getByText('Luftrausers')).toBeInTheDocument();
-		expect(screen.getByText('Astral Ascent')).toBeInTheDocument();
 	});
 
-	it('draws a single card exactly as before when nobody passes more', () => {
+	it('draws the card alone, exactly as before, when nobody passes a lead', () => {
 		show(embedDraft({ title: 'Only one' }));
 
 		expect(screen.getByText('Only one')).toBeInTheDocument();
-		expect(screen.queryByText('Astral Ascent')).not.toBeInTheDocument();
+		expect(screen.queryByText('@Gamers')).not.toBeInTheDocument();
+	});
+});
+
+describe('the time in the footer of the card', () => {
+	const stamped = embedDraft({
+		title: 'Luftrausers',
+		footerText: 'Next up: Mindcop',
+		timestamp: true
+	});
+
+	it('shows the moment the screen names, when the card dates something other than the message', () => {
+		render(
+			<DiscordPreview message={stamped} variables={[]} embedTimestampLabel="9/17/26, 12:00 PM" />,
+			{ wrapper: Translated }
+		);
+
+		expect(screen.getByText('Next up: Mindcop • 9/17/26, 12:00 PM')).toBeInTheDocument();
+	});
+
+	it('shows the time of the message, as before, when the screen names none', () => {
+		render(<DiscordPreview message={stamped} variables={[]} timestampLabel="Today at 14:32" />, {
+			wrapper: Translated
+		});
+
+		expect(screen.getByText('Next up: Mindcop • Today at 14:32')).toBeInTheDocument();
 	});
 });

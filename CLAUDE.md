@@ -861,20 +861,19 @@ abaixo dela tem `loading.tsx`. `(shell)` e `modules` saem da segunda regra por c
 filhas e usam `<Suspense>`; `billing` é a única exceção declarada, numa lista que o próprio teste
 confere.
 
-**O skeleton desenhava o modo texto, e a tela abre no embed.** É a regra do welcome no sentido
-contrário: o padrão da API para jogos grátis é `useEmbed: true`, então desenhar o modo padrão é
-desenhar o construtor de embed. E o ramo `embed` do `ComposerSkeleton` estava velho diante do
-`MessageComposer` — dois cards de campo que um rascunho vazio nunca tem, e nada de cor, miniatura e
-rodapé. Ele agora é o rascunho vazio, que é como os dois usuários dele abrem (jogos grátis e o
-ateliê de embeds), e o `chips` diz quantas variáveis a tela oferece — o ateliê não tem nenhuma,
-então a fileira some. O `GameAlertsSkeleton.test` prende o que muda a altura: painéis, switches, a
-amostra de cor e os chips, contados na tela real.
+**O skeleton desenhava o modo texto, e a tela abria no embed.** Corrigido em 11/09/2026 e, no mesmo
+dia, o compositor saiu da tela: o card dos jogos grátis ficou fixo. O que a correção deixou foi o
+ramo `embed` do `ComposerSkeleton`, que estava velho diante do `MessageComposer` — dois cards de
+campo que um rascunho vazio nunca tem, e nada de cor, miniatura e rodapé. Ele agora é o rascunho
+vazio, que é como o ateliê de embeds abre, e o `chips` diz quantas variáveis a tela oferece — o
+ateliê não tem nenhuma, então a fileira some. O `GameAlertsSkeleton.test` prende o que muda a
+altura: painéis, switches, a ausência de caixa de texto e o card da prévia, contados na tela real.
 
 **`DiscordPreviewSkeleton` é a mensagem sozinha, sem o rótulo e a legenda do `PreviewSkeleton`.** O
 aside dos jogos grátis não tem nenhum dos dois, e a tela esperava a prévia da API com o quadro
 genérico de três linhas antes de receber um card com imagem de 160px. O skeleton da rota e a tela
-usam a mesma peça, com o card quando o rascunho está em embed. Nada disso foi medido no navegador:
-as alturas saem somadas das classes, pelo mesmo motivo do welcome.
+usam a mesma peça, com o card. Nada disso foi medido no navegador: as alturas saem somadas das
+classes, pelo mesmo motivo do welcome.
 
 ## Typed routes
 
@@ -1486,27 +1485,44 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 <!-- END:nextjs-agent-rules -->
 
-## Jogos grátis: o que a tela nova mudou nas peças compartilhadas
+## Jogos grátis: o que a tela mudou nas peças compartilhadas
 
-**A prévia do Discord ganhou texto acima dos cards e mais de um card.** O anúncio de jogos grátis tem
-cargos mencionados e a linha "A seguir" no conteúdo **mais** um card por jogo. O `DiscordPreview`
-escondia o texto em modo embed e desenhava um card só. O card virou o `EmbedCard` interno, e duas props
-opcionais — `lead` e `moreEmbeds` — cobrem o caso. Sem elas o componente desenha exatamente o que
-desenhava, e há teste que confere isso.
+**O card é fixo, e por isso a tela não tem compositor.** Em 11/09/2026 o card personalizado saiu: o
+dono quer o layout padrão sempre — nome Tessera Gaming, borda azul, um jogo por mensagem.
+`message`, `useEmbed` e `embed` saíram do registry e da tela, e config antiga com essas chaves continua
+abrindo, porque o `toGameAlertsConfig` só lê o que declara. Os chips `{game}` `{store}` `{until}` `{url}`
+saíram junto, com os rótulos deles em `modules.variables.tokens`. O módulo tem id `game-alerts` com
+hífen — o mesmo formato de `reaction-roles` —, com o dicionário da tela em `modules.gameAlerts`.
+
+**Quem assina a prévia é a API, não o apelido do bot.** O anúncio sai por um webhook com o nome
+Tessera Gaming e a foto do Tessera, então a tela não lê mais `botNickname` e `botAvatarUrl` das
+Configurações, e o `page.tsx` deixou de buscar `/settings`. O `POST /game-alerts/preview` devolve
+`sender` com nome e foto, e é isso que vai no topo da prévia. Quando o canal não tem webhook, o anúncio
+sai com o nome do bot, e o teste devolve `sent-as-bot` para a tela avisar em vez de dizer que deu certo.
+
+**A prévia do Discord ganhou texto acima do card e uma data própria no rodapé.** O anúncio tem as
+menções no conteúdo e um card, e o `DiscordPreview` escondia o texto em modo embed: a prop `lead` cobre
+o caso. O rodapé do card sempre repetia a hora da mensagem; o "A seguir" data os próximos jogos, e a
+prop `embedTimestampLabel` troca só essa data. Sem as duas props o componente desenha exatamente o que
+desenhava, e há teste que confere isso. A `moreEmbeds` saiu junto com a mensagem de vários cards.
 
 **A prévia da tela vem da API, não do cliente.** `POST /guilds/:id/game-alerts/preview` devolve o corpo
-montado pelo mesmo código que publica, com o jogo real da semana — a mesma regra da prévia do registro.
-As marcas do Discord que sobram no corpo (`<@&id>`, `<t:…:f>`, `<t:…:R>`) viram variáveis de prévia pelo
-`discordTokens`, que nomeia o cargo pela lista de cargos da guild e formata a data no idioma de quem
-olha. O `previewVariables` do registro só entende `:R`, e por isso não serviu.
+da primeira mensagem, montado pelo mesmo código que publica, com o jogo real da semana — a mesma regra
+da prévia do registro —, mais o `spacingMinutes` que a tela usa para dizer o intervalo entre as
+mensagens sem copiar a constante, e os `components` com o botão de resgatar. As marcas do Discord que
+sobram no corpo (`@everyone`, `<@&id>`, `<t:…:f>`) viram variáveis de prévia pelo `discordTokens`, que
+nomeia o cargo pela lista de cargos da guild, pinta o @everyone como menção e formata a data no idioma
+de quem olha. O `previewVariables` do registro só entende `:R`, e por isso não serviu.
+
+**O card não tem markdown nem link no nome.** `**negrito**` e `[texto](url)` apareciam crus na prévia
+enquanto o Discord os desenhava, e o nome do jogo como link azul não dizia que era clicável. O link virou
+um botão de link embaixo do card, que a prévia desenha como `<a>` e que abre a loja de verdade; o "A
+seguir" virou o rodapé, a única linha que o Discord desenha embaixo da imagem. O skeleton guarda a
+altura do botão (`DiscordPreviewSkeleton link`), senão a prévia cresce quando carrega. Há teste no
+bot-api que falha se `**` ou `](` voltarem.
 
 **O wizard de setup oferece só o módulo que ele sabe ligar.** Ele listava todo módulo com tela, cada um
 com uma caixa de marcar; marcar "Jogos grátis" mandaria `enabled: true` sem canal, e o canal é
 obrigatório — 400 garantido. O `toSetupModules` agora deixa de fora o módulo que ainda não está
 `configured`, exceto os que o próprio wizard configura (`ASKED_BY_THE_WIZARD`, hoje só o welcome). Um
 módulo futuro com campo obrigatório cai na mesma regra sem mexer no wizard.
-
-**Os chips `{game}` `{store}` `{until}` `{url}` usam o jogo da semana como exemplo.** Sem jogo, caem nas
-palavras do dicionário. O rótulo de cada chip mora em `modules.variables.tokens`, e o módulo tem id
-`game-alerts` com hífen — o mesmo formato de `reaction-roles` —, com o dicionário da tela em
-`modules.gameAlerts`.
